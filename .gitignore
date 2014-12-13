@@ -1,0 +1,5 @@
+.idea
+*.iml
+node_modules/
+coverage/
+shift-parser.js

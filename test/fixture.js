@@ -14,479 +14,466 @@
  * limitations under the License.
  */
 
-var expect = require('expect.js');
-var esprima = require('esprima');
-var converters = require('shift-spidermonkey-converter');
-var ShiftParser = require('../');
+var assertEsprimaEquiv = require('./assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
-  var parse = ShiftParser.default;
-
   describe("basic fixture", function () {
-    function testParsing(name, source) {
-      it(name, function () {
-        var tree = parse(source);
-        var oracle = converters.toShift(esprima.parse(source));
-        expect(tree).eql(oracle);
-      });
-    }
-
     // Unicode
-    testParsing("unicode/00", "日本語 = []");
-    testParsing("unicode/01", "T\u203F = []");
-    testParsing("unicode/02", "T\u200C = []");
-    testParsing("unicode/03", "T\u200D = []");
-    testParsing("unicode/04", "\u2163\u2161 = []");
-    testParsing("unicode/05", "\u2163\u2161\u200A=\u2009[]");
+    assertEsprimaEquiv("unicode/00", "日本語 = []");
+    assertEsprimaEquiv("unicode/01", "T\u203F = []");
+    assertEsprimaEquiv("unicode/02", "T\u200C = []");
+    assertEsprimaEquiv("unicode/03", "T\u200D = []");
+    assertEsprimaEquiv("unicode/04", "\u2163\u2161 = []");
+    assertEsprimaEquiv("unicode/05", "\u2163\u2161\u200A=\u2009[]");
 
     // Comments
-    testParsing("comments/00", "/* block comment */ 42");
-    testParsing("comments/01", "42 /* block comment 1 */ /* block comment 2 */");
-    testParsing("comments/02", "(a + /* assignment */b ) * c");
-    testParsing("comments/03", "/* assignment */\n a = b");
-    testParsing("comments/04", "42 /*The*/ /*Answer*/");
-    testParsing("comments/05", "42 /*the*/ /*answer*/");
-    testParsing("comments/06", "42 /* the * answer */");
-    testParsing("comments/07", "42 /* The * answer */");
-    testParsing("comments/08", "/* multiline\ncomment\nshould\nbe\nignored */ 42");
-    testParsing("comments/09", "/*a\r\nb*/ 42");
-    testParsing("comments/10", "/*a\rb*/ 42");
-    testParsing("comments/11", "/*a\nb*/ 42");
-    testParsing("comments/12", "/*a\nc*/ 42");
-    testParsing("comments/13", "// line comment\n42");
-    testParsing("comments/14", "42 // line comment");
-    testParsing("comments/15", "// Hello, world!\n42");
-    testParsing("comments/16", "// Hello, world!\n");
-    testParsing("comments/17", "// Hallo, world!\n");
-    testParsing("comments/18", "//\n42");
-    testParsing("comments/19", "//");
-    testParsing("comments/20", "// ");
-    testParsing("comments/21", "/**/42");
-    testParsing("comments/22", "42/**/");
-    testParsing("comments/23", "// Hello, world!\n\n//   Another hello\n42");
-    testParsing("comments/24", "if (x) { doThat() // Some comment\n }");
-    testParsing("comments/25", "if (x) { // Some comment\ndoThat(); }");
-    testParsing("comments/26", "if (x) { /* Some comment */ doThat() }");
-    testParsing("comments/27", "if (x) { doThat() /* Some comment */ }");
-    testParsing("comments/28", "switch (answer) { case 42: /* perfect */ bingo() }");
-    testParsing("comments/29", "switch (answer) { case 42: bingo() /* perfect */ }");
-    testParsing("comments/30", "/* header */ (function(){ var version = 1; }).call(this)");
-    testParsing("comments/31", "(function(){ var version = 1; /* sync */ }).call(this)");
-    testParsing("comments/32", "function f() { /* infinite */ while (true) { } /* bar */ var each; }");
-    testParsing("comments/33", "<!-- foo");
-    testParsing("comments/34", "var x = 1<!--foo");
-    testParsing("comments/35", "--> comment");
-    testParsing("comments/36", "<!-- comment");
-    testParsing("comments/37", " \t --> comment");
-    testParsing("comments/38", " \t /* block comment */  --> comment");
-    testParsing("comments/39", "/* block comment */--> comment");
-    testParsing("comments/40", "/* not comment*/; i-->0");
-    testParsing("comments/41", "while (i-->0) {}");
+    assertEsprimaEquiv("comments/00", "/* block comment */ 42");
+    assertEsprimaEquiv("comments/01", "42 /* block comment 1 */ /* block comment 2 */");
+    assertEsprimaEquiv("comments/02", "(a + /* assignment */b ) * c");
+    assertEsprimaEquiv("comments/03", "/* assignment */\n a = b");
+    assertEsprimaEquiv("comments/04", "42 /*The*/ /*Answer*/");
+    assertEsprimaEquiv("comments/05", "42 /*the*/ /*answer*/");
+    assertEsprimaEquiv("comments/06", "42 /* the * answer */");
+    assertEsprimaEquiv("comments/07", "42 /* The * answer */");
+    assertEsprimaEquiv("comments/08", "/* multiline\ncomment\nshould\nbe\nignored */ 42");
+    assertEsprimaEquiv("comments/09", "/*a\r\nb*/ 42");
+    assertEsprimaEquiv("comments/10", "/*a\rb*/ 42");
+    assertEsprimaEquiv("comments/11", "/*a\nb*/ 42");
+    assertEsprimaEquiv("comments/12", "/*a\nc*/ 42");
+    assertEsprimaEquiv("comments/13", "// line comment\n42");
+    assertEsprimaEquiv("comments/14", "42 // line comment");
+    assertEsprimaEquiv("comments/15", "// Hello, world!\n42");
+    assertEsprimaEquiv("comments/16", "// Hello, world!\n");
+    assertEsprimaEquiv("comments/17", "// Hallo, world!\n");
+    assertEsprimaEquiv("comments/18", "//\n42");
+    assertEsprimaEquiv("comments/19", "//");
+    assertEsprimaEquiv("comments/20", "// ");
+    assertEsprimaEquiv("comments/21", "/**/42");
+    assertEsprimaEquiv("comments/22", "42/**/");
+    assertEsprimaEquiv("comments/23", "// Hello, world!\n\n//   Another hello\n42");
+    assertEsprimaEquiv("comments/24", "if (x) { doThat() // Some comment\n }");
+    assertEsprimaEquiv("comments/25", "if (x) { // Some comment\ndoThat(); }");
+    assertEsprimaEquiv("comments/26", "if (x) { /* Some comment */ doThat() }");
+    assertEsprimaEquiv("comments/27", "if (x) { doThat() /* Some comment */ }");
+    assertEsprimaEquiv("comments/28", "switch (answer) { case 42: /* perfect */ bingo() }");
+    assertEsprimaEquiv("comments/29", "switch (answer) { case 42: bingo() /* perfect */ }");
+    assertEsprimaEquiv("comments/30", "/* header */ (function(){ var version = 1; }).call(this)");
+    assertEsprimaEquiv("comments/31", "(function(){ var version = 1; /* sync */ }).call(this)");
+    assertEsprimaEquiv("comments/32", "function f() { /* infinite */ while (true) { } /* bar */ var each; }");
+    assertEsprimaEquiv("comments/33", "<!-- foo");
+    assertEsprimaEquiv("comments/34", "var x = 1<!--foo");
+    assertEsprimaEquiv("comments/35", "--> comment");
+    assertEsprimaEquiv("comments/36", "<!-- comment");
+    assertEsprimaEquiv("comments/37", " \t --> comment");
+    assertEsprimaEquiv("comments/38", " \t /* block comment */  --> comment");
+    assertEsprimaEquiv("comments/39", "/* block comment */--> comment");
+    assertEsprimaEquiv("comments/40", "/* not comment*/; i-->0");
+    assertEsprimaEquiv("comments/41", "while (i-->0) {}");
 
     // Primary Expression
-    testParsing("expression/primary/00", "this\n");
-    testParsing("expression/primary/01", "null\n");
-    testParsing("expression/primary/02", "\n    42\n\n");
-    testParsing("expression/primary/03", "(1 + 2 ) * 3");
+    assertEsprimaEquiv("expression/primary/00", "this\n");
+    assertEsprimaEquiv("expression/primary/01", "null\n");
+    assertEsprimaEquiv("expression/primary/02", "\n    42\n\n");
+    assertEsprimaEquiv("expression/primary/03", "(1 + 2 ) * 3");
 
     // Grouping Operator
-    testParsing("expression/grouping/00", "(1) + (2  ) + 3");
-    testParsing("expression/grouping/01", "4 + 5 << (6)");
+    assertEsprimaEquiv("expression/grouping/00", "(1) + (2  ) + 3");
+    assertEsprimaEquiv("expression/grouping/01", "4 + 5 << (6)");
 
     // Array Initializer
-    testParsing("expression/array/00", "x = []");
-    testParsing("expression/array/01", "x = [ ]");
-    testParsing("expression/array/02", "x = [ 42 ]");
-    testParsing("expression/array/03", "x = [ 42, ]");
-    testParsing("expression/array/04", "x = [ ,, 42 ]");
-    testParsing("expression/array/05", "x = [ 1, 2, 3, ]");
-    testParsing("expression/array/06", "x = [ 1, 2,, 3, ]");
+    assertEsprimaEquiv("expression/array/00", "x = []");
+    assertEsprimaEquiv("expression/array/01", "x = [ ]");
+    assertEsprimaEquiv("expression/array/02", "x = [ 42 ]");
+    assertEsprimaEquiv("expression/array/03", "x = [ 42, ]");
+    assertEsprimaEquiv("expression/array/04", "x = [ ,, 42 ]");
+    assertEsprimaEquiv("expression/array/05", "x = [ 1, 2, 3, ]");
+    assertEsprimaEquiv("expression/array/06", "x = [ 1, 2,, 3, ]");
 
     // Object Initializer
-    testParsing("expression/object/00", "x = {}");
-    testParsing("expression/object/01", "x = { }");
-    testParsing("expression/object/02", "x = { answer: 42 }");
-    testParsing("expression/object/03", "x = { if: 42 }");
-    testParsing("expression/object/04", "x = { true: 42 }");
-    testParsing("expression/object/05", "x = { false: 42 }");
-    testParsing("expression/object/06", "x = { null: 42 }");
-    testParsing("expression/object/07", "x = { \"answer\": 42 }");
-    testParsing("expression/object/08", "x = { x: 1, x: 2 }");
-    testParsing("expression/object/09", "x = { get width() { return m_width } }");
-    testParsing("expression/object/10", "x = { get undef() {} }");
-    testParsing("expression/object/11", "x = { get if() {} }");
-    testParsing("expression/object/12", "x = { get true() {} }");
-    testParsing("expression/object/13", "x = { get false() {} }");
-    testParsing("expression/object/14", "x = { get null() {} }");
-    testParsing("expression/object/15", "x = { get \"undef\"() {} }");
-    testParsing("expression/object/16", "x = { get 10() {} }");
-    testParsing("expression/object/17", "x = { set width(w) { m_width = w } }");
-    testParsing("expression/object/18", "x = { set if(w) { m_if = w } }");
-    testParsing("expression/object/19", "x = { set true(w) { m_true = w } }");
-    testParsing("expression/object/20", "x = { set false(w) { m_false = w } }");
-    testParsing("expression/object/21", "x = { set null(w) { m_null = w } }");
-    testParsing("expression/object/22", "x = { set \"null\"(w) { m_null = w } }");
-    testParsing("expression/object/23", "x = { set 10(w) { m_null = w } }");
-    testParsing("expression/object/24", "x = { get: 42 }");
-    testParsing("expression/object/25", "x = { set: 43 }");
-    testParsing("expression/object/26", "x = { __proto__: 2 }");
-    testParsing("expression/object/27", "x = {\"__proto__\": 2 }");
-    testParsing("expression/object/28",
+    assertEsprimaEquiv("expression/object/00", "x = {}");
+    assertEsprimaEquiv("expression/object/01", "x = { }");
+    assertEsprimaEquiv("expression/object/02", "x = { answer: 42 }");
+    assertEsprimaEquiv("expression/object/03", "x = { if: 42 }");
+    assertEsprimaEquiv("expression/object/04", "x = { true: 42 }");
+    assertEsprimaEquiv("expression/object/05", "x = { false: 42 }");
+    assertEsprimaEquiv("expression/object/06", "x = { null: 42 }");
+    assertEsprimaEquiv("expression/object/07", "x = { \"answer\": 42 }");
+    assertEsprimaEquiv("expression/object/08", "x = { x: 1, x: 2 }");
+    assertEsprimaEquiv("expression/object/09", "x = { get width() { return m_width } }");
+    assertEsprimaEquiv("expression/object/10", "x = { get undef() {} }");
+    assertEsprimaEquiv("expression/object/11", "x = { get if() {} }");
+    assertEsprimaEquiv("expression/object/12", "x = { get true() {} }");
+    assertEsprimaEquiv("expression/object/13", "x = { get false() {} }");
+    assertEsprimaEquiv("expression/object/14", "x = { get null() {} }");
+    assertEsprimaEquiv("expression/object/15", "x = { get \"undef\"() {} }");
+    assertEsprimaEquiv("expression/object/16", "x = { get 10() {} }");
+    assertEsprimaEquiv("expression/object/17", "x = { set width(w) { m_width = w } }");
+    assertEsprimaEquiv("expression/object/18", "x = { set if(w) { m_if = w } }");
+    assertEsprimaEquiv("expression/object/19", "x = { set true(w) { m_true = w } }");
+    assertEsprimaEquiv("expression/object/20", "x = { set false(w) { m_false = w } }");
+    assertEsprimaEquiv("expression/object/21", "x = { set null(w) { m_null = w } }");
+    assertEsprimaEquiv("expression/object/22", "x = { set \"null\"(w) { m_null = w } }");
+    assertEsprimaEquiv("expression/object/23", "x = { set 10(w) { m_null = w } }");
+    assertEsprimaEquiv("expression/object/24", "x = { get: 42 }");
+    assertEsprimaEquiv("expression/object/25", "x = { set: 43 }");
+    assertEsprimaEquiv("expression/object/26", "x = { __proto__: 2 }");
+    assertEsprimaEquiv("expression/object/27", "x = {\"__proto__\": 2 }");
+    assertEsprimaEquiv("expression/object/28",
         "x = { get width() { return m_width }, set width(width) { m_width = width; } }");
 
     // Numeric Literals
-    testParsing("expression/numeric/00", "0");
-    testParsing("expression/numeric/01", "3");
-    testParsing("expression/numeric/02", "5");
-    testParsing("expression/numeric/03", "42");
-    testParsing("expression/numeric/04", ".14");
-    testParsing("expression/numeric/05", "3.14159");
-    testParsing("expression/numeric/06", "6.02214179e+23");
-    testParsing("expression/numeric/07", "1.492417830e-10");
-    testParsing("expression/numeric/08", "0x0");
-    testParsing("expression/numeric/09", "0x0;");
-    testParsing("expression/numeric/10", "0e+100 ");
-    testParsing("expression/numeric/11", "0e+100");
-    testParsing("expression/numeric/12", "0xabc");
-    testParsing("expression/numeric/13", "0xdef");
-    testParsing("expression/numeric/14", "0X1A");
-    testParsing("expression/numeric/15", "0x10");
-    testParsing("expression/numeric/16", "0x100");
-    testParsing("expression/numeric/17", "0X04");
-    testParsing("expression/numeric/18", "02");
-    testParsing("expression/numeric/19", "012");
-    testParsing("expression/numeric/20", "0012");
+    assertEsprimaEquiv("expression/numeric/00", "0");
+    assertEsprimaEquiv("expression/numeric/01", "3");
+    assertEsprimaEquiv("expression/numeric/02", "5");
+    assertEsprimaEquiv("expression/numeric/03", "42");
+    assertEsprimaEquiv("expression/numeric/04", ".14");
+    assertEsprimaEquiv("expression/numeric/05", "3.14159");
+    assertEsprimaEquiv("expression/numeric/06", "6.02214179e+23");
+    assertEsprimaEquiv("expression/numeric/07", "1.492417830e-10");
+    assertEsprimaEquiv("expression/numeric/08", "0x0");
+    assertEsprimaEquiv("expression/numeric/09", "0x0;");
+    assertEsprimaEquiv("expression/numeric/10", "0e+100 ");
+    assertEsprimaEquiv("expression/numeric/11", "0e+100");
+    assertEsprimaEquiv("expression/numeric/12", "0xabc");
+    assertEsprimaEquiv("expression/numeric/13", "0xdef");
+    assertEsprimaEquiv("expression/numeric/14", "0X1A");
+    assertEsprimaEquiv("expression/numeric/15", "0x10");
+    assertEsprimaEquiv("expression/numeric/16", "0x100");
+    assertEsprimaEquiv("expression/numeric/17", "0X04");
+    assertEsprimaEquiv("expression/numeric/18", "02");
+    assertEsprimaEquiv("expression/numeric/19", "012");
+    assertEsprimaEquiv("expression/numeric/20", "0012");
 
     // String Literals
-    testParsing("expression/string/00", "\"Hello\"");
-    testParsing("expression/string/01", "\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"");
-    testParsing("expression/string/02", "\"\\u0061\"");
-    testParsing("expression/string/03", "\"\\x61\"");
-    testParsing("expression/string/04", "\"\\u00\"");
-    testParsing("expression/string/05", "\"\\xt\"");
-    testParsing("expression/string/06", "\"Hello\\nworld\"");
-    testParsing("expression/string/07", "\"Hello\\\nworld\"");
-    testParsing("expression/string/08", "\"Hello\\02World\"");
-    testParsing("expression/string/09", "\"Hello\\012World\"");
-    testParsing("expression/string/10", "\"Hello\\122World\"");
-    testParsing("expression/string/11", "\"Hello\\0122World\"");
-    testParsing("expression/string/12", "\"Hello\\312World\"");
-    testParsing("expression/string/13", "\"Hello\\412World\"");
-    testParsing("expression/string/14", "\"Hello\\812World\"");
-    testParsing("expression/string/15", "\"Hello\\712World\"");
-    testParsing("expression/string/16", "\"Hello\\0World\"");
-    testParsing("expression/string/17", "\"Hello\\\r\nworld\"");
-    testParsing("expression/string/18", "\"Hello\\1World\"");
+    assertEsprimaEquiv("expression/string/00", "\"Hello\"");
+    assertEsprimaEquiv("expression/string/01", "\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"");
+    assertEsprimaEquiv("expression/string/02", "\"\\u0061\"");
+    assertEsprimaEquiv("expression/string/03", "\"\\x61\"");
+    assertEsprimaEquiv("expression/string/04", "\"\\u00\"");
+    assertEsprimaEquiv("expression/string/05", "\"\\xt\"");
+    assertEsprimaEquiv("expression/string/06", "\"Hello\\nworld\"");
+    assertEsprimaEquiv("expression/string/07", "\"Hello\\\nworld\"");
+    assertEsprimaEquiv("expression/string/08", "\"Hello\\02World\"");
+    assertEsprimaEquiv("expression/string/09", "\"Hello\\012World\"");
+    assertEsprimaEquiv("expression/string/10", "\"Hello\\122World\"");
+    assertEsprimaEquiv("expression/string/11", "\"Hello\\0122World\"");
+    assertEsprimaEquiv("expression/string/12", "\"Hello\\312World\"");
+    assertEsprimaEquiv("expression/string/13", "\"Hello\\412World\"");
+    assertEsprimaEquiv("expression/string/14", "\"Hello\\812World\"");
+    assertEsprimaEquiv("expression/string/15", "\"Hello\\712World\"");
+    assertEsprimaEquiv("expression/string/16", "\"Hello\\0World\"");
+    assertEsprimaEquiv("expression/string/17", "\"Hello\\\r\nworld\"");
+    assertEsprimaEquiv("expression/string/18", "\"Hello\\1World\"");
 
     // Regular Expression Literals
-    testParsing("expression/regexp/00", "var x = /[a-z]/i");
-    testParsing("expression/regexp/01", "var x = /[x-z]/i");
-    testParsing("expression/regexp/02", "var x = /[a-c]/i");
-    testParsing("expression/regexp/03", "var x = /[P QR]/i");
-    testParsing("expression/regexp/04", "var x = /[\\]/]/");
-    testParsing("expression/regexp/05", "var x = /foo\\/bar/");
-    testParsing("expression/regexp/06", "var x = /=([^=\\s])+/g");
+    assertEsprimaEquiv("expression/regexp/00", "var x = /[a-z]/i");
+    assertEsprimaEquiv("expression/regexp/01", "var x = /[x-z]/i");
+    assertEsprimaEquiv("expression/regexp/02", "var x = /[a-c]/i");
+    assertEsprimaEquiv("expression/regexp/03", "var x = /[P QR]/i");
+    assertEsprimaEquiv("expression/regexp/04", "var x = /[\\]/]/");
+    assertEsprimaEquiv("expression/regexp/05", "var x = /foo\\/bar/");
+    assertEsprimaEquiv("expression/regexp/06", "var x = /=([^=\\s])+/g");
     // testParser("expression/regexp/07", "var x = /[P QR]/\\g");
-    testParsing("expression/regexp/08", "var x = /42/g.test");
+    assertEsprimaEquiv("expression/regexp/08", "var x = /42/g.test");
 
     // Left-Hand-Side Expression
-    testParsing("expression/lhs/00", "new Button");
-    testParsing("expression/lhs/01", "new Button()");
-    testParsing("expression/lhs/02", "new new foo");
-    testParsing("expression/lhs/03", "new new foo()");
-    testParsing("expression/lhs/04", "new foo().bar()");
-    testParsing("expression/lhs/05", "new foo[bar]");
-    testParsing("expression/lhs/06", "new foo.bar()");
-    testParsing("expression/lhs/07", "( new foo).bar()");
-    testParsing("expression/lhs/08", "foo(bar, baz)");
-    testParsing("expression/lhs/09", "(    foo  )()");
-    testParsing("expression/lhs/10", "universe.milkyway");
-    testParsing("expression/lhs/11", "universe.milkyway.solarsystem");
-    testParsing("expression/lhs/12", "universe.milkyway.solarsystem.Earth");
-    testParsing("expression/lhs/13", "universe[galaxyName, otherUselessName]");
-    testParsing("expression/lhs/14", "universe[galaxyName]");
-    testParsing("expression/lhs/15", "universe[42].galaxies");
-    testParsing("expression/lhs/16", "universe(42).galaxies");
-    testParsing("expression/lhs/17", "universe(42).galaxies(14, 3, 77).milkyway");
-    testParsing("expression/lhs/18", "earth.asia.Indonesia.prepareForElection(2014)");
-    testParsing("expression/lhs/19", "universe.if");
-    testParsing("expression/lhs/20", "universe.true");
-    testParsing("expression/lhs/21", "universe.false");
-    testParsing("expression/lhs/22", "universe.null");
+    assertEsprimaEquiv("expression/lhs/00", "new Button");
+    assertEsprimaEquiv("expression/lhs/01", "new Button()");
+    assertEsprimaEquiv("expression/lhs/02", "new new foo");
+    assertEsprimaEquiv("expression/lhs/03", "new new foo()");
+    assertEsprimaEquiv("expression/lhs/04", "new foo().bar()");
+    assertEsprimaEquiv("expression/lhs/05", "new foo[bar]");
+    assertEsprimaEquiv("expression/lhs/06", "new foo.bar()");
+    assertEsprimaEquiv("expression/lhs/07", "( new foo).bar()");
+    assertEsprimaEquiv("expression/lhs/08", "foo(bar, baz)");
+    assertEsprimaEquiv("expression/lhs/09", "(    foo  )()");
+    assertEsprimaEquiv("expression/lhs/10", "universe.milkyway");
+    assertEsprimaEquiv("expression/lhs/11", "universe.milkyway.solarsystem");
+    assertEsprimaEquiv("expression/lhs/12", "universe.milkyway.solarsystem.Earth");
+    assertEsprimaEquiv("expression/lhs/13", "universe[galaxyName, otherUselessName]");
+    assertEsprimaEquiv("expression/lhs/14", "universe[galaxyName]");
+    assertEsprimaEquiv("expression/lhs/15", "universe[42].galaxies");
+    assertEsprimaEquiv("expression/lhs/16", "universe(42).galaxies");
+    assertEsprimaEquiv("expression/lhs/17", "universe(42).galaxies(14, 3, 77).milkyway");
+    assertEsprimaEquiv("expression/lhs/18", "earth.asia.Indonesia.prepareForElection(2014)");
+    assertEsprimaEquiv("expression/lhs/19", "universe.if");
+    assertEsprimaEquiv("expression/lhs/20", "universe.true");
+    assertEsprimaEquiv("expression/lhs/21", "universe.false");
+    assertEsprimaEquiv("expression/lhs/22", "universe.null");
 
     // Postfix Expressions
-    testParsing("expression/postfix/00", "x++");
-    testParsing("expression/postfix/01", "x--");
-    testParsing("expression/postfix/02", "eval++");
-    testParsing("expression/postfix/03", "eval--");
-    testParsing("expression/postfix/04", "arguments++");
-    testParsing("expression/postfix/05", "arguments--");
+    assertEsprimaEquiv("expression/postfix/00", "x++");
+    assertEsprimaEquiv("expression/postfix/01", "x--");
+    assertEsprimaEquiv("expression/postfix/02", "eval++");
+    assertEsprimaEquiv("expression/postfix/03", "eval--");
+    assertEsprimaEquiv("expression/postfix/04", "arguments++");
+    assertEsprimaEquiv("expression/postfix/05", "arguments--");
 
     // Unary Operators
-    testParsing("expression/unary/00", "++x");
-    testParsing("expression/unary/01", "--x");
-    testParsing("expression/unary/02", "++eval");
-    testParsing("expression/unary/03", "--eval");
-    testParsing("expression/unary/04", "++arguments");
-    testParsing("expression/unary/05", "--arguments");
-    testParsing("expression/unary/06", "+x");
-    testParsing("expression/unary/07", "-x");
-    testParsing("expression/unary/08", "~x");
-    testParsing("expression/unary/09", "!x");
-    testParsing("expression/unary/10", "void x");
-    testParsing("expression/unary/11", "delete x");
-    testParsing("expression/unary/12", "typeof x");
+    assertEsprimaEquiv("expression/unary/00", "++x");
+    assertEsprimaEquiv("expression/unary/01", "--x");
+    assertEsprimaEquiv("expression/unary/02", "++eval");
+    assertEsprimaEquiv("expression/unary/03", "--eval");
+    assertEsprimaEquiv("expression/unary/04", "++arguments");
+    assertEsprimaEquiv("expression/unary/05", "--arguments");
+    assertEsprimaEquiv("expression/unary/06", "+x");
+    assertEsprimaEquiv("expression/unary/07", "-x");
+    assertEsprimaEquiv("expression/unary/08", "~x");
+    assertEsprimaEquiv("expression/unary/09", "!x");
+    assertEsprimaEquiv("expression/unary/10", "void x");
+    assertEsprimaEquiv("expression/unary/11", "delete x");
+    assertEsprimaEquiv("expression/unary/12", "typeof x");
 
     // Multiplicative Operators
-    testParsing("expression/mul/00", "x * y");
-    testParsing("expression/mul/01", "x / y");
-    testParsing("expression/mul/02", "x % y");
+    assertEsprimaEquiv("expression/mul/00", "x * y");
+    assertEsprimaEquiv("expression/mul/01", "x / y");
+    assertEsprimaEquiv("expression/mul/02", "x % y");
 
     // Additive Operators
-    testParsing("expression/add/00", "x + y");
-    testParsing("expression/add/01", "x - y");
-    testParsing("expression/add/02", "\"use strict\" + 42");
+    assertEsprimaEquiv("expression/add/00", "x + y");
+    assertEsprimaEquiv("expression/add/01", "x - y");
+    assertEsprimaEquiv("expression/add/02", "\"use strict\" + 42");
 
     // Bitwise Shift Operator
-    testParsing("expression/shift/00", "x << y");
-    testParsing("expression/shift/01", "x >> y");
-    testParsing("expression/shift/02", "x >>> y");
+    assertEsprimaEquiv("expression/shift/00", "x << y");
+    assertEsprimaEquiv("expression/shift/01", "x >> y");
+    assertEsprimaEquiv("expression/shift/02", "x >>> y");
 
     // Relational Operators
-    testParsing("expression/rel/00", "x < y");
-    testParsing("expression/rel/01", "x > y");
-    testParsing("expression/rel/02", "x <= y");
-    testParsing("expression/rel/03", "x >= y");
-    testParsing("expression/rel/04", "x in y");
-    testParsing("expression/rel/05", "x instanceof y");
-    testParsing("expression/rel/06", "x < y < z");
+    assertEsprimaEquiv("expression/rel/00", "x < y");
+    assertEsprimaEquiv("expression/rel/01", "x > y");
+    assertEsprimaEquiv("expression/rel/02", "x <= y");
+    assertEsprimaEquiv("expression/rel/03", "x >= y");
+    assertEsprimaEquiv("expression/rel/04", "x in y");
+    assertEsprimaEquiv("expression/rel/05", "x instanceof y");
+    assertEsprimaEquiv("expression/rel/06", "x < y < z");
 
     // Equality Operators
-    testParsing("expression/eq/00", "x == y");
-    testParsing("expression/eq/01", "x != y");
-    testParsing("expression/eq/02", "x === y");
-    testParsing("expression/eq/03", "x !== y");
+    assertEsprimaEquiv("expression/eq/00", "x == y");
+    assertEsprimaEquiv("expression/eq/01", "x != y");
+    assertEsprimaEquiv("expression/eq/02", "x === y");
+    assertEsprimaEquiv("expression/eq/03", "x !== y");
 
     // Binary Bitwise Operators
-    testParsing("expression/bit/00", "x & y");
-    testParsing("expression/bit/01", "x ^ y");
-    testParsing("expression/bit/02", "x | y");
+    assertEsprimaEquiv("expression/bit/00", "x & y");
+    assertEsprimaEquiv("expression/bit/01", "x ^ y");
+    assertEsprimaEquiv("expression/bit/02", "x | y");
 
     // Binary Expressions
-    testParsing("expression/binary/00", "x + y + z");
-    testParsing("expression/binary/01", "x - y + z");
-    testParsing("expression/binary/02", "x + y - z");
-    testParsing("expression/binary/03", "x - y - z");
-    testParsing("expression/binary/04", "x + y * z");
-    testParsing("expression/binary/05", "x + y / z");
-    testParsing("expression/binary/06", "x - y % z");
-    testParsing("expression/binary/07", "x * y * z");
-    testParsing("expression/binary/08", "x * y / z");
-    testParsing("expression/binary/09", "x * y % z");
-    testParsing("expression/binary/10", "x % y * z");
-    testParsing("expression/binary/11", "x << y << z");
-    testParsing("expression/binary/12", "x | y | z");
-    testParsing("expression/binary/13", "x & y & z");
-    testParsing("expression/binary/14", "x ^ y ^ z");
-    testParsing("expression/binary/15", "x & y | z");
-    testParsing("expression/binary/16", "x | y ^ z");
-    testParsing("expression/binary/17", "x | y & z");
+    assertEsprimaEquiv("expression/binary/00", "x + y + z");
+    assertEsprimaEquiv("expression/binary/01", "x - y + z");
+    assertEsprimaEquiv("expression/binary/02", "x + y - z");
+    assertEsprimaEquiv("expression/binary/03", "x - y - z");
+    assertEsprimaEquiv("expression/binary/04", "x + y * z");
+    assertEsprimaEquiv("expression/binary/05", "x + y / z");
+    assertEsprimaEquiv("expression/binary/06", "x - y % z");
+    assertEsprimaEquiv("expression/binary/07", "x * y * z");
+    assertEsprimaEquiv("expression/binary/08", "x * y / z");
+    assertEsprimaEquiv("expression/binary/09", "x * y % z");
+    assertEsprimaEquiv("expression/binary/10", "x % y * z");
+    assertEsprimaEquiv("expression/binary/11", "x << y << z");
+    assertEsprimaEquiv("expression/binary/12", "x | y | z");
+    assertEsprimaEquiv("expression/binary/13", "x & y & z");
+    assertEsprimaEquiv("expression/binary/14", "x ^ y ^ z");
+    assertEsprimaEquiv("expression/binary/15", "x & y | z");
+    assertEsprimaEquiv("expression/binary/16", "x | y ^ z");
+    assertEsprimaEquiv("expression/binary/17", "x | y & z");
 
     // Binary Logical Operators
-    testParsing("expression/logic/00", "x || y");
-    testParsing("expression/logic/01", "x && y");
-    testParsing("expression/logic/02", "x || y || z");
-    testParsing("expression/logic/03", "x && y && z");
-    testParsing("expression/logic/04", "x || y && z");
-    testParsing("expression/logic/05", "x || y ^ z");
+    assertEsprimaEquiv("expression/logic/00", "x || y");
+    assertEsprimaEquiv("expression/logic/01", "x && y");
+    assertEsprimaEquiv("expression/logic/02", "x || y || z");
+    assertEsprimaEquiv("expression/logic/03", "x && y && z");
+    assertEsprimaEquiv("expression/logic/04", "x || y && z");
+    assertEsprimaEquiv("expression/logic/05", "x || y ^ z");
 
     // Conditional Operator
-    testParsing("expression/cond/00", "y ? 1 : 2");
-    testParsing("expression/cond/01", "x && y ? 1 : 2");
-    testParsing("expression/cond/02", "x = (0) ? 1 : 2");
+    assertEsprimaEquiv("expression/cond/00", "y ? 1 : 2");
+    assertEsprimaEquiv("expression/cond/01", "x && y ? 1 : 2");
+    assertEsprimaEquiv("expression/cond/02", "x = (0) ? 1 : 2");
 
     // Assignment Operators
-    testParsing("expression/assignment/00", "x = 42");
-    testParsing("expression/assignment/01", "eval = 42");
-    testParsing("expression/assignment/02", "arguments = 42");
-    testParsing("expression/assignment/03", "x *= 42");
-    testParsing("expression/assignment/04", "x /= 42");
-    testParsing("expression/assignment/05", "x %= 42");
-    testParsing("expression/assignment/06", "x += 42");
-    testParsing("expression/assignment/07", "x -= 42");
-    testParsing("expression/assignment/08", "x <<= 42");
-    testParsing("expression/assignment/09", "x >>= 42");
-    testParsing("expression/assignment/10", "x >>>= 42");
-    testParsing("expression/assignment/11", "x &= 42");
-    testParsing("expression/assignment/12", "x ^= 42");
-    testParsing("expression/assignment/13", "x |= 42");
-    testParsing("expression/assignment/16", "'use strict'; eval[0] = 42");
-    testParsing("expression/assignment/17", "'use strict'; arguments[0] = 42");
+    assertEsprimaEquiv("expression/assignment/00", "x = 42");
+    assertEsprimaEquiv("expression/assignment/01", "eval = 42");
+    assertEsprimaEquiv("expression/assignment/02", "arguments = 42");
+    assertEsprimaEquiv("expression/assignment/03", "x *= 42");
+    assertEsprimaEquiv("expression/assignment/04", "x /= 42");
+    assertEsprimaEquiv("expression/assignment/05", "x %= 42");
+    assertEsprimaEquiv("expression/assignment/06", "x += 42");
+    assertEsprimaEquiv("expression/assignment/07", "x -= 42");
+    assertEsprimaEquiv("expression/assignment/08", "x <<= 42");
+    assertEsprimaEquiv("expression/assignment/09", "x >>= 42");
+    assertEsprimaEquiv("expression/assignment/10", "x >>>= 42");
+    assertEsprimaEquiv("expression/assignment/11", "x &= 42");
+    assertEsprimaEquiv("expression/assignment/12", "x ^= 42");
+    assertEsprimaEquiv("expression/assignment/13", "x |= 42");
+    assertEsprimaEquiv("expression/assignment/16", "'use strict'; eval[0] = 42");
+    assertEsprimaEquiv("expression/assignment/17", "'use strict'; arguments[0] = 42");
 
     // Complex Expression
-    testParsing("expression/complex", "a || b && c | d ^ e & f == g < h >>> i + j * k");
+    assertEsprimaEquiv("expression/complex", "a || b && c | d ^ e & f == g < h >>> i + j * k");
 
     // Block
-    testParsing("statement/block/00", "{ foo }");
-    testParsing("statement/block/01", "{ doThis(); doThat(); }");
-    testParsing("statement/block/02", "{}");
+    assertEsprimaEquiv("statement/block/00", "{ foo }");
+    assertEsprimaEquiv("statement/block/01", "{ doThis(); doThat(); }");
+    assertEsprimaEquiv("statement/block/02", "{}");
 
     // Variable Statement
-    testParsing("statement/var/00", "var x");
-    testParsing("statement/var/01", "var x, y;");
-    testParsing("statement/var/02", "var x = 42");
-    testParsing("statement/var/03", "var eval = 42, arguments = 42");
-    testParsing("statement/var/04", "var x = 14, y = 3, z = 1977");
-    testParsing("statement/var/05", "var implements, interface, package");
-    testParsing("statement/var/06", "var private, protected, public, static");
+    assertEsprimaEquiv("statement/var/00", "var x");
+    assertEsprimaEquiv("statement/var/01", "var x, y;");
+    assertEsprimaEquiv("statement/var/02", "var x = 42");
+    assertEsprimaEquiv("statement/var/03", "var eval = 42, arguments = 42");
+    assertEsprimaEquiv("statement/var/04", "var x = 14, y = 3, z = 1977");
+    assertEsprimaEquiv("statement/var/05", "var implements, interface, package");
+    assertEsprimaEquiv("statement/var/06", "var private, protected, public, static");
 
     // Let Statement
-    testParsing("statement/let/00", "let x");
-    testParsing("statement/let/01", "{ let x }");
-    testParsing("statement/let/02", "{ let x = 42 }");
-    testParsing("statement/let/03", "{ let x = 14, y = 3, z = 1977 }");
+    assertEsprimaEquiv("statement/let/00", "let x");
+    assertEsprimaEquiv("statement/let/01", "{ let x }");
+    assertEsprimaEquiv("statement/let/02", "{ let x = 42 }");
+    assertEsprimaEquiv("statement/let/03", "{ let x = 14, y = 3, z = 1977 }");
 
     // Const Statement
-    testParsing("statement/const/00", "const x = 42");
-    testParsing("statement/const/01", "{ const x = 42 }");
-    testParsing("statement/const/02", "{ const x = 14, y = 3, z = 1977 }");
+    assertEsprimaEquiv("statement/const/00", "const x = 42");
+    assertEsprimaEquiv("statement/const/01", "{ const x = 42 }");
+    assertEsprimaEquiv("statement/const/02", "{ const x = 14, y = 3, z = 1977 }");
 
     // Empty Statement
-    testParsing("statement/empty", ";");
+    assertEsprimaEquiv("statement/empty", ";");
 
     // Expression Statement
-    testParsing("statement/expression/00", "x");
-    testParsing("statement/expression/01", "x, y");
-    testParsing("statement/expression/02", "\\u0061");
-    testParsing("statement/expression/03", "a\\u0061");
-    testParsing("statement/expression/04", "\\u0061a");
-    testParsing("statement/expression/05", "\\u0061a ");
+    assertEsprimaEquiv("statement/expression/00", "x");
+    assertEsprimaEquiv("statement/expression/01", "x, y");
+    assertEsprimaEquiv("statement/expression/02", "\\u0061");
+    assertEsprimaEquiv("statement/expression/03", "a\\u0061");
+    assertEsprimaEquiv("statement/expression/04", "\\u0061a");
+    assertEsprimaEquiv("statement/expression/05", "\\u0061a ");
 
     // If Statement
-    testParsing("statement/if/00", "if (morning) goodMorning()");
-    testParsing("statement/if/01", "if (morning) (function(){})");
-    testParsing("statement/if/02", "if (morning) var x = 0;");
-    testParsing("statement/if/03", "if (morning) function a(){}");
-    testParsing("statement/if/04", "if (morning) goodMorning(); else goodDay()");
+    assertEsprimaEquiv("statement/if/00", "if (morning) goodMorning()");
+    assertEsprimaEquiv("statement/if/01", "if (morning) (function(){})");
+    assertEsprimaEquiv("statement/if/02", "if (morning) var x = 0;");
+    assertEsprimaEquiv("statement/if/03", "if (morning) function a(){}");
+    assertEsprimaEquiv("statement/if/04", "if (morning) goodMorning(); else goodDay()");
 
     // Iteration Statements
-    testParsing("statement/iteration/00", "do keep(); while (true)");
-    testParsing("statement/iteration/01", "do keep(); while (true);");
-    testParsing("statement/iteration/02", "do { x++; y--; } while (x < 10)");
-    testParsing("statement/iteration/03", "{ do { } while (false) false }");
-    testParsing("statement/iteration/04", "while (true) doSomething()");
-    testParsing("statement/iteration/05", "while (x < 10) { x++; y--; }");
-    testParsing("statement/iteration/06", "for(;;);");
-    testParsing("statement/iteration/07", "for(;;){}");
-    testParsing("statement/iteration/08", "for(x = 0;;);");
-    testParsing("statement/iteration/09", "for(var x = 0;;);");
-    testParsing("statement/iteration/10", "for(let x = 0;;);");
-    testParsing("statement/iteration/11", "for(var x = 0, y = 1;;);");
-    testParsing("statement/iteration/12", "for(x = 0; x < 42;);");
-    testParsing("statement/iteration/13", "for(x = 0; x < 42; x++);");
-    testParsing("statement/iteration/14", "for(x = 0; x < 42; x++) process(x);");
-    testParsing("statement/iteration/15", "for(x in list) process(x);");
-    testParsing("statement/iteration/16", "for (var x in list) process(x);");
-    testParsing("statement/iteration/17", "for (var x = 42 in list) process(x);");
-    testParsing("statement/iteration/18", "for (let x in list) process(x);");
-    testParsing("statement/iteration/19", "for (var x = y = z in q);");
-    testParsing("statement/iteration/20", "for (var a = b = c = (d in e) in z);");
-    testParsing("statement/iteration/21", "for (var i = function() { return 10 in [] } in list) process(x);");
+    assertEsprimaEquiv("statement/iteration/00", "do keep(); while (true)");
+    assertEsprimaEquiv("statement/iteration/01", "do keep(); while (true);");
+    assertEsprimaEquiv("statement/iteration/02", "do { x++; y--; } while (x < 10)");
+    assertEsprimaEquiv("statement/iteration/03", "{ do { } while (false) false }");
+    assertEsprimaEquiv("statement/iteration/04", "while (true) doSomething()");
+    assertEsprimaEquiv("statement/iteration/05", "while (x < 10) { x++; y--; }");
+    assertEsprimaEquiv("statement/iteration/06", "for(;;);");
+    assertEsprimaEquiv("statement/iteration/07", "for(;;){}");
+    assertEsprimaEquiv("statement/iteration/08", "for(x = 0;;);");
+    assertEsprimaEquiv("statement/iteration/09", "for(var x = 0;;);");
+    assertEsprimaEquiv("statement/iteration/10", "for(let x = 0;;);");
+    assertEsprimaEquiv("statement/iteration/11", "for(var x = 0, y = 1;;);");
+    assertEsprimaEquiv("statement/iteration/12", "for(x = 0; x < 42;);");
+    assertEsprimaEquiv("statement/iteration/13", "for(x = 0; x < 42; x++);");
+    assertEsprimaEquiv("statement/iteration/14", "for(x = 0; x < 42; x++) process(x);");
+    assertEsprimaEquiv("statement/iteration/15", "for(x in list) process(x);");
+    assertEsprimaEquiv("statement/iteration/16", "for (var x in list) process(x);");
+    assertEsprimaEquiv("statement/iteration/17", "for (var x = 42 in list) process(x);");
+    assertEsprimaEquiv("statement/iteration/18", "for (let x in list) process(x);");
+    assertEsprimaEquiv("statement/iteration/19", "for (var x = y = z in q);");
+    assertEsprimaEquiv("statement/iteration/20", "for (var a = b = c = (d in e) in z);");
+    assertEsprimaEquiv("statement/iteration/21", "for (var i = function() { return 10 in [] } in list) process(x);");
 
     // continue body
-    testParsing("statement/continue/00", "while (true) { continue; }");
-    testParsing("statement/continue/01", "while (true) { continue }");
-    testParsing("statement/continue/02", "done: while (true) { continue done }");
-    testParsing("statement/continue/03", "done: while (true) { continue done; }");
-    testParsing("statement/continue/04", "__proto__: while (true) { continue __proto__; }");
+    assertEsprimaEquiv("statement/continue/00", "while (true) { continue; }");
+    assertEsprimaEquiv("statement/continue/01", "while (true) { continue }");
+    assertEsprimaEquiv("statement/continue/02", "done: while (true) { continue done }");
+    assertEsprimaEquiv("statement/continue/03", "done: while (true) { continue done; }");
+    assertEsprimaEquiv("statement/continue/04", "__proto__: while (true) { continue __proto__; }");
 
     // break body
-    testParsing("statement/break/00", "while (true) { break }");
-    testParsing("statement/break/01", "done: while (true) { break done }");
-    testParsing("statement/break/02", "done: while (true) { break done; }");
-    testParsing("statement/break/03", "__proto__: while (true) { break __proto__; }");
+    assertEsprimaEquiv("statement/break/00", "while (true) { break }");
+    assertEsprimaEquiv("statement/break/01", "done: while (true) { break done }");
+    assertEsprimaEquiv("statement/break/02", "done: while (true) { break done; }");
+    assertEsprimaEquiv("statement/break/03", "__proto__: while (true) { break __proto__; }");
 
     // return body
-    testParsing("statement/return/00", "(function(){ return })");
-    testParsing("statement/return/01", "(function(){ return; })");
-    testParsing("statement/return/02", "(function(){ return x; })");
-    testParsing("statement/return/03", "(function(){ return x * y })");
+    assertEsprimaEquiv("statement/return/00", "(function(){ return })");
+    assertEsprimaEquiv("statement/return/01", "(function(){ return; })");
+    assertEsprimaEquiv("statement/return/02", "(function(){ return x; })");
+    assertEsprimaEquiv("statement/return/03", "(function(){ return x * y })");
 
     // with body
-    testParsing("statement/with/00", "with (x) foo = bar");
-    testParsing("statement/with/01", "with (x) foo = bar;");
-    testParsing("statement/with/02", "with (x) { foo = bar }");
+    assertEsprimaEquiv("statement/with/00", "with (x) foo = bar");
+    assertEsprimaEquiv("statement/with/01", "with (x) foo = bar;");
+    assertEsprimaEquiv("statement/with/02", "with (x) { foo = bar }");
 
     // switch body
-    testParsing("statement/switch/00", "switch (x) {}");
-    testParsing("statement/switch/01", "switch (answer) { case 42: hi(); break; }");
-    testParsing("statement/switch/02", "switch (answer) { case 42: hi(); break; default: break }");
+    assertEsprimaEquiv("statement/switch/00", "switch (x) {}");
+    assertEsprimaEquiv("statement/switch/01", "switch (answer) { case 42: hi(); break; }");
+    assertEsprimaEquiv("statement/switch/02", "switch (answer) { case 42: hi(); break; default: break }");
 
     // Labelled Statements
-    testParsing("statement/labeled/00", "start: for (;;) break start");
-    testParsing("statement/labeled/01", "start: while (true) break start");
-    testParsing("statement/labeled/02", "__proto__: test");
+    assertEsprimaEquiv("statement/labeled/00", "start: for (;;) break start");
+    assertEsprimaEquiv("statement/labeled/01", "start: while (true) break start");
+    assertEsprimaEquiv("statement/labeled/02", "__proto__: test");
 
     // throw body
-    testParsing("statement/throw/00", "throw x;");
-    testParsing("statement/throw/01", "throw x * y");
-    testParsing("statement/throw/02", "throw { message: \"Error\" }");
+    assertEsprimaEquiv("statement/throw/00", "throw x;");
+    assertEsprimaEquiv("statement/throw/01", "throw x * y");
+    assertEsprimaEquiv("statement/throw/02", "throw { message: \"Error\" }");
 
     // try body
-    testParsing("statement/try/00", "try { } catch (e) { }");
-    testParsing("statement/try/01", "try { } catch (eval) { }");
-    testParsing("statement/try/02", "try { } catch (arguments) { }");
-    testParsing("statement/try/03", "try { } catch (e) { say(e) }");
-    testParsing("statement/try/04", "try { } finally { cleanup(stuff) }");
-    testParsing("statement/try/05", "try { doThat(); } catch (e) { say(e) }");
-    testParsing("statement/try/06", "try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }");
+    assertEsprimaEquiv("statement/try/00", "try { } catch (e) { }");
+    assertEsprimaEquiv("statement/try/01", "try { } catch (eval) { }");
+    assertEsprimaEquiv("statement/try/02", "try { } catch (arguments) { }");
+    assertEsprimaEquiv("statement/try/03", "try { } catch (e) { say(e) }");
+    assertEsprimaEquiv("statement/try/04", "try { } finally { cleanup(stuff) }");
+    assertEsprimaEquiv("statement/try/05", "try { doThat(); } catch (e) { say(e) }");
+    assertEsprimaEquiv("statement/try/06", "try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }");
 
     // debugger body
-    testParsing("statement/debugger", "debugger;");
+    assertEsprimaEquiv("statement/debugger", "debugger;");
 
     // FunctionId Definition
-    testParsing("statement/functionDecl/00", "function hello() { sayHi(); }");
-    testParsing("statement/functionDecl/01", "function eval() { }");
-    testParsing("statement/functionDecl/02", "function arguments() { }");
-    testParsing("statement/functionDecl/03", "function test(t, t) { }");
-    testParsing("statement/functionDecl/04", "(function test(t, t) { })");
-    testParsing("statement/functionDecl/05", "function eval() { function inner() { \"use strict\" } }");
-    testParsing("statement/functionDecl/06", "function hello(a) { sayHi(); }");
-    testParsing("statement/functionDecl/07", "function hello(a, b) { sayHi(); }");
-    testParsing("statement/functionDecl/08", "var hi = function() { sayHi() };");
-    testParsing("statement/functionDecl/09", "var hi = function eval() { };");
-    testParsing("statement/functionDecl/10", "var hi = function arguments() { };");
-    testParsing("statement/functionDecl/11", "var hello = function hi() { sayHi() };");
-    testParsing("statement/functionDecl/12", "(function(){})");
-    testParsing("statement/functionDecl/13", "function universe(__proto__) { }");
-    testParsing("statement/functionDecl/14", "function test() { \"use strict\" + 42; }");
+    assertEsprimaEquiv("statement/functionDecl/00", "function hello() { sayHi(); }");
+    assertEsprimaEquiv("statement/functionDecl/01", "function eval() { }");
+    assertEsprimaEquiv("statement/functionDecl/02", "function arguments() { }");
+    assertEsprimaEquiv("statement/functionDecl/03", "function test(t, t) { }");
+    assertEsprimaEquiv("statement/functionDecl/04", "(function test(t, t) { })");
+    assertEsprimaEquiv("statement/functionDecl/05", "function eval() { function inner() { \"use strict\" } }");
+    assertEsprimaEquiv("statement/functionDecl/06", "function hello(a) { sayHi(); }");
+    assertEsprimaEquiv("statement/functionDecl/07", "function hello(a, b) { sayHi(); }");
+    assertEsprimaEquiv("statement/functionDecl/08", "var hi = function() { sayHi() };");
+    assertEsprimaEquiv("statement/functionDecl/09", "var hi = function eval() { };");
+    assertEsprimaEquiv("statement/functionDecl/10", "var hi = function arguments() { };");
+    assertEsprimaEquiv("statement/functionDecl/11", "var hello = function hi() { sayHi() };");
+    assertEsprimaEquiv("statement/functionDecl/12", "(function(){})");
+    assertEsprimaEquiv("statement/functionDecl/13", "function universe(__proto__) { }");
+    assertEsprimaEquiv("statement/functionDecl/14", "function test() { \"use strict\" + 42; }");
 
     // Automatic semicolon insertion
-    testParsing("asi/00", "{ x\n++y }");
-    testParsing("asi/01", "{ x\n--y }");
-    testParsing("asi/02", "var x /* comment */;");
-    testParsing("asi/03", "{ var x = 14, y = 3\nz; }");
-    testParsing("asi/04", "while (true) { continue\nthere; }");
-    testParsing("asi/05", "while (true) { continue // Comment\nthere; }");
-    testParsing("asi/06", "while (true) { continue /* Multiline\nComment */there; }");
-    testParsing("asi/07", "while (true) { break\nthere; }");
-    testParsing("asi/08", "while (true) { break // Comment\nthere; }");
-    testParsing("asi/09", "while (true) { break /* Multiline\nComment */there; }");
-    testParsing("asi/10", "(function(){ return\nx; })");
-    testParsing("asi/11", "(function(){ return // Comment\nx; })");
-    testParsing("asi/12", "(function(){ return/* Multiline\nComment */x; })");
-    testParsing("asi/13", "{ throw error\nerror; }");
-    testParsing("asi/14", "{ throw error// Comment\nerror; }");
-    testParsing("asi/15", "{ throw error/* Multiline\nComment */error; }");
+    assertEsprimaEquiv("asi/00", "{ x\n++y }");
+    assertEsprimaEquiv("asi/01", "{ x\n--y }");
+    assertEsprimaEquiv("asi/02", "var x /* comment */;");
+    assertEsprimaEquiv("asi/03", "{ var x = 14, y = 3\nz; }");
+    assertEsprimaEquiv("asi/04", "while (true) { continue\nthere; }");
+    assertEsprimaEquiv("asi/05", "while (true) { continue // Comment\nthere; }");
+    assertEsprimaEquiv("asi/06", "while (true) { continue /* Multiline\nComment */there; }");
+    assertEsprimaEquiv("asi/07", "while (true) { break\nthere; }");
+    assertEsprimaEquiv("asi/08", "while (true) { break // Comment\nthere; }");
+    assertEsprimaEquiv("asi/09", "while (true) { break /* Multiline\nComment */there; }");
+    assertEsprimaEquiv("asi/10", "(function(){ return\nx; })");
+    assertEsprimaEquiv("asi/11", "(function(){ return // Comment\nx; })");
+    assertEsprimaEquiv("asi/12", "(function(){ return/* Multiline\nComment */x; })");
+    assertEsprimaEquiv("asi/13", "{ throw error\nerror; }");
+    assertEsprimaEquiv("asi/14", "{ throw error// Comment\nerror; }");
+    assertEsprimaEquiv("asi/15", "{ throw error/* Multiline\nComment */error; }");
 
     // Directive Prolog
     // FIXME: heuristic converter cannot handle information loss in SpiderMonkey Parse API.
-    // testParsing("directive/00", "(function () { 'use\\x20strict'; with (i); }())");
-    testParsing("directive/01", "(function () { 'use\\nstrict'; with (i); }())");
+    // assertEsprimaEquiv("directive/00", "(function () { 'use\\x20strict'; with (i); }())");
+    assertEsprimaEquiv("directive/01", "(function () { 'use\\nstrict'; with (i); }())");
 
     // Whitespace
-    testParsing("ws/00",
+    assertEsprimaEquiv("ws/00",
         "new\u0020\u0009\u000B\u000C\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFFa");
-    testParsing("ws/01", "{0\n1\r2\u20283\u20294}");
+    assertEsprimaEquiv("ws/01", "{0\n1\r2\u20283\u20294}");
   });
 });

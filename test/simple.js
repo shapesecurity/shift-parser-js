@@ -15,9 +15,8 @@
  */
 
 var expect = require('expect.js');
-var esprima = require('esprima');
-var converters = require('shift-spidermonkey-converter');
 var ShiftParser = require('../');
+var assertParseSuccess = require('./assertions').assertParseSuccess;
 
 describe("API", function () {
   it("should exist", function () {
@@ -26,65 +25,58 @@ describe("API", function () {
 });
 
 describe("Parser", function () {
-  var parse = ShiftParser.default;
   describe("parses simple JavaScript", function () {
-    function test(source) {
-      it(source, function () {
-        expect(parse(source)).eql(converters.toShift(esprima.parse(source)));
-      })
-    }
+    assertParseSuccess("");
+    assertParseSuccess(" ");
+    assertParseSuccess(" /**/");
+    assertParseSuccess(" /****/");
+    assertParseSuccess(" /**\n\r\r\n**/");
+    assertParseSuccess(" //\n");
+    assertParseSuccess("//\n;a;");
 
-    test("");
-    test(" ");
-    test(" /**/");
-    test(" /****/");
-    test(" /**\n\r\r\n**/");
-    test(" //\n");
-    test("//\n;a;");
-
-    test("x");
-    test("'x';");
-    test("\"x\";");
-    test("0;");
-    test("null;");
-    test("/a/g;");
-    test("1+2;");
-    test("[,,1,,,3,4,,]");
-    test("a=2;");
-    test("a(b,c)");
-    test("new a(b,c)");
-    test("a++");
-    test("!a");
-    test("a.b(b,c)");
-    test("a[b](b,c)");
-    test("function a(a,b,c) {'use strict';return 0;};");
-    test("(function(a,b,c) {'use strict';return 0;});");
-    test("(function a(a,b,c) {'use strict';return 0;});");
-    test("a:{break a;}");
-    test("try{}catch(a){}");
-    test("try{}catch(a){}finally{}");
-    test("a?b:c");
-    test("do continue; while(1);");
-    test("a: do continue a; while(1);");
-    test("debugger");
-    test("for(a;b;c);");
-    test("for(var a;b;c);");
-    test("for(var a = 0;b;c);");
-    test("for(;b;c);");
-    test("for(var a in b);");
-    test("for(var a = c in b);");
-    test("for(a in b);");
-    test("for(a.b in b);");
-    test("if(a)b;");
-    test("if(a)b;else c;");
-    test("+{a:0, get 'b'(){}, set 3(d){}}");
-    test("while(1);");
-    test("with(1);");
-    test("throw this");
-    test("switch(a){case 1:}");
-    test("switch(a){case 1:default:case 2:}");
-    test("switch(a){case 1:default:}");
-    test("switch(a){default:case 2:}");
-    test("var a;");
+    assertParseSuccess("x");
+    assertParseSuccess("'x';");
+    assertParseSuccess("\"x\";");
+    assertParseSuccess("0;");
+    assertParseSuccess("null;");
+    assertParseSuccess("/a/g;");
+    assertParseSuccess("1+2;");
+    assertParseSuccess("[,,1,,,3,4,,]");
+    assertParseSuccess("a=2;");
+    assertParseSuccess("a(b,c)");
+    assertParseSuccess("new a(b,c)");
+    assertParseSuccess("a++");
+    assertParseSuccess("!a");
+    assertParseSuccess("a.b(b,c)");
+    assertParseSuccess("a[b](b,c)");
+    assertParseSuccess("function a(a,b,c) {'use strict';return 0;};");
+    assertParseSuccess("(function(a,b,c) {'use strict';return 0;});");
+    assertParseSuccess("(function a(a,b,c) {'use strict';return 0;});");
+    assertParseSuccess("a:{break a;}");
+    assertParseSuccess("try{}catch(a){}");
+    assertParseSuccess("try{}catch(a){}finally{}");
+    assertParseSuccess("a?b:c");
+    assertParseSuccess("do continue; while(1);");
+    assertParseSuccess("a: do continue a; while(1);");
+    assertParseSuccess("debugger");
+    assertParseSuccess("for(a;b;c);");
+    assertParseSuccess("for(var a;b;c);");
+    assertParseSuccess("for(var a = 0;b;c);");
+    assertParseSuccess("for(;b;c);");
+    assertParseSuccess("for(var a in b);");
+    assertParseSuccess("for(var a = c in b);");
+    assertParseSuccess("for(a in b);");
+    assertParseSuccess("for(a.b in b);");
+    assertParseSuccess("if(a)b;");
+    assertParseSuccess("if(a)b;else c;");
+    assertParseSuccess("+{a:0, get 'b'(){}, set 3(d){}}");
+    assertParseSuccess("while(1);");
+    assertParseSuccess("with(1);");
+    assertParseSuccess("throw this");
+    assertParseSuccess("switch(a){case 1:}");
+    assertParseSuccess("switch(a){case 1:default:case 2:}");
+    assertParseSuccess("switch(a){case 1:default:}");
+    assertParseSuccess("switch(a){default:case 2:}");
+    assertParseSuccess("var a;");
   });
 });

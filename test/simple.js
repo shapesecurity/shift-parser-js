@@ -79,5 +79,6 @@ describe("Parser", function () {
     assertEsprimaEquiv("switch(a){case 1:default:}");
     assertEsprimaEquiv("switch(a){default:case 2:}");
     assertEsprimaEquiv("var a;");
+    assertParseSuccess("var yield;");
   });
 });

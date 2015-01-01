@@ -120,7 +120,6 @@ export const TokenType = {
   FUTURE_STRICT_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   CONST: {klass: TokenClass.Keyword, name: "const"},
   LET: {klass: TokenClass.Keyword, name: "let"},
-  YIELD: {klass: TokenClass.Keyword, name: "yield"},
   ILLEGAL: {klass: TokenClass.Illegal, name: ""}
 };
 
@@ -485,7 +484,7 @@ class Tokenizer {
             break;
           case "y": // YIELD
             if (Tokenizer.cse4(id, "i", "e", "l", "d")) {
-              return strict ? TokenType.FUTURE_STRICT_RESERVED_WORD : TokenType.YIELD;
+              return strict ? TokenType.FUTURE_STRICT_RESERVED_WORD : TokenType.ILLEGAL;
             }
             break;
           case "s": // SUPER

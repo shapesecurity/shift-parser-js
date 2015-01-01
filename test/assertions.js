@@ -18,12 +18,12 @@ exports.assertParseFailure = function assertParseFailure(source, message) {
 
 exports.assertParseSuccess = function assertParseSuccess(source) {
   it(source, function () {
-    expect(parse(source)).eql(converters.toShift(esprima.parse(source)));
+    parse(source)
   })
 }
 
-exports.assertEsprimaEquiv = function assertEsprimaEquiv(name, source) {
-  it(name, function () {
+exports.assertEsprimaEquiv = function assertEsprimaEquiv(source) {
+  it(source, function () {
     var tree = parse(source);
     var oracle = converters.toShift(esprima.parse(source));
     expect(tree).eql(oracle);

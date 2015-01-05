@@ -333,8 +333,6 @@ describe("Parser", function () {
     assertParseFailure("function eval(a) { \"use strict\"; }", "Function name may not be eval or arguments in strict mode");
     assertParseFailure("function arguments(a) { \"use strict\"; }",
         "Function name may not be eval or arguments in strict mode");
-    assertParseFailure("var yield", "Unexpected token yield");
-    assertParseFailure("var let", "Unexpected token let");
     assertParseFailure("\"use strict\"; function static() { }", "Use of future reserved word in strict mode");
     assertParseFailure("function a(t, t) { \"use strict\"; }", "Strict mode function may not have duplicate parameter names");
     assertParseFailure("function a(eval) { \"use strict\"; }",

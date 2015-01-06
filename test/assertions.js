@@ -13,14 +13,14 @@ exports.assertParseFailure = function assertParseFailure(source, message) {
       return;
     }
     throw new Error("Expecting error");
-  })
-}
+  });
+};
 
 exports.assertParseSuccess = function assertParseSuccess(source) {
   it(source, function () {
-    parse(source)
-  })
-}
+    parse(source);
+  });
+};
 
 exports.assertEsprimaEquiv = function assertEsprimaEquiv(source) {
   it(source, function () {
@@ -28,5 +28,4 @@ exports.assertEsprimaEquiv = function assertEsprimaEquiv(source) {
     var oracle = converters.toShift(esprima.parse(source));
     expect(tree).eql(oracle);
   });
-}
-
+};

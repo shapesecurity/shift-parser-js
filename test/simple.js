@@ -30,6 +30,11 @@ describe("Parser", function () {
     expect(ShiftParser.default("2e308").body.statements[0].expression.type).to.be("LiteralInfinityExpression");
   });
 
+  describe("parses numeric property names as strings", function () {
+    expect(ShiftParser.default("({0x0:0})").body.statements[0].expression.properties[0].name.value).to.be("0");
+    expect(ShiftParser.default("({2e308:0})").body.statements[0].expression.properties[0].name.value).to.be("" + 1/0);
+  });
+
   describe("parses simple JavaScript", function () {
     assertEsprimaEquiv("");
     assertEsprimaEquiv(" ");

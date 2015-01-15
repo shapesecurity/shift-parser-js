@@ -114,10 +114,6 @@ describe("Parser", function () {
     assertParseFailure("var x = \"\n", "Unexpected token ILLEGAL");
     assertParseFailure("var if = 42", "Unexpected token if");
     assertParseFailure("i #= 42", "Unexpected token ILLEGAL");
-
-    // assertParseFailure("i + 2 = 42", "Invalid left-hand side in assignment");
-    // assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
-
     assertParseFailure("1 + (", "Unexpected end of input");
     assertParseFailure("\n\n\n{", "Unexpected end of input");
     assertParseFailure("\n/* Some multiline\ncomment */\n)", "Unexpected token )");

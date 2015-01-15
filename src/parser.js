@@ -845,6 +845,7 @@ export class Parser extends Tokenizer {
     let token = this.lookahead;
     let startTokenIndex = this.tokenIndex;
 
+    let isParenthesised = token.type === TokenType.LPAREN;
     let node = this.parseConditionalExpression();
 
     let isOperator = false;
@@ -867,10 +868,9 @@ export class Parser extends Tokenizer {
     }
 
     if (isOperator) {
-      // To be permissive.
-      // if (!isLeftHandSide(node)) {
-      //     throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
-      // }
+      if (!isParenthesised && !Parser.isLeftHandSide(node)) {
+        throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      }
 
       // 11.13.1;
       if (node.type === "IdentifierExpression") {

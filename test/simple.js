@@ -26,6 +26,10 @@ describe("API", function () {
 });
 
 describe("Parser", function () {
+  describe("parses infinity literals to LiteralInfinityExpressions", function () {
+    expect(ShiftParser.default("2e308").body.statements[0].expression.type).to.be("LiteralInfinityExpression");
+  });
+
   describe("parses simple JavaScript", function () {
     assertEsprimaEquiv("");
     assertEsprimaEquiv(" ");

@@ -19,7 +19,7 @@ var assertParseFailure = require('./assertions').assertParseFailure;
 var assertParseSuccess = require('./assertions').assertParseSuccess;
 
 describe("Parser", function() {
-  // programs that parse according to ES3 but either fail or parse differently accoding to ES5
+  // programs that parse according to ES3 but either fail or parse differently according to ES5
   describe("ES5 backward incompatibilities", function() {
     // ES3: zero-width non-breaking space is allowed in an identifier
     // ES5: zero-width non-breaking space is a whitespace character
@@ -47,7 +47,7 @@ describe("Parser", function() {
     assertParseSuccess("{ function f(){} }");
   });
 
-  // programs that parse according to ES5 but either fail or parse differently accoding to ES6
+  // programs that parse according to ES5 but either fail or parse differently according to ES6
   describe("ES6 backward incompatibilities", function() {
     // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
     // ES6: yield has been moved from the future reserved words list to the keywords list
@@ -56,5 +56,11 @@ describe("Parser", function() {
     // ES5: this declares a function-scoped variable while at the same time assigning to the block-scoped variable
     // ES6: this particular construction is explicitly disallowed
     assertParseSuccess("try {} catch(e) { var e = 0; }");
+
+    // ES5: allows any LeftHandSideExpression on the left of an assignment
+    // ES6: allows only valid bindings on the left of an assignment
+    assertParseFailure("a+b=c", "Invalid left-hand side in assignment");
+    assertParseSuccess("(a+b)=c");
+    assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
   });
 });

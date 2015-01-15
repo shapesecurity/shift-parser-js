@@ -19,10 +19,10 @@
     "cjsify": "cjsify --export ShiftParser lib/index.js > shift-parser.js"
   },
   "dependencies": {
-    "shift-ast": "^1.0.0",
-    "shift-spidermonkey-converter": "^1.0.0"
+    "shift-ast": "^1.0.3"
   },
   "devDependencies": {
+    "shift-spidermonkey-converter": "^1.0.0",
     "6to5": "^1.14.14",
     "commonjs-everywhere": "^0.9.7",
     "esmangle": "^1.0.1",

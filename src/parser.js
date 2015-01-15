@@ -171,7 +171,7 @@ export class Parser extends Tokenizer {
 
   consumeSemicolon() {
     // Catch the very common case first: immediately a semicolon (U+003B).
-    if (this.index < this.source.length && this.source.charAt(this.index) == ';') {
+    if (this.index < this.source.length && this.source.charAt(this.index) == ";") {
       this.lex();
       return;
     }
@@ -328,8 +328,8 @@ export class Parser extends Tokenizer {
         // 12.12 Labelled Statements;
         if (expr.type === "IdentifierExpression" && this.match(TokenType.COLON)) {
           this.lex();
-          let key = '$' + expr.identifier.name;
-          if (Object.prototype.hasOwnProperty.call(this.labelSet, key)) {
+          let key = "$" + expr.identifier.name;
+          if ({}.hasOwnProperty.call(this.labelSet, key)) {
             throw this.createError(ErrorMessages.LABEL_REDECLARATION, expr.identifier.name);
           }
 
@@ -399,8 +399,8 @@ export class Parser extends Tokenizer {
     if (this.lookahead.type == TokenType.IDENTIFIER) {
       label = this.parseVariableIdentifier();
 
-      let key = '$' + label.name;
-      if (!Object.prototype.hasOwnProperty.call(this.labelSet, key)) {
+      let key = "$" + label.name;
+      if (!{}.hasOwnProperty.call(this.labelSet, key)) {
         throw this.createError(ErrorMessages.UNKNOWN_LABEL, label.name);
       }
     }
@@ -440,8 +440,8 @@ export class Parser extends Tokenizer {
     if (this.lookahead.type == TokenType.IDENTIFIER) {
       label = this.parseVariableIdentifier();
 
-      let key = '$' + label.name;
-      if (!Object.prototype.hasOwnProperty.call(this.labelSet, key)) {
+      let key = "$" + label.name;
+      if (!{}.hasOwnProperty.call(this.labelSet, key)) {
         throw this.createError(ErrorMessages.UNKNOWN_LABEL, label.name);
       }
     }
@@ -1165,7 +1165,7 @@ export class Parser extends Tokenizer {
           this.lookahead = this.scanRegExp();
           let token = this.lex();
           try {
-            let lastSlash = token.value.lastIndexOf('/');
+            let lastSlash = token.value.lastIndexOf("/");
             RegExp(token.value.slice(1, lastSlash), token.value.slice(lastSlash + 1));
           } catch (unused) {
             throw this.createErrorWithToken(token, ErrorMessages.INVALID_REGULAR_EXPRESSION);
@@ -1303,10 +1303,10 @@ export class Parser extends Tokenizer {
   parseObjectExpressionItem(propertyMap) {
     let property = this.parseObjectProperty();
     let type = property.type;
-    let key = '$' + property.name.value;
-    let value = Object.prototype.hasOwnProperty.call(propertyMap, key) ? propertyMap[key] : 0;
+    let key = "$" + property.name.value;
+    let value = {}.hasOwnProperty.call(propertyMap, key) ? propertyMap[key] : 0;
 
-    if (Object.prototype.hasOwnProperty.call(propertyMap, key)) {
+    if ({}.hasOwnProperty.call(propertyMap, key)) {
       if ((value & INIT_MASK) !== 0) {
         if (this.strict && type === "DataProperty") {
           throw this.createError(ErrorMessages.STRICT_DUPLICATE_PROPERTY);
@@ -1465,13 +1465,13 @@ export class Parser extends Tokenizer {
       while (!this.eof()) {
         let token = this.lookahead;
         let param = this.parseVariableIdentifier();
-        let key = '$' + param.name;
+        let key = "$" + param.name;
         if (this.strict) {
           if (token instanceof IdentifierLikeToken && isRestrictedWord(param.name)) {
             info.stricted = token;
             info.message = ErrorMessages.STRICT_PARAM_NAME;
           }
-          if (Object.prototype.hasOwnProperty.call(paramSet, key)) {
+          if ({}.hasOwnProperty.call(paramSet, key)) {
             info.stricted = token;
             info.message = ErrorMessages.STRICT_PARAM_DUPE;
           }
@@ -1482,7 +1482,7 @@ export class Parser extends Tokenizer {
           } else if (STRICT_MODE_RESERVED_WORD.indexOf(param.name) !== -1) {
             info.firstRestricted = token;
             info.message = ErrorMessages.STRICT_RESERVED_WORD;
-          } else if (Object.prototype.hasOwnProperty.call(paramSet, key)) {
+          } else if ({}.hasOwnProperty.call(paramSet, key)) {
             info.firstRestricted = token;
             info.message = ErrorMessages.STRICT_PARAM_DUPE;
           }

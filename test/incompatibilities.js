@@ -60,7 +60,9 @@ describe("Parser", function() {
     // ES5: allows any LeftHandSideExpression on the left of an assignment
     // ES6: allows only valid bindings on the left of an assignment
     assertParseFailure("a+b=c", "Invalid left-hand side in assignment");
-    assertParseSuccess("(a+b)=c");
     assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
+    assertParseSuccess("new a=b");
+    assertParseSuccess("(a+b)=c");
+    
   });
 });

@@ -1127,7 +1127,10 @@ export class Parser extends Tokenizer {
       throw this.createErrorWithToken(this.lookahead, ErrorMessages.STRICT_OCTAL_LITERAL);
     }
     let token2 = this.lex();
-    return this.markLocation(new Shift.LiteralNumericExpression(token2._value), startTokenIndex);
+    let node = token2._value === 1/0
+      ? new Shift.LiteralInfinityExpression
+      : new Shift.LiteralNumericExpression(token2._value);
+    return this.markLocation(node, startTokenIndex);
   }
 
   parseStringLiteral() {

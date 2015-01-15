@@ -1297,7 +1297,8 @@ export class Parser extends Tokenizer {
       return new Shift.PropertyName("string", this.parseStringLiteral().value);
     }
     if (token instanceof NumericLiteralToken) {
-      return new Shift.PropertyName("number", this.parseNumericLiteral().value);
+      let numLiteral = this.parseNumericLiteral();
+      return new Shift.PropertyName("number", "" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value));
     }
     if (token instanceof IdentifierLikeToken) {
       return new Shift.PropertyName("identifier", this.parseIdentifier().name);

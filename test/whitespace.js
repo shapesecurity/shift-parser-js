@@ -37,19 +37,19 @@ describe("Parser", function () {
     assertEsprimaEquiv("while (true) { break /* Multiline\nComment */there; }");
 
     expect(expr(parse("(function(){ return\nx; })"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     expect(expr(parse("(function(){ return // Comment\nx; })"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     expect(expr(parse("(function(){ return/* Multiline\nComment */x; })"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))

@@ -37,19 +37,19 @@ suite("Parser", function () {
     testEsprimaEquiv("0 ;");
 
     testParse("(function(){ return\nx; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     testParse("(function(){ return // Comment\nx; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     testParse("(function(){ return/* Multiline\nComment */x; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))

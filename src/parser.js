@@ -192,18 +192,15 @@ export class Parser extends Tokenizer {
         if (isStringLiteral && stmt.type === "ExpressionStatement" &&
             stmt.expression.type === "LiteralStringExpression") {
           if (text === "\"use strict\"" || text === "'use strict'") {
-            directives.push(this.markLocation(new Shift.UseStrictDirective, directiveLocation));
             isStrict = true;
             this.strict = true;
             if (firstRestricted != null) {
               throw this.createErrorWithLocation(firstRestricted, ErrorMessages.STRICT_OCTAL_LITERAL);
             }
-          } else {
-            directives.push(this.markLocation(new Shift.UnknownDirective(stmt.expression.value), directiveLocation));
-            if (firstRestricted == null && token.octal) {
-              firstRestricted = token.slice.startLocation;
-            }
+          } else if (firstRestricted == null && token.octal) {
+            firstRestricted = token;
           }
+          directives.push(this.markLocation(new Shift.Directive(text.slice(1, -1)), directiveLocation));
         } else {
           parsingDirectives = false;
           statements.push(stmt);
@@ -1287,14 +1284,14 @@ export class Parser extends Tokenizer {
     // Eof and Punctuator tokens are already filtered out.
 
     if (token instanceof StringLiteralToken) {
-      return this.markLocation(new Shift.PropertyName("string", this.parseStringLiteral().value), location);
+      return this.markLocation(new Shift.StaticPropertyName(this.parseStringLiteral().value), location);
     }
     if (token instanceof NumericLiteralToken) {
       let numLiteral = this.parseNumericLiteral();
-      return this.markLocation(new Shift.PropertyName("number", "" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value)), location);
+      return this.markLocation(new Shift.StaticPropertyName("" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value)), location);
     }
     if (token instanceof IdentifierLikeToken) {
-      return this.markLocation(new Shift.PropertyName("identifier", this.parseIdentifier().name), location);
+      return this.markLocation(new Shift.StaticPropertyName(this.parseIdentifier().name), location);
     }
 
     throw this.createError(ErrorMessages.INVALID_PROPERTY_NAME);
@@ -1390,8 +1387,10 @@ export class Parser extends Tokenizer {
       }
     }
     this.strict = previousStrict;
-    return this.markLocation(new (isExpression ? Shift.FunctionExpression : Shift.FunctionDeclaration)(id, info.params, body),
-        startLocation);
+    return this.markLocation(
+      new (isExpression ? Shift.FunctionExpression : Shift.FunctionDeclaration)(false, id, info.params, null, body),
+      startLocation
+    );
   }
 
 

@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2014 Shape Security, Inc.
  *
@@ -63,6 +62,6 @@ describe("Parser", function() {
     assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
     assertParseSuccess("new a=b");
     assertParseSuccess("(a+b)=c");
-    
+
   });
 });

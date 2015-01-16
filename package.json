@@ -15,7 +15,7 @@
   "scripts": {
     "test": "npm run-script coverage",
     "build": "6to5 --source-maps-inline --out-dir lib src",
-    "coverage": "istanbul cover node_modules/.bin/_mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot test",
+    "coverage": "istanbul cover node_modules/.bin/_mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot --recursive test",
     "cjsify": "cjsify --export ShiftParser lib/index.js > shift-parser.js"
   },
   "dependencies": {

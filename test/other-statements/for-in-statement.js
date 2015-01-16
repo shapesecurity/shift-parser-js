@@ -35,7 +35,7 @@ describe("Parser", function () {
         new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
             new Shift.Identifier("i"),
-            new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+            new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
               new Shift.ReturnStatement(new Shift.BinaryExpression("in", new Shift.LiteralNumericExpression(10), new Shift.ArrayExpression([])))
             ]))
           )

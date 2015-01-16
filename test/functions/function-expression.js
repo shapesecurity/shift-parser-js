@@ -25,22 +25,22 @@ var assertEsprimaEquiv = require("../assertions").assertEsprimaEquiv;
 describe("Parser", function () {
   describe("literal numeric expression", function () {
     expect(expr(parse("(function(){})"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))
     );
     expect(expr(parse("(function x() { y; z() });"))).to.be.eql(
-      new Shift.FunctionExpression(new Shift.Identifier("x"), [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, new Shift.Identifier("x"), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("y"))),
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
     expect(expr(parse("(function eval() { });"))).to.be.eql(
-      new Shift.FunctionExpression(new Shift.Identifier("eval"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.Identifier("eval"), [], null, new Shift.FunctionBody([], []))
     );
     expect(expr(parse("(function arguments() { });"))).to.be.eql(
-      new Shift.FunctionExpression(new Shift.Identifier("arguments"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.Identifier("arguments"), [], null, new Shift.FunctionBody([], []))
     );
     expect(expr(parse("(function x(y, z) { })"))).to.be.eql(
-      new Shift.FunctionExpression(new Shift.Identifier("x"), [new Shift.Identifier("y"), new Shift.Identifier("z")], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.Identifier("x"), [new Shift.Identifier("y"), new Shift.Identifier("z")], null, new Shift.FunctionBody([], []))
     );
   });
 });

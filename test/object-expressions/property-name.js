@@ -23,13 +23,13 @@ suite("Parser", function () {
   suite("property name", function () {
     testParse("({0x0:0})", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.PropertyName("number", "0"), new Shift.LiteralNumericExpression(0)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("0"), new Shift.LiteralNumericExpression(0)),
       ])
     );
 
     testParse("({2e308:0})", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.PropertyName("number", "" + 1 / 0), new Shift.LiteralNumericExpression(0)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("" + 1 / 0), new Shift.LiteralNumericExpression(0)),
       ])
     );
   });

@@ -28,7 +28,7 @@ describe("Parser", function () {
     expect(stmt(parse("if (morning) (function(){})"))).to.be.eql(
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
-        new Shift.ExpressionStatement(new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))),
+        new Shift.ExpressionStatement(new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))),
         null
       )
     );
@@ -36,7 +36,7 @@ describe("Parser", function () {
     expect(stmt(parse("if (morning) function a(){}"))).to.be.eql(
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
-        new Shift.FunctionDeclaration(new Shift.Identifier("a"), [], new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([], [])),
         null
       )
     );

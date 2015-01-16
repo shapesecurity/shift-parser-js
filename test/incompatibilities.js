@@ -51,7 +51,7 @@ describe("Parser", function() {
     // We choose to parse this because of ubiquitous support among popular interpreters, despite disagreements about semantics.
     expect(stmt(parse("{ function f(){} }"))).to.be.eql(
       new Shift.BlockStatement(new Shift.Block([
-        new Shift.FunctionDeclaration(new Shift.Identifier("f"), [], new Shift.FunctionBody([], []))
+        new Shift.FunctionDeclaration(false, new Shift.Identifier("f"), [], null, new Shift.FunctionBody([], []))
       ]))
     );
   });
@@ -64,7 +64,7 @@ describe("Parser", function() {
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(
           new Shift.Identifier("yield"),
-          new Shift.FunctionExpression(new Shift.Identifier("yield"), [], new Shift.FunctionBody([], []))
+          new Shift.FunctionExpression(false, new Shift.Identifier("yield"), [], null, new Shift.FunctionBody([], []))
         )
       ]))
     );

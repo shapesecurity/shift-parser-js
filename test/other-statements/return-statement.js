@@ -22,22 +22,22 @@ var expr = require("../helpers").expr;
 suite("Parser", function () {
   suite("return statement", function () {
     testParse("(function(){ return })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
       ]))
     );
     testParse("(function(){ return; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
       ]))
     );
     testParse("(function(){ return x; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     testParse("(function(){ return x * y })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(new Shift.BinaryExpression("*", new Shift.IdentifierExpression(new Shift.Identifier("x")), new Shift.IdentifierExpression(new Shift.Identifier("y")))),
       ]))
     );

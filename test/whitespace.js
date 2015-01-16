@@ -35,19 +35,19 @@ suite("Parser", function () {
     testEsprimaEquiv("while (true) { break /* Multiline\nComment */there; }");
 
     testParse("(function(){ return\nx; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     testParse("(function(){ return // Comment\nx; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     testParse("(function(){ return/* Multiline\nComment */x; })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))

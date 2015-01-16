@@ -198,18 +198,15 @@ export class Parser extends Tokenizer {
         if (isStringLiteral && stmt.type === "ExpressionStatement" &&
             stmt.expression.type === "LiteralStringExpression") {
           if (text === "\"use strict\"" || text === "'use strict'") {
-            directives.push(new Shift.UseStrictDirective);
             isStrict = true;
             this.strict = true;
             if (firstRestricted != null) {
               throw this.createErrorWithToken(firstRestricted, ErrorMessages.STRICT_OCTAL_LITERAL);
             }
-          } else {
-            directives.push(new Shift.UnknownDirective(stmt.expression.value));
-            if (firstRestricted == null && token.octal) {
-              firstRestricted = token;
-            }
+          } else if (firstRestricted == null && token.octal) {
+            firstRestricted = token;
           }
+          directives.push(new Shift.Directive(text.slice(1, -1)));
         } else {
           parsingDirectives = false;
           statements.push(stmt);
@@ -1294,14 +1291,14 @@ export class Parser extends Tokenizer {
     // Eof and Punctuator tokens are already filtered out.
 
     if (token instanceof StringLiteralToken) {
-      return new Shift.PropertyName("string", this.parseStringLiteral().value);
+      return new Shift.StaticPropertyName(this.parseStringLiteral().value);
     }
     if (token instanceof NumericLiteralToken) {
       let numLiteral = this.parseNumericLiteral();
-      return new Shift.PropertyName("number", "" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value));
+      return new Shift.StaticPropertyName("" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value));
     }
     if (token instanceof IdentifierLikeToken) {
-      return new Shift.PropertyName("identifier", this.parseIdentifier().name);
+      return new Shift.StaticPropertyName(this.parseIdentifier().name);
     }
 
     throw this.createError(ErrorMessages.INVALID_PROPERTY_NAME);
@@ -1397,7 +1394,7 @@ export class Parser extends Tokenizer {
       }
     }
     this.strict = previousStrict;
-    return this.markLocation(new (isExpression ? Shift.FunctionExpression : Shift.FunctionDeclaration)(id, info.params, body),
+    return this.markLocation(new (isExpression ? Shift.FunctionExpression : Shift.FunctionDeclaration)(false, id, info.params, null, body),
         startTokenIndex);
   }
 

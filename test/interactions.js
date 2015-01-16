@@ -80,7 +80,7 @@ suite("Parser", function () {
     testParse("/* header */ (function(){ var version = 1; }).call(this)", expr,
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(
-          new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+          new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
               new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
             ])),
@@ -92,7 +92,7 @@ suite("Parser", function () {
     testParse("(function(){ var version = 1; /* sync */ }).call(this)", expr,
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(
-          new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+          new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
               new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
             ])),
@@ -102,7 +102,7 @@ suite("Parser", function () {
       )
     );
     testParse("function f() { /* infinite */ while (true) { } /* bar */ var each; }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("f"), [], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("f"), [], null, new Shift.FunctionBody([], [
         new Shift.WhileStatement(new Shift.LiteralBooleanExpression(true), new Shift.BlockStatement(new Shift.Block([]))),
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(new Shift.Identifier("each"), null)

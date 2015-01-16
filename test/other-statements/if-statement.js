@@ -26,7 +26,7 @@ suite("Parser", function () {
     testParse("if (morning) (function(){})", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
-        new Shift.ExpressionStatement(new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))),
+        new Shift.ExpressionStatement(new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))),
         null
       )
     );
@@ -34,7 +34,7 @@ suite("Parser", function () {
     testParse("if (morning) function a(){}", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
-        new Shift.FunctionDeclaration(new Shift.Identifier("a"), [], new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([], [])),
         null
       )
     );

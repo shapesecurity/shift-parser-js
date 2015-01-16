@@ -22,23 +22,22 @@ var testParse = require("../assertions").testParse;
 suite("Parser", function () {
   suite("literal numeric expression", function () {
     testParse("(function(){})", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))
     );
     testParse("(function x() { y; z() });", expr,
-      new Shift.FunctionExpression(new Shift.Identifier("x"), [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, new Shift.Identifier("x"), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("y"))),
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
     testParse("(function eval() { });", expr,
-      new Shift.FunctionExpression(new Shift.Identifier("eval"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.Identifier("eval"), [], null, new Shift.FunctionBody([], []))
     );
     testParse("(function arguments() { });", expr,
-      new Shift.FunctionExpression(new Shift.Identifier("arguments"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.Identifier("arguments"), [], null, new Shift.FunctionBody([], []))
     );
     testParse("(function x(y, z) { })", expr,
-      new Shift.FunctionExpression(new Shift.Identifier("x"), [new Shift.Identifier("y"), new Shift.Identifier("z")], new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.Identifier("x"), [new Shift.Identifier("y"), new Shift.Identifier("z")], null, new Shift.FunctionBody([], []))
     );
-
   });
 });

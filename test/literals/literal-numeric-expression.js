@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+var Shift = require("shift-ast");
+var parse = require("../..").default;
+var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("literal numeric expression", function () {
@@ -23,24 +29,61 @@ suite("Parser", function () {
     testEsprimaEquiv("3");
     testEsprimaEquiv("5");
     testEsprimaEquiv("42");
+    testEsprimaEquiv("\n    42\n\n");
+
     testEsprimaEquiv(".14");
     testEsprimaEquiv("3.14159");
+
     testEsprimaEquiv("6.02214179e+23");
     testEsprimaEquiv("1.492417830e-10");
-    testEsprimaEquiv("0x0");
-    testEsprimaEquiv("0x0;");
     testEsprimaEquiv("0e+100 ");
     testEsprimaEquiv("0e+100");
+
+    testEsprimaEquiv("0x0");
+    testEsprimaEquiv("0x0;");
     testEsprimaEquiv("0xabc");
     testEsprimaEquiv("0xdef");
     testEsprimaEquiv("0X1A");
     testEsprimaEquiv("0x10");
     testEsprimaEquiv("0x100");
     testEsprimaEquiv("0X04");
+
     testEsprimaEquiv("02");
     testEsprimaEquiv("012");
     testEsprimaEquiv("0012");
     testEsprimaEquiv("\n    42\n\n");
     testEsprimaEquiv("0.");
+
+    // Binary Numeric Literal
+    testParse("0b0", expr, new Shift.LiteralNumericExpression(0));
+    testParse("0b1", expr, new Shift.LiteralNumericExpression(1));
+    testParse("0b10", expr, new Shift.LiteralNumericExpression(2));
+    testParse("0B0", expr, new Shift.LiteralNumericExpression(0));
+
+    testParseFailure("0b", "Unexpected token ILLEGAL");
+    testParseFailure("0b1a", "Unexpected token ILLEGAL");
+    testParseFailure("0b9", "Unexpected token ILLEGAL");
+    testParseFailure("0b18", "Unexpected token ILLEGAL");
+    testParseFailure("0b12", "Unexpected token ILLEGAL");
+    testParseFailure("0B", "Unexpected token ILLEGAL");
+    testParseFailure("0B1a", "Unexpected token ILLEGAL");
+    testParseFailure("0B9", "Unexpected token ILLEGAL");
+    testParseFailure("0B18", "Unexpected token ILLEGAL");
+    testParseFailure("0B12", "Unexpected token ILLEGAL");
+
+    // Octal Numeric Literal
+    testParse("0o0", expr, new Shift.LiteralNumericExpression(0));
+    testParse("0o1", expr, new Shift.LiteralNumericExpression(1));
+    testParse("0o10", expr, new Shift.LiteralNumericExpression(8));
+    testParse("0O0", expr, new Shift.LiteralNumericExpression(0));
+
+    testParseFailure("0o", "Unexpected token ILLEGAL");
+    testParseFailure("0o1a", "Unexpected token ILLEGAL");
+    testParseFailure("0o9", "Unexpected token ILLEGAL");
+    testParseFailure("0o18", "Unexpected token ILLEGAL");
+    testParseFailure("0O", "Unexpected token ILLEGAL");
+    testParseFailure("0O1a", "Unexpected token ILLEGAL");
+    testParseFailure("0O9", "Unexpected token ILLEGAL");
+    testParseFailure("0O18", "Unexpected token ILLEGAL");
   });
 });

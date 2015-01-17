@@ -1022,7 +1022,32 @@ class Tokenizer {
     return new NumericLiteralToken(slice, parseInt(slice.text.substr(2), 16));
   }
 
+  scanBinaryLiteral(start) {
+    let offset = this.index - start;
+
+    while (this.index < this.source.length) {
+      let ch = this.source.charAt(this.index);
+      if (ch !== "0" && ch !== "1") {
+        break;
+      }
+      this.index++;
+    }
+
+    if (this.index - start <= offset) {
+      throw this.createILLEGAL();
+    }
+
+    if (this.index < this.source.length && (isIdentifierStart(this.source.charCodeAt(this.index))
+        || isDecimalDigit(this.source.charAt(this.index)))) {
+      throw this.createILLEGAL();
+    }
+
+    return new NumericLiteralToken(this.getSlice(start), parseInt(this.getSlice(start).text.substr(offset), 2), true);
+  }
+
   scanOctalLiteral(start) {
+    var offset = this.index - start;
+
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
       if (!("0" <= ch && ch <= "7")) {
@@ -1031,12 +1056,16 @@ class Tokenizer {
       this.index++;
     }
 
+    if (offset === 2 && this.index - start === 2) {
+      throw this.createILLEGAL();
+    }
+
     if (this.index < this.source.length && (isIdentifierStart(this.source.charCodeAt(this.index))
         || isDecimalDigit(this.source.charAt(this.index)))) {
       throw this.createILLEGAL();
     }
 
-    return new NumericLiteralToken(this.getSlice(start), parseInt(this.getSlice(start).text.substr(1), 8), true);
+    return new NumericLiteralToken(this.getSlice(start), parseInt(this.getSlice(start).text.substr(offset), 8), true);
   }
 
   scanNumericLiteral() {
@@ -1051,6 +1080,12 @@ class Tokenizer {
         if (ch === "x" || ch === "X") {
           this.index++;
           return this.scanHexLiteral(start);
+        } else if (ch === "b" || ch === "B") {
+          this.index++;
+          return this.scanBinaryLiteral(start);
+        } else if (ch === "o" || ch === "O") {
+          this.index++;
+          return this.scanOctalLiteral(start);
         } else if ("0" <= ch && ch <= "9") {
           return this.scanOctalLiteral(start);
         }

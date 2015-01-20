@@ -14,29 +14,26 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
 
 describe("Parser", function () {
   describe("literal string expression", function () {
-    // String Literals
-    assertEsprimaEquiv("\"Hello\"");
-    assertEsprimaEquiv("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"");
-    assertEsprimaEquiv("\"\\u0061\"");
-    assertEsprimaEquiv("\"\\x61\"");
-    assertEsprimaEquiv("\"\\u00\"");
-    assertEsprimaEquiv("\"\\xt\"");
-    assertEsprimaEquiv("\"Hello\\nworld\"");
-    assertEsprimaEquiv("\"Hello\\\nworld\"");
-    assertEsprimaEquiv("\"Hello\\02World\"");
-    assertEsprimaEquiv("\"Hello\\012World\"");
-    assertEsprimaEquiv("\"Hello\\122World\"");
-    assertEsprimaEquiv("\"Hello\\0122World\"");
-    assertEsprimaEquiv("\"Hello\\312World\"");
-    assertEsprimaEquiv("\"Hello\\412World\"");
-    assertEsprimaEquiv("\"Hello\\812World\"");
-    assertEsprimaEquiv("\"Hello\\712World\"");
-    assertEsprimaEquiv("\"Hello\\0World\"");
-    assertEsprimaEquiv("\"Hello\\\r\nworld\"");
-    assertEsprimaEquiv("\"Hello\\1World\"");
+    expect(expr(parse("('x')"))).to.be.eql(
+      new Shift.LiteralStringExpression("x")
+    );
+    expect(expr(parse("('\\\\\\'')"))).to.be.eql(
+      new Shift.LiteralStringExpression("\\'")
+    );
+    expect(expr(parse("(\"x\")"))).to.be.eql(
+      new Shift.LiteralStringExpression("x")
+    );
+    expect(expr(parse("(\"\\\\\\\"\")"))).to.be.eql(
+      new Shift.LiteralStringExpression("\\\"")
+    );
   });
 });

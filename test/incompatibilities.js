@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../").default;
+var Shift = require("shift-ast");
+
+var expr = require("./helpers").expr;
+var stmt = require("./helpers").stmt;
 var assertParseFailure = require('./assertions').assertParseFailure;
-var assertParseSuccess = require('./assertions').assertParseSuccess;
 
 describe("Parser", function() {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
@@ -43,25 +49,64 @@ describe("Parser", function() {
     // ES5: invalid program
     // ES6: function declaration within a block
     // We choose to parse this because of ubiquitous support among popular interpreters, despite disagreements about semantics.
-    assertParseSuccess("{ function f(){} }");
+    expect(stmt(parse("{ function f(){} }"))).to.be.eql(
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.FunctionDeclaration(new Shift.Identifier("f"), [], new Shift.FunctionBody([], []))
+      ]))
+    );
   });
 
   // programs that parse according to ES5 but either fail or parse differently according to ES6
   describe("ES6 backward incompatibilities", function() {
     // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
     // ES6: yield has been moved from the future reserved words list to the keywords list
-    assertParseSuccess("var yield = function yield(){};");
+    expect(stmt(parse("var yield = function yield(){};"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(
+          new Shift.Identifier("yield"),
+          new Shift.FunctionExpression(new Shift.Identifier("yield"), [], new Shift.FunctionBody([], []))
+        )
+      ]))
+    );
 
     // ES5: this declares a function-scoped variable while at the same time assigning to the block-scoped variable
     // ES6: this particular construction is explicitly disallowed
-    assertParseSuccess("try {} catch(e) { var e = 0; }");
+    expect(stmt(parse("try {} catch(e) { var e = 0; }"))).to.be.eql(
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.Identifier("e"),
+          new Shift.Block([
+            new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+              new Shift.VariableDeclarator(new Shift.Identifier("e"), new Shift.LiteralNumericExpression(0))
+            ]))
+          ])
+        )
+      )
+    );
 
     // ES5: allows any LeftHandSideExpression on the left of an assignment
     // ES6: allows only valid bindings on the left of an assignment
     assertParseFailure("a+b=c", "Invalid left-hand side in assignment");
     assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
-    assertParseSuccess("new a=b");
-    assertParseSuccess("(a+b)=c");
+    expect(expr(parse("new a=b"))).to.be.eql(
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), []),
+        new Shift.IdentifierExpression(new Shift.Identifier("b"))
+      )
+    );
+    expect(expr(parse(("(a+b)=c")))).to.be.eql(
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.BinaryExpression(
+          "+",
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          new Shift.IdentifierExpression(new Shift.Identifier("b"))
+        ),
+        new Shift.IdentifierExpression(new Shift.Identifier("c"))
+      )
+    );
 
   });
 });

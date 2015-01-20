@@ -14,10 +14,23 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../").default;
+var Shift = require("shift-ast");
+
+var expr = require("./helpers").expr;
+var stmt = require("./helpers").stmt;
 var assertEsprimaEquiv = require('./assertions').assertEsprimaEquiv;
+var assertParseFailure = require('./assertions').assertParseFailure;
 
 describe("Parser", function () {
   describe("interactions", function () {
+    // LiteralNumericExpression and StaticMemberExpression
+    assertEsprimaEquiv("0..toString");
+    assertEsprimaEquiv("01.toString");
+    assertParseFailure("0.toString", "Unexpected token ILLEGAL");
+
     // LeftHandSideExpressions
     assertEsprimaEquiv("a.b(b,c)");
     assertEsprimaEquiv("a[b](b,c)");
@@ -65,9 +78,40 @@ describe("Parser", function () {
     assertEsprimaEquiv("if (x) { doThat() /* Some comment */ }");
     assertEsprimaEquiv("switch (answer) { case 42: /* perfect */ bingo() }");
     assertEsprimaEquiv("switch (answer) { case 42: bingo() /* perfect */ }");
-    assertEsprimaEquiv("/* header */ (function(){ var version = 1; }).call(this)");
-    assertEsprimaEquiv("(function(){ var version = 1; /* sync */ }).call(this)");
-    assertEsprimaEquiv("function f() { /* infinite */ while (true) { } /* bar */ var each; }");
+    expect(expr(parse("/* header */ (function(){ var version = 1; }).call(this)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.StaticMemberExpression(
+          new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+            new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+              new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
+            ])),
+          ])),
+          new Shift.Identifier("call")
+        ),
+        [new Shift.ThisExpression]
+      )
+    );
+    expect(expr(parse("(function(){ var version = 1; /* sync */ }).call(this)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.StaticMemberExpression(
+          new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+            new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+              new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
+            ])),
+          ])),
+          new Shift.Identifier("call")
+        ),
+        [new Shift.ThisExpression]
+      )
+    );
+    expect(stmt(parse("function f() { /* infinite */ while (true) { } /* bar */ var each; }"))).to.be.eql(
+      new Shift.FunctionDeclaration(new Shift.Identifier("f"), [], new Shift.FunctionBody([], [
+        new Shift.WhileStatement(new Shift.LiteralBooleanExpression(true), new Shift.BlockStatement(new Shift.Block([]))),
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.Identifier("each"), null)
+        ])),
+      ]))
+    );
     assertEsprimaEquiv("while (i-->0) {}");
     assertEsprimaEquiv("var x = 1<!--foo");
     assertEsprimaEquiv("/* not comment*/; i-->0");

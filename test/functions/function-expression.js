@@ -14,15 +14,33 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
+var assertEsprimaEquiv = require("../assertions").assertEsprimaEquiv;
 
 describe("Parser", function () {
   describe("literal numeric expression", function () {
-    assertEsprimaEquiv("var hi = function() { sayHi() };");
-    assertEsprimaEquiv("var hi = function eval() { };");
-    assertEsprimaEquiv("var hi = function arguments() { };");
-    assertEsprimaEquiv("var hello = function hi() { sayHi() };");
-    assertEsprimaEquiv("(function(){})");
-    assertEsprimaEquiv("(function test(t, t) { })");
+    expect(expr(parse("(function(){})"))).to.be.eql(
+      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))
+    );
+    expect(expr(parse("(function x() { y; z() });"))).to.be.eql(
+      new Shift.FunctionExpression(new Shift.Identifier("x"), [], new Shift.FunctionBody([], [
+        new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("y"))),
+        new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
+      ]))
+    );
+    expect(expr(parse("(function eval() { });"))).to.be.eql(
+      new Shift.FunctionExpression(new Shift.Identifier("eval"), [], new Shift.FunctionBody([], []))
+    );
+    expect(expr(parse("(function arguments() { });"))).to.be.eql(
+      new Shift.FunctionExpression(new Shift.Identifier("arguments"), [], new Shift.FunctionBody([], []))
+    );
+    expect(expr(parse("(function x(y, z) { })"))).to.be.eql(
+      new Shift.FunctionExpression(new Shift.Identifier("x"), [new Shift.Identifier("y"), new Shift.Identifier("z")], new Shift.FunctionBody([], []))
+    );
   });
 });

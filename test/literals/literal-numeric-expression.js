@@ -18,8 +18,8 @@ var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
   describe("literal numeric expression", function () {
-    // Numeric Literals
     assertEsprimaEquiv("0");
+    assertEsprimaEquiv("0;");
     assertEsprimaEquiv("3");
     assertEsprimaEquiv("5");
     assertEsprimaEquiv("42");

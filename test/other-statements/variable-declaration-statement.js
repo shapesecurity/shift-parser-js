@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var stmt = require("../helpers").stmt;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
-var assertParseSuccess = require('../assertions').assertParseSuccess;
 
 describe("Parser", function () {
   describe("variable declaration statement", function () {
@@ -28,7 +33,11 @@ describe("Parser", function () {
     assertEsprimaEquiv("var x = 14, y = 3, z = 1977");
     assertEsprimaEquiv("var implements, interface, package");
     assertEsprimaEquiv("var private, protected, public, static");
-    assertParseSuccess("var yield;");
+    expect(stmt(parse("var yield;"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.Identifier("yield"), null),
+      ]))
+    );
 
     // Let Statement
     assertEsprimaEquiv("let x");

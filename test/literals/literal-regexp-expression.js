@@ -19,14 +19,18 @@ var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 describe("Parser", function () {
   describe("literal regexp expression", function () {
     // Regular Expression Literals
-    assertEsprimaEquiv("var x = /[a-z]/i");
-    assertEsprimaEquiv("var x = /[x-z]/i");
-    assertEsprimaEquiv("var x = /[a-c]/i");
-    assertEsprimaEquiv("var x = /[P QR]/i");
-    assertEsprimaEquiv("var x = /[\\]/]/");
-    assertEsprimaEquiv("var x = /foo\\/bar/");
-    assertEsprimaEquiv("var x = /=([^=\\s])+/g");
-    // testParser("expression/regexp/07", "var x = /[P QR]/\\g");
-    assertEsprimaEquiv("var x = /42/g.test");
+    assertEsprimaEquiv("/a/");
+    assertEsprimaEquiv("/a/;");
+    assertEsprimaEquiv("/a/i");
+    assertEsprimaEquiv("/a/i;");
+    assertEsprimaEquiv("/[a-z]/i");
+    assertEsprimaEquiv("/[x-z]/i");
+    assertEsprimaEquiv("/[a-c]/i");
+    assertEsprimaEquiv("/[P QR]/i");
+    assertEsprimaEquiv("/[\\]/]/");
+    assertEsprimaEquiv("/foo\\/bar/");
+    assertEsprimaEquiv("/=([^=\\s])+/g");
+    // assertEsprimaEquiv("/[P QR]/\\g");
+    assertEsprimaEquiv("/42/g.test");
   });
 });

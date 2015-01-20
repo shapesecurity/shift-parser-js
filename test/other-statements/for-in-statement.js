@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var stmt = require("../helpers").stmt;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
@@ -24,7 +30,23 @@ describe("Parser", function () {
     assertEsprimaEquiv("for (let x in list) process(x);");
     assertEsprimaEquiv("for (var x = y = z in q);");
     assertEsprimaEquiv("for (var a = b = c = (d in e) in z);");
-    assertEsprimaEquiv("for (var i = function() { return 10 in [] } in list) process(x);");
+    expect(stmt(parse("for (var i = function() { return 10 in [] } in list) process(x);"))).to.be.eql(
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.Identifier("i"),
+            new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+              new Shift.ReturnStatement(new Shift.BinaryExpression("in", new Shift.LiteralNumericExpression(10), new Shift.ArrayExpression([])))
+            ]))
+          )
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("list")),
+        new Shift.ExpressionStatement(new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("process")),
+          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+        ))
+      )
+    );
     assertEsprimaEquiv("for(var a in b);");
     assertEsprimaEquiv("for(var a = c in b);");
     assertEsprimaEquiv("for(a in b);");

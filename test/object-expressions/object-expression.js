@@ -14,40 +14,188 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
   describe("object expression", function () {
-    // Object Initializer
+    assertEsprimaEquiv("({})");
     assertEsprimaEquiv("+{}");
     assertEsprimaEquiv("+{ }");
-    assertEsprimaEquiv("+{ answer: 42 }");
-    assertEsprimaEquiv("+{ if: 42 }");
-    assertEsprimaEquiv("+{ true: 42 }");
-    assertEsprimaEquiv("+{ false: 42 }");
-    assertEsprimaEquiv("+{ null: 42 }");
-    assertEsprimaEquiv("+{ \"answer\": 42 }");
-    assertEsprimaEquiv("+{ x: 1, x: 2 }");
-    assertEsprimaEquiv("+{ get width() { return m_width } }");
-    assertEsprimaEquiv("+{ get undef() {} }");
-    assertEsprimaEquiv("+{ get if() {} }");
-    assertEsprimaEquiv("+{ get true() {} }");
-    assertEsprimaEquiv("+{ get false() {} }");
-    assertEsprimaEquiv("+{ get null() {} }");
-    assertEsprimaEquiv("+{ get \"undef\"() {} }");
-    assertEsprimaEquiv("+{ get 10() {} }");
-    assertEsprimaEquiv("+{ set width(w) { m_width = w } }");
-    assertEsprimaEquiv("+{ set if(w) { m_if = w } }");
-    assertEsprimaEquiv("+{ set true(w) { m_true = w } }");
-    assertEsprimaEquiv("+{ set false(w) { m_false = w } }");
-    assertEsprimaEquiv("+{ set null(w) { m_null = w } }");
-    assertEsprimaEquiv("+{ set \"null\"(w) { m_null = w } }");
-    assertEsprimaEquiv("+{ set 10(w) { m_null = w } }");
-    assertEsprimaEquiv("+{ get: 42 }");
-    assertEsprimaEquiv("+{ set: 43 }");
-    assertEsprimaEquiv("+{ __proto__: 2 }");
-    assertEsprimaEquiv("+{\"__proto__\": 2 }");
-    assertEsprimaEquiv("+{ get width() { return m_width }, set width(width) { m_width = width; } }");
-    assertEsprimaEquiv("+{a:0, get 'b'(){}, set 3(d){}}");
+
+    expect(expr(parse("({ answer: 42 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "answer"), new Shift.LiteralNumericExpression(42)),
+      ])
+    );
+    expect(expr(parse("({ if: 42 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "if"), new Shift.LiteralNumericExpression(42)),
+      ])
+    );
+    expect(expr(parse("({ true: 42 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "true"), new Shift.LiteralNumericExpression(42)),
+      ])
+    );
+    expect(expr(parse("({ false: 42 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "false"), new Shift.LiteralNumericExpression(42)),
+      ])
+    );
+    expect(expr(parse("({ null: 42 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "null"), new Shift.LiteralNumericExpression(42)),
+      ])
+    );
+    expect(expr(parse("({ \"answer\": 42 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("string", "answer"), new Shift.LiteralNumericExpression(42)),
+      ])
+    );
+    expect(expr(parse("({ x: 1, x: 2 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "x"), new Shift.LiteralNumericExpression(1)),
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "x"), new Shift.LiteralNumericExpression(2)),
+      ])
+    );
+
+    expect(expr(parse("({ get width() { return m_width } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("identifier", "width"), new Shift.FunctionBody([], [
+          new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("m_width"))),
+        ])),
+      ])
+    );
+    expect(expr(parse("({ get undef() {} })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("identifier", "undef"), new Shift.FunctionBody([], [])),
+      ])
+    );
+    expect(expr(parse("({ get if() {} })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("identifier", "if"), new Shift.FunctionBody([], [])),
+      ])
+    );
+    expect(expr(parse("({ get true() {} })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("identifier", "true"), new Shift.FunctionBody([], [])),
+      ])
+    );
+    expect(expr(parse("({ get false() {} })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("identifier", "false"), new Shift.FunctionBody([], [])),
+      ])
+    );
+    expect(expr(parse("({ get null() {} })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("identifier", "null"), new Shift.FunctionBody([], [])),
+      ])
+    );
+    expect(expr(parse("({ get \"undef\"() {} })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("string", "undef"), new Shift.FunctionBody([], [])),
+      ])
+    );
+    expect(expr(parse("({ get 10() {} })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("number", "10"), new Shift.FunctionBody([], [])),
+      ])
+    );
+
+    expect(expr(parse("({ set width(w) { w } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.PropertyName("identifier", "width"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+        ])),
+      ])
+    );
+    expect(expr(parse("({ set if(w) { w } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.PropertyName("identifier", "if"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+        ])),
+      ])
+    );
+    expect(expr(parse("({ set true(w) { w } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.PropertyName("identifier", "true"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+        ])),
+      ])
+    );
+    expect(expr(parse("({ set false(w) { w } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.PropertyName("identifier", "false"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+        ])),
+      ])
+    );
+    expect(expr(parse("({ set null(w) { w } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.PropertyName("identifier", "null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+        ])),
+      ])
+    );
+    expect(expr(parse("({ set \"null\"(w) { w } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.PropertyName("string", "null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+        ])),
+      ])
+    );
+    expect(expr(parse("({ set 10(w) { w } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.PropertyName("number", "10"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+        ])),
+      ])
+    );
+
+    expect(expr(parse("({ get: 2 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "get"), new Shift.LiteralNumericExpression(2)),
+      ])
+    );
+    expect(expr(parse("({ set: 2 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "set"), new Shift.LiteralNumericExpression(2)),
+      ])
+    );
+    expect(expr(parse("({ __proto__: 2 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "__proto__"), new Shift.LiteralNumericExpression(2)),
+      ])
+    );
+    expect(expr(parse("({\"__proto__\": 2 })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("string", "__proto__"), new Shift.LiteralNumericExpression(2)),
+      ])
+    );
+
+    expect(expr(parse("({ get width() { return width }, set width(width) { return width; } })"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.PropertyName("identifier", "width"), new Shift.FunctionBody([], [
+          new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("width"))),
+        ])),
+        new Shift.Setter(new Shift.PropertyName("identifier", "width"), new Shift.Identifier("width"), new Shift.FunctionBody([], [
+          new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("width"))),
+        ])),
+      ])
+    );
+
+    expect(expr(parse("({a:0, get 'b'(){}, set 3(d){}})"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("identifier", "a"), new Shift.LiteralNumericExpression(0)),
+        new Shift.Getter(new Shift.PropertyName("string", "b"), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.PropertyName("number", "3"), new Shift.Identifier("d"), new Shift.FunctionBody([], [])),
+      ])
+    );
   });
 });

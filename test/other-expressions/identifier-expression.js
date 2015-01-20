@@ -17,16 +17,8 @@
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
-  describe("debugger statement", function () {
+  describe("identifier expression", function () {
     assertEsprimaEquiv("x");
-
-    assertEsprimaEquiv("'x';");
-    assertEsprimaEquiv("\"x\";");
-
-    assertEsprimaEquiv("0;");
-
-    assertEsprimaEquiv("null;");
-
-    assertEsprimaEquiv("/a/g;");
+    assertEsprimaEquiv("x;");
   });
 });

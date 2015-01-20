@@ -21,6 +21,6 @@ describe("Parser", function () {
     assertEsprimaEquiv("throw this");
     assertEsprimaEquiv("throw x;");
     assertEsprimaEquiv("throw x * y");
-    assertEsprimaEquiv("throw { message: \"Error\" }");
+    assertEsprimaEquiv("throw {}");
   });
 });

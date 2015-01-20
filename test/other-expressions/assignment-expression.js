@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
   describe("assignment expression", function () {
-    // Assignment Operators
     assertEsprimaEquiv("a=2;");
     assertEsprimaEquiv("x = 42");
     assertEsprimaEquiv("eval = 42");
@@ -34,7 +39,25 @@ describe("Parser", function () {
     assertEsprimaEquiv("x &= 42");
     assertEsprimaEquiv("x ^= 42");
     assertEsprimaEquiv("x |= 42");
-    assertEsprimaEquiv("'use strict'; eval[0] = 42");
-    assertEsprimaEquiv("'use strict'; arguments[0] = 42");
+    expect(expr(parse("'use strict'; eval[0] = 42"))).to.be.eql(
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.ComputedMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("eval")),
+          new Shift.LiteralNumericExpression(0)
+        ),
+        new Shift.LiteralNumericExpression(42)
+      )
+    );
+    expect(expr(parse("'use strict'; arguments[0] = 42"))).to.be.eql(
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.ComputedMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("arguments")),
+          new Shift.LiteralNumericExpression(0)
+        ),
+        new Shift.LiteralNumericExpression(42)
+      )
+    );
   });
 });

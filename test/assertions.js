@@ -16,12 +16,6 @@ exports.assertParseFailure = function assertParseFailure(source, message) {
   });
 };
 
-exports.assertParseSuccess = function assertParseSuccess(source) {
-  it(source, function () {
-    parse(source);
-  });
-};
-
 exports.assertEsprimaEquiv = function assertEsprimaEquiv(source) {
   it(source, function () {
     var tree = parse(source);

@@ -983,6 +983,7 @@ export class Parser extends Tokenizer {
   parsePostfixExpression() {
     let startTokenIndex = this.tokenIndex;
 
+    let isParenthesised = this.lookahead.type === TokenType.LPAREN;
     let expr = this.parseLeftHandSideExpressionAllowCall();
 
     if (this.hasLineTerminatorBeforeNext) {
@@ -1000,7 +1001,7 @@ export class Parser extends Tokenizer {
         throw this.createError(ErrorMessages.STRICT_LHS_POSTFIX);
       }
     }
-    if (!Parser.isLeftHandSide(expr)) {
+    if (!isParenthesised && !Parser.isLeftHandSide(expr)) {
       throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
     }
     return this.markLocation(new Shift.PostfixExpression(expr, operator.value), startTokenIndex);

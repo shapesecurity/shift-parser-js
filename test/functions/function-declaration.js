@@ -25,42 +25,42 @@ var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 describe("Parser", function () {
   describe("function declaration", function () {
     expect(stmt(parse("function hello() { z(); }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("hello"), [], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
     expect(stmt(parse("function eval() { }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("eval"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("eval"), [], null, new Shift.FunctionBody([], []))
     );
     expect(stmt(parse("function arguments() { }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("arguments"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("arguments"), [], null, new Shift.FunctionBody([], []))
     );
     expect(stmt(parse("function test(t, t) { }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("test"), [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("test"), [
         new Shift.Identifier("t"),
         new Shift.Identifier("t"),
-      ], new Shift.FunctionBody([], []))
+      ], null, new Shift.FunctionBody([], []))
     );
     expect(stmt(parse("function eval() { function inner() { \"use strict\" } }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("eval"), [], new Shift.FunctionBody([], [
-        new Shift.FunctionDeclaration(new Shift.Identifier("inner"), [], new Shift.FunctionBody([new Shift.UseStrictDirective], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("eval"), [], null, new Shift.FunctionBody([], [
+        new Shift.FunctionDeclaration(false, new Shift.Identifier("inner"), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], []))
       ]))
     );
     expect(stmt(parse("function hello(a) { z(); }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("hello"), [new Shift.Identifier("a")], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.Identifier("a")], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
     expect(stmt(parse("function hello(a, b) { z(); }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("hello"), [new Shift.Identifier("a"), new Shift.Identifier("b")], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.Identifier("a"), new Shift.Identifier("b")], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
     expect(stmt(parse("function universe(__proto__) { }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("universe"), [new Shift.Identifier("__proto__")], new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("universe"), [new Shift.Identifier("__proto__")], null, new Shift.FunctionBody([], []))
     );
     expect(stmt(parse("function test() { \"use strict\"\n + 42; }"))).to.be.eql(
-      new Shift.FunctionDeclaration(new Shift.Identifier("test"), [], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("test"), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("use strict"), new Shift.LiteralNumericExpression(42))),
       ]))
     );

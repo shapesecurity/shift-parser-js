@@ -24,22 +24,22 @@ var expr = require("../helpers").expr;
 describe("Parser", function () {
   describe("return statement", function () {
     expect(expr(parse("(function(){ return })"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
       ]))
     );
     expect(expr(parse("(function(){ return; })"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
       ]))
     );
     expect(expr(parse("(function(){ return x; })"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
     expect(expr(parse("(function(){ return x * y })"))).to.be.eql(
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(new Shift.BinaryExpression("*", new Shift.IdentifierExpression(new Shift.Identifier("x")), new Shift.IdentifierExpression(new Shift.Identifier("y")))),
       ]))
     );

@@ -1252,8 +1252,8 @@ export class Parser extends Tokenizer {
 
     if ({}.hasOwnProperty.call(propertyMap, key)) {
       if ((value & INIT_MASK) !== 0) {
-        if (this.strict && type === "DataProperty") {
-          throw this.createError(ErrorMessages.STRICT_DUPLICATE_PROPERTY);
+        if (type === "DataProperty" && key === "$__proto__") {
+          throw this.createError(ErrorMessages.DUPLICATE_PROTO_PROPERTY);
         } else if (type !== "DataProperty") {
           throw this.createError(ErrorMessages.ACCESSOR_DATA_PROPERTY);
         }

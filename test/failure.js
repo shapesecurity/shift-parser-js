@@ -240,10 +240,6 @@ describe("Parser", function () {
     assertParseFailure("x: while (true) { x: while (true) { } }", "Label \'x\' has already been declared");
     assertParseFailure("(function () { \'use strict\'; delete i; }())", "Delete of an unqualified identifier in strict mode.");
     assertParseFailure("(function () { \'use strict\'; with (i); }())", "Strict mode code may not include a with statement");
-    assertParseFailure("function hello() {\'use strict\'; ({ i: 42, i: 42 }) }",
-        "Duplicate data property in object literal not allowed in strict mode");
-    assertParseFailure("function hello() {\'use strict\'; ({ hasOwnProperty: 42, hasOwnProperty: 42 }) }",
-        "Duplicate data property in object literal not allowed in strict mode");
     assertParseFailure("function hello() {\'use strict\'; var eval = 10; }",
         "Variable name may not be eval or arguments in strict mode");
     assertParseFailure("function hello() {\'use strict\'; var arguments = 10; }",
@@ -346,10 +342,9 @@ describe("Parser", function () {
     assertParseFailure("__proto__: __proto__: 42;", "Label \'__proto__\' has already been declared");
     assertParseFailure("\"use strict\"; function t(__proto__, __proto__) { }",
         "Strict mode function may not have duplicate parameter names");
-    assertParseFailure("\"use strict\"; x = { __proto__: 42, __proto__: 43 }",
-        "Duplicate data property in object literal not allowed in strict mode");
-    assertParseFailure("\"use strict\"; x = { get __proto__() { }, __proto__: 43 }",
-        "Object literal may not have data and accessor property with the same name");
+    assertParseFailure("({__proto__:1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");
+    assertParseFailure("({\'__proto__\':1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");
+    assertParseFailure("{ \"use strict\"; ({__proto__:1,__proto__:2}) }", "Duplicate __proto__ property in object literal not allowed");
     assertParseFailure("var", "Unexpected end of input");
     assertParseFailure("let", "Unexpected end of input");
     assertParseFailure("const", "Unexpected end of input");

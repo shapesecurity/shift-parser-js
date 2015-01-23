@@ -240,10 +240,6 @@ suite("Parser", function () {
     testParseFailure("x: while (true) { x: while (true) { } }", "Label \'x\' has already been declared");
     testParseFailure("(function () { \'use strict\'; delete i; }())", "Delete of an unqualified identifier in strict mode.");
     testParseFailure("(function () { \'use strict\'; with (i); }())", "Strict mode code may not include a with statement");
-    testParseFailure("function hello() {\'use strict\'; ({ i: 42, i: 42 }) }",
-        "Duplicate data property in object literal not allowed in strict mode");
-    testParseFailure("function hello() {\'use strict\'; ({ hasOwnProperty: 42, hasOwnProperty: 42 }) }",
-        "Duplicate data property in object literal not allowed in strict mode");
     testParseFailure("function hello() {\'use strict\'; var eval = 10; }",
         "Variable name may not be eval or arguments in strict mode");
     testParseFailure("function hello() {\'use strict\'; var arguments = 10; }",
@@ -346,10 +342,9 @@ suite("Parser", function () {
     testParseFailure("__proto__: __proto__: 42;", "Label \'__proto__\' has already been declared");
     testParseFailure("\"use strict\"; function t(__proto__, __proto__) { }",
         "Strict mode function may not have duplicate parameter names");
-    testParseFailure("\"use strict\"; x = { __proto__: 42, __proto__: 43 }",
-        "Duplicate data property in object literal not allowed in strict mode");
-    testParseFailure("\"use strict\"; x = { get __proto__() { }, __proto__: 43 }",
-        "Object literal may not have data and accessor property with the same name");
+    testParseFailure("({__proto__:1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");
+    testParseFailure("({\'__proto__\':1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");
+    testParseFailure("{ \"use strict\"; ({__proto__:1,__proto__:2}) }", "Duplicate __proto__ property in object literal not allowed");
     testParseFailure("var", "Unexpected end of input");
     testParseFailure("let", "Unexpected end of input");
     testParseFailure("const", "Unexpected end of input");

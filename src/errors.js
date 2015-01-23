@@ -43,7 +43,7 @@ export const ErrorMessages = {
   STRICT_FUNCTION_NAME: "Function name may not be eval or arguments in strict mode",
   STRICT_OCTAL_LITERAL: "Octal literals are not allowed in strict mode.",
   STRICT_DELETE: "Delete of an unqualified identifier in strict mode.",
-  STRICT_DUPLICATE_PROPERTY: "Duplicate data property in object literal not allowed in strict mode",
+  DUPLICATE_PROTO_PROPERTY: "Duplicate __proto__ property in object literal not allowed",
   ACCESSOR_DATA_PROPERTY: "Object literal may not have data and accessor property with the same name",
   ACCESSOR_GET_SET: "Object literal may not have multiple get/set accessors with the same name",
   STRICT_LHS_ASSIGNMENT: "Assignment to eval or arguments is not allowed in strict mode",

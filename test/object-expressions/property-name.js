@@ -21,5 +21,9 @@ describe("Parser", function () {
   describe("property name", function () {
     expect(ShiftParser.default("({0x0:0})").body.statements[0].expression.properties[0].name.value).to.be("0");
     expect(ShiftParser.default("({2e308:0})").body.statements[0].expression.properties[0].name.value).to.be("" + 1 / 0);
+
+    expect(function () { ShiftParser.default("({__proto__:42,__proto__:43})") }).to.throwError();
+    expect(function () { ShiftParser.default("use strict; ({__proto__:42,__proto__:43})") }).to.throwError();
+    expect(function () { ShiftParser.default("({__proto__:42},{__proto__:43})") }).to.not.throwError();
   });
 });

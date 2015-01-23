@@ -197,12 +197,12 @@ suite("Parser", function () {
       ])
     );
 
-    expect(expr(parse("({a})"))).to.be.eql(
+    testParse("({a})", expr,
       new Shift.ObjectExpression([
         new Shift.ShorthandProperty(new Shift.Identifier("a")),
       ])
     );
-    expect(expr(parse("({a, b: 0, c})"))).to.be.eql(
+    testParse("({a, b: 0, c})", expr,
       new Shift.ObjectExpression([
         new Shift.ShorthandProperty(new Shift.Identifier("a")),
         new Shift.DataProperty(
@@ -212,7 +212,7 @@ suite("Parser", function () {
         new Shift.ShorthandProperty(new Shift.Identifier("c")),
       ])
     );
-    expect(expr(parse("({a, b})"))).to.be.eql(
+    testParse("({a, b})", expr,
       new Shift.ObjectExpression([
         new Shift.ShorthandProperty(new Shift.Identifier("a")),
         new Shift.ShorthandProperty(new Shift.Identifier("b")),

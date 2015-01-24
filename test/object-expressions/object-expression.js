@@ -196,5 +196,27 @@ suite("Parser", function () {
         new Shift.Setter(new Shift.StaticPropertyName("3"), new Shift.Identifier("d"), new Shift.FunctionBody([], [])),
       ])
     );
+
+    expect(expr(parse("({a})"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.ShorthandProperty(new Shift.Identifier("a")),
+      ])
+    );
+    expect(expr(parse("({a, b: 0, c})"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.ShorthandProperty(new Shift.Identifier("a")),
+        new Shift.DataProperty(
+          new Shift.StaticPropertyName("b"),
+          new Shift.LiteralNumericExpression(0)
+        ),
+        new Shift.ShorthandProperty(new Shift.Identifier("c")),
+      ])
+    );
+    expect(expr(parse("({a, b})"))).to.be.eql(
+      new Shift.ObjectExpression([
+        new Shift.ShorthandProperty(new Shift.Identifier("a")),
+        new Shift.ShorthandProperty(new Shift.Identifier("b")),
+      ])
+    );
   });
 });

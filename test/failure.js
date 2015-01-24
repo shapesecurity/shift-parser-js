@@ -352,5 +352,6 @@ suite("Parser", function () {
     testParseFailure("({get +:3})", "Property name in object literal must be identifier, string literal or number literal");
     testParseFailure("({get +:3})", "Property name in object literal must be identifier, string literal or number literal");
     testParseFailure("function t() { ;  ;  ", "Unexpected end of input");
+    testParseFailure("({a = 0})", "Unexpected token )");
   });
 });

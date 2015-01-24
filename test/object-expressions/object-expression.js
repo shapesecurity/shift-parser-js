@@ -196,5 +196,27 @@ suite("Parser", function () {
         new Shift.Setter(new Shift.StaticPropertyName("3"), new Shift.Identifier("d"), new Shift.FunctionBody([], [])),
       ])
     );
+
+    testParse("({a})", expr,
+      new Shift.ObjectExpression([
+        new Shift.ShorthandProperty(new Shift.Identifier("a")),
+      ])
+    );
+    testParse("({a, b: 0, c})", expr,
+      new Shift.ObjectExpression([
+        new Shift.ShorthandProperty(new Shift.Identifier("a")),
+        new Shift.DataProperty(
+          new Shift.StaticPropertyName("b"),
+          new Shift.LiteralNumericExpression(0)
+        ),
+        new Shift.ShorthandProperty(new Shift.Identifier("c")),
+      ])
+    );
+    testParse("({a, b})", expr,
+      new Shift.ObjectExpression([
+        new Shift.ShorthandProperty(new Shift.Identifier("a")),
+        new Shift.ShorthandProperty(new Shift.Identifier("b")),
+      ])
+    );
   });
 });

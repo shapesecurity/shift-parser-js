@@ -38,8 +38,8 @@ suite("Parser", function () {
 
     testParse("function test(t, t) { }", stmt,
       new Shift.FunctionDeclaration(false, new Shift.Identifier("test"), [
-        new Shift.Identifier("t"),
-        new Shift.Identifier("t"),
+        new Shift.BindingIdentifier(new Shift.Identifier("t")),
+        new Shift.BindingIdentifier(new Shift.Identifier("t")),
       ], null, new Shift.FunctionBody([], []))
     );
 
@@ -50,19 +50,19 @@ suite("Parser", function () {
     );
 
     testParse("function hello(a) { z(); }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.Identifier("a")], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.BindingIdentifier(new Shift.Identifier("a"))], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
 
     testParse("function hello(a, b) { z(); }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.Identifier("a"), new Shift.Identifier("b")], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.BindingIdentifier(new Shift.Identifier("b"))], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
 
     testParse("function universe(__proto__) { }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.Identifier("universe"), [new Shift.Identifier("__proto__")], null, new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("universe"), [new Shift.BindingIdentifier(new Shift.Identifier("__proto__"))], null, new Shift.FunctionBody([], []))
     );
 
     testParse("function test() { \"use strict\"\n + 42; }", stmt,

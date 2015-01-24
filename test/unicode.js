@@ -19,11 +19,11 @@ var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 suite("Parser", function () {
   suite("unicode", function () {
     // Unicode
-    testEsprimaEquiv("日本語 = []");
-    testEsprimaEquiv("T\u203F = []");
-    testEsprimaEquiv("T\u200C = []");
-    testEsprimaEquiv("T\u200D = []");
-    testEsprimaEquiv("\u2163\u2161 = []");
-    testEsprimaEquiv("\u2163\u2161\u200A=\u2009[]");
+    testEsprimaEquiv("日本語");
+    testEsprimaEquiv("T\u203F");
+    testEsprimaEquiv("T\u200C");
+    testEsprimaEquiv("T\u200D");
+    testEsprimaEquiv("\u2163\u2161");
+    testEsprimaEquiv("\u2163\u2161\u200A; \u2009");
   });
 });

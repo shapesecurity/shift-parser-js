@@ -1331,9 +1331,12 @@ export class Parser extends Tokenizer {
         }
       }
 
-      this.expect(TokenType.COLON);
-      let value = this.parseAssignmentExpression();
-      return this.markLocation(new Shift.DataProperty(key, value), startLocation);
+      if (this.eat(TokenType.COLON)) {
+        let value = this.parseAssignmentExpression();
+        return this.markLocation(new Shift.DataProperty(key, value), startLocation);
+      } else {
+        return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(key.value)), startLocation);
+      }
     }
     if (this.eof() || token.type.klass == TokenClass.Punctuator) {
       throw this.createUnexpected(token);

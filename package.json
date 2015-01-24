@@ -20,7 +20,7 @@
     "cjsify": "cjsify --export ShiftParser dist/index.js > shift-parser.js"
   },
   "dependencies": {
-    "shift-ast": "git://github.com/shapesecurity/shift-ast-js.git#7839974be989ebc58c6e49ab5a0eb66fe465dddf"
+    "shift-ast": "git://github.com/shapesecurity/shift-ast-js.git#02d335f4cc20ee4e67377390cf6034099b495964"
   },
   "devDependencies": {
     "6to5": "^1.14.14",

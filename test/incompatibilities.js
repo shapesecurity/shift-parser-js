@@ -39,16 +39,27 @@ describe("Parser", function() {
   describe("ES5 divergences", function() {
     // ES5: assignment to computed member expression
     // ES6: variable declaration statement
-    // We choose to fail here because we support ES5 with a minor addition: let/const with binding identifier.
-    // This is the same decision esprima has made.
-    assertParseFailure("let[a] = b;", "Unexpected token [");
-    assertParseFailure("const[a] = b;", "Unexpected token [");
+    expect(stmt(parse("let[a] = b;"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator(
+          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
+          new Shift.IdentifierExpression(new Shift.Identifier("b"))
+        ),
+      ]))
+    );
+    expect(stmt(parse("const[a] = b;"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
+        new Shift.VariableDeclarator(
+          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
+          new Shift.IdentifierExpression(new Shift.Identifier("b"))
+        ),
+      ]))
+    );
     assertParseFailure("var let", "Unexpected token let");
     assertParseFailure("var const", "Unexpected token const");
 
     // ES5: invalid program
     // ES6: function declaration within a block
-    // We choose to parse this because of ubiquitous support among popular interpreters, despite disagreements about semantics.
     expect(stmt(parse("{ function f(){} }"))).to.be.eql(
       new Shift.BlockStatement(new Shift.Block([
         new Shift.FunctionDeclaration(false, new Shift.Identifier("f"), [], null, new Shift.FunctionBody([], []))
@@ -63,7 +74,7 @@ describe("Parser", function() {
     expect(stmt(parse("var yield = function yield(){};"))).to.be.eql(
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(
-          new Shift.Identifier("yield"),
+          new Shift.BindingIdentifier(new Shift.Identifier("yield")),
           new Shift.FunctionExpression(false, new Shift.Identifier("yield"), [], null, new Shift.FunctionBody([], []))
         )
       ]))
@@ -75,10 +86,10 @@ describe("Parser", function() {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.Identifier("e"),
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
           new Shift.Block([
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.Identifier("e"), new Shift.LiteralNumericExpression(0))
+              new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("e")), new Shift.LiteralNumericExpression(0))
             ]))
           ])
         )
@@ -89,24 +100,10 @@ describe("Parser", function() {
     // ES6: allows only valid bindings on the left of an assignment
     assertParseFailure("a+b=c", "Invalid left-hand side in assignment");
     assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
-    expect(expr(parse("new a=b"))).to.be.eql(
-      new Shift.AssignmentExpression(
-        "=",
-        new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), []),
-        new Shift.IdentifierExpression(new Shift.Identifier("b"))
-      )
-    );
-    expect(expr(parse(("(a+b)=c")))).to.be.eql(
-      new Shift.AssignmentExpression(
-        "=",
-        new Shift.BinaryExpression(
-          "+",
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          new Shift.IdentifierExpression(new Shift.Identifier("b"))
-        ),
-        new Shift.IdentifierExpression(new Shift.Identifier("c"))
-      )
-    );
+    assertParseFailure("new a=b", "Invalid left-hand side in assignment");
+    assertParseFailure("(a+b)=c", "Invalid left-hand side in assignment");
+    assertParseFailure("f()++", "Invalid left-hand side in assignment");
+    assertParseFailure("--f()", "Invalid left-hand side in assignment");
 
   });
 });

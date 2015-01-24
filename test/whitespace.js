@@ -20,13 +20,28 @@ var parse = require("../").default;
 var Shift = require("shift-ast");
 
 var expr = require("./helpers").expr;
+var stmt = require("./helpers").stmt;
 var assertEsprimaEquiv = require('./assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
   describe("automatic semicolon insertion", function () {
     assertEsprimaEquiv("{ x\n++y }");
     assertEsprimaEquiv("{ x\n--y }");
-    assertEsprimaEquiv("{ var x = 14, y = 3\nz; }");
+    expect(stmt(parse("{ var x = 14, y = 3\nz; }"))).to.be.eql(
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("x")),
+            new Shift.LiteralNumericExpression(14)
+          ),
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("y")),
+            new Shift.LiteralNumericExpression(3)
+          ),
+        ])),
+        new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("z"))),
+      ]))
+    );
 
     assertEsprimaEquiv("while (true) { continue\nthere; }");
     assertEsprimaEquiv("while (true) { continue // Comment\nthere; }");

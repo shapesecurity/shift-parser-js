@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
@@ -21,6 +27,16 @@ describe("Parser", function () {
     assertEsprimaEquiv("a?b:c");
     assertEsprimaEquiv("y ? 1 : 2");
     assertEsprimaEquiv("x && y ? 1 : 2");
-    assertEsprimaEquiv("x = (0) ? 1 : 2");
+    expect(expr(parse("x = (0) ? 1 : 2"))).to.be.eql(
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        new Shift.ConditionalExpression(
+          new Shift.LiteralNumericExpression(0),
+          new Shift.LiteralNumericExpression(1),
+          new Shift.LiteralNumericExpression(2)
+        )
+      )
+    );
   });
 });

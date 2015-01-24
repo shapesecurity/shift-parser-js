@@ -14,22 +14,74 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var stmt = require("../helpers").stmt;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
   describe("for statement", function () {
     assertEsprimaEquiv("for(;;);");
     assertEsprimaEquiv("for(;;){}");
-    assertEsprimaEquiv("for(x = 0;;);");
-    assertEsprimaEquiv("for(var x = 0;;);");
-    assertEsprimaEquiv("for(let x = 0;;);");
-    assertEsprimaEquiv("for(var x = 0, y = 1;;);");
-    assertEsprimaEquiv("for(x = 0; x < 42;);");
-    assertEsprimaEquiv("for(x = 0; x < 42; x++);");
-    assertEsprimaEquiv("for(x = 0; x < 42; x++) process(x);");
+    assertEsprimaEquiv("for(x, y;;);");
+    expect(stmt(parse("for(var x = 0;;);"))).to.be.eql(
+      new Shift.ForStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+        ]),
+        null,
+        null,
+        new Shift.EmptyStatement
+      )
+    );
+    expect(stmt(parse("for(let x = 0;;);"))).to.be.eql(
+      new Shift.ForStatement(
+        new Shift.VariableDeclaration("let", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+        ]),
+        null,
+        null,
+        new Shift.EmptyStatement
+      )
+    );
+    expect(stmt(parse("for(var x = 0, y = 1;;);"))).to.be.eql(
+      new Shift.ForStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("y")), new Shift.LiteralNumericExpression(1)),
+        ]),
+        null,
+        null,
+        new Shift.EmptyStatement
+      )
+    );
+    assertEsprimaEquiv("for(x, y; x < 42;);");
+    assertEsprimaEquiv("for(x, y; x < 42; x++);");
+    assertEsprimaEquiv("for(x, y; x < 42; x++) process(x);");
     assertEsprimaEquiv("for(a;b;c);");
-    assertEsprimaEquiv("for(var a;b;c);");
-    assertEsprimaEquiv("for(var a = 0;b;c);");
+    expect(stmt(parse("for(var a;b;c);"))).to.be.eql(
+      new Shift.ForStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("b")),
+        new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        new Shift.EmptyStatement
+      )
+    );
+    expect(stmt(parse("for(var a = 0;b;c);"))).to.be.eql(
+      new Shift.ForStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.LiteralNumericExpression(0))
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("b")),
+        new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        new Shift.EmptyStatement
+      )
+    );
     assertEsprimaEquiv("for(;b;c);");
   });
 });

@@ -352,5 +352,6 @@ describe("Parser", function () {
     assertParseFailure("({get +:3})", "Property name in object literal must be identifier, string literal or number literal");
     assertParseFailure("({get +:3})", "Property name in object literal must be identifier, string literal or number literal");
     assertParseFailure("function t() { ;  ;  ", "Unexpected end of input");
+    assertParseFailure("({a = 0})", "Unexpected token )");
   });
 });

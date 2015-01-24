@@ -32,7 +32,15 @@ describe("Parser", function () {
         null
       )
     );
-    assertEsprimaEquiv("if (morning) var x = 0;");
+    expect(stmt(parse("if (morning) var x = 0;"))).to.be.eql(
+      new Shift.IfStatement(
+        new Shift.IdentifierExpression(new Shift.Identifier("morning")),
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+        ])),
+        null
+      )
+    );
     expect(stmt(parse("if (morning) function a(){}"))).to.be.eql(
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),

@@ -14,15 +14,76 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var stmt = require("../helpers").stmt;
 
 describe("Parser", function () {
-  describe("literal numeric expression", function () {
-    assertEsprimaEquiv("try{}catch(a){}");
-    assertEsprimaEquiv("try { } catch (e) { }");
-    assertEsprimaEquiv("try { } catch (eval) { }");
-    assertEsprimaEquiv("try { } catch (arguments) { }");
-    assertEsprimaEquiv("try { } catch (e) { say(e) }");
-    assertEsprimaEquiv("try { doThat(); } catch (e) { say(e) }");
+  describe("try-catch statement", function () {
+    expect(stmt(parse("try{}catch(a){}"))).to.be.eql(
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("a")),
+          new Shift.Block([])
+        )
+      )
+    );
+    expect(stmt(parse("try { } catch (e) { }"))).to.be.eql(
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([])
+        )
+      )
+    );
+    expect(stmt(parse("try { } catch (eval) { }"))).to.be.eql(
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("eval")),
+          new Shift.Block([])
+        )
+      )
+    );
+    expect(stmt(parse("try { } catch (arguments) { }"))).to.be.eql(
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("arguments")),
+          new Shift.Block([])
+        )
+      )
+    );
+    expect(stmt(parse("try { } catch (e) { say(e) }"))).to.be.eql(
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+            new Shift.IdentifierExpression(new Shift.Identifier("say")),
+            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+          ))])
+        )
+      )
+    );
+    expect(stmt(parse("try { doThat(); } catch (e) { say(e) }"))).to.be.eql(
+      new Shift.TryCatchStatement(
+        new Shift.Block([
+          new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("doThat")), []))
+        ]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+            new Shift.IdentifierExpression(new Shift.Identifier("say")),
+            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+          ))])
+        )
+      )
+    );
   });
 });

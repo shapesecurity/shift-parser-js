@@ -51,7 +51,13 @@ describe("Parser", function () {
     assertEsprimaEquiv("/* block comment */ 42");
     assertEsprimaEquiv("42 /* block comment 1 */ /* block comment 2 */");
     assertEsprimaEquiv("(a + /* assignment */b ) * c");
-    assertEsprimaEquiv("/* assignment */\n a = b");
+    expect(expr(parse("/* assignment */\n a = b"))).to.be.eql(
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        new Shift.IdentifierExpression(new Shift.Identifier("b"))
+      )
+    );
     assertEsprimaEquiv("42 /*The*/ /*Answer*/");
     assertEsprimaEquiv("42 /*the*/ /*answer*/");
     assertEsprimaEquiv("42 /* the * answer */");
@@ -83,7 +89,7 @@ describe("Parser", function () {
         new Shift.StaticMemberExpression(
           new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
+              new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("version")), new Shift.LiteralNumericExpression(1)),
             ])),
           ])),
           new Shift.Identifier("call")
@@ -96,7 +102,7 @@ describe("Parser", function () {
         new Shift.StaticMemberExpression(
           new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
+              new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("version")), new Shift.LiteralNumericExpression(1)),
             ])),
           ])),
           new Shift.Identifier("call")
@@ -108,12 +114,16 @@ describe("Parser", function () {
       new Shift.FunctionDeclaration(false, new Shift.Identifier("f"), [], null, new Shift.FunctionBody([], [
         new Shift.WhileStatement(new Shift.LiteralBooleanExpression(true), new Shift.BlockStatement(new Shift.Block([]))),
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.Identifier("each"), null)
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("each")), null)
         ])),
       ]))
     );
     assertEsprimaEquiv("while (i-->0) {}");
-    assertEsprimaEquiv("var x = 1<!--foo");
+    expect(stmt(parse("var x = 1<!--foo"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(1)),
+      ]))
+    );
     assertEsprimaEquiv("/* not comment*/; i-->0");
   });
 });

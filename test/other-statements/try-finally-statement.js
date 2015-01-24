@@ -14,12 +14,54 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var stmt = require("../helpers").stmt;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
-  describe("literal numeric expression", function () {
-    assertEsprimaEquiv("try { } finally { cleanup(stuff) }");
-    assertEsprimaEquiv("try{}catch(a){}finally{}");
-    assertEsprimaEquiv("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }");
+  describe("try-finally statement", function () {
+    expect(stmt(parse("try { } finally { cleanup(stuff) }"))).to.be.eql(
+      new Shift.TryFinallyStatement(
+        new Shift.Block([]),
+        null,
+        new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("cleanup")),
+          [new Shift.IdentifierExpression(new Shift.Identifier("stuff"))]
+        ))])
+      )
+    );
+    expect(stmt(parse("try{}catch(a){}finally{}"))).to.be.eql(
+      new Shift.TryFinallyStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("a")),
+          new Shift.Block([])
+        ),
+        new Shift.Block([])
+      )
+    );
+    expect(stmt(parse("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }"))).to.be.eql(
+      new Shift.TryFinallyStatement(
+        new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("doThat")),
+          []
+        ))]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+            new Shift.IdentifierExpression(new Shift.Identifier("say")),
+            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+          ))])
+        ),
+        new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("cleanup")),
+          [new Shift.IdentifierExpression(new Shift.Identifier("stuff"))]
+        ))])
+      )
+    );
   });
 });

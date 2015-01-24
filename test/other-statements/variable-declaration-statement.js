@@ -20,34 +20,126 @@ var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var assertParseFailure = require('../assertions').assertParseFailure;
 
 describe("Parser", function () {
   describe("variable declaration statement", function () {
     // Variable Statement
-    assertEsprimaEquiv("var x");
-    assertEsprimaEquiv("var a;");
-    assertEsprimaEquiv("var x, y;");
-    assertEsprimaEquiv("var x = 42");
-    assertEsprimaEquiv("var eval = 42, arguments = 42");
-    assertEsprimaEquiv("var x = 14, y = 3, z = 1977");
-    assertEsprimaEquiv("var implements, interface, package");
-    assertEsprimaEquiv("var private, protected, public, static");
+    expect(stmt(parse("var x"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null),
+      ]))
+    );
+    expect(stmt(parse("var a;"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null),
+      ]))
+    );
+    expect(stmt(parse("var x, y;"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("y")), null),
+      ]))
+    );
+    expect(stmt(parse("var x = 0"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
+      ]))
+    );
+    expect(stmt(parse("var eval = 0, arguments = 1"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("eval")), new Shift.LiteralNumericExpression(0)),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("arguments")), new Shift.LiteralNumericExpression(1)),
+      ]))
+    );
+    expect(stmt(parse("var x = 0, y = 1, z = 2"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("y")), new Shift.LiteralNumericExpression(1)),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("z")), new Shift.LiteralNumericExpression(2)),
+      ]))
+    );
+    expect(stmt(parse("var implements, interface, package"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("implements")), null),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("interface")), null),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("package")), null),
+      ]))
+    );
+    expect(stmt(parse("var private, protected, public, static"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("private")), null),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("protected")), null),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("public")), null),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("static")), null),
+      ]))
+    );
     expect(stmt(parse("var yield;"))).to.be.eql(
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator(new Shift.Identifier("yield"), null),
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("yield")), null),
       ]))
     );
 
     // Let Statement
-    assertEsprimaEquiv("let x");
-    assertEsprimaEquiv("{ let x }");
-    assertEsprimaEquiv("{ let x = 42 }");
-    assertEsprimaEquiv("{ let x = 14, y = 3, z = 1977 }");
+    expect(stmt(parse("let x"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null),
+      ]))
+    );
+    expect(stmt(parse("{ let x }"))).to.be.eql(
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null),
+        ])),
+      ]))
+    );
+    expect(stmt(parse("{ let x = 0 }"))).to.be.eql(
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
+        ])),
+      ]))
+    );
+    expect(stmt(parse("{ let x = 0, y = 1, z = 2 }"))).to.be.eql(
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("y")), new Shift.LiteralNumericExpression(1)),
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("z")), new Shift.LiteralNumericExpression(2)),
+        ])),
+      ]))
+    );
 
     // Const Statement
-    assertEsprimaEquiv("const x = 42");
-    assertEsprimaEquiv("{ const x = 42 }");
-    assertEsprimaEquiv("{ const x = 14, y = 3, z = 1977 }");
+    assertParseFailure("const x", "Unexpected end of input");
+    assertParseFailure("{ const x }", "Unexpected token }");
+    expect(stmt(parse("{ const x = 0 }"))).to.be.eql(
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
+        ])),
+      ]))
+    );
+    expect(stmt(parse("{ const x = 0, y = 1, z = 2 }"))).to.be.eql(
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("y")), new Shift.LiteralNumericExpression(1)),
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("z")), new Shift.LiteralNumericExpression(2)),
+        ])),
+      ]))
+    );
+
+    // destructuring
+    expect(stmt(parse("var {a};"))).to.be.eql(
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(
+          new Shift.ObjectBinding([
+            new Shift.BindingPropertyIdentifier(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+          ]),
+          null
+        ),
+      ]))
+    );
   });
 });

@@ -30,7 +30,15 @@ suite("Parser", function () {
         null
       )
     );
-    testEsprimaEquiv("if (morning) var x = 0;");
+    testParse("if (morning) var x = 0;", stmt,
+      new Shift.IfStatement(
+        new Shift.IdentifierExpression(new Shift.Identifier("morning")),
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+        ])),
+        null
+      )
+    );
     testParse("if (morning) function a(){}", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),

@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("conditional expression", function () {
     testEsprimaEquiv("a?b:c");
     testEsprimaEquiv("y ? 1 : 2");
     testEsprimaEquiv("x && y ? 1 : 2");
-    testEsprimaEquiv("x = (0) ? 1 : 2");
+    testParse("x = (0) ? 1 : 2", expr,
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        new Shift.ConditionalExpression(
+          new Shift.LiteralNumericExpression(0),
+          new Shift.LiteralNumericExpression(1),
+          new Shift.LiteralNumericExpression(2)
+        )
+      )
+    );
   });
 });

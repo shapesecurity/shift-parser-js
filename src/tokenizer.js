@@ -45,6 +45,7 @@ export const TokenType = {
   COLON: {klass: TokenClass.Punctuator, name: ":"},
   SEMICOLON: {klass: TokenClass.Punctuator, name: ";"},
   PERIOD: {klass: TokenClass.Punctuator, name: "."},
+  ELLIPSIS: {klass: TokenClass.Punctuator, name: "..."},
   CONDITIONAL: {klass: TokenClass.Punctuator, name: "?"},
   INC: {klass: TokenClass.Punctuator, name: "++"},
   DEC: {klass: TokenClass.Punctuator, name: "--"},
@@ -894,7 +895,11 @@ export default class Tokenizer {
     switch (ch1) {
       // Check for most common single-character punctuators.
       case ".":
-        return TokenType.PERIOD;
+        let ch2 = this.source.charAt(this.index + 1);
+        if (ch2 !== ".") return TokenType.PERIOD;
+        let ch3 = this.source.charAt(this.index + 2);
+        if (ch3 !== ".") return TokenType.PERIOD;
+        return TokenType.ELLIPSIS;
       case "(":
         return TokenType.LPAREN;
       case ")":

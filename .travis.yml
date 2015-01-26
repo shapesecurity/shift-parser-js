@@ -1,4 +1,9 @@
 language: node_js
+script:
+  - npm run build
+  - git diff-index --quiet --cached HEAD
+  - npm run generate-coverage
+  - npm run check-coverage
 node_js:
   - "0.11"
   - "0.10"

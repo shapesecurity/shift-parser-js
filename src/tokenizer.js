@@ -251,7 +251,7 @@ export class EOFToken extends Token {
   }
 }
 
-export class JsError {
+export class JsError extends Error {
   constructor(index, line, column, msg) {
     this.index = index;
     this.line = line;

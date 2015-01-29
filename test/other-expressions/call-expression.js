@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
+var assertParseFailure = require('../assertions').assertParseFailure;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
@@ -21,5 +28,77 @@ describe("Parser", function () {
     assertEsprimaEquiv("a(b,c)");
     assertEsprimaEquiv("foo(bar, baz)");
     assertEsprimaEquiv("(    foo  )()");
+
+    expect(expr(parse("f(...a)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+        ]
+      )
+    );
+    expect(expr(parse("f(...a = b)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(
+            new Shift.AssignmentExpression(
+              "=",
+              new Shift.BindingIdentifier(new Shift.Identifier("a")),
+              new Shift.IdentifierExpression(new Shift.Identifier("b"))
+            )
+          ),
+        ]
+      )
+    );
+    expect(expr(parse("f(...a, ...b)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+        ]
+      )
+    );
+    expect(expr(parse("f(a, ...b, c)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        ]
+      )
+    );
+    expect(expr(parse("f(...a, b, ...c)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("b")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("c"))),
+        ]
+      )
+    );
+    expect(expr(parse("f(....0)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.LiteralNumericExpression(0)),
+        ]
+      )
+    );
+    expect(expr(parse("f(.0)"))).to.be.eql(
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.LiteralNumericExpression(0),
+        ]
+      )
+    );
+
+    assertParseFailure("f(..a)", "Unexpected token .");
+    assertParseFailure("f(....a)", "Unexpected token .");
+    assertParseFailure("f(... ... a)", "Unexpected token ...");
   });
 });

@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
+var parse = require("../..").default;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
 var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
 
 describe("Parser", function () {
@@ -24,5 +30,57 @@ describe("Parser", function () {
     assertEsprimaEquiv("new Button(a)");
     assertEsprimaEquiv("new new foo");
     assertEsprimaEquiv("new new foo()");
+
+    expect(expr(parse("new f(...a)"))).to.be.eql(
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+        ]
+      )
+    );
+    expect(expr(parse("new f(...a = b)"))).to.be.eql(
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(
+            new Shift.AssignmentExpression(
+              "=",
+              new Shift.BindingIdentifier(new Shift.Identifier("a")),
+              new Shift.IdentifierExpression(new Shift.Identifier("b"))
+            )
+          ),
+        ]
+      )
+    );
+    expect(expr(parse("new f(...a, ...b)"))).to.be.eql(
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+        ]
+      )
+    );
+    expect(expr(parse("new f(a, ...b, c)"))).to.be.eql(
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        ]
+      )
+    );
+    expect(expr(parse("new f(...a, b, ...c)"))).to.be.eql(
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("b")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("c"))),
+        ]
+      )
+    );
   });
 });

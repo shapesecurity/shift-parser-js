@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 suite("Parser", function () {
@@ -21,5 +26,77 @@ suite("Parser", function () {
     testEsprimaEquiv("a(b,c)");
     testEsprimaEquiv("foo(bar, baz)");
     testEsprimaEquiv("(    foo  )()");
+
+    testParse("f(...a)", expr,
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+        ]
+      )
+    );
+    testParse("f(...a = b)", expr,
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(
+            new Shift.AssignmentExpression(
+              "=",
+              new Shift.BindingIdentifier(new Shift.Identifier("a")),
+              new Shift.IdentifierExpression(new Shift.Identifier("b"))
+            )
+          ),
+        ]
+      )
+    );
+    testParse("f(...a, ...b)", expr,
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+        ]
+      )
+    );
+    testParse("f(a, ...b, c)", expr,
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        ]
+      )
+    );
+    testParse("f(...a, b, ...c)", expr,
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("b")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("c"))),
+        ]
+      )
+    );
+    testParse("f(....0)", expr,
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.LiteralNumericExpression(0)),
+        ]
+      )
+    );
+    testParse("f(.0)", expr,
+      new Shift.CallExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.LiteralNumericExpression(0),
+        ]
+      )
+    );
+
+    testParseFailure("f(..a)", "Unexpected token .");
+    testParseFailure("f(....a)", "Unexpected token .");
+    testParseFailure("f(... ... a)", "Unexpected token ...");
   });
 });

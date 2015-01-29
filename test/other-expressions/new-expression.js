@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 suite("Parser", function () {
@@ -24,5 +28,57 @@ suite("Parser", function () {
     testEsprimaEquiv("new Button(a)");
     testEsprimaEquiv("new new foo");
     testEsprimaEquiv("new new foo()");
+
+    testParse("new f(...a)", expr,
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+        ]
+      )
+    );
+    testParse("new f(...a = b)", expr,
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(
+            new Shift.AssignmentExpression(
+              "=",
+              new Shift.BindingIdentifier(new Shift.Identifier("a")),
+              new Shift.IdentifierExpression(new Shift.Identifier("b"))
+            )
+          ),
+        ]
+      )
+    );
+    testParse("new f(...a, ...b)", expr,
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+        ]
+      )
+    );
+    testParse("new f(a, ...b, c)", expr,
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        ]
+      )
+    );
+    testParse("new f(...a, b, ...c)", expr,
+      new Shift.NewExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        [
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.IdentifierExpression(new Shift.Identifier("b")),
+          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("c"))),
+        ]
+      )
+    );
   });
 });

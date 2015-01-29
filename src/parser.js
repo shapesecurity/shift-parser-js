@@ -1324,7 +1324,14 @@ export class Parser extends Tokenizer {
       if (this.match(TokenType.RPAREN) || this.eof()) {
         return result;
       }
-      let arg = this.parseAssignmentExpression();
+      let startTokenIndex = this.tokenIndex;
+      let arg;
+      if (this.eat(TokenType.ELLIPSIS)) {
+        arg = this.parseAssignmentExpression();
+        arg = this.markLocation(new Shift.SpreadElement(arg), startTokenIndex);
+      } else {
+        arg = this.parseAssignmentExpression();
+      }
       result.push(arg);
       if (!this.eat(TokenType.COMMA)) {
         break;

@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("literal null expression", function () {
+suite("Parser", function () {
+  suite("literal null expression", function () {
     testEsprimaEquiv("null");
     testEsprimaEquiv("null;");
     testEsprimaEquiv("null\n");

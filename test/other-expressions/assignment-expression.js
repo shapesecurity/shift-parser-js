@@ -22,8 +22,8 @@ var Shift = require("shift-ast");
 var expr = require("../helpers").expr;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("assignment expression", function () {
+suite("Parser", function () {
+  suite("assignment expression", function () {
     testEsprimaEquiv("a=2;");
     testEsprimaEquiv("x = 42");
     testEsprimaEquiv("eval = 42");

@@ -24,8 +24,8 @@ var stmt = require("./helpers").stmt;
 var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 var testParseFailure = require('./assertions').testParseFailure;
 
-describe("Parser", function () {
-  describe("interactions", function () {
+suite("Parser", function () {
+  suite("interactions", function () {
     // LiteralNumericExpression and StaticMemberExpression
     testEsprimaEquiv("0..toString");
     testEsprimaEquiv("01.toString");

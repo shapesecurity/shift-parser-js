@@ -22,8 +22,8 @@ var Shift = require("shift-ast");
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("for in statement", function () {
+suite("Parser", function () {
+  suite("for in statement", function () {
     testEsprimaEquiv("for(x in list) process(x);");
     testEsprimaEquiv("for (var x in list) process(x);");
     testEsprimaEquiv("for (var x = 42 in list) process(x);");

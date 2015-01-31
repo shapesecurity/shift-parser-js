@@ -22,8 +22,8 @@ var Shift = require("shift-ast");
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("variable declaration statement", function () {
+suite("Parser", function () {
+  suite("variable declaration statement", function () {
     // Variable Statement
     testEsprimaEquiv("var x");
     testEsprimaEquiv("var a;");

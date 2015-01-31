@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("switch statement", function () {
+suite("Parser", function () {
+  suite("switch statement", function () {
     testEsprimaEquiv("switch (x) {}");
     testEsprimaEquiv("switch(a){case 1:}");
     testEsprimaEquiv("switch (answer) { case 42: hi(); break; }");

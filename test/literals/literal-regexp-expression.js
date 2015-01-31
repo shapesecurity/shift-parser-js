@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("literal regexp expression", function () {
+suite("Parser", function () {
+  suite("literal regexp expression", function () {
     // Regular Expression Literals
     testEsprimaEquiv("/a/");
     testEsprimaEquiv("/a/;");

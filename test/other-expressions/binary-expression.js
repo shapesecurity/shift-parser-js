@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("binary expression", function () {
+suite("Parser", function () {
+  suite("binary expression", function () {
     testEsprimaEquiv("1+2;");
 
     // Binary Bitwise Operators

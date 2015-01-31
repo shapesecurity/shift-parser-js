@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("conditional expression", function () {
+suite("Parser", function () {
+  suite("conditional expression", function () {
     testEsprimaEquiv("a?b:c");
     testEsprimaEquiv("y ? 1 : 2");
     testEsprimaEquiv("x && y ? 1 : 2");

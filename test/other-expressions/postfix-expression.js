@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("postfix expression", function () {
+suite("Parser", function () {
+  suite("postfix expression", function () {
     // Postfix Expressions
     testEsprimaEquiv("x++");
     testEsprimaEquiv("x--");

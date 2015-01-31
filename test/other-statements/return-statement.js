@@ -21,8 +21,8 @@ var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 
-describe("Parser", function () {
-  describe("return statement", function () {
+suite("Parser", function () {
+  suite("return statement", function () {
     expect(expr(parse("(function(){ return })"))).to.be.eql(
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),

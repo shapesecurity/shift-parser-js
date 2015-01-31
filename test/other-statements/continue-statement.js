@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("continue statement", function () {
+suite("Parser", function () {
+  suite("continue statement", function () {
     testEsprimaEquiv("while (true) { continue; }");
     testEsprimaEquiv("while (true) { continue }");
     testEsprimaEquiv("done: while (true) { continue done }");

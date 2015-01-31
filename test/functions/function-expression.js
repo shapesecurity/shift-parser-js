@@ -22,8 +22,8 @@ var Shift = require("shift-ast");
 var expr = require("../helpers").expr;
 var testEsprimaEquiv = require("../assertions").testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("literal numeric expression", function () {
+suite("Parser", function () {
+  suite("literal numeric expression", function () {
     expect(expr(parse("(function(){})"))).to.be.eql(
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))
     );

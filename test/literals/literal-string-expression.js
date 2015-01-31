@@ -21,8 +21,8 @@ var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 
-describe("Parser", function () {
-  describe("literal string expression", function () {
+suite("Parser", function () {
+  suite("literal string expression", function () {
     expect(expr(parse("('x')"))).to.be.eql(
       new Shift.LiteralStringExpression("x")
     );

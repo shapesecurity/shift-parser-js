@@ -17,8 +17,8 @@
 var expect = require('expect.js');
 var ShiftParser = require('../..');
 
-describe("Parser", function () {
-  describe("literal infinity expression", function () {
+suite("Parser", function () {
+  suite("literal infinity expression", function () {
     expect(ShiftParser.default("2e308").body.statements[0].expression.type).to.be("LiteralInfinityExpression");
   });
 });

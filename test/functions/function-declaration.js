@@ -22,8 +22,8 @@ var Shift = require("shift-ast");
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("function declaration", function () {
+suite("Parser", function () {
+  suite("function declaration", function () {
     expect(stmt(parse("function hello() { z(); }"))).to.be.eql(
       new Shift.FunctionDeclaration(new Shift.Identifier("hello"), [], new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),

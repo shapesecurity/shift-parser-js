@@ -16,9 +16,9 @@
 
 var testParseFailure = require('./assertions').testParseFailure;
 
-describe("Parser", function () {
+suite("Parser", function () {
 
-  describe("error handling", function () {
+  suite("error handling", function () {
     testParseFailure("/*", "Unexpected token ILLEGAL");
     testParseFailure("/*\r", "Unexpected token ILLEGAL");
     testParseFailure("/*\r\n", "Unexpected token ILLEGAL");

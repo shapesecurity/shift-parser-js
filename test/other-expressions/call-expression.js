@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("call expression", function () {
+suite("Parser", function () {
+  suite("call expression", function () {
     testEsprimaEquiv("a(b,c)");
     testEsprimaEquiv("foo(bar, baz)");
     testEsprimaEquiv("(    foo  )()");

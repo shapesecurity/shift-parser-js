@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("Comments", function () {
+suite("Parser", function () {
+  suite("Comments", function () {
     testEsprimaEquiv(" /**/");
     testEsprimaEquiv(" /****/");
     testEsprimaEquiv(" /**\n\r\r\n**/");

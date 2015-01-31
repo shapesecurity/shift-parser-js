@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("array expression", function () {
+suite("Parser", function () {
+  suite("array expression", function () {
     testEsprimaEquiv("[]");
     testEsprimaEquiv("[ ]");
     testEsprimaEquiv("[ 42 ]");

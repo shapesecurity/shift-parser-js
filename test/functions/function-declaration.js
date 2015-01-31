@@ -20,7 +20,7 @@ var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("function declaration", function () {

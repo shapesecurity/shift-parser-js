@@ -20,11 +20,11 @@ var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("if statement", function () {
-    assertEsprimaEquiv("if (morning) goodMorning()");
+    testEsprimaEquiv("if (morning) goodMorning()");
     expect(stmt(parse("if (morning) (function(){})"))).to.be.eql(
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
@@ -32,7 +32,7 @@ describe("Parser", function () {
         null
       )
     );
-    assertEsprimaEquiv("if (morning) var x = 0;");
+    testEsprimaEquiv("if (morning) var x = 0;");
     expect(stmt(parse("if (morning) function a(){}"))).to.be.eql(
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
@@ -40,8 +40,8 @@ describe("Parser", function () {
         null
       )
     );
-    assertEsprimaEquiv("if (morning) goodMorning(); else goodDay()");
-    assertEsprimaEquiv("if(a)b;");
-    assertEsprimaEquiv("if(a)b;else c;");
+    testEsprimaEquiv("if (morning) goodMorning(); else goodDay()");
+    testEsprimaEquiv("if(a)b;");
+    testEsprimaEquiv("if(a)b;else c;");
   });
 });

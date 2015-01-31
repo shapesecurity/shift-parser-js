@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('./assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("grouping", function () {
-    assertEsprimaEquiv("(1 + 2 ) * 3");
-    assertEsprimaEquiv("(1) + (2  ) + 3");
-    assertEsprimaEquiv("4 + 5 << (6)");
+    testEsprimaEquiv("(1 + 2 ) * 3");
+    testEsprimaEquiv("(1) + (2  ) + 3");
+    testEsprimaEquiv("4 + 5 << (6)");
   });
 });

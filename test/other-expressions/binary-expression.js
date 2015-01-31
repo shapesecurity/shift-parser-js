@@ -14,73 +14,73 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("binary expression", function () {
-    assertEsprimaEquiv("1+2;");
+    testEsprimaEquiv("1+2;");
 
     // Binary Bitwise Operators
-    assertEsprimaEquiv("x & y");
-    assertEsprimaEquiv("x ^ y");
-    assertEsprimaEquiv("x | y");
+    testEsprimaEquiv("x & y");
+    testEsprimaEquiv("x ^ y");
+    testEsprimaEquiv("x | y");
 
     // Binary Expressions
-    assertEsprimaEquiv("x + y + z");
-    assertEsprimaEquiv("x - y + z");
-    assertEsprimaEquiv("x + y - z");
-    assertEsprimaEquiv("x - y - z");
-    assertEsprimaEquiv("x + y * z");
-    assertEsprimaEquiv("x + y / z");
-    assertEsprimaEquiv("x - y % z");
-    assertEsprimaEquiv("x * y * z");
-    assertEsprimaEquiv("x * y / z");
-    assertEsprimaEquiv("x * y % z");
-    assertEsprimaEquiv("x % y * z");
-    assertEsprimaEquiv("x << y << z");
-    assertEsprimaEquiv("x | y | z");
-    assertEsprimaEquiv("x & y & z");
-    assertEsprimaEquiv("x ^ y ^ z");
-    assertEsprimaEquiv("x & y | z");
-    assertEsprimaEquiv("x | y ^ z");
-    assertEsprimaEquiv("x | y & z");
+    testEsprimaEquiv("x + y + z");
+    testEsprimaEquiv("x - y + z");
+    testEsprimaEquiv("x + y - z");
+    testEsprimaEquiv("x - y - z");
+    testEsprimaEquiv("x + y * z");
+    testEsprimaEquiv("x + y / z");
+    testEsprimaEquiv("x - y % z");
+    testEsprimaEquiv("x * y * z");
+    testEsprimaEquiv("x * y / z");
+    testEsprimaEquiv("x * y % z");
+    testEsprimaEquiv("x % y * z");
+    testEsprimaEquiv("x << y << z");
+    testEsprimaEquiv("x | y | z");
+    testEsprimaEquiv("x & y & z");
+    testEsprimaEquiv("x ^ y ^ z");
+    testEsprimaEquiv("x & y | z");
+    testEsprimaEquiv("x | y ^ z");
+    testEsprimaEquiv("x | y & z");
 
     // Binary Logical Operators
-    assertEsprimaEquiv("x || y");
-    assertEsprimaEquiv("x && y");
-    assertEsprimaEquiv("x || y || z");
-    assertEsprimaEquiv("x && y && z");
-    assertEsprimaEquiv("x || y && z");
-    assertEsprimaEquiv("x || y ^ z");
+    testEsprimaEquiv("x || y");
+    testEsprimaEquiv("x && y");
+    testEsprimaEquiv("x || y || z");
+    testEsprimaEquiv("x && y && z");
+    testEsprimaEquiv("x || y && z");
+    testEsprimaEquiv("x || y ^ z");
 
     // Multiplicative Operators
-    assertEsprimaEquiv("x * y");
-    assertEsprimaEquiv("x / y");
-    assertEsprimaEquiv("x % y");
+    testEsprimaEquiv("x * y");
+    testEsprimaEquiv("x / y");
+    testEsprimaEquiv("x % y");
 
     // Additive Operators
-    assertEsprimaEquiv("x + y");
-    assertEsprimaEquiv("x - y");
-    assertEsprimaEquiv("\"use strict\" + 42");
+    testEsprimaEquiv("x + y");
+    testEsprimaEquiv("x - y");
+    testEsprimaEquiv("\"use strict\" + 42");
 
     // Bitwise Shift Operator
-    assertEsprimaEquiv("x << y");
-    assertEsprimaEquiv("x >> y");
-    assertEsprimaEquiv("x >>> y");
+    testEsprimaEquiv("x << y");
+    testEsprimaEquiv("x >> y");
+    testEsprimaEquiv("x >>> y");
 
     // Relational Operators
-    assertEsprimaEquiv("x < y");
-    assertEsprimaEquiv("x > y");
-    assertEsprimaEquiv("x <= y");
-    assertEsprimaEquiv("x >= y");
-    assertEsprimaEquiv("x in y");
-    assertEsprimaEquiv("x instanceof y");
-    assertEsprimaEquiv("x < y < z");
+    testEsprimaEquiv("x < y");
+    testEsprimaEquiv("x > y");
+    testEsprimaEquiv("x <= y");
+    testEsprimaEquiv("x >= y");
+    testEsprimaEquiv("x in y");
+    testEsprimaEquiv("x instanceof y");
+    testEsprimaEquiv("x < y < z");
 
     // Equality Operators
-    assertEsprimaEquiv("x == y");
-    assertEsprimaEquiv("x != y");
-    assertEsprimaEquiv("x === y");
-    assertEsprimaEquiv("x !== y");
+    testEsprimaEquiv("x == y");
+    testEsprimaEquiv("x != y");
+    testEsprimaEquiv("x === y");
+    testEsprimaEquiv("x !== y");
   });
 });

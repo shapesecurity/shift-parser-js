@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("new expression", function () {
-    assertEsprimaEquiv("new a(b,c)");
-    assertEsprimaEquiv("new Button");
-    assertEsprimaEquiv("new Button()");
-    assertEsprimaEquiv("new Button(a)");
-    assertEsprimaEquiv("new new foo");
-    assertEsprimaEquiv("new new foo()");
+    testEsprimaEquiv("new a(b,c)");
+    testEsprimaEquiv("new Button");
+    testEsprimaEquiv("new Button()");
+    testEsprimaEquiv("new Button(a)");
+    testEsprimaEquiv("new new foo");
+    testEsprimaEquiv("new new foo()");
   });
 });

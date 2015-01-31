@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("literal regexp expression", function () {
     // Regular Expression Literals
-    assertEsprimaEquiv("/a/");
-    assertEsprimaEquiv("/a/;");
-    assertEsprimaEquiv("/a/i");
-    assertEsprimaEquiv("/a/i;");
-    assertEsprimaEquiv("/[a-z]/i");
-    assertEsprimaEquiv("/[x-z]/i");
-    assertEsprimaEquiv("/[a-c]/i");
-    assertEsprimaEquiv("/[P QR]/i");
-    assertEsprimaEquiv("/[\\]/]/");
-    assertEsprimaEquiv("/foo\\/bar/");
-    assertEsprimaEquiv("/=([^=\\s])+/g");
-    // assertEsprimaEquiv("/[P QR]/\\g");
-    assertEsprimaEquiv("/42/g.test");
+    testEsprimaEquiv("/a/");
+    testEsprimaEquiv("/a/;");
+    testEsprimaEquiv("/a/i");
+    testEsprimaEquiv("/a/i;");
+    testEsprimaEquiv("/[a-z]/i");
+    testEsprimaEquiv("/[x-z]/i");
+    testEsprimaEquiv("/[a-c]/i");
+    testEsprimaEquiv("/[P QR]/i");
+    testEsprimaEquiv("/[\\]/]/");
+    testEsprimaEquiv("/foo\\/bar/");
+    testEsprimaEquiv("/=([^=\\s])+/g");
+    // testEsprimaEquiv("/[P QR]/\\g");
+    testEsprimaEquiv("/42/g.test");
   });
 });

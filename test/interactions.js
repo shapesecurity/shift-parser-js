@@ -21,76 +21,80 @@ var Shift = require("shift-ast");
 
 var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
-var assertEsprimaEquiv = require('./assertions').assertEsprimaEquiv;
-var assertParseFailure = require('./assertions').assertParseFailure;
+var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
+var testParseFailure = require('./assertions').testParseFailure;
 
 describe("Parser", function () {
   describe("interactions", function () {
     // LiteralNumericExpression and StaticMemberExpression
-    assertEsprimaEquiv("0..toString");
-    assertEsprimaEquiv("01.toString");
-    assertParseFailure("0.toString", "Unexpected token ILLEGAL");
+    testEsprimaEquiv("0..toString");
+    testEsprimaEquiv("01.toString");
+    testParseFailure("0.toString", "Unexpected token ILLEGAL");
 
     // LeftHandSideExpressions
-    assertEsprimaEquiv("a.b(b,c)");
-    assertEsprimaEquiv("a[b](b,c)");
-    assertEsprimaEquiv("new foo().bar()");
-    assertEsprimaEquiv("new foo[bar]");
-    assertEsprimaEquiv("new foo.bar()");
-    assertEsprimaEquiv("( new foo).bar()");
-    assertEsprimaEquiv("universe[42].galaxies");
-    assertEsprimaEquiv("universe(42).galaxies");
-    assertEsprimaEquiv("universe(42).galaxies(14, 3, 77).milkyway");
-    assertEsprimaEquiv("earth.asia.Indonesia.prepareForElection(2014)");
+    testEsprimaEquiv("a.b(b,c)");
+    testEsprimaEquiv("a[b](b,c)");
+    testEsprimaEquiv("new foo().bar()");
+    testEsprimaEquiv("new foo[bar]");
+    testEsprimaEquiv("new foo.bar()");
+    testEsprimaEquiv("( new foo).bar()");
+    testEsprimaEquiv("universe[42].galaxies");
+    testEsprimaEquiv("universe(42).galaxies");
+    testEsprimaEquiv("universe(42).galaxies(14, 3, 77).milkyway");
+    testEsprimaEquiv("earth.asia.Indonesia.prepareForElection(2014)");
 
     // BinaryExpressions
-    assertEsprimaEquiv("a || b && c | d ^ e & f == g < h >>> i + j * k");
+    testEsprimaEquiv("a || b && c | d ^ e & f == g < h >>> i + j * k");
 
     // Comments
-    assertEsprimaEquiv("//\n;a;");
-    assertEsprimaEquiv("/* block comment */ 42");
-    assertEsprimaEquiv("42 /* block comment 1 */ /* block comment 2 */");
-    assertEsprimaEquiv("(a + /* assignment */b ) * c");
-    assertEsprimaEquiv("/* assignment */\n a = b");
-    assertEsprimaEquiv("42 /*The*/ /*Answer*/");
-    assertEsprimaEquiv("42 /*the*/ /*answer*/");
-    assertEsprimaEquiv("42 /* the * answer */");
-    assertEsprimaEquiv("42 /* The * answer */");
-    assertEsprimaEquiv("/* multiline\ncomment\nshould\nbe\nignored */ 42");
-    assertEsprimaEquiv("/*a\r\nb*/ 42");
-    assertEsprimaEquiv("/*a\rb*/ 42");
-    assertEsprimaEquiv("/*a\nb*/ 42");
-    assertEsprimaEquiv("/*a\nc*/ 42");
-    assertEsprimaEquiv("// line comment\n42");
-    assertEsprimaEquiv("42 // line comment");
-    assertEsprimaEquiv("// Hello, world!\n42");
-    assertEsprimaEquiv("// Hello, world!\n");
-    assertEsprimaEquiv("// Hallo, world!\n");
-    assertEsprimaEquiv("//\n42");
-    assertEsprimaEquiv("//");
-    assertEsprimaEquiv("// ");
-    assertEsprimaEquiv("/**/42");
-    assertEsprimaEquiv("42/**/");
-    assertEsprimaEquiv("// Hello, world!\n\n//   Another hello\n42");
-    assertEsprimaEquiv("if (x) { doThat() // Some comment\n }");
-    assertEsprimaEquiv("if (x) { // Some comment\ndoThat(); }");
-    assertEsprimaEquiv("if (x) { /* Some comment */ doThat() }");
-    assertEsprimaEquiv("if (x) { doThat() /* Some comment */ }");
-    assertEsprimaEquiv("switch (answer) { case 42: /* perfect */ bingo() }");
-    assertEsprimaEquiv("switch (answer) { case 42: bingo() /* perfect */ }");
-    expect(expr(parse("/* header */ (function(){ var version = 1; }).call(this)"))).to.be.eql(
-      new Shift.CallExpression(
-        new Shift.StaticMemberExpression(
-          new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
-            new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
+    testEsprimaEquiv("//\n;a;");
+    testEsprimaEquiv("/* block comment */ 42");
+    testEsprimaEquiv("42 /* block comment 1 */ /* block comment 2 */");
+    testEsprimaEquiv("(a + /* assignment */b ) * c");
+    testEsprimaEquiv("/* assignment */\n a = b");
+    testEsprimaEquiv("42 /*The*/ /*Answer*/");
+    testEsprimaEquiv("42 /*the*/ /*answer*/");
+    testEsprimaEquiv("42 /* the * answer */");
+    testEsprimaEquiv("42 /* The * answer */");
+    testEsprimaEquiv("/* multiline\ncomment\nshould\nbe\nignored */ 42");
+    testEsprimaEquiv("/*a\r\nb*/ 42");
+    testEsprimaEquiv("/*a\rb*/ 42");
+    testEsprimaEquiv("/*a\nb*/ 42");
+    testEsprimaEquiv("/*a\nc*/ 42");
+    testEsprimaEquiv("// line comment\n42");
+    testEsprimaEquiv("42 // line comment");
+    testEsprimaEquiv("// Hello, world!\n42");
+    testEsprimaEquiv("// Hello, world!\n");
+    testEsprimaEquiv("// Hallo, world!\n");
+    testEsprimaEquiv("//\n42");
+    testEsprimaEquiv("//");
+    testEsprimaEquiv("// ");
+    testEsprimaEquiv("/**/42");
+    testEsprimaEquiv("42/**/");
+    testEsprimaEquiv("// Hello, world!\n\n//   Another hello\n42");
+    testEsprimaEquiv("if (x) { doThat() // Some comment\n }");
+    testEsprimaEquiv("if (x) { // Some comment\ndoThat(); }");
+    testEsprimaEquiv("if (x) { /* Some comment */ doThat() }");
+    testEsprimaEquiv("if (x) { doThat() /* Some comment */ }");
+    testEsprimaEquiv("switch (answer) { case 42: /* perfect */ bingo() }");
+    testEsprimaEquiv("switch (answer) { case 42: bingo() /* perfect */ }");
+
+    test(function () {
+      expect(expr(parse("/* header */ (function(){ var version = 1; }).call(this)"))).to.be.eql(
+        new Shift.CallExpression(
+          new Shift.StaticMemberExpression(
+            new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+              new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+                new Shift.VariableDeclarator(new Shift.Identifier("version"), new Shift.LiteralNumericExpression(1)),
+              ])),
             ])),
-          ])),
-          new Shift.Identifier("call")
-        ),
-        [new Shift.ThisExpression]
-      )
-    );
+            new Shift.Identifier("call")
+          ),
+          [new Shift.ThisExpression]
+        )
+      );
+    });
+
     expect(expr(parse("(function(){ var version = 1; /* sync */ }).call(this)"))).to.be.eql(
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(
@@ -112,8 +116,8 @@ describe("Parser", function () {
         ])),
       ]))
     );
-    assertEsprimaEquiv("while (i-->0) {}");
-    assertEsprimaEquiv("var x = 1<!--foo");
-    assertEsprimaEquiv("/* not comment*/; i-->0");
+    testEsprimaEquiv("while (i-->0) {}");
+    testEsprimaEquiv("var x = 1<!--foo");
+    testEsprimaEquiv("/* not comment*/; i-->0");
   });
 });

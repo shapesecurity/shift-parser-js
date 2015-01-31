@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("break statement", function () {
-    assertEsprimaEquiv("while (true) { break }");
-    assertEsprimaEquiv("done: while (true) { break done }");
-    assertEsprimaEquiv("done: while (true) { break done; }");
-    assertEsprimaEquiv("__proto__: while (true) { break __proto__; }");
+    testEsprimaEquiv("while (true) { break }");
+    testEsprimaEquiv("done: while (true) { break done }");
+    testEsprimaEquiv("done: while (true) { break done; }");
+    testEsprimaEquiv("__proto__: while (true) { break __proto__; }");
   });
 });

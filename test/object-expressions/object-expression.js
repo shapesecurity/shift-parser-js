@@ -20,13 +20,13 @@ var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("object expression", function () {
-    assertEsprimaEquiv("({})");
-    assertEsprimaEquiv("+{}");
-    assertEsprimaEquiv("+{ }");
+    testEsprimaEquiv("({})");
+    testEsprimaEquiv("+{}");
+    testEsprimaEquiv("+{ }");
 
     expect(expr(parse("({ answer: 42 })"))).to.be.eql(
       new Shift.ObjectExpression([

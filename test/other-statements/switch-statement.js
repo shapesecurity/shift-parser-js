@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("switch statement", function () {
-    assertEsprimaEquiv("switch (x) {}");
-    assertEsprimaEquiv("switch(a){case 1:}");
-    assertEsprimaEquiv("switch (answer) { case 42: hi(); break; }");
-    assertEsprimaEquiv("switch (answer) { case 42: hi(); break; default: break }");
+    testEsprimaEquiv("switch (x) {}");
+    testEsprimaEquiv("switch(a){case 1:}");
+    testEsprimaEquiv("switch (answer) { case 42: hi(); break; }");
+    testEsprimaEquiv("switch (answer) { case 42: hi(); break; default: break }");
   });
 });

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("block statement", function () {
-    assertEsprimaEquiv("{ foo }");
-    assertEsprimaEquiv("{ doThis(); doThat(); }");
-    assertEsprimaEquiv("{}");
+    testEsprimaEquiv("{ foo }");
+    testEsprimaEquiv("{ doThis(); doThat(); }");
+    testEsprimaEquiv("{}");
   });
 });

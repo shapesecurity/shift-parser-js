@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("array expression", function () {
-    assertEsprimaEquiv("[]");
-    assertEsprimaEquiv("[ ]");
-    assertEsprimaEquiv("[ 42 ]");
-    assertEsprimaEquiv("[ 42, ]");
-    assertEsprimaEquiv("[ ,, 42 ]");
-    assertEsprimaEquiv("[ 1, 2, 3, ]");
-    assertEsprimaEquiv("[ 1, 2,, 3, ]");
-    assertEsprimaEquiv("[,,1,,,3,4,,]");
+    testEsprimaEquiv("[]");
+    testEsprimaEquiv("[ ]");
+    testEsprimaEquiv("[ 42 ]");
+    testEsprimaEquiv("[ 42, ]");
+    testEsprimaEquiv("[ ,, 42 ]");
+    testEsprimaEquiv("[ 1, 2, 3, ]");
+    testEsprimaEquiv("[ 1, 2,, 3, ]");
+    testEsprimaEquiv("[,,1,,,3,4,,]");
   });
 });

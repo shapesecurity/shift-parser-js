@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("computed member expression", function () {
-    assertEsprimaEquiv("universe[galaxyName, otherUselessName]");
-    assertEsprimaEquiv("universe[galaxyName]");
+    testEsprimaEquiv("universe[galaxyName, otherUselessName]");
+    testEsprimaEquiv("universe[galaxyName]");
   });
 });

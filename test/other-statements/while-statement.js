@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("while statement", function () {
-    assertEsprimaEquiv("while(1);");
-    assertEsprimaEquiv("while (true) doSomething()");
-    assertEsprimaEquiv("while (x < 10) { x++; y--; }");
+    testEsprimaEquiv("while(1);");
+    testEsprimaEquiv("while (true) doSomething()");
+    testEsprimaEquiv("while (x < 10) { x++; y--; }");
   });
 });

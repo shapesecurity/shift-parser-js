@@ -20,16 +20,16 @@ var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("for in statement", function () {
-    assertEsprimaEquiv("for(x in list) process(x);");
-    assertEsprimaEquiv("for (var x in list) process(x);");
-    assertEsprimaEquiv("for (var x = 42 in list) process(x);");
-    assertEsprimaEquiv("for (let x in list) process(x);");
-    assertEsprimaEquiv("for (var x = y = z in q);");
-    assertEsprimaEquiv("for (var a = b = c = (d in e) in z);");
+    testEsprimaEquiv("for(x in list) process(x);");
+    testEsprimaEquiv("for (var x in list) process(x);");
+    testEsprimaEquiv("for (var x = 42 in list) process(x);");
+    testEsprimaEquiv("for (let x in list) process(x);");
+    testEsprimaEquiv("for (var x = y = z in q);");
+    testEsprimaEquiv("for (var a = b = c = (d in e) in z);");
     expect(stmt(parse("for (var i = function() { return 10 in [] } in list) process(x);"))).to.be.eql(
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("var", [
@@ -47,9 +47,9 @@ describe("Parser", function () {
         ))
       )
     );
-    assertEsprimaEquiv("for(var a in b);");
-    assertEsprimaEquiv("for(var a = c in b);");
-    assertEsprimaEquiv("for(a in b);");
-    assertEsprimaEquiv("for(a.b in b);");
+    testEsprimaEquiv("for(var a in b);");
+    testEsprimaEquiv("for(var a = c in b);");
+    testEsprimaEquiv("for(a in b);");
+    testEsprimaEquiv("for(a.b in b);");
   });
 });

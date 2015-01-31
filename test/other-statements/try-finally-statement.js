@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("literal numeric expression", function () {
-    assertEsprimaEquiv("try { } finally { cleanup(stuff) }");
-    assertEsprimaEquiv("try{}catch(a){}finally{}");
-    assertEsprimaEquiv("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }");
+    testEsprimaEquiv("try { } finally { cleanup(stuff) }");
+    testEsprimaEquiv("try{}catch(a){}finally{}");
+    testEsprimaEquiv("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }");
   });
 });

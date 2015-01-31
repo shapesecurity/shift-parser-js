@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("static member expression", function () {
-    assertEsprimaEquiv("universe.milkyway");
-    assertEsprimaEquiv("universe.milkyway.solarsystem");
-    assertEsprimaEquiv("universe.milkyway.solarsystem.Earth");
-    assertEsprimaEquiv("universe.if");
-    assertEsprimaEquiv("universe.true");
-    assertEsprimaEquiv("universe.false");
-    assertEsprimaEquiv("universe.null");
+    testEsprimaEquiv("universe.milkyway");
+    testEsprimaEquiv("universe.milkyway.solarsystem");
+    testEsprimaEquiv("universe.milkyway.solarsystem.Earth");
+    testEsprimaEquiv("universe.if");
+    testEsprimaEquiv("universe.true");
+    testEsprimaEquiv("universe.false");
+    testEsprimaEquiv("universe.null");
   });
 });

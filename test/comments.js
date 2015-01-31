@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('./assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("Comments", function () {
-    assertEsprimaEquiv(" /**/");
-    assertEsprimaEquiv(" /****/");
-    assertEsprimaEquiv(" /**\n\r\r\n**/");
-    assertEsprimaEquiv(" //\n");
-    assertEsprimaEquiv("<!-- foo");
-    assertEsprimaEquiv("--> comment");
-    assertEsprimaEquiv("<!-- comment");
-    assertEsprimaEquiv(" \t --> comment");
-    assertEsprimaEquiv(" \t /* block comment */  --> comment");
-    assertEsprimaEquiv("/* block comment */--> comment");
+    testEsprimaEquiv(" /**/");
+    testEsprimaEquiv(" /****/");
+    testEsprimaEquiv(" /**\n\r\r\n**/");
+    testEsprimaEquiv(" //\n");
+    testEsprimaEquiv("<!-- foo");
+    testEsprimaEquiv("--> comment");
+    testEsprimaEquiv("<!-- comment");
+    testEsprimaEquiv(" \t --> comment");
+    testEsprimaEquiv(" \t /* block comment */  --> comment");
+    testEsprimaEquiv("/* block comment */--> comment");
   });
 });

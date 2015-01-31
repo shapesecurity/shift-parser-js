@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("prefix expression", function () {
-    assertEsprimaEquiv("!a");
-    assertEsprimaEquiv("typeof a");
-    assertEsprimaEquiv("void a");
-    assertEsprimaEquiv("delete a");
-    assertEsprimaEquiv("+a");
-    assertEsprimaEquiv("~a");
-    assertEsprimaEquiv("++a");
-    assertEsprimaEquiv("-a");
-    assertEsprimaEquiv("--a");
+    testEsprimaEquiv("!a");
+    testEsprimaEquiv("typeof a");
+    testEsprimaEquiv("void a");
+    testEsprimaEquiv("delete a");
+    testEsprimaEquiv("+a");
+    testEsprimaEquiv("~a");
+    testEsprimaEquiv("++a");
+    testEsprimaEquiv("-a");
+    testEsprimaEquiv("--a");
   });
 });

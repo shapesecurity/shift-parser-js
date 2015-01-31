@@ -20,25 +20,25 @@ var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("assignment expression", function () {
-    assertEsprimaEquiv("a=2;");
-    assertEsprimaEquiv("x = 42");
-    assertEsprimaEquiv("eval = 42");
-    assertEsprimaEquiv("arguments = 42");
-    assertEsprimaEquiv("x *= 42");
-    assertEsprimaEquiv("x /= 42");
-    assertEsprimaEquiv("x %= 42");
-    assertEsprimaEquiv("x += 42");
-    assertEsprimaEquiv("x -= 42");
-    assertEsprimaEquiv("x <<= 42");
-    assertEsprimaEquiv("x >>= 42");
-    assertEsprimaEquiv("x >>>= 42");
-    assertEsprimaEquiv("x &= 42");
-    assertEsprimaEquiv("x ^= 42");
-    assertEsprimaEquiv("x |= 42");
+    testEsprimaEquiv("a=2;");
+    testEsprimaEquiv("x = 42");
+    testEsprimaEquiv("eval = 42");
+    testEsprimaEquiv("arguments = 42");
+    testEsprimaEquiv("x *= 42");
+    testEsprimaEquiv("x /= 42");
+    testEsprimaEquiv("x %= 42");
+    testEsprimaEquiv("x += 42");
+    testEsprimaEquiv("x -= 42");
+    testEsprimaEquiv("x <<= 42");
+    testEsprimaEquiv("x >>= 42");
+    testEsprimaEquiv("x >>>= 42");
+    testEsprimaEquiv("x &= 42");
+    testEsprimaEquiv("x ^= 42");
+    testEsprimaEquiv("x |= 42");
     expect(expr(parse("'use strict'; eval[0] = 42"))).to.be.eql(
       new Shift.AssignmentExpression(
         "=",

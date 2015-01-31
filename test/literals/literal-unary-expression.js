@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("literal unary expression", function () {
     // Unary Operators
-    assertEsprimaEquiv("++x");
-    assertEsprimaEquiv("--x");
-    assertEsprimaEquiv("++eval");
-    assertEsprimaEquiv("--eval");
-    assertEsprimaEquiv("++arguments");
-    assertEsprimaEquiv("--arguments");
-    assertEsprimaEquiv("+x");
-    assertEsprimaEquiv("-x");
-    assertEsprimaEquiv("~x");
-    assertEsprimaEquiv("!x");
-    assertEsprimaEquiv("void x");
-    assertEsprimaEquiv("delete x");
-    assertEsprimaEquiv("typeof x");
+    testEsprimaEquiv("++x");
+    testEsprimaEquiv("--x");
+    testEsprimaEquiv("++eval");
+    testEsprimaEquiv("--eval");
+    testEsprimaEquiv("++arguments");
+    testEsprimaEquiv("--arguments");
+    testEsprimaEquiv("+x");
+    testEsprimaEquiv("-x");
+    testEsprimaEquiv("~x");
+    testEsprimaEquiv("!x");
+    testEsprimaEquiv("void x");
+    testEsprimaEquiv("delete x");
+    testEsprimaEquiv("typeof x");
   });
 });

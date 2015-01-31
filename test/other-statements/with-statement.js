@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("with statement", function () {
-    assertEsprimaEquiv("with(1);");
-    assertEsprimaEquiv("with (x) foo = bar");
-    assertEsprimaEquiv("with (x) foo = bar;");
-    assertEsprimaEquiv("with (x) { foo = bar }");
+    testEsprimaEquiv("with(1);");
+    testEsprimaEquiv("with (x) foo = bar");
+    testEsprimaEquiv("with (x) foo = bar;");
+    testEsprimaEquiv("with (x) { foo = bar }");
   });
 });

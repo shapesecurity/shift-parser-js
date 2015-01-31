@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("expression statement", function () {
     // Expression Statement
-    assertEsprimaEquiv("x");
-    assertEsprimaEquiv("x, y");
-    assertEsprimaEquiv("\\u0061");
-    assertEsprimaEquiv("a\\u0061");
-    assertEsprimaEquiv("\\u0061a");
-    assertEsprimaEquiv("\\u0061a ");
+    testEsprimaEquiv("x");
+    testEsprimaEquiv("x, y");
+    testEsprimaEquiv("\\u0061");
+    testEsprimaEquiv("a\\u0061");
+    testEsprimaEquiv("\\u0061a");
+    testEsprimaEquiv("\\u0061a ");
   });
 });

@@ -22,7 +22,7 @@ var Shift = require("shift-ast");
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 
-var assertParseFailure = require('../assertions').assertParseFailure;
+var testParseFailure = require('../assertions').testParseFailure;
 
 function directives(program) {
   return program.body.directives;
@@ -52,7 +52,7 @@ describe("Parser", function () {
   });
 
   describe("use strict directive", function () {
-    assertParseFailure("(function () { 'use strict'; with (i); })", "Strict mode code may not include a with statement");
+    testParseFailure("(function () { 'use strict'; with (i); })", "Strict mode code may not include a with statement");
     expect(expr(parse("(function () { 'use\\x20strict'; with (i); })"))).to.be.eql(
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use strict")], [
         new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),

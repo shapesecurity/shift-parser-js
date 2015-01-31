@@ -4,7 +4,7 @@ var converters = require('shift-spidermonkey-converter');
 var ShiftParser = require('../');
 var parse = ShiftParser.default;
 
-exports.assertParseFailure = function assertParseFailure(source, message) {
+exports.testParseFailure = function testParseFailure(source, message) {
   it(source, function () {
     try {
       parse(source);
@@ -16,7 +16,7 @@ exports.assertParseFailure = function assertParseFailure(source, message) {
   });
 };
 
-exports.assertEsprimaEquiv = function assertEsprimaEquiv(source) {
+exports.testEsprimaEquiv = function testEsprimaEquiv(source) {
   it(source, function () {
     var tree = parse(source);
     var oracle = converters.toShift(esprima.parse(source));

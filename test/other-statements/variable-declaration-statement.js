@@ -20,19 +20,19 @@ var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("variable declaration statement", function () {
     // Variable Statement
-    assertEsprimaEquiv("var x");
-    assertEsprimaEquiv("var a;");
-    assertEsprimaEquiv("var x, y;");
-    assertEsprimaEquiv("var x = 42");
-    assertEsprimaEquiv("var eval = 42, arguments = 42");
-    assertEsprimaEquiv("var x = 14, y = 3, z = 1977");
-    assertEsprimaEquiv("var implements, interface, package");
-    assertEsprimaEquiv("var private, protected, public, static");
+    testEsprimaEquiv("var x");
+    testEsprimaEquiv("var a;");
+    testEsprimaEquiv("var x, y;");
+    testEsprimaEquiv("var x = 42");
+    testEsprimaEquiv("var eval = 42, arguments = 42");
+    testEsprimaEquiv("var x = 14, y = 3, z = 1977");
+    testEsprimaEquiv("var implements, interface, package");
+    testEsprimaEquiv("var private, protected, public, static");
     expect(stmt(parse("var yield;"))).to.be.eql(
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(new Shift.Identifier("yield"), null),
@@ -40,14 +40,14 @@ describe("Parser", function () {
     );
 
     // Let Statement
-    assertEsprimaEquiv("let x");
-    assertEsprimaEquiv("{ let x }");
-    assertEsprimaEquiv("{ let x = 42 }");
-    assertEsprimaEquiv("{ let x = 14, y = 3, z = 1977 }");
+    testEsprimaEquiv("let x");
+    testEsprimaEquiv("{ let x }");
+    testEsprimaEquiv("{ let x = 42 }");
+    testEsprimaEquiv("{ let x = 14, y = 3, z = 1977 }");
 
     // Const Statement
-    assertEsprimaEquiv("const x = 42");
-    assertEsprimaEquiv("{ const x = 42 }");
-    assertEsprimaEquiv("{ const x = 14, y = 3, z = 1977 }");
+    testEsprimaEquiv("const x = 42");
+    testEsprimaEquiv("{ const x = 42 }");
+    testEsprimaEquiv("{ const x = 14, y = 3, z = 1977 }");
   });
 });

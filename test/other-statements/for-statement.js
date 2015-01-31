@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("for statement", function () {
-    assertEsprimaEquiv("for(;;);");
-    assertEsprimaEquiv("for(;;){}");
-    assertEsprimaEquiv("for(x = 0;;);");
-    assertEsprimaEquiv("for(var x = 0;;);");
-    assertEsprimaEquiv("for(let x = 0;;);");
-    assertEsprimaEquiv("for(var x = 0, y = 1;;);");
-    assertEsprimaEquiv("for(x = 0; x < 42;);");
-    assertEsprimaEquiv("for(x = 0; x < 42; x++);");
-    assertEsprimaEquiv("for(x = 0; x < 42; x++) process(x);");
-    assertEsprimaEquiv("for(a;b;c);");
-    assertEsprimaEquiv("for(var a;b;c);");
-    assertEsprimaEquiv("for(var a = 0;b;c);");
-    assertEsprimaEquiv("for(;b;c);");
+    testEsprimaEquiv("for(;;);");
+    testEsprimaEquiv("for(;;){}");
+    testEsprimaEquiv("for(x = 0;;);");
+    testEsprimaEquiv("for(var x = 0;;);");
+    testEsprimaEquiv("for(let x = 0;;);");
+    testEsprimaEquiv("for(var x = 0, y = 1;;);");
+    testEsprimaEquiv("for(x = 0; x < 42;);");
+    testEsprimaEquiv("for(x = 0; x < 42; x++);");
+    testEsprimaEquiv("for(x = 0; x < 42; x++) process(x);");
+    testEsprimaEquiv("for(a;b;c);");
+    testEsprimaEquiv("for(var a;b;c);");
+    testEsprimaEquiv("for(var a = 0;b;c);");
+    testEsprimaEquiv("for(;b;c);");
   });
 });

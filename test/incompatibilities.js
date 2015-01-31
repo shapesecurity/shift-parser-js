@@ -21,18 +21,18 @@ var Shift = require("shift-ast");
 
 var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
-var assertParseFailure = require('./assertions').assertParseFailure;
+var testParseFailure = require('./assertions').testParseFailure;
 
 describe("Parser", function() {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
   describe("ES5 backward incompatibilities", function() {
     // ES3: zero-width non-breaking space is allowed in an identifier
     // ES5: zero-width non-breaking space is a whitespace character
-    assertParseFailure("_\uFEFF_", "Unexpected identifier");
+    testParseFailure("_\uFEFF_", "Unexpected identifier");
 
     // ES3: a slash in a regexp character class will terminate the regexp
     // ES5: a slash is allowed within a regexp character class
-    assertParseFailure("[/[/]", "Invalid regular expression: missing /");
+    testParseFailure("[/[/]", "Invalid regular expression: missing /");
   });
 
   // programs where we choose to diverge from the ES5 specification
@@ -41,14 +41,15 @@ describe("Parser", function() {
     // ES6: variable declaration statement
     // We choose to fail here because we support ES5 with a minor addition: let/const with binding identifier.
     // This is the same decision esprima has made.
-    assertParseFailure("let[a] = b;", "Unexpected token [");
-    assertParseFailure("const[a] = b;", "Unexpected token [");
-    assertParseFailure("var let", "Unexpected token let");
-    assertParseFailure("var const", "Unexpected token const");
+    testParseFailure("let[a] = b;", "Unexpected token [");
+    testParseFailure("const[a] = b;", "Unexpected token [");
+    testParseFailure("var let", "Unexpected token let");
+    testParseFailure("var const", "Unexpected token const");
 
     // ES5: invalid program
     // ES6: function declaration within a block
     // We choose to parse this because of ubiquitous support among popular interpreters, despite disagreements about semantics.
+
     expect(stmt(parse("{ function f(){} }"))).to.be.eql(
       new Shift.BlockStatement(new Shift.Block([
         new Shift.FunctionDeclaration(new Shift.Identifier("f"), [], new Shift.FunctionBody([], []))
@@ -87,8 +88,8 @@ describe("Parser", function() {
 
     // ES5: allows any LeftHandSideExpression on the left of an assignment
     // ES6: allows only valid bindings on the left of an assignment
-    assertParseFailure("a+b=c", "Invalid left-hand side in assignment");
-    assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
+    testParseFailure("a+b=c", "Invalid left-hand side in assignment");
+    testParseFailure("+i = 42", "Invalid left-hand side in assignment");
     expect(expr(parse("new a=b"))).to.be.eql(
       new Shift.AssignmentExpression(
         "=",

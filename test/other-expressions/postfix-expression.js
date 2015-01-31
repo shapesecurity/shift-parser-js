@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 describe("Parser", function () {
   describe("postfix expression", function () {
     // Postfix Expressions
-    assertEsprimaEquiv("x++");
-    assertEsprimaEquiv("x--");
-    assertEsprimaEquiv("eval++");
-    assertEsprimaEquiv("eval--");
-    assertEsprimaEquiv("arguments++");
-    assertEsprimaEquiv("arguments--");
+    testEsprimaEquiv("x++");
+    testEsprimaEquiv("x--");
+    testEsprimaEquiv("eval++");
+    testEsprimaEquiv("eval--");
+    testEsprimaEquiv("arguments++");
+    testEsprimaEquiv("arguments--");
   });
 });

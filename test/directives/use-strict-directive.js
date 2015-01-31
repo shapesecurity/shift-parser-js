@@ -28,8 +28,8 @@ function directives(program) {
   return program.body.directives;
 }
 
-describe("Parser", function () {
-  describe("directive", function () {
+suite("Parser", function () {
+  suite("directive", function () {
     expect(directives(parse("\"Hello\""))).to.be.eql([new Shift.UnknownDirective("Hello")]);
     expect(directives(parse("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\""))).to.be.eql([new Shift.UnknownDirective("\n\r\t\v\b\f\\\'\"\0")]);
     expect(directives(parse("\"\\u0061\""))).to.be.eql([new Shift.UnknownDirective("a")]);
@@ -51,7 +51,7 @@ describe("Parser", function () {
     expect(directives(parse("\"Hello\\1World\""))).to.be.eql([new Shift.UnknownDirective("Hello\1World")]);
   });
 
-  describe("use strict directive", function () {
+  suite("use strict directive", function () {
     testParseFailure("(function () { 'use strict'; with (i); })", "Strict mode code may not include a with statement");
     expect(expr(parse("(function () { 'use\\x20strict'; with (i); })"))).to.be.eql(
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use strict")], [

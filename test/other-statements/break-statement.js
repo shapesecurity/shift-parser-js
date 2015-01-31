@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("break statement", function () {
+suite("Parser", function () {
+  suite("break statement", function () {
     testEsprimaEquiv("while (true) { break }");
     testEsprimaEquiv("done: while (true) { break done }");
     testEsprimaEquiv("done: while (true) { break done; }");

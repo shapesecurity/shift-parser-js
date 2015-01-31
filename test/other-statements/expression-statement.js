@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("expression statement", function () {
+suite("Parser", function () {
+  suite("expression statement", function () {
     // Expression Statement
     testEsprimaEquiv("x");
     testEsprimaEquiv("x, y");

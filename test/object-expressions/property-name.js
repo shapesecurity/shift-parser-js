@@ -17,8 +17,8 @@
 var expect = require('expect.js');
 var ShiftParser = require('../..');
 
-describe("Parser", function () {
-  describe("property name", function () {
+suite("Parser", function () {
+  suite("property name", function () {
     expect(ShiftParser.default("({0x0:0})").body.statements[0].expression.properties[0].name.value).to.be("0");
     expect(ShiftParser.default("({2e308:0})").body.statements[0].expression.properties[0].name.value).to.be("" + 1 / 0);
   });

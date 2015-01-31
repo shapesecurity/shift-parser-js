@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("switch with default statement", function () {
+suite("Parser", function () {
+  suite("switch with default statement", function () {
     testEsprimaEquiv("switch(a){case 1:default:case 2:}");
     testEsprimaEquiv("switch(a){case 1:default:}");
     testEsprimaEquiv("switch(a){default:case 2:}");

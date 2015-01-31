@@ -22,8 +22,8 @@ var Shift = require("shift-ast");
 var expr = require("./helpers").expr;
 var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("automatic semicolon insertion", function () {
+suite("Parser", function () {
+  suite("automatic semicolon insertion", function () {
     testEsprimaEquiv("{ x\n++y }");
     testEsprimaEquiv("{ x\n--y }");
     testEsprimaEquiv("{ var x = 14, y = 3\nz; }");
@@ -60,7 +60,7 @@ describe("Parser", function () {
     testEsprimaEquiv("{ throw error/* Multiline\nComment */error; }");
   });
 
-  describe("whitespace characters", function () {
+  suite("whitespace characters", function () {
     testEsprimaEquiv("new\u0020\u0009\u000B\u000C\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFFa");
     testEsprimaEquiv("{0\n1\r2\u20283\u20294}");
   });

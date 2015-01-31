@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("labeled statement", function () {
+suite("Parser", function () {
+  suite("labeled statement", function () {
     testEsprimaEquiv("start: for (;;) break start");
     testEsprimaEquiv("start: while (true) break start");
     testEsprimaEquiv("__proto__: test");

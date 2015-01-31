@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("do while statement", function () {
+suite("Parser", function () {
+  suite("do while statement", function () {
     testEsprimaEquiv("do keep(); while (true)");
     testEsprimaEquiv("do keep(); while (true);");
     testEsprimaEquiv("do { x++; y--; } while (x < 10)");

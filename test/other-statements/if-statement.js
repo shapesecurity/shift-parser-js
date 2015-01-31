@@ -22,8 +22,8 @@ var Shift = require("shift-ast");
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("if statement", function () {
+suite("Parser", function () {
+  suite("if statement", function () {
     testEsprimaEquiv("if (morning) goodMorning()");
     expect(stmt(parse("if (morning) (function(){})"))).to.be.eql(
       new Shift.IfStatement(

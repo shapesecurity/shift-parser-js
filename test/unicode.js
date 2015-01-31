@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("unicode", function () {
+suite("Parser", function () {
+  suite("unicode", function () {
     // Unicode
     testEsprimaEquiv("日本語 = []");
     testEsprimaEquiv("T\u203F = []");

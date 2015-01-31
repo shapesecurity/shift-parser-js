@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("prefix expression", function () {
+suite("Parser", function () {
+  suite("prefix expression", function () {
     testEsprimaEquiv("!a");
     testEsprimaEquiv("typeof a");
     testEsprimaEquiv("void a");

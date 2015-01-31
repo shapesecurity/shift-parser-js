@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("literal unary expression", function () {
+suite("Parser", function () {
+  suite("literal unary expression", function () {
     // Unary Operators
     testEsprimaEquiv("++x");
     testEsprimaEquiv("--x");

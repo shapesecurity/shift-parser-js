@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("for statement", function () {
+suite("Parser", function () {
+  suite("for statement", function () {
     testEsprimaEquiv("for(;;);");
     testEsprimaEquiv("for(;;){}");
     testEsprimaEquiv("for(x = 0;;);");

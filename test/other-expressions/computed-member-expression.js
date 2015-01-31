@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("computed member expression", function () {
+suite("Parser", function () {
+  suite("computed member expression", function () {
     testEsprimaEquiv("universe[galaxyName, otherUselessName]");
     testEsprimaEquiv("universe[galaxyName]");
   });

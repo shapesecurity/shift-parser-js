@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("literal numeric expression", function () {
+suite("Parser", function () {
+  suite("literal numeric expression", function () {
     testEsprimaEquiv("try { } finally { cleanup(stuff) }");
     testEsprimaEquiv("try{}catch(a){}finally{}");
     testEsprimaEquiv("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }");

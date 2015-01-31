@@ -23,9 +23,9 @@ var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
 var testParseFailure = require('./assertions').testParseFailure;
 
-describe("Parser", function() {
+suite("Parser", function() {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
-  describe("ES5 backward incompatibilities", function() {
+  suite("ES5 backward incompatibilities", function() {
     // ES3: zero-width non-breaking space is allowed in an identifier
     // ES5: zero-width non-breaking space is a whitespace character
     testParseFailure("_\uFEFF_", "Unexpected identifier");
@@ -36,7 +36,7 @@ describe("Parser", function() {
   });
 
   // programs where we choose to diverge from the ES5 specification
-  describe("ES5 divergences", function() {
+  suite("ES5 divergences", function() {
     // ES5: assignment to computed member expression
     // ES6: variable declaration statement
     // We choose to fail here because we support ES5 with a minor addition: let/const with binding identifier.
@@ -58,7 +58,7 @@ describe("Parser", function() {
   });
 
   // programs that parse according to ES5 but either fail or parse differently according to ES6
-  describe("ES6 backward incompatibilities", function() {
+  suite("ES6 backward incompatibilities", function() {
     // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
     // ES6: yield has been moved from the future reserved words list to the keywords list
     expect(stmt(parse("var yield = function yield(){};"))).to.be.eql(

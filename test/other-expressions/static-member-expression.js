@@ -16,8 +16,8 @@
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("static member expression", function () {
+suite("Parser", function () {
+  suite("static member expression", function () {
     testEsprimaEquiv("universe.milkyway");
     testEsprimaEquiv("universe.milkyway.solarsystem");
     testEsprimaEquiv("universe.milkyway.solarsystem.Earth");

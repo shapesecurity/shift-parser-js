@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("assignment expression", function () {
@@ -39,7 +37,7 @@ suite("Parser", function () {
     testEsprimaEquiv("x &= 42");
     testEsprimaEquiv("x ^= 42");
     testEsprimaEquiv("x |= 42");
-    expect(expr(parse("'use strict'; eval[0] = 42"))).to.be.eql(
+    testParse("'use strict'; eval[0] = 42", expr,
       new Shift.AssignmentExpression(
         "=",
         new Shift.ComputedMemberExpression(
@@ -49,7 +47,7 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(42)
       )
     );
-    expect(expr(parse("'use strict'; arguments[0] = 42"))).to.be.eql(
+    testParse("'use strict'; arguments[0] = 42", expr,
       new Shift.AssignmentExpression(
         "=",
         new Shift.ComputedMemberExpression(

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../").default;
 var Shift = require("shift-ast");
 
 var expr = require("./helpers").expr;
 var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
+var testParse = require('./assertions').testParse;
 
 suite("Parser", function () {
   suite("automatic semicolon insertion", function () {
@@ -36,19 +34,19 @@ suite("Parser", function () {
     testEsprimaEquiv("while (true) { break // Comment\nthere; }");
     testEsprimaEquiv("while (true) { break /* Multiline\nComment */there; }");
 
-    expect(expr(parse("(function(){ return\nx; })"))).to.be.eql(
+    testParse("(function(){ return\nx; })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
-    expect(expr(parse("(function(){ return // Comment\nx; })"))).to.be.eql(
+    testParse("(function(){ return // Comment\nx; })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
-    expect(expr(parse("(function(){ return/* Multiline\nComment */x; })"))).to.be.eql(
+    testParse("(function(){ return/* Multiline\nComment */x; })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),

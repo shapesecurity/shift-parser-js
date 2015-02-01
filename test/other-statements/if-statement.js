@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("if statement", function () {
     testEsprimaEquiv("if (morning) goodMorning()");
-    expect(stmt(parse("if (morning) (function(){})"))).to.be.eql(
+    testParse("if (morning) (function(){})", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
         new Shift.ExpressionStatement(new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))),
@@ -33,7 +31,7 @@ suite("Parser", function () {
       )
     );
     testEsprimaEquiv("if (morning) var x = 0;");
-    expect(stmt(parse("if (morning) function a(){}"))).to.be.eql(
+    testParse("if (morning) function a(){}", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
         new Shift.FunctionDeclaration(new Shift.Identifier("a"), [], new Shift.FunctionBody([], [])),

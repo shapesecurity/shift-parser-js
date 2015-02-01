@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("for in statement", function () {
@@ -30,7 +28,7 @@ suite("Parser", function () {
     testEsprimaEquiv("for (let x in list) process(x);");
     testEsprimaEquiv("for (var x = y = z in q);");
     testEsprimaEquiv("for (var a = b = c = (d in e) in z);");
-    expect(stmt(parse("for (var i = function() { return 10 in [] } in list) process(x);"))).to.be.eql(
+    testParse("for (var i = function() { return 10 in [] } in list) process(x);", stmt,
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
@@ -42,8 +40,7 @@ suite("Parser", function () {
         ]),
         new Shift.IdentifierExpression(new Shift.Identifier("list")),
         new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("process")),
-          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+          new Shift.IdentifierExpression(new Shift.Identifier("process")), [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
         ))
       )
     );

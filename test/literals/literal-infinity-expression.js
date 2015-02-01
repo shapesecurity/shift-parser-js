@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-var expect = require('expect.js');
-var ShiftParser = require('../..');
+var Shift = require("shift-ast");
 
-suite("Parser", function () {
+var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
+
+suite("Parser", function() {
   suite("literal infinity expression", function () {
-    expect(ShiftParser.default("2e308").body.statements[0].expression.type).to.be("LiteralInfinityExpression");
+    testParse("2e308", expr,
+      new Shift.LiteralInfinityExpression
+    );
   });
 });

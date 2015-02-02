@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-var expect = require('expect.js');
-var ShiftParser = require('../..');
+var Shift = require("shift-ast");
 
-describe("Parser", function () {
-  describe("property name", function () {
-    expect(ShiftParser.default("({0x0:0})").body.statements[0].expression.properties[0].name.value).to.be("0");
-    expect(ShiftParser.default("({2e308:0})").body.statements[0].expression.properties[0].name.value).to.be("" + 1 / 0);
+var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
+
+suite("Parser", function () {
+  suite("property name", function () {
+    testParse("({0x0:0})", expr,
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("number", "0"), new Shift.LiteralNumericExpression(0)),
+      ])
+    );
+
+    testParse("({2e308:0})", expr,
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.PropertyName("number", "" + 1 / 0), new Shift.LiteralNumericExpression(0)),
+      ])
+    );
   });
 });

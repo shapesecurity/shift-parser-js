@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
+var testParse = require('../assertions').testParse;
 var expr = require("../helpers").expr;
 
-describe("Parser", function () {
-  describe("return statement", function () {
-    expect(expr(parse("(function(){ return })"))).to.be.eql(
+suite("Parser", function () {
+  suite("return statement", function () {
+    testParse("(function(){ return })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
       ]))
     );
-    expect(expr(parse("(function(){ return; })"))).to.be.eql(
+    testParse("(function(){ return; })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
       ]))
     );
-    expect(expr(parse("(function(){ return x; })"))).to.be.eql(
+    testParse("(function(){ return x; })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
       ]))
     );
-    expect(expr(parse("(function(){ return x * y })"))).to.be.eql(
+    testParse("(function(){ return x * y })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
         new Shift.ReturnStatement(new Shift.BinaryExpression("*", new Shift.IdentifierExpression(new Shift.Identifier("x")), new Shift.IdentifierExpression(new Shift.Identifier("y")))),
       ]))

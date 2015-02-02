@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
-describe("Parser", function () {
-  describe("assignment expression", function () {
-    assertEsprimaEquiv("a=2;");
-    assertEsprimaEquiv("x = 42");
-    assertEsprimaEquiv("eval = 42");
-    assertEsprimaEquiv("arguments = 42");
-    assertEsprimaEquiv("x *= 42");
-    assertEsprimaEquiv("x /= 42");
-    assertEsprimaEquiv("x %= 42");
-    assertEsprimaEquiv("x += 42");
-    assertEsprimaEquiv("x -= 42");
-    assertEsprimaEquiv("x <<= 42");
-    assertEsprimaEquiv("x >>= 42");
-    assertEsprimaEquiv("x >>>= 42");
-    assertEsprimaEquiv("x &= 42");
-    assertEsprimaEquiv("x ^= 42");
-    assertEsprimaEquiv("x |= 42");
-    expect(expr(parse("'use strict'; eval[0] = 42"))).to.be.eql(
+suite("Parser", function () {
+  suite("assignment expression", function () {
+    testEsprimaEquiv("a=2;");
+    testEsprimaEquiv("x = 42");
+    testEsprimaEquiv("eval = 42");
+    testEsprimaEquiv("arguments = 42");
+    testEsprimaEquiv("x *= 42");
+    testEsprimaEquiv("x /= 42");
+    testEsprimaEquiv("x %= 42");
+    testEsprimaEquiv("x += 42");
+    testEsprimaEquiv("x -= 42");
+    testEsprimaEquiv("x <<= 42");
+    testEsprimaEquiv("x >>= 42");
+    testEsprimaEquiv("x >>>= 42");
+    testEsprimaEquiv("x &= 42");
+    testEsprimaEquiv("x ^= 42");
+    testEsprimaEquiv("x |= 42");
+    testParse("'use strict'; eval[0] = 42", expr,
       new Shift.AssignmentExpression(
         "=",
         new Shift.ComputedMemberExpression(
@@ -49,7 +47,7 @@ describe("Parser", function () {
         new Shift.LiteralNumericExpression(42)
       )
     );
-    expect(expr(parse("'use strict'; arguments[0] = 42"))).to.be.eql(
+    testParse("'use strict'; arguments[0] = 42", expr,
       new Shift.AssignmentExpression(
         "=",
         new Shift.ComputedMemberExpression(

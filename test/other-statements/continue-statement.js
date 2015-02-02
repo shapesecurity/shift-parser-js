@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("continue statement", function () {
-    assertEsprimaEquiv("while (true) { continue; }");
-    assertEsprimaEquiv("while (true) { continue }");
-    assertEsprimaEquiv("done: while (true) { continue done }");
-    assertEsprimaEquiv("done: while (true) { continue done; }");
-    assertEsprimaEquiv("__proto__: while (true) { continue __proto__; }");
-    assertEsprimaEquiv("a: do continue a; while(1);");
+suite("Parser", function () {
+  suite("continue statement", function () {
+    testEsprimaEquiv("while (true) { continue; }");
+    testEsprimaEquiv("while (true) { continue }");
+    testEsprimaEquiv("done: while (true) { continue done }");
+    testEsprimaEquiv("done: while (true) { continue done; }");
+    testEsprimaEquiv("__proto__: while (true) { continue __proto__; }");
+    testEsprimaEquiv("a: do continue a; while(1);");
   });
 });

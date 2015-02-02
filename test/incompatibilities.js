@@ -14,42 +14,41 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../").default;
 var Shift = require("shift-ast");
 
 var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
-var assertParseFailure = require('./assertions').assertParseFailure;
+var testParseFailure = require('./assertions').testParseFailure;
+var testParse = require('./assertions').testParse;
 
-describe("Parser", function() {
+suite("Parser", function () {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
-  describe("ES5 backward incompatibilities", function() {
+  suite("ES5 backward incompatibilities", function () {
     // ES3: zero-width non-breaking space is allowed in an identifier
     // ES5: zero-width non-breaking space is a whitespace character
-    assertParseFailure("_\uFEFF_", "Unexpected identifier");
+    testParseFailure("_\uFEFF_", "Unexpected identifier");
 
     // ES3: a slash in a regexp character class will terminate the regexp
     // ES5: a slash is allowed within a regexp character class
-    assertParseFailure("[/[/]", "Invalid regular expression: missing /");
+    testParseFailure("[/[/]", "Invalid regular expression: missing /");
   });
 
   // programs where we choose to diverge from the ES5 specification
-  describe("ES5 divergences", function() {
+  suite("ES5 divergences", function () {
     // ES5: assignment to computed member expression
     // ES6: variable declaration statement
     // We choose to fail here because we support ES5 with a minor addition: let/const with binding identifier.
     // This is the same decision esprima has made.
-    assertParseFailure("let[a] = b;", "Unexpected token [");
-    assertParseFailure("const[a] = b;", "Unexpected token [");
-    assertParseFailure("var let", "Unexpected token let");
-    assertParseFailure("var const", "Unexpected token const");
+    testParseFailure("let[a] = b;", "Unexpected token [");
+    testParseFailure("const[a] = b;", "Unexpected token [");
+    testParseFailure("var let", "Unexpected token let");
+    testParseFailure("var const", "Unexpected token const");
 
     // ES5: invalid program
     // ES6: function declaration within a block
     // We choose to parse this because of ubiquitous support among popular interpreters, despite disagreements about semantics.
-    expect(stmt(parse("{ function f(){} }"))).to.be.eql(
+
+    testParse("{ function f(){} }", stmt,
       new Shift.BlockStatement(new Shift.Block([
         new Shift.FunctionDeclaration(new Shift.Identifier("f"), [], new Shift.FunctionBody([], []))
       ]))
@@ -57,10 +56,10 @@ describe("Parser", function() {
   });
 
   // programs that parse according to ES5 but either fail or parse differently according to ES6
-  describe("ES6 backward incompatibilities", function() {
+  suite("ES6 backward incompatibilities", function () {
     // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
     // ES6: yield has been moved from the future reserved words list to the keywords list
-    expect(stmt(parse("var yield = function yield(){};"))).to.be.eql(
+    testParse("var yield = function yield(){};", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(
           new Shift.Identifier("yield"),
@@ -71,7 +70,7 @@ describe("Parser", function() {
 
     // ES5: this declares a function-scoped variable while at the same time assigning to the block-scoped variable
     // ES6: this particular construction is explicitly disallowed
-    expect(stmt(parse("try {} catch(e) { var e = 0; }"))).to.be.eql(
+    testParse("try {} catch(e) { var e = 0; }", stmt,
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
@@ -87,16 +86,16 @@ describe("Parser", function() {
 
     // ES5: allows any LeftHandSideExpression on the left of an assignment
     // ES6: allows only valid bindings on the left of an assignment
-    assertParseFailure("a+b=c", "Invalid left-hand side in assignment");
-    assertParseFailure("+i = 42", "Invalid left-hand side in assignment");
-    expect(expr(parse("new a=b"))).to.be.eql(
+    testParseFailure("a+b=c", "Invalid left-hand side in assignment");
+    testParseFailure("+i = 42", "Invalid left-hand side in assignment");
+    testParse("new a=b", expr,
       new Shift.AssignmentExpression(
         "=",
         new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), []),
         new Shift.IdentifierExpression(new Shift.Identifier("b"))
       )
     );
-    expect(expr(parse(("(a+b)=c")))).to.be.eql(
+    testParse("(a+b)=c", expr,
       new Shift.AssignmentExpression(
         "=",
         new Shift.BinaryExpression(

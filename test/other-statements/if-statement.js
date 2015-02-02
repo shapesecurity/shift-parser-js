@@ -14,34 +14,32 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
-describe("Parser", function () {
-  describe("if statement", function () {
-    assertEsprimaEquiv("if (morning) goodMorning()");
-    expect(stmt(parse("if (morning) (function(){})"))).to.be.eql(
+suite("Parser", function () {
+  suite("if statement", function () {
+    testEsprimaEquiv("if (morning) goodMorning()");
+    testParse("if (morning) (function(){})", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
         new Shift.ExpressionStatement(new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))),
         null
       )
     );
-    assertEsprimaEquiv("if (morning) var x = 0;");
-    expect(stmt(parse("if (morning) function a(){}"))).to.be.eql(
+    testEsprimaEquiv("if (morning) var x = 0;");
+    testParse("if (morning) function a(){}", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
         new Shift.FunctionDeclaration(new Shift.Identifier("a"), [], new Shift.FunctionBody([], [])),
         null
       )
     );
-    assertEsprimaEquiv("if (morning) goodMorning(); else goodDay()");
-    assertEsprimaEquiv("if(a)b;");
-    assertEsprimaEquiv("if(a)b;else c;");
+    testEsprimaEquiv("if (morning) goodMorning(); else goodDay()");
+    testEsprimaEquiv("if(a)b;");
+    testEsprimaEquiv("if(a)b;else c;");
   });
 });

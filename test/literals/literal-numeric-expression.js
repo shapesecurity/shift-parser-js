@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("literal numeric expression", function () {
-    assertEsprimaEquiv("0");
-    assertEsprimaEquiv("0;");
-    assertEsprimaEquiv("3");
-    assertEsprimaEquiv("5");
-    assertEsprimaEquiv("42");
-    assertEsprimaEquiv(".14");
-    assertEsprimaEquiv("3.14159");
-    assertEsprimaEquiv("6.02214179e+23");
-    assertEsprimaEquiv("1.492417830e-10");
-    assertEsprimaEquiv("0x0");
-    assertEsprimaEquiv("0x0;");
-    assertEsprimaEquiv("0e+100 ");
-    assertEsprimaEquiv("0e+100");
-    assertEsprimaEquiv("0xabc");
-    assertEsprimaEquiv("0xdef");
-    assertEsprimaEquiv("0X1A");
-    assertEsprimaEquiv("0x10");
-    assertEsprimaEquiv("0x100");
-    assertEsprimaEquiv("0X04");
-    assertEsprimaEquiv("02");
-    assertEsprimaEquiv("012");
-    assertEsprimaEquiv("0012");
-    assertEsprimaEquiv("\n    42\n\n");
+suite("Parser", function () {
+  suite("literal numeric expression", function () {
+    testEsprimaEquiv("0");
+    testEsprimaEquiv("0;");
+    testEsprimaEquiv("3");
+    testEsprimaEquiv("5");
+    testEsprimaEquiv("42");
+    testEsprimaEquiv(".14");
+    testEsprimaEquiv("3.14159");
+    testEsprimaEquiv("6.02214179e+23");
+    testEsprimaEquiv("1.492417830e-10");
+    testEsprimaEquiv("0x0");
+    testEsprimaEquiv("0x0;");
+    testEsprimaEquiv("0e+100 ");
+    testEsprimaEquiv("0e+100");
+    testEsprimaEquiv("0xabc");
+    testEsprimaEquiv("0xdef");
+    testEsprimaEquiv("0X1A");
+    testEsprimaEquiv("0x10");
+    testEsprimaEquiv("0x100");
+    testEsprimaEquiv("0X04");
+    testEsprimaEquiv("02");
+    testEsprimaEquiv("012");
+    testEsprimaEquiv("0012");
+    testEsprimaEquiv("\n    42\n\n");
   });
 });

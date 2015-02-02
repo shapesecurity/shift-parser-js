@@ -17,8 +17,8 @@
 var expect = require('expect.js');
 var ShiftParser = require('../');
 
-describe("API", function () {
-  it("should exist", function () {
+suite("API", function () {
+  test("should exist", function () {
     expect(typeof ShiftParser.default).be('function');
   });
 });

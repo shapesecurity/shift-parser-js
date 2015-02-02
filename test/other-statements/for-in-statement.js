@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
-describe("Parser", function () {
-  describe("for in statement", function () {
-    assertEsprimaEquiv("for(x in list) process(x);");
-    assertEsprimaEquiv("for (var x in list) process(x);");
-    assertEsprimaEquiv("for (var x = 42 in list) process(x);");
-    assertEsprimaEquiv("for (let x in list) process(x);");
-    assertEsprimaEquiv("for (var x = y = z in q);");
-    assertEsprimaEquiv("for (var a = b = c = (d in e) in z);");
-    expect(stmt(parse("for (var i = function() { return 10 in [] } in list) process(x);"))).to.be.eql(
+suite("Parser", function () {
+  suite("for in statement", function () {
+    testEsprimaEquiv("for(x in list) process(x);");
+    testEsprimaEquiv("for (var x in list) process(x);");
+    testEsprimaEquiv("for (var x = 42 in list) process(x);");
+    testEsprimaEquiv("for (let x in list) process(x);");
+    testEsprimaEquiv("for (var x = y = z in q);");
+    testEsprimaEquiv("for (var a = b = c = (d in e) in z);");
+    testParse("for (var i = function() { return 10 in [] } in list) process(x);", stmt,
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
@@ -42,14 +40,13 @@ describe("Parser", function () {
         ]),
         new Shift.IdentifierExpression(new Shift.Identifier("list")),
         new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("process")),
-          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+          new Shift.IdentifierExpression(new Shift.Identifier("process")), [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
         ))
       )
     );
-    assertEsprimaEquiv("for(var a in b);");
-    assertEsprimaEquiv("for(var a = c in b);");
-    assertEsprimaEquiv("for(a in b);");
-    assertEsprimaEquiv("for(a.b in b);");
+    testEsprimaEquiv("for(var a in b);");
+    testEsprimaEquiv("for(var a = c in b);");
+    testEsprimaEquiv("for(a in b);");
+    testEsprimaEquiv("for(a.b in b);");
   });
 });

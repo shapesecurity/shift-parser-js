@@ -14,143 +14,142 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require('../assertions').testParse;
 
-describe("Parser", function () {
-  describe("object expression", function () {
-    assertEsprimaEquiv("({})");
-    assertEsprimaEquiv("+{}");
-    assertEsprimaEquiv("+{ }");
+suite("Parser", function () {
+  suite("object expression", function () {
+    testEsprimaEquiv("({})");
+    testEsprimaEquiv("+{}");
+    testEsprimaEquiv("+{ }");
 
-    expect(expr(parse("({ answer: 42 })"))).to.be.eql(
+    testParse("({ answer: 42 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "answer"), new Shift.LiteralNumericExpression(42)),
       ])
     );
-    expect(expr(parse("({ if: 42 })"))).to.be.eql(
+
+    testParse("({ if: 42 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "if"), new Shift.LiteralNumericExpression(42)),
       ])
     );
-    expect(expr(parse("({ true: 42 })"))).to.be.eql(
+    testParse("({ true: 42 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "true"), new Shift.LiteralNumericExpression(42)),
       ])
     );
-    expect(expr(parse("({ false: 42 })"))).to.be.eql(
+    testParse("({ false: 42 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "false"), new Shift.LiteralNumericExpression(42)),
       ])
     );
-    expect(expr(parse("({ null: 42 })"))).to.be.eql(
+    testParse("({ null: 42 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "null"), new Shift.LiteralNumericExpression(42)),
       ])
     );
-    expect(expr(parse("({ \"answer\": 42 })"))).to.be.eql(
+    testParse("({ \"answer\": 42 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("string", "answer"), new Shift.LiteralNumericExpression(42)),
       ])
     );
-    expect(expr(parse("({ x: 1, x: 2 })"))).to.be.eql(
+    testParse("({ x: 1, x: 2 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "x"), new Shift.LiteralNumericExpression(1)),
         new Shift.DataProperty(new Shift.PropertyName("identifier", "x"), new Shift.LiteralNumericExpression(2)),
       ])
     );
 
-    expect(expr(parse("({ get width() { return m_width } })"))).to.be.eql(
+    testParse("({ get width() { return m_width } })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("identifier", "width"), new Shift.FunctionBody([], [
           new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("m_width"))),
         ])),
       ])
     );
-    expect(expr(parse("({ get undef() {} })"))).to.be.eql(
+    testParse("({ get undef() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("identifier", "undef"), new Shift.FunctionBody([], [])),
       ])
     );
-    expect(expr(parse("({ get if() {} })"))).to.be.eql(
+    testParse("({ get if() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("identifier", "if"), new Shift.FunctionBody([], [])),
       ])
     );
-    expect(expr(parse("({ get true() {} })"))).to.be.eql(
+    testParse("({ get true() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("identifier", "true"), new Shift.FunctionBody([], [])),
       ])
     );
-    expect(expr(parse("({ get false() {} })"))).to.be.eql(
+    testParse("({ get false() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("identifier", "false"), new Shift.FunctionBody([], [])),
       ])
     );
-    expect(expr(parse("({ get null() {} })"))).to.be.eql(
+    testParse("({ get null() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("identifier", "null"), new Shift.FunctionBody([], [])),
       ])
     );
-    expect(expr(parse("({ get \"undef\"() {} })"))).to.be.eql(
+    testParse("({ get \"undef\"() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("string", "undef"), new Shift.FunctionBody([], [])),
       ])
     );
-    expect(expr(parse("({ get 10() {} })"))).to.be.eql(
+    testParse("({ get 10() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("number", "10"), new Shift.FunctionBody([], [])),
       ])
     );
 
-    expect(expr(parse("({ set width(w) { w } })"))).to.be.eql(
+    testParse("({ set width(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.PropertyName("identifier", "width"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
         ])),
       ])
     );
-    expect(expr(parse("({ set if(w) { w } })"))).to.be.eql(
+    testParse("({ set if(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.PropertyName("identifier", "if"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
         ])),
       ])
     );
-    expect(expr(parse("({ set true(w) { w } })"))).to.be.eql(
+    testParse("({ set true(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.PropertyName("identifier", "true"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
         ])),
       ])
     );
-    expect(expr(parse("({ set false(w) { w } })"))).to.be.eql(
+    testParse("({ set false(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.PropertyName("identifier", "false"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
         ])),
       ])
     );
-    expect(expr(parse("({ set null(w) { w } })"))).to.be.eql(
+    testParse("({ set null(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.PropertyName("identifier", "null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
         ])),
       ])
     );
-    expect(expr(parse("({ set \"null\"(w) { w } })"))).to.be.eql(
+    testParse("({ set \"null\"(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.PropertyName("string", "null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
         ])),
       ])
     );
-    expect(expr(parse("({ set 10(w) { w } })"))).to.be.eql(
+    testParse("({ set 10(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.PropertyName("number", "10"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
@@ -158,28 +157,28 @@ describe("Parser", function () {
       ])
     );
 
-    expect(expr(parse("({ get: 2 })"))).to.be.eql(
+    testParse("({ get: 2 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "get"), new Shift.LiteralNumericExpression(2)),
       ])
     );
-    expect(expr(parse("({ set: 2 })"))).to.be.eql(
+    testParse("({ set: 2 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "set"), new Shift.LiteralNumericExpression(2)),
       ])
     );
-    expect(expr(parse("({ __proto__: 2 })"))).to.be.eql(
+    testParse("({ __proto__: 2 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "__proto__"), new Shift.LiteralNumericExpression(2)),
       ])
     );
-    expect(expr(parse("({\"__proto__\": 2 })"))).to.be.eql(
+    testParse("({\"__proto__\": 2 })", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("string", "__proto__"), new Shift.LiteralNumericExpression(2)),
       ])
     );
 
-    expect(expr(parse("({ get width() { return width }, set width(width) { return width; } })"))).to.be.eql(
+    testParse("({ get width() { return width }, set width(width) { return width; } })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.PropertyName("identifier", "width"), new Shift.FunctionBody([], [
           new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("width"))),
@@ -190,7 +189,7 @@ describe("Parser", function () {
       ])
     );
 
-    expect(expr(parse("({a:0, get 'b'(){}, set 3(d){}})"))).to.be.eql(
+    testParse("({a:0, get 'b'(){}, set 3(d){}})", expr,
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.PropertyName("identifier", "a"), new Shift.LiteralNumericExpression(0)),
         new Shift.Getter(new Shift.PropertyName("string", "b"), new Shift.FunctionBody([], [])),

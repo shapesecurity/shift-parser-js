@@ -14,67 +14,66 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 
-var assertParseFailure = require('../assertions').assertParseFailure;
+var testParseFailure = require('../assertions').testParseFailure;
+var testParse = require('../assertions').testParse;
 
 function directives(program) {
   return program.body.directives;
 }
 
-describe("Parser", function () {
-  describe("directive", function () {
-    expect(directives(parse("\"Hello\""))).to.be.eql([new Shift.UnknownDirective("Hello")]);
-    expect(directives(parse("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\""))).to.be.eql([new Shift.UnknownDirective("\n\r\t\v\b\f\\\'\"\0")]);
-    expect(directives(parse("\"\\u0061\""))).to.be.eql([new Shift.UnknownDirective("a")]);
-    expect(directives(parse("\"\\x61\""))).to.be.eql([new Shift.UnknownDirective("a")]);
-    expect(directives(parse("\"\\u00\""))).to.be.eql([new Shift.UnknownDirective("u00")]);
-    expect(directives(parse("\"\\xt\""))).to.be.eql([new Shift.UnknownDirective("xt")]);
-    expect(directives(parse("\"Hello\\nworld\""))).to.be.eql([new Shift.UnknownDirective("Hello\nworld")]);
-    expect(directives(parse("\"Hello\\\nworld\""))).to.be.eql([new Shift.UnknownDirective("Helloworld")]);
-    expect(directives(parse("\"Hello\\02World\""))).to.be.eql([new Shift.UnknownDirective("Hello\x02World")]);
-    expect(directives(parse("\"Hello\\012World\""))).to.be.eql([new Shift.UnknownDirective("Hello\nWorld")]);
-    expect(directives(parse("\"Hello\\122World\""))).to.be.eql([new Shift.UnknownDirective("HelloRWorld")]);
-    expect(directives(parse("\"Hello\\0122World\""))).to.be.eql([new Shift.UnknownDirective("Hello\n2World")]);
-    expect(directives(parse("\"Hello\\312World\""))).to.be.eql([new Shift.UnknownDirective("Hello\xCAWorld")]);
-    expect(directives(parse("\"Hello\\412World\""))).to.be.eql([new Shift.UnknownDirective("Hello!2World")]);
-    expect(directives(parse("\"Hello\\812World\""))).to.be.eql([new Shift.UnknownDirective("Hello812World")]);
-    expect(directives(parse("\"Hello\\712World\""))).to.be.eql([new Shift.UnknownDirective("Hello92World")]);
-    expect(directives(parse("\"Hello\\0World\""))).to.be.eql([new Shift.UnknownDirective("Hello\0World")]);
-    expect(directives(parse("\"Hello\\\r\nworld\""))).to.be.eql([new Shift.UnknownDirective("Helloworld")]);
-    expect(directives(parse("\"Hello\\1World\""))).to.be.eql([new Shift.UnknownDirective("Hello\1World")]);
-  });
+suite("Parser", function () {
+  suite("use strict", function () {
 
-  describe("use strict directive", function () {
-    assertParseFailure("(function () { 'use strict'; with (i); })", "Strict mode code may not include a with statement");
-    expect(expr(parse("(function () { 'use\\x20strict'; with (i); })"))).to.be.eql(
+    testParse("\"Hello\"", directives, [new Shift.UnknownDirective("Hello")]);
+
+    testParse("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"", directives, [new Shift.UnknownDirective("\n\r\t\v\b\f\\\'\"\0")]);
+    testParse("\"\\u0061\"", directives, [new Shift.UnknownDirective("a")]);
+    testParse("\"\\x61\"", directives, [new Shift.UnknownDirective("a")]);
+    testParse("\"\\u00\"", directives, [new Shift.UnknownDirective("u00")]);
+    testParse("\"\\xt\"", directives, [new Shift.UnknownDirective("xt")]);
+    testParse("\"Hello\\nworld\"", directives, [new Shift.UnknownDirective("Hello\nworld")]);
+    testParse("\"Hello\\\nworld\"", directives, [new Shift.UnknownDirective("Helloworld")]);
+    testParse("\"Hello\\02World\"", directives, [new Shift.UnknownDirective("Hello\x02World")]);
+    testParse("\"Hello\\012World\"", directives, [new Shift.UnknownDirective("Hello\nWorld")]);
+    testParse("\"Hello\\122World\"", directives, [new Shift.UnknownDirective("HelloRWorld")]);
+    testParse("\"Hello\\0122World\"", directives, [new Shift.UnknownDirective("Hello\n2World")]);
+    testParse("\"Hello\\312World\"", directives, [new Shift.UnknownDirective("Hello\xCAWorld")]);
+    testParse("\"Hello\\412World\"", directives, [new Shift.UnknownDirective("Hello!2World")]);
+    testParse("\"Hello\\812World\"", directives, [new Shift.UnknownDirective("Hello812World")]);
+    testParse("\"Hello\\712World\"", directives, [new Shift.UnknownDirective("Hello92World")]);
+    testParse("\"Hello\\0World\"", directives, [new Shift.UnknownDirective("Hello\0World")]);
+    testParse("\"Hello\\\r\nworld\"", directives, [new Shift.UnknownDirective("Helloworld")]);
+    testParse("\"Hello\\1World\"", directives, [new Shift.UnknownDirective("Hello\1World")]);
+
+    testParseFailure("(function () { 'use strict'; with (i); })", "Strict mode code may not include a with statement");
+
+    testParse("(function () { 'use\\x20strict'; with (i); })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use strict")], [
         new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),
       ]))
     );
-    expect(expr(parse("(function () { 'use\\nstrict'; with (i); })"))).to.be.eql(
+    testParse("(function () { 'use\\nstrict'; with (i); })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use\nstrict")], [
         new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),
       ]))
     );
 
-    expect(stmt(parse("function a() {'use strict';return 0;};"))).to.be.eql(
+    testParse("function a() {'use strict';return 0;};", stmt,
       new Shift.FunctionDeclaration(new Shift.Identifier("a"), [], new Shift.FunctionBody([new Shift.UseStrictDirective], [
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))
     );
-    expect(expr(parse("(function() {'use strict';return 0;});"))).to.be.eql(
+    testParse("(function() {'use strict';return 0;});", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UseStrictDirective()], [
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))
     );
-    expect(expr(parse("(function a() {'use strict';return 0;});"))).to.be.eql(
+    testParse("(function a() {'use strict';return 0;});", expr,
       new Shift.FunctionExpression(new Shift.Identifier("a"), [], new Shift.FunctionBody([new Shift.UseStrictDirective], [
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))

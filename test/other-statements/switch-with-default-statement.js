@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-var assertEsprimaEquiv = require('../assertions').assertEsprimaEquiv;
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-describe("Parser", function () {
-  describe("switch with default statement", function () {
-    assertEsprimaEquiv("switch(a){case 1:default:case 2:}");
-    assertEsprimaEquiv("switch(a){case 1:default:}");
-    assertEsprimaEquiv("switch(a){default:case 2:}");
+suite("Parser", function () {
+  suite("switch with default statement", function () {
+    testEsprimaEquiv("switch(a){case 1:default:case 2:}");
+    testEsprimaEquiv("switch(a){case 1:default:}");
+    testEsprimaEquiv("switch(a){default:case 2:}");
   });
 });

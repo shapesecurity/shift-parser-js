@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-
-var parse = require("../..").default;
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
 
-describe("Parser", function () {
-  describe("literal string expression", function () {
-    expect(expr(parse("('x')"))).to.be.eql(
-      new Shift.LiteralStringExpression("x")
-    );
-    expect(expr(parse("('\\\\\\'')"))).to.be.eql(
-      new Shift.LiteralStringExpression("\\'")
-    );
-    expect(expr(parse("(\"x\")"))).to.be.eql(
-      new Shift.LiteralStringExpression("x")
-    );
-    expect(expr(parse("(\"\\\\\\\"\")"))).to.be.eql(
-      new Shift.LiteralStringExpression("\\\"")
-    );
+suite("Parser", function () {
+  suite("literal string expression", function () {
+    testParse("('x')", expr, new Shift.LiteralStringExpression("x") );
+    testParse("('\\\\\\'')", expr, new Shift.LiteralStringExpression("\\'"));
+    testParse("(\"x\")", expr, new Shift.LiteralStringExpression("x"));
+    testParse("(\"\\\\\\\"\")", expr, new Shift.LiteralStringExpression("\\\""));
   });
 });

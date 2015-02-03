@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
 var Shift = require("shift-ast");
-var parse = require("../..").default;
+
 var expr = require("../helpers").expr;
 var testParse = require('../assertions').testParse;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;

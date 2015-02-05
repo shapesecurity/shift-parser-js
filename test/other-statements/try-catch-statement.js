@@ -14,15 +14,74 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var Shift = require("shift-ast");
+
+var stmt = require("../helpers").stmt;
+var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
-  suite("literal numeric expression", function () {
-    testEsprimaEquiv("try{}catch(a){}");
-    testEsprimaEquiv("try { } catch (e) { }");
-    testEsprimaEquiv("try { } catch (eval) { }");
-    testEsprimaEquiv("try { } catch (arguments) { }");
-    testEsprimaEquiv("try { } catch (e) { say(e) }");
-    testEsprimaEquiv("try { doThat(); } catch (e) { say(e) }");
+  suite("try-catch statement", function () {
+    testParse("try{}catch(a){}", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("a")),
+          new Shift.Block([])
+        )
+      )
+    );
+    testParse("try { } catch (e) { }", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([])
+        )
+      )
+    );
+    testParse("try { } catch (eval) { }", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("eval")),
+          new Shift.Block([])
+        )
+      )
+    );
+    testParse("try { } catch (arguments) { }", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("arguments")),
+          new Shift.Block([])
+        )
+      )
+    );
+    testParse("try { } catch (e) { say(e) }", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+            new Shift.IdentifierExpression(new Shift.Identifier("say")),
+            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+          ))])
+        )
+      )
+    );
+    testParse("try { doThat(); } catch (e) { say(e) }", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([
+          new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("doThat")), []))
+        ]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
+            new Shift.IdentifierExpression(new Shift.Identifier("say")),
+            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+          ))])
+        )
+      )
+    );
   });
 });

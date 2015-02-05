@@ -23,13 +23,49 @@ suite("Parser", function () {
   suite("property name", function () {
     testParse("({0x0:0})", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.PropertyName("number", "0"), new Shift.LiteralNumericExpression(0)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("0"), new Shift.LiteralNumericExpression(0)),
       ])
     );
 
     testParse("({2e308:0})", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.PropertyName("number", "" + 1 / 0), new Shift.LiteralNumericExpression(0)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("" + 1 / 0), new Shift.LiteralNumericExpression(0)),
+      ])
+    );
+
+    testParse("({get b() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.StaticPropertyName("b"), new Shift.FunctionBody([], [])),
+      ])
+    );
+    testParse("({set c(x) {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.StaticPropertyName("c"), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
+      ])
+    );
+
+    testParse("({__proto__:0})", expr,
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.StaticPropertyName("__proto__"), new Shift.LiteralNumericExpression(0)),
+      ])
+    );
+
+    testParse("({get __proto__() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.StaticPropertyName("__proto__"), new Shift.FunctionBody([], [])),
+      ])
+    );
+
+    testParse("({set __proto__(x) {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Setter(new Shift.StaticPropertyName("__proto__"), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
+      ])
+    );
+
+    testParse("({get __proto__() {}, set __proto__(x) {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.StaticPropertyName("__proto__"), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.StaticPropertyName("__proto__"), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
       ])
     );
   });

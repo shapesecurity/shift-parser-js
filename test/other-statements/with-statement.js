@@ -19,8 +19,8 @@ var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 suite("Parser", function () {
   suite("with statement", function () {
     testEsprimaEquiv("with(1);");
-    testEsprimaEquiv("with (x) foo = bar");
-    testEsprimaEquiv("with (x) foo = bar;");
-    testEsprimaEquiv("with (x) { foo = bar }");
+    testEsprimaEquiv("with (x) foo");
+    testEsprimaEquiv("with (x) foo;");
+    testEsprimaEquiv("with (x) { foo }");
   });
 });

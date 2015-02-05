@@ -37,20 +37,30 @@ suite("Parser", function () {
   suite("ES5 divergences", function () {
     // ES5: assignment to computed member expression
     // ES6: variable declaration statement
-    // We choose to fail here because we support ES5 with a minor addition: let/const with binding identifier.
-    // This is the same decision esprima has made.
-    testParseFailure("let[a] = b;", "Unexpected token [");
-    testParseFailure("const[a] = b;", "Unexpected token [");
+    testParse("let[a] = b;", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator(
+          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
+          new Shift.IdentifierExpression(new Shift.Identifier("b"))
+        ),
+      ]))
+    );
+    testParse("const[a] = b;", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
+        new Shift.VariableDeclarator(
+          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
+          new Shift.IdentifierExpression(new Shift.Identifier("b"))
+        ),
+      ]))
+    );
     testParseFailure("var let", "Unexpected token let");
     testParseFailure("var const", "Unexpected token const");
 
     // ES5: invalid program
     // ES6: function declaration within a block
-    // We choose to parse this because of ubiquitous support among popular interpreters, despite disagreements about semantics.
-
     testParse("{ function f(){} }", stmt,
       new Shift.BlockStatement(new Shift.Block([
-        new Shift.FunctionDeclaration(new Shift.Identifier("f"), [], new Shift.FunctionBody([], []))
+        new Shift.FunctionDeclaration(false, new Shift.Identifier("f"), [], null, new Shift.FunctionBody([], []))
       ]))
     );
   });
@@ -62,8 +72,8 @@ suite("Parser", function () {
     testParse("var yield = function yield(){};", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(
-          new Shift.Identifier("yield"),
-          new Shift.FunctionExpression(new Shift.Identifier("yield"), [], new Shift.FunctionBody([], []))
+          new Shift.BindingIdentifier(new Shift.Identifier("yield")),
+          new Shift.FunctionExpression(false, new Shift.Identifier("yield"), [], null, new Shift.FunctionBody([], []))
         )
       ]))
     );
@@ -74,10 +84,10 @@ suite("Parser", function () {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.Identifier("e"),
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
           new Shift.Block([
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.Identifier("e"), new Shift.LiteralNumericExpression(0))
+              new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("e")), new Shift.LiteralNumericExpression(0))
             ]))
           ])
         )
@@ -88,24 +98,9 @@ suite("Parser", function () {
     // ES6: allows only valid bindings on the left of an assignment
     testParseFailure("a+b=c", "Invalid left-hand side in assignment");
     testParseFailure("+i = 42", "Invalid left-hand side in assignment");
-    testParse("new a=b", expr,
-      new Shift.AssignmentExpression(
-        "=",
-        new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), []),
-        new Shift.IdentifierExpression(new Shift.Identifier("b"))
-      )
-    );
-    testParse("(a+b)=c", expr,
-      new Shift.AssignmentExpression(
-        "=",
-        new Shift.BinaryExpression(
-          "+",
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          new Shift.IdentifierExpression(new Shift.Identifier("b"))
-        ),
-        new Shift.IdentifierExpression(new Shift.Identifier("c"))
-      )
-    );
-
+    testParseFailure("new a=b", "Invalid left-hand side in assignment");
+    testParseFailure("(a+b)=c", "Invalid left-hand side in assignment");
+    testParseFailure("f()++", "Invalid left-hand side in assignment");
+    testParseFailure("--f()", "Invalid left-hand side in assignment");
   });
 });

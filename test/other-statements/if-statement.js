@@ -26,15 +26,23 @@ suite("Parser", function () {
     testParse("if (morning) (function(){})", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
-        new Shift.ExpressionStatement(new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], []))),
+        new Shift.ExpressionStatement(new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))),
         null
       )
     );
-    testEsprimaEquiv("if (morning) var x = 0;");
+    testParse("if (morning) var x = 0;", stmt,
+      new Shift.IfStatement(
+        new Shift.IdentifierExpression(new Shift.Identifier("morning")),
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+        ])),
+        null
+      )
+    );
     testParse("if (morning) function a(){}", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
-        new Shift.FunctionDeclaration(new Shift.Identifier("a"), [], new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([], [])),
         null
       )
     );

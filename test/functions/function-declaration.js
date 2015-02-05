@@ -23,50 +23,50 @@ var testParse = require('../assertions').testParse;
 suite("Parser", function () {
   suite("function declaration", function () {
     testParse("function hello() { z(); }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("hello"), [], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
 
     testParse("function eval() { }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("eval"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("eval"), [], null, new Shift.FunctionBody([], []))
     );
 
     testParse("function arguments() { }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("arguments"), [], new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("arguments"), [], null, new Shift.FunctionBody([], []))
     );
 
     testParse("function test(t, t) { }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("test"), [
-        new Shift.Identifier("t"),
-        new Shift.Identifier("t"),
-      ], new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("test"), [
+        new Shift.BindingIdentifier(new Shift.Identifier("t")),
+        new Shift.BindingIdentifier(new Shift.Identifier("t")),
+      ], null, new Shift.FunctionBody([], []))
     );
 
     testParse("function eval() { function inner() { \"use strict\" } }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("eval"), [], new Shift.FunctionBody([], [
-        new Shift.FunctionDeclaration(new Shift.Identifier("inner"), [], new Shift.FunctionBody([new Shift.UseStrictDirective], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("eval"), [], null, new Shift.FunctionBody([], [
+        new Shift.FunctionDeclaration(false, new Shift.Identifier("inner"), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], []))
       ]))
     );
 
     testParse("function hello(a) { z(); }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("hello"), [new Shift.Identifier("a")], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.BindingIdentifier(new Shift.Identifier("a"))], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
 
     testParse("function hello(a, b) { z(); }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("hello"), [new Shift.Identifier("a"), new Shift.Identifier("b")], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("hello"), [new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.BindingIdentifier(new Shift.Identifier("b"))], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
 
     testParse("function universe(__proto__) { }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("universe"), [new Shift.Identifier("__proto__")], new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("universe"), [new Shift.BindingIdentifier(new Shift.Identifier("__proto__"))], null, new Shift.FunctionBody([], []))
     );
 
     testParse("function test() { \"use strict\"\n + 42; }", stmt,
-      new Shift.FunctionDeclaration(new Shift.Identifier("test"), [], new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.Identifier("test"), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("use strict"), new Shift.LiteralNumericExpression(42))),
       ]))
     );

@@ -23,17 +23,91 @@ var testParse = require('../assertions').testParse;
 suite("Parser", function () {
   suite("for in statement", function () {
     testEsprimaEquiv("for(x in list) process(x);");
-    testEsprimaEquiv("for (var x in list) process(x);");
-    testEsprimaEquiv("for (var x = 42 in list) process(x);");
-    testEsprimaEquiv("for (let x in list) process(x);");
-    testEsprimaEquiv("for (var x = y = z in q);");
-    testEsprimaEquiv("for (var a = b = c = (d in e) in z);");
+    testParse("for (var x in list) process(x);", stmt,
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("list")),
+        new Shift.ExpressionStatement(new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("process")),
+          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+        ))
+      )
+    );
+    testParse("for (var x = 0 in list) process(x);", stmt,
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("x")),
+            new Shift.LiteralNumericExpression(0)
+          )
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("list")),
+        new Shift.ExpressionStatement(new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("process")),
+          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+        ))
+      )
+    );
+    testParse("for (let x in list) process(x);", stmt,
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("let", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("list")),
+        new Shift.ExpressionStatement(new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("process")),
+          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+        ))
+      )
+    );
+    testParse("for (var x = y = z in q);", stmt,
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("x")),
+            new Shift.AssignmentExpression(
+              "=",
+              new Shift.BindingIdentifier(new Shift.Identifier("y")),
+              new Shift.IdentifierExpression(new Shift.Identifier("z"))
+            )
+          )
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("q")),
+        new Shift.EmptyStatement
+      )
+    );
+    testParse("for (var a = b = c = (d in e) in z);", stmt,
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("a")),
+            new Shift.AssignmentExpression(
+              "=",
+              new Shift.BindingIdentifier(new Shift.Identifier("b")),
+              new Shift.AssignmentExpression(
+                "=",
+                new Shift.BindingIdentifier(new Shift.Identifier("c")),
+                new Shift.BinaryExpression(
+                  "in",
+                  new Shift.IdentifierExpression(new Shift.Identifier("d")),
+                  new Shift.IdentifierExpression(new Shift.Identifier("e"))
+                )
+              )
+            )
+          )
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("z")),
+        new Shift.EmptyStatement
+      )
+    );
     testParse("for (var i = function() { return 10 in [] } in list) process(x);", stmt,
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
-            new Shift.Identifier("i"),
-            new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
+            new Shift.BindingIdentifier(new Shift.Identifier("i")),
+            new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
               new Shift.ReturnStatement(new Shift.BinaryExpression("in", new Shift.LiteralNumericExpression(10), new Shift.ArrayExpression([])))
             ]))
           )
@@ -44,8 +118,27 @@ suite("Parser", function () {
         ))
       )
     );
-    testEsprimaEquiv("for(var a in b);");
-    testEsprimaEquiv("for(var a = c in b);");
+    testParse("for(var a in b);", stmt,
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("b")),
+        new Shift.EmptyStatement
+      )
+    );
+    testParse("for(var a = c in b);", stmt,
+      new Shift.ForInStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("a")),
+            new Shift.IdentifierExpression(new Shift.Identifier("c"))
+          )
+        ]),
+        new Shift.IdentifierExpression(new Shift.Identifier("b")),
+        new Shift.EmptyStatement
+      )
+    );
     testEsprimaEquiv("for(a in b);");
     testEsprimaEquiv("for(a.b in b);");
   });

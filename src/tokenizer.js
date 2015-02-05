@@ -44,6 +44,7 @@ export const TokenType = {
   COLON: {klass: TokenClass.Punctuator, name: ":"},
   SEMICOLON: {klass: TokenClass.Punctuator, name: ";"},
   PERIOD: {klass: TokenClass.Punctuator, name: "."},
+  ELLIPSIS: {klass: TokenClass.Punctuator, name: "..."},
   CONDITIONAL: {klass: TokenClass.Punctuator, name: "?"},
   INC: {klass: TokenClass.Punctuator, name: "++"},
   DEC: {klass: TokenClass.Punctuator, name: "--"},
@@ -83,6 +84,7 @@ export const TokenType = {
   GTE: {klass: TokenClass.Punctuator, name: ">="},
   INSTANCEOF: {klass: TokenClass.Keyword, name: "instanceof"},
   IN: {klass: TokenClass.Keyword, name: "in"},
+  OF: {klass: TokenClass.Keyword, name: "of"},
   NOT: {klass: TokenClass.Punctuator, name: "!"},
   BIT_NOT: {klass: TokenClass.Punctuator, name: "~"},
   DELETE: {klass: TokenClass.Keyword, name: "delete"},
@@ -388,6 +390,10 @@ class Tokenizer {
               return TokenType.DO;
             }
             break;
+          case "o":
+            if (id.charAt(1) === "f") {
+              return TokenType.OF;
+            }
           default:
             break;
         }
@@ -889,7 +895,11 @@ class Tokenizer {
     switch (ch1) {
       // Check for most common single-character punctuators.
       case ".":
-        return TokenType.PERIOD;
+        let ch2 = this.source.charAt(this.index + 1);
+        if (ch2 !== ".") return TokenType.PERIOD;
+        let ch3 = this.source.charAt(this.index + 2);
+        if (ch3 !== ".") return TokenType.PERIOD;
+        return TokenType.ELLIPSIS;
       case "(":
         return TokenType.LPAREN;
       case ")":
@@ -1022,7 +1032,32 @@ class Tokenizer {
     return new NumericLiteralToken(slice, parseInt(slice.text.substr(2), 16));
   }
 
+  scanBinaryLiteral(start) {
+    let offset = this.index - start;
+
+    while (this.index < this.source.length) {
+      let ch = this.source.charAt(this.index);
+      if (ch !== "0" && ch !== "1") {
+        break;
+      }
+      this.index++;
+    }
+
+    if (this.index - start <= offset) {
+      throw this.createILLEGAL();
+    }
+
+    if (this.index < this.source.length && (isIdentifierStart(this.source.charCodeAt(this.index))
+        || isDecimalDigit(this.source.charAt(this.index)))) {
+      throw this.createILLEGAL();
+    }
+
+    return new NumericLiteralToken(this.getSlice(start), parseInt(this.getSlice(start).text.substr(offset), 2), true);
+  }
+
   scanOctalLiteral(start) {
+    var offset = this.index - start;
+
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
       if (!("0" <= ch && ch <= "7")) {
@@ -1031,12 +1066,16 @@ class Tokenizer {
       this.index++;
     }
 
+    if (offset === 2 && this.index - start === 2) {
+      throw this.createILLEGAL();
+    }
+
     if (this.index < this.source.length && (isIdentifierStart(this.source.charCodeAt(this.index))
         || isDecimalDigit(this.source.charAt(this.index)))) {
       throw this.createILLEGAL();
     }
 
-    return new NumericLiteralToken(this.getSlice(start), parseInt(this.getSlice(start).text.substr(1), 8), true);
+    return new NumericLiteralToken(this.getSlice(start), parseInt(this.getSlice(start).text.substr(offset), 8), true);
   }
 
   scanNumericLiteral() {
@@ -1051,6 +1090,12 @@ class Tokenizer {
         if (ch === "x" || ch === "X") {
           this.index++;
           return this.scanHexLiteral(start);
+        } else if (ch === "b" || ch === "B") {
+          this.index++;
+          return this.scanBinaryLiteral(start);
+        } else if (ch === "o" || ch === "O") {
+          this.index++;
+          return this.scanOctalLiteral(start);
         } else if ("0" <= ch && ch <= "9") {
           return this.scanOctalLiteral(start);
         }

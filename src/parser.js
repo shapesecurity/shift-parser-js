@@ -607,13 +607,10 @@ export class Parser extends Tokenizer {
         let initDecl = this.parseVariableDeclaration();
         this.allowIn = previousAllowIn;
 
-        if (initDecl.declarators.length === 1 && (this.match(TokenType.IN) || this.match(TokenType.OF))) {
-          let type = this.match(TokenType.IN) ?
-            Shift.ForInStatement : Shift.ForOfStatement;
-
+        if (initDecl.declarators.length === 1 && this.match(TokenType.IN)) {
           this.lex();
           right = this.parseExpression();
-          return new type(initDecl, right, this.getIteratorStatementEpilogue());
+          return new Shift.ForInStatement(initDecl, right, this.getIteratorStatementEpilogue());
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
@@ -631,18 +628,14 @@ export class Parser extends Tokenizer {
         let init = this.parseExpression();
         this.allowIn = previousAllowIn;
 
-        if (this.match(TokenType.IN) || this.match(TokenType.OF)) {
+        if (this.match(TokenType.IN)) {
           if (!Parser.isValidSimpleAssignmentTarget(init)) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
           }
 
-          let type = this.match(TokenType.IN) ?
-            Shift.ForInStatement : Shift.ForOfStatement;
-
           this.lex();
           right = this.parseExpression();
-
-          return new type(init, right, this.getIteratorStatementEpilogue());
+          return new Shift.ForInStatement(init, right, this.getIteratorStatementEpilogue());
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
@@ -1539,7 +1532,7 @@ export class Parser extends Tokenizer {
       } else if(this.match(TokenType.LPAREN)) {
         // Parse the method parameters and the function body
         let parmInfo = this.parseParams(null);
-        let [body, isStrict]= this.parseFunctionBody();
+        let [body, isStrict] = this.parseFunctionBody();
 
         // Get all the local declarations from the function body
         let decls = [];

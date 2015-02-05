@@ -607,13 +607,10 @@ export class Parser extends Tokenizer {
         let initDecl = this.parseVariableDeclaration();
         this.allowIn = previousAllowIn;
 
-        if (initDecl.declarators.length === 1 && (this.match(TokenType.IN) || this.match(TokenType.OF))) {
-          let type = this.match(TokenType.IN) ?
-            Shift.ForInStatement : Shift.ForOfStatement;
-
+        if (initDecl.declarators.length === 1 && this.match(TokenType.IN)) {
           this.lex();
           right = this.parseExpression();
-          return new type(initDecl, right, this.getIteratorStatementEpilogue());
+          return new Shift.ForInStatement(initDecl, right, this.getIteratorStatementEpilogue());
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
@@ -631,18 +628,14 @@ export class Parser extends Tokenizer {
         let init = this.parseExpression();
         this.allowIn = previousAllowIn;
 
-        if (this.match(TokenType.IN) || this.match(TokenType.OF)) {
+        if (this.match(TokenType.IN)) {
           if (!Parser.isValidSimpleAssignmentTarget(init)) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
           }
 
-          let type = this.match(TokenType.IN) ?
-            Shift.ForInStatement : Shift.ForOfStatement;
-
           this.lex();
           right = this.parseExpression();
-
-          return new type(init, right, this.getIteratorStatementEpilogue());
+          return new Shift.ForInStatement(init, right, this.getIteratorStatementEpilogue());
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
@@ -1535,6 +1528,32 @@ export class Parser extends Tokenizer {
           new Shift.BindingIdentifier(new Shift.Identifier(key.value)),
           this.parseAssignmentExpression()
         ), startTokenIndex);
+
+      } else if(this.match(TokenType.LPAREN)) {
+        // Parse the method parameters and the function body
+        let parmInfo = this.parseParams(null);
+        let [body, isStrict] = this.parseFunctionBody();
+
+        // Get all the local declarations from the function body
+        let decls = [];
+        body.statements.forEach(function(statement) {
+          if (statement.type === "VariableDeclarationStatement" && statement.declaration.kind === "let") {
+            statement.declaration.declarators.forEach(function(varDecl) {
+              decls.push(varDecl.binding.identifier.name);
+            });
+          }
+        });
+
+        // Get a list of the local declarations that match the method parameter names
+        let dups = parmInfo.params.filter(function(param) {
+          return (decls.indexOf(param.identifier.name) != -1);
+        });
+
+        // It is an error if any of the parameters are declared in the function body
+        if (dups.length != 0) {
+          throw this.createErrorWithToken(token, ErrorMessages.DUPLICATE_PARAM_BINDING);
+        }
+        return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startTokenIndex);
       } else {
         return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(key.value)), startTokenIndex);
       }

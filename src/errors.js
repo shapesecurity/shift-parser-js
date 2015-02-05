@@ -45,6 +45,7 @@ export const ErrorMessages = {
   STRICT_DELETE: "Delete of an unqualified identifier in strict mode.",
   DUPLICATE_PROTO_PROPERTY: "Duplicate __proto__ property in object literal not allowed",
   DUPLICATE_BINDING: "Duplicate binding '{0}' in assignment",
+  DUPLICATE_PARAM_BINDING: "Duplicate parameter binding in method definition",
   ACCESSOR_DATA_PROPERTY: "Object literal may not have data and accessor property with the same name",
   ACCESSOR_GET_SET: "Object literal may not have multiple get/set accessors with the same name",
   STRICT_LHS_ASSIGNMENT: "Assignment to eval or arguments is not allowed in strict mode",

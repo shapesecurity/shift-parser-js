@@ -218,5 +218,79 @@ suite("Parser", function () {
         new Shift.ShorthandProperty(new Shift.Identifier("b")),
       ])
     );
+
+    testParse("({a(){}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("a"),
+          [],
+          null,
+          new Shift.FunctionBody([], []), false
+        )
+      ])
+    );
+    testParse("({a(){let a;}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("a"),
+          [],
+          null,
+          new Shift.FunctionBody(
+            [],
+            [new Shift.VariableDeclarationStatement(
+              new Shift.VariableDeclaration("let",
+                [new Shift.VariableDeclarator(
+                  new Shift.BindingIdentifier(new Shift.Identifier("a"),null),null)
+                ])
+            )]
+          ), false
+        )
+      ])
+    );
+ testParse("({a(b){}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("a"),
+          [new Shift.BindingIdentifier(new Shift.Identifier("b"))],
+          null,
+          new Shift.FunctionBody([], []), false
+        )
+      ])
+    );
+    testParse("({a(b,c){}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("a"),
+          [ new Shift.BindingIdentifier(new Shift.Identifier("b")),
+            new Shift.BindingIdentifier(new Shift.Identifier("c")) ],
+          null,
+          new Shift.FunctionBody([], []), false
+        )
+      ])
+    );
+    testParse("({a(b,c){let d;}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("a"),
+          [ new Shift.BindingIdentifier(new Shift.Identifier("b")),
+            new Shift.BindingIdentifier(new Shift.Identifier("c")) ],
+          null,
+          new Shift.FunctionBody(
+            [],
+            [new Shift.VariableDeclarationStatement(
+              new Shift.VariableDeclaration("let",
+                [new Shift.VariableDeclarator(
+                  new Shift.BindingIdentifier(new Shift.Identifier("d"),null),null)
+                ])
+            )]
+          ), false
+        )
+      ])
+    );
   });
 });

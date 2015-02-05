@@ -353,5 +353,8 @@ suite("Parser", function () {
     testParseFailure("({get +:3})", "Property name in object literal must be identifier, string literal or number literal");
     testParseFailure("function t() { ;  ;  ", "Unexpected end of input");
     testParseFailure("({a = 0})", "Unexpected token )");
+    testParseFailure("({a(b,c){let b;}})", "Duplicate parameter binding in method definition");
+    testParseFailure("({a(b,c){let d; let b;}})", "Duplicate parameter binding in method definition");
+    testParseFailure("({a(b,c){let d,e,b;}})", "Duplicate parameter binding in method definition");
   });
 });

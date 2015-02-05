@@ -1535,6 +1535,32 @@ export class Parser extends Tokenizer {
           new Shift.BindingIdentifier(new Shift.Identifier(key.value)),
           this.parseAssignmentExpression()
         ), startTokenIndex);
+
+      } else if(this.match(TokenType.LPAREN)) {
+        // Parse the method parameters and the function body
+        let parmInfo = this.parseParams(null);
+        let [body, isStrict]= this.parseFunctionBody();
+
+        // Get all the local declarations from the function body
+        let decls = [];
+        body.statements.forEach(function(statement) {
+          if (statement.type === "VariableDeclarationStatement" && statement.declaration.kind === "let") {
+            statement.declaration.declarators.forEach(function(varDecl) {
+              decls.push(varDecl.binding.identifier.name);
+            });
+          }
+        });
+
+        // Get a list of the local declarations that match the method parameter names
+        let dups = parmInfo.params.filter(function(param) {
+          return (decls.indexOf(param.identifier.name) != -1);
+        });
+
+        // It is an error if any of the parameters are declared in the function body
+        if (dups.length != 0) {
+          throw this.createErrorWithToken(token, ErrorMessages.DUPLICATE_PARAM_BINDING);
+        }
+        return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startTokenIndex);
       } else {
         return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(key.value)), startTokenIndex);
       }

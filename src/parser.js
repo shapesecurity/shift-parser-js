@@ -1535,6 +1535,11 @@ export class Parser extends Tokenizer {
           new Shift.BindingIdentifier(new Shift.Identifier(key.value)),
           this.parseAssignmentExpression()
         ), startTokenIndex);
+
+      } else if(this.match(TokenType.LPAREN)) {
+        let parmInfo = this.parseParams(null);
+        let [body, isStrict] = this.parseFunctionBody();
+        return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startTokenIndex);
       } else {
         return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(key.value)), startTokenIndex);
       }

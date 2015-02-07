@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "shift-spidermonkey-converter": "^1.0.0",
-    "6to5": "^1.14.14",
+    "6to5": "1.15.0",
     "commonjs-everywhere": "^0.9.7",
     "esmangle": "^1.0.1",
     "esprima": "^1.2.2",

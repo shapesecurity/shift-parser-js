@@ -23,7 +23,7 @@
     "shift-ast": "git://github.com/shapesecurity/shift-ast-js.git#591c3376fde127c6bdf6d5c61c00ab309af456c3"
   },
   "devDependencies": {
-    "6to5": "^1.14.14",
+    "6to5": "3.4.1",
     "commonjs-everywhere": "^0.9.7",
     "esmangle": "^1.0.1",
     "esprima": "^1.2.2",

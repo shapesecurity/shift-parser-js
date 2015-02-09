@@ -139,10 +139,14 @@ suite("Parser", function () {
       )
     );
 
-    testParseFailure("(function([]){})", "Unexpected token [")
-    testParseFailure("(function([a, a]){})", "Duplicate binding 'a' in assignment")
-    testParseFailure("(function({a: x, b: x}){})", "Duplicate binding 'x' in assignment")
-    testParseFailure("'use strict'; (function({a: x}, {b: x}){})", "Strict mode function may not have duplicate parameter names")
-    testParseFailure("(function(...a, b){})", "Unexpected token ,")
+    testParseFailure("(function([]){})", "Unexpected token [");
+    testParseFailure("(function([a, a]){})", "Duplicate binding 'a'");
+    testParseFailure("'use strict'; (function(a, a){})", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("(function({a: x, b: x}){})", "Duplicate binding 'x'");
+    testParseFailure("'use strict'; (function({a: x}, {b: x}){})", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("(function(...a, b){})", "Unexpected token ,");
+    testParseFailure("(function((a)){})", "Unexpected token (");
+    testParseFailure("(function(eval){'use strict';})", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("(function(package){'use strict';})", "Use of future reserved word in strict mode");
   });
 });

@@ -45,6 +45,7 @@ export const TokenType = {
   SEMICOLON: {klass: TokenClass.Punctuator, name: ";"},
   PERIOD: {klass: TokenClass.Punctuator, name: "."},
   ELLIPSIS: {klass: TokenClass.Punctuator, name: "..."},
+  ARROW: {klass: TokenClass.Punctuator, name: "=>"},
   CONDITIONAL: {klass: TokenClass.Punctuator, name: "?"},
   INC: {klass: TokenClass.Punctuator, name: "++"},
   DEC: {klass: TokenClass.Punctuator, name: "--"},
@@ -998,6 +999,8 @@ class Tokenizer {
           default:
             break; //failed
         }
+      } else if (ch1 === '=' && ch2 === '>') {
+        return TokenType.ARROW;
       }
     }
 

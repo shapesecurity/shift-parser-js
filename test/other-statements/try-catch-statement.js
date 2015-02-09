@@ -106,7 +106,7 @@ suite("Parser", function () {
       )
     );
 
-    testParseFailure("try {} catch ([a,a]) {}", "Duplicate binding \'a\' in assignment");
-    testParseFailure("try {} catch ([a,...a]) {}", "Duplicate binding \'a\' in assignment");
+    testParseFailure("try {} catch ([e,e]) {}", "Duplicate binding \'e\'");
+    testParseFailure("try {} catch ((e)) {}", "Unexpected token (");
   });
 });

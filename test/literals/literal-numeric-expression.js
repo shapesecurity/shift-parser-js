@@ -31,6 +31,8 @@ suite("Parser", function () {
     testEsprimaEquiv("\n    42\n\n");
 
     testEsprimaEquiv(".14");
+    testEsprimaEquiv("6.");
+    testEsprimaEquiv("0.");
     testEsprimaEquiv("3.14159");
 
     testEsprimaEquiv("6.02214179e+23");

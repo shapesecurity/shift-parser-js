@@ -152,8 +152,12 @@ suite("Parser", function () {
 
     // FIXME(bzhang): testParseFailure("var a[0]=0;", "Unexpected token 'a'");
     // FIXME(bzhang): testParseFailure("var (a)=0;", "Unexpected token '('");
-    testParseFailure("var [a,a]=0;", "Duplicate binding \'a\' in assignment");
-    testParseFailure("var {a,x:{y:a}} = 0;", "Duplicate binding \'a\' in assignment");
+    testParseFailure("var [a, a]", "Duplicate binding \'a\'");
+    testParseFailure("var [a,a]=0;", "Duplicate binding \'a\'");
+    testParseFailure("var {a,x:{y:a}} = 0;", "Duplicate binding \'a\'");
     testParseFailure("var new A = 0;", "Unexpected token new");
+    testParseFailure("var (x)", "Unexpected token (");
+    testParseFailure("var ([x])", "Unexpected token (");
+    testParseFailure("var this", "Unexpected token this");
   });
 });

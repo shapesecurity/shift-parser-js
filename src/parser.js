@@ -32,8 +32,13 @@ const INIT_MASK = 1;
 const GETTER_MASK = 2;
 const SETTER_MASK = 4;
 
-const STRICT_MODE_RESERVED_WORD = [
-  "implements", "interface", "package", "private", "protected", "public", "static", "yield", "let"];
+// Empty parameter list for ArrowExpression
+const ARROW_EXPRESSION_PARAMS = "CoverParenthesizedExpressionAndArrowParameterList";
+
+const STRICT_MODE_RESERVED_WORD = {
+  "implements": null, "interface": null, "package": null, "private": null, "protected": null,
+  "public": null, "static": null, "yield": null, "let": null
+};
 
 const Precedence = {
   Sequence: 0,
@@ -86,42 +91,27 @@ const BinaryPrecedence = {
   "/": Precedence.Multiplicative,
 };
 
+/**
+ *
+ * @param {[string]} strings
+ * @returns {string?}
+ */
 function firstDuplicate(strings) {
   if (strings.length < 2)
     return null;
-  strings.sort();
-  for (let cursor = 1, prev = strings[0]; cursor < strings.length; cursor++) {
-    if (strings[cursor] === prev) {
-      return prev;
-    } else {
-      prev = strings[cursor];
+  let map = {};
+  for (let cursor = 0; cursor < strings.length; cursor++) {
+    let id = '$' + strings[cursor];
+    if (map.hasOwnProperty(id)) {
+      return strings[cursor];
     }
+    map[id] = true;
   }
   return null;
 }
 
-function intersection(stringsA, stringsB) {
-  let result = [];
-  stringsA.sort();
-  stringsB.sort();
-  let cursorA = 0, cursorB = 0;
-  do {
-    let stringA = stringsA[cursorA], stringB = stringsB[cursorB];
-    if (stringA === stringB)
-      result.push(stringA);
-    if (stringA < stringB) {
-      ++cursorA;
-      if (cursorA >= stringsA.length)
-        return result;
-    } else {
-      ++cursorB;
-      if (cursorB >= stringsB.length)
-        return result;
-    }
-  } while(true);
-
-  // istanbul ignore next
-  throw new Error("intersection algorithm broken");
+function hasStrictModeReservedWord(ids) {
+  return ids.some(id => STRICT_MODE_RESERVED_WORD.hasOwnProperty(id));
 }
 
 export class Parser extends Tokenizer {
@@ -180,7 +170,7 @@ export class Parser extends Tokenizer {
   }
 
   parseScript() {
-    var [body, isStrict] = this.parseBody(true);
+    let [body] = this.parseBody(true);
     return new Shift.Script(this.markLocation(body, 0));
   }
 
@@ -845,7 +835,7 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.CATCH);
     this.expect(TokenType.LPAREN);
     let token = this.lookahead;
-    if (this.match(TokenType.RPAREN)) {
+    if (this.match(TokenType.RPAREN) || this.match(TokenType.LPAREN)) {
       throw this.createUnexpected(token);
     }
 
@@ -909,6 +899,9 @@ export class Parser extends Tokenizer {
     let startTokenIndex = this.tokenIndex;
     let token = this.lookahead;
 
+    if (this.match(TokenType.LPAREN)) {
+      throw this.createUnexpected(this.lookahead);
+    }
     let id = this.parseLeftHandSideExpression();
 
     if (!Parser.isDestructuringAssignmentTarget(id)) {
@@ -954,11 +947,63 @@ export class Parser extends Tokenizer {
     return expr;
   }
 
+  parseArrowExpressionTail(head, startTokenIndex) {
+    let arrow = this.expect(TokenType.ARROW);
+
+    // Convert param list.
+    let {params = null, rest = null, dup = null, strict_reserved_word = false, strict_restricted_word = false} = head;
+    if (head.type !== ARROW_EXPRESSION_PARAMS) {
+      if (head.type === "IdentifierExpression") {
+        let name = head.identifier.name;
+        if (STRICT_MODE_RESERVED_WORD.hasOwnProperty(name)) {
+          strict_reserved_word = true;
+          if (this.strict) {
+            throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
+          }
+        }
+        if (isRestrictedWord(name)) {
+          strict_restricted_word = true;
+          if (this.strict) {
+            throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
+          }
+        }
+        head = Parser.transformDestructuringAssignment(head);
+        params = [head];
+      } else {
+        throw this.createUnexpected(arrow);
+      }
+    }
+
+    if (this.eat(TokenType.LBRACE)) {
+      let [body, isStrict] = this.parseBody();
+      if (isStrict) {
+        if (dup) {
+          throw this.createError(ErrorMessages.STRICT_PARAM_DUPE);
+        }
+        if (strict_reserved_word) {
+          throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
+        }
+        if (strict_restricted_word) {
+          throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
+        }
+      }
+      this.expect(TokenType.RBRACE);
+      return this.markLocation(new Shift.ArrowExpression(params, rest, body), startTokenIndex);
+    } else {
+      let body = this.parseAssignmentExpression();
+      return this.markLocation(new Shift.ArrowExpression(params, rest, body), startTokenIndex);
+    }
+  }
+
   parseAssignmentExpression() {
     let token = this.lookahead;
     let startTokenIndex = this.tokenIndex;
 
     let node = this.parseConditionalExpression();
+
+    if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
+      return this.parseArrowExpressionTail(node, startTokenIndex)
+    }
 
     let isOperator = false;
     let operator = this.lookahead;
@@ -1370,11 +1415,109 @@ export class Parser extends Tokenizer {
     }
   }
 
+  ensureArrow() {
+    if (this.hasLineTerminatorBeforeNext) {
+      throw this.createError(ErrorMessages.UNEXPECTED_LT);
+    }
+    if (!this.match(TokenType.ARROW)) {
+      this.expect(TokenType.ARROW);
+    }
+  }
+
   parseGroupExpression() {
-    this.expect(TokenType.LPAREN);
-    let expr = this.parseExpression();
+    let rest = null;
+    let start = this.expect(TokenType.LPAREN);
+    if (this.eat(TokenType.RPAREN)) {
+      this.ensureArrow();
+      return {
+        type: ARROW_EXPRESSION_PARAMS,
+        params: [],
+        rest: null
+      };
+    } else if (this.eat(TokenType.ELLIPSIS)) {
+      rest = new Shift.BindingIdentifier(this.parseIdentifier());
+      this.expect(TokenType.RPAREN);
+      this.ensureArrow();
+      return {
+        type: ARROW_EXPRESSION_PARAMS,
+        params: [],
+        rest: rest
+      };
+    }
+
+    let possibleBindings = !this.match(TokenType.LPAREN);
+    let startTokenIndex = this.tokenIndex;
+    let group = this.parseAssignmentExpression();
+    let params = [group];
+
+    while (this.eat(TokenType.COMMA)) {
+      if (this.match(TokenType.ELLIPSIS)) {
+        if (!possibleBindings) {
+          throw this.createUnexpected(this.lookahead);
+        }
+        this.lex();
+        rest = new Shift.BindingIdentifier(this.parseIdentifier());
+        break;
+      }
+      possibleBindings = possibleBindings && !this.match(TokenType.LPAREN);
+      let expr = this.parseAssignmentExpression();
+      params.push(expr);
+      group = this.markLocation(new Shift.BinaryExpression(",", group, expr), startTokenIndex);
+    }
+
+    if (possibleBindings) {
+      possibleBindings = params.every(Parser.isDestructuringAssignmentTargetWithDefault);
+    }
+
     this.expect(TokenType.RPAREN);
-    return expr;
+
+    if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
+      if (!possibleBindings) {
+        throw this.createErrorWithToken(start, ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
+      }
+      // check dup params
+      params = params.map(Parser.transformDestructuringAssignment);
+      let allBoundNames = [];
+      params.forEach(expr => {
+        let boundNames = Parser.boundNames(expr);
+        let dup = firstDuplicate(boundNames);
+        if (dup) {
+          throw this.createError(ErrorMessages.DUPLICATE_BINDING, dup);
+        }
+        allBoundNames = allBoundNames.concat(boundNames)
+      });
+      if (rest) {
+        allBoundNames.push(rest.identifier.name);
+      }
+
+      let dup = firstDuplicate(allBoundNames);
+      if (this.strict && dup) {
+        throw this.createError(ErrorMessages.STRICT_PARAM_DUPE);
+      }
+
+      let strict_restricted_word = allBoundNames.some(isRestrictedWord);
+      if (this.strict && strict_restricted_word) {
+        throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
+      }
+
+      let strict_reserved_word = hasStrictModeReservedWord(allBoundNames);
+      if (this.strict && strict_reserved_word) {
+        throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
+      }
+
+      return {
+        type: ARROW_EXPRESSION_PARAMS,
+        params,
+        rest,
+        dup,
+        strict_reserved_word,
+        strict_restricted_word};
+    } else {
+      if (rest) {
+        this.ensureArrow();
+      }
+      return group;
+    }
   }
 
 
@@ -1622,9 +1765,12 @@ export class Parser extends Tokenizer {
         let param;
         if (this.eat(TokenType.ELLIPSIS)) {
           token = this.lookahead;
-          param = this.parseLeftHandSideExpression();
+          param = new Shift.BindingIdentifier(this.parseIdentifier());
           seenRest = true;
         } else {
+          if (this.match(TokenType.LPAREN)) {
+            throw this.createUnexpected(this.lookahead);
+          }
           param = this.parseLeftHandSideExpression();
           if (this.eat(TokenType.ASSIGN)) {
             param = this.markLocation(new Shift.AssignmentExpression("=", param, this.parseAssignmentExpression()));
@@ -1654,7 +1800,7 @@ export class Parser extends Tokenizer {
           if (newBound.some(isRestrictedWord)) {
             info.firstRestricted = token;
             info.message = ErrorMessages.STRICT_PARAM_NAME;
-          } else if (intersection(STRICT_MODE_RESERVED_WORD, newBound).length > 0) {
+          } else if (hasStrictModeReservedWord(newBound)) {
             info.firstRestricted = token;
             info.message = ErrorMessages.STRICT_RESERVED_WORD;
           } else if (firstDuplicate(bound) != null) {

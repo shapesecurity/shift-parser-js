@@ -140,5 +140,20 @@ suite("Parser", function () {
         ),
       ]))
     );
+
+    testParse("var [a]=[1];", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(
+          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
+          new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1)], null)
+        )
+      ]))
+    );
+
+    // FIXME(bzhang): testParseFailure("var a[0]=0;", "Unexpected token 'a'");
+    // FIXME(bzhang): testParseFailure("var (a)=0;", "Unexpected token '('");
+    testParseFailure("var [a,a]=0;", "Duplicate binding \'a\' in assignment");
+    testParseFailure("var {a,x:{y:a}} = 0;", "Duplicate binding \'a\' in assignment");
+    testParseFailure("var new A = 0;", "Unexpected token new");
   });
 });

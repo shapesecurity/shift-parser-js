@@ -362,7 +362,7 @@ export default class Tokenizer {
       return TokenType.ILLEGAL;
     }
 
-    // istanbul ignore next
+    /* istanbul ignore next */
     switch (id.length) {
       case 2:
         switch (id.charAt(0)) {
@@ -996,6 +996,7 @@ export default class Tokenizer {
             return TokenType.AND;
           case "|":
             return TokenType.OR;
+          // istanbul ignore next
           default:
             break; //failed
         }
@@ -1417,9 +1418,6 @@ export default class Tokenizer {
   }
 
   lex() {
-    if (this.prevToken !== null && this.prevToken.type === TokenType.EOS) {
-      return this.prevToken;
-    }
     this.prevToken = this.lookahead;
     this.lookahead = this.advance();
     this.tokenIndex++;

@@ -18,6 +18,7 @@ var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("literal string expression", function () {
@@ -25,5 +26,16 @@ suite("Parser", function () {
     testParse("('\\\\\\'')", expr, new Shift.LiteralStringExpression("\\'"));
     testParse("(\"x\")", expr, new Shift.LiteralStringExpression("x"));
     testParse("(\"\\\\\\\"\")", expr, new Shift.LiteralStringExpression("\\\""));
+    testParse("('\\\r')", expr, new Shift.LiteralStringExpression(""));
+    testParse("('\\\r\n')", expr, new Shift.LiteralStringExpression(""));
+    testParse("('\\\n')", expr, new Shift.LiteralStringExpression(""));
+    testParse("('\\\u2028')", expr, new Shift.LiteralStringExpression(""));
+    testParse("('\\\u2029')", expr, new Shift.LiteralStringExpression(""));
+    testParse("('\u202a')", expr, new Shift.LiteralStringExpression("\u202a"));
+
+    testParseFailure("(')", "Unexpected token ILLEGAL");
+    testParseFailure("('\n')", "Unexpected token ILLEGAL");
+    testParseFailure("('\u2028')", "Unexpected token ILLEGAL");
+    testParseFailure("('\u2029')", "Unexpected token ILLEGAL");
   });
 });

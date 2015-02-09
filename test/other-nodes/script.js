@@ -15,10 +15,12 @@
  */
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("script", function () {
     testEsprimaEquiv("");
     testEsprimaEquiv(" ");
+    testParseFailure("/*", "Unexpected token ILLEGAL");
   });
 });

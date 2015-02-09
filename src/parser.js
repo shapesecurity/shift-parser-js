@@ -551,14 +551,15 @@ export class Parser extends Tokenizer {
         return [node.identifier.name];
       case "BindingWithDefault":
         return Parser.boundNames(node.binding);
-      case "ArrayBinding":
+      case "ArrayBinding": {
         let names = [];
         node.elements.filter(e => e != null).forEach(e => [].push.apply(names, Parser.boundNames(e)));
         if (node.restElement != null) {
           names.push(node.restElement.identifier.name);
         }
         return names;
-      case "ObjectBinding":
+      }
+      case "ObjectBinding": {
         let names = [];
         node.properties.forEach(p => {
           switch (p.type) {
@@ -573,6 +574,7 @@ export class Parser extends Tokenizer {
           }
         });
         return names;
+      }
       case "ComputedMemberExpression":
       case "StaticMemberExpression":
         return [];

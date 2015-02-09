@@ -119,6 +119,8 @@ function intersection(stringsA, stringsB) {
         return result;
     }
   } while(true);
+
+  // istanbul ignore next
   throw new Error("intersection algorithm broken");
 }
 
@@ -569,6 +571,7 @@ export class Parser extends Tokenizer {
             case "BindingPropertyProperty":
               [].push.apply(names, Parser.boundNames(p.binding));
               break;
+            // istanbul ignore next
             default:
               throw new Error("boundNames called on ObjectBinding with invalid property: " + p.type);
           }
@@ -579,6 +582,7 @@ export class Parser extends Tokenizer {
       case "StaticMemberExpression":
         return [];
     }
+    // istanbul ignore next
     throw new Error("boundNames called on invalid assignment target: " + node.type);
   }
 

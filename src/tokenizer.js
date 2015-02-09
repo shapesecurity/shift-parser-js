@@ -372,6 +372,8 @@ class Tokenizer {
     if (id.length === 1 || id.length > 10) {
       return TokenType.ILLEGAL;
     }
+
+    /* istanbul ignore next */
     switch (id.length) {
       case 2:
         switch (id.charAt(0)) {
@@ -660,7 +662,7 @@ class Tokenizer {
             i++;
             this.lineStarts.push(this.index);
             break;
-          case 12: // "\r":
+          case 13: // "\r":
             this.hasLineTerminatorBeforeNext = true;
             if (i < length - 1 && this.source.charAt(i + 1) === "\n") {
               i++;
@@ -672,6 +674,7 @@ class Tokenizer {
             i++;
         }
       } else if (chCode === 0x2028 || chCode === 0x2029) {
+        this.hasLineTerminatorBeforeNext = true;
         i++;
         this.lineStarts.push(this.index);
       } else {
@@ -949,6 +952,7 @@ class Tokenizer {
               return TokenType.ASSIGN_BIT_XOR;
             case "&":
               return TokenType.ASSIGN_BIT_AND;
+            // istanbul ignore next
             default:
               break; //failed
           }
@@ -990,6 +994,7 @@ class Tokenizer {
             return TokenType.AND;
           case "|":
             return TokenType.OR;
+          // istanbul ignore next
           default:
             break; //failed
         }
@@ -1399,9 +1404,6 @@ class Tokenizer {
   }
 
   lex() {
-    if (this.prevToken !== null && this.prevToken.type === TokenType.EOS) {
-      return this.prevToken;
-    }
     this.prevToken = this.lookahead;
     let start = this.index = this.lookaheadEnd;
     this.hasLineTerminatorBeforeNext = false;

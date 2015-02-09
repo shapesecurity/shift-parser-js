@@ -18,6 +18,7 @@ var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("property name", function () {
@@ -95,5 +96,7 @@ suite("Parser", function () {
         ), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
       ])
     );
+
+    testParseFailure("({[1,2]:3})", "Unexpected token ,");
   });
 });

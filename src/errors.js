@@ -22,6 +22,7 @@ export const ErrorMessages = {
   UNEXPECTED_IDENTIFIER: "Unexpected identifier",
   UNEXPECTED_RESERVED_WORD: "Unexpected reserved word",
   UNEXPECTED_EOS: "Unexpected end of input",
+  UNEXPECTED_LT: "Unexpected line terminator",
   NEWLINE_AFTER_THROW: "Illegal newline after throw",
   INVALID_REGULAR_EXPRESSION: "Invalid regular expression",
   UNTERMINATED_REG_EXP: "Invalid regular expression: missing /",
@@ -44,11 +45,12 @@ export const ErrorMessages = {
   STRICT_OCTAL_LITERAL: "Octal literals are not allowed in strict mode.",
   STRICT_DELETE: "Delete of an unqualified identifier in strict mode.",
   DUPLICATE_PROTO_PROPERTY: "Duplicate __proto__ property in object literal not allowed",
-  DUPLICATE_BINDING: "Duplicate binding '{0}' in assignment",
+  DUPLICATE_BINDING: "Duplicate binding '{0}'",
   ACCESSOR_DATA_PROPERTY: "Object literal may not have data and accessor property with the same name",
   ACCESSOR_GET_SET: "Object literal may not have multiple get/set accessors with the same name",
   STRICT_LHS_ASSIGNMENT: "Assignment to eval or arguments is not allowed in strict mode",
   STRICT_LHS_POSTFIX: "Postfix increment/decrement may not have eval or arguments operand in strict mode",
   STRICT_LHS_PREFIX: "Prefix increment/decrement may not have eval or arguments operand in strict mode",
-  STRICT_RESERVED_WORD: "Use of future reserved word in strict mode"
+  STRICT_RESERVED_WORD: "Use of future reserved word in strict mode",
+  ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list"
 };

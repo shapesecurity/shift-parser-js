@@ -30,6 +30,13 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(0)
       )
     );
+    testParse("(a)=(0);", expr,
+      new Shift.AssignmentExpression(
+        "=",
+        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        new Shift.LiteralNumericExpression(0)
+      )
+    );
     testParse("x = 0", expr,
       new Shift.AssignmentExpression(
         "=",
@@ -194,13 +201,13 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(0)
       )
     );
-    testParseFailure("[] = 0", "Invalid left-hand side in assignment")
-    testParseFailure("[x, x] = 0", "Duplicate binding 'x' in assignment")
-    testParseFailure("[x, ...x] = 0", "Duplicate binding 'x' in assignment")
-    testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment")
-    testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment")
-    testParseFailure("[...x,,] = 0", "Invalid left-hand side in assignment")
-    testParseFailure("[...[x]] = 0", "Invalid left-hand side in assignment")
+    testParseFailure("[] = 0", "Invalid left-hand side in assignment");
+    testParseFailure("[x, x] = 0", "Duplicate binding 'x'");
+    testParseFailure("[x, ...x] = 0", "Duplicate binding 'x'");
+    testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment");
+    testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment");
+    testParseFailure("[...x,,] = 0", "Invalid left-hand side in assignment");
+    testParseFailure("[...[x]] = 0", "Invalid left-hand side in assignment");
 
     testParse("({x} = 0)", expr,
       new Shift.AssignmentExpression(
@@ -304,12 +311,12 @@ suite("Parser", function () {
     );
     testParseFailure("({var} = 0)", "Unexpected token }")
 
-    testParseFailure("'use strict'; [eval] = 0", "Assignment to eval or arguments is not allowed in strict mode")
-    testParseFailure("'use strict'; [,,,eval,] = 0", "Assignment to eval or arguments is not allowed in strict mode")
-    testParseFailure("'use strict'; ({eval} = 0)", "Assignment to eval or arguments is not allowed in strict mode")
-    testParseFailure("'use strict'; ({eval = 0} = 0)", "Assignment to eval or arguments is not allowed in strict mode")
-    testParseFailure("'use strict'; ({a: eval} = 0)", "Assignment to eval or arguments is not allowed in strict mode")
-    testParseFailure("'use strict'; ({a: eval = 0} = 0)", "Assignment to eval or arguments is not allowed in strict mode")
+    testParseFailure("'use strict'; [eval] = 0", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; [,,,eval,] = 0", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({eval} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({eval = 0} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({a: eval} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({a: eval = 0} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
 
     testParse("'use strict'; eval[0] = 0", expr,
       new Shift.AssignmentExpression(

@@ -15,6 +15,7 @@
  */
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("continue statement", function () {
@@ -24,5 +25,14 @@ suite("Parser", function () {
     testEsprimaEquiv("done: while (true) { continue done; }");
     testEsprimaEquiv("__proto__: while (true) { continue __proto__; }");
     testEsprimaEquiv("a: do continue a; while(1);");
+    testEsprimaEquiv("a: while (0) { continue \n b; }");
+    testEsprimaEquiv("a: while (0) { continue \r b; }");
+    testEsprimaEquiv("a: while (0) { continue \r\n b; }");
+    testEsprimaEquiv("a: while (0) { continue /*\r*/ b; }");
+    testEsprimaEquiv("a: while (0) { continue /*\n*/ b; }");
+    testEsprimaEquiv("a: while (0) { continue /*\r\n*/ b; }");
+    testEsprimaEquiv("a: while (0) { continue /*\u2028*/ b; }");
+    testEsprimaEquiv("a: while (0) { continue /*\u2029*/ b; }");
+    testParseFailure("a: while (0) { continue /*\u202a*/ b; }", "Undefined label \'b\'");
   });
 });

@@ -18,6 +18,7 @@ var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
 var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("try-catch statement", function () {
@@ -83,5 +84,29 @@ suite("Parser", function () {
         )
       )
     );
+
+    testParse("try {} catch ([e]) {}", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("e"))], null),
+          new Shift.Block([])
+        )
+      )
+    );
+
+    testParse("try {} catch ([e, ...a]) {}", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("e"))],
+            new Shift.BindingIdentifier(new Shift.Identifier("a"))),
+          new Shift.Block([])
+        )
+      )
+    );
+
+    testParseFailure("try {} catch ([a,a]) {}", "Duplicate binding \'a\' in assignment");
+    testParseFailure("try {} catch ([a,...a]) {}", "Duplicate binding \'a\' in assignment");
   });
 });

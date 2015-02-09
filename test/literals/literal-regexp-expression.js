@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 suite("Parser", function () {
@@ -27,7 +31,9 @@ suite("Parser", function () {
     testEsprimaEquiv("/[x-z]/i");
     testEsprimaEquiv("/[a-c]/i");
     testEsprimaEquiv("/[P QR]/i");
-    testEsprimaEquiv("/[\\]/]/");
+    testParse("/[\\]/]/", expr,
+      new Shift.LiteralRegExpExpression("/[\\]/]/")
+    );
     testEsprimaEquiv("/foo\\/bar/");
     testEsprimaEquiv("/=([^=\\s])+/g");
     // testEsprimaEquiv("/[P QR]/\\g");

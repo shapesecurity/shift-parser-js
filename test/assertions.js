@@ -10,7 +10,7 @@ exports.testParseFailure = function testParseFailure(source, message) {
     try {
       parse(source);
     } catch (e) {
-      expect(e.description).be(message);
+      expect(e.description).to.be(message);
       return;
     }
     throw new Error("Expecting error");
@@ -23,7 +23,7 @@ exports.testEsprimaEquiv = function testEsprimaEquiv(source) {
     expect(args).to.be(testEsprimaEquiv.length);
     var tree = parse(source);
     var oracle = converters.toShift(esprima.parse(source));
-    expect(tree).eql(oracle);
+    expect(tree).to.eql(oracle);
   });
 };
 

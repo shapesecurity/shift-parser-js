@@ -68,5 +68,32 @@ suite("Parser", function () {
         new Shift.Setter(new Shift.StaticPropertyName("__proto__"), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
       ])
     );
+
+    testParse("({[\"nUmBeR\"+9]:\"nein\"})", expr,
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("nUmBeR"), new Shift.LiteralNumericExpression(9))
+        ), new Shift.LiteralStringExpression("nein")),
+      ])
+    );
+
+    testParse("({[2*308]:0})", expr,
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("*", new Shift.LiteralNumericExpression(2), new Shift.LiteralNumericExpression(308))
+        ), new Shift.LiteralNumericExpression(0)),
+      ])
+    );
+
+    testParse("({get [6+3]() {}, set [5/4](x) {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(6), new Shift.LiteralNumericExpression(3))
+        ), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("/", new Shift.LiteralNumericExpression(5), new Shift.LiteralNumericExpression(4))
+        ), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
+      ])
+    );
   });
 });

@@ -1652,7 +1652,6 @@ export class Parser extends Tokenizer {
         this.paramYield = false;
       } // else [~GeneratorParameter] ComputedPropertyName[?Yield]
       let expr = this.parseAssignmentExpression();
-      token = this.lookahead;
       this.expect(TokenType.RBRACK);
       this.paramGeneratorParameter = previousGeneratorParameter;
       this.paramYield = previousYield;

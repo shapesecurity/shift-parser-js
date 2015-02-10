@@ -122,6 +122,8 @@ export class Parser extends Tokenizer {
     this.inIteration = false;
     this.inSwitch = false;
     this.inFunctionBody = false;
+    this.paramGeneratorParameter = false;
+    this.paramYield = false;
   }
 
   eat(tokenType) {
@@ -1623,10 +1625,12 @@ export class Parser extends Tokenizer {
   }
 
   parseObjectPropertyKey() {
+    // PropertyName[Yield,GeneratorParameter]:
     let token = this.lookahead;
 
-    // Note: This function is called only from parseObjectProperty(), where;
-    // Eof and Punctuator tokens are already filtered out.
+    if (this.eof()) {
+      throw this.createUnexpected(token);
+    }
 
     if (token instanceof StringLiteralToken) {
       return new Shift.StaticPropertyName(this.parseStringLiteral().value);
@@ -1637,6 +1641,22 @@ export class Parser extends Tokenizer {
     }
     if (token instanceof IdentifierLikeToken) {
       return new Shift.StaticPropertyName(this.parseIdentifier().name);
+    }
+    if (token.type == TokenType.LBRACK) {
+      let previousGeneratorParameter = this.paramGeneratorParameter;
+      let previousYield = this.paramYield;
+      this.expect(TokenType.LBRACK);
+      if (this.paramGeneratorParameter) {
+        // [+GeneratorParameter] ComputedPropertyName
+        this.paramGeneratorParameter = false;
+        this.paramYield = false;
+      } // else [~GeneratorParameter] ComputedPropertyName[?Yield]
+      let expr = this.parseAssignmentExpression();
+      token = this.lookahead;
+      this.expect(TokenType.RBRACK);
+      this.paramGeneratorParameter = previousGeneratorParameter;
+      this.paramYield = previousYield;
+      return new Shift.ComputedPropertyName(expr);
     }
 
     throw this.createError(ErrorMessages.INVALID_PROPERTY_NAME);
@@ -1693,14 +1713,17 @@ export class Parser extends Tokenizer {
         return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(key.value)), startTokenIndex);
       }
     }
-    if (this.eof() || token.type.klass == TokenClass.Punctuator) {
-      throw this.createUnexpected(token);
-    } else {
-      let key = this.parseObjectPropertyKey();
-      this.expect(TokenType.COLON);
+
+    let key = this.parseObjectPropertyKey();
+    if (this.eat(TokenType.COLON)) {
+      // PropertyName[?Yield] : AssignmentExpression[In,?Yield]
       let value = this.parseAssignmentExpression();
       return this.markLocation(new Shift.DataProperty(key, value), startTokenIndex);
     }
+    this.match(TokenType.LPAREN);
+    let parmInfo = this.parseParams(null);
+    let [body, isStrict] = this.parseFunctionBody();
+    return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startTokenIndex);
   }
 
   parseFunction(isExpression) {

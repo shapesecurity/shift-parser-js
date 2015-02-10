@@ -22,7 +22,7 @@ export const ErrorMessages = {
   UNEXPECTED_IDENTIFIER: "Unexpected identifier",
   UNEXPECTED_RESERVED_WORD: "Unexpected reserved word",
   UNEXPECTED_EOS: "Unexpected end of input",
-  UNEXPECTED_LT: "Unexpected line terminator",
+  UNEXPECTED_LINE_TERMINATOR: "Unexpected line terminator",
   NEWLINE_AFTER_THROW: "Illegal newline after throw",
   INVALID_REGULAR_EXPRESSION: "Invalid regular expression",
   UNTERMINATED_REG_EXP: "Invalid regular expression: missing /",
@@ -52,5 +52,7 @@ export const ErrorMessages = {
   STRICT_LHS_POSTFIX: "Postfix increment/decrement may not have eval or arguments operand in strict mode",
   STRICT_LHS_PREFIX: "Prefix increment/decrement may not have eval or arguments operand in strict mode",
   STRICT_RESERVED_WORD: "Use of future reserved word in strict mode",
-  ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list"
+  ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list",
+  INVALID_VAR_INIT_FOR_IN: "Invalid variable declaration in for-in statement",
+  INVALID_VAR_INIT_FOR_OF: "Invalid variable declaration in for-of statement"
 };

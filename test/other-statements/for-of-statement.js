@@ -43,18 +43,7 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
-    testParse("for(var a = c of b);", stmt,
-      new Shift.ForOfStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.BindingIdentifier(new Shift.Identifier("a")),
-            new Shift.IdentifierExpression(new Shift.Identifier("c"))
-          )
-        ]),
-        new Shift.IdentifierExpression(new Shift.Identifier("b")),
-        new Shift.EmptyStatement
-      )
-    );
+
     testParse("for(a of b);", stmt,
       new Shift.ForOfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("a")),

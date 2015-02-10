@@ -608,7 +608,11 @@ export class Parser extends Tokenizer {
         if (initDecl.declarators.length === 1 && (this.match(TokenType.IN) || this.match(TokenType.OF))) {
           let type = this.match(TokenType.IN) ?
             Shift.ForInStatement : Shift.ForOfStatement;
-
+          if (initDecl.declarators[0].init != null) {
+            throw type == Shift.ForInStatement ? 
+              this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN) :
+              this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_OF);
+          }
           this.lex();
           right = this.parseExpression();
           return new type(initDecl, right, this.getIteratorStatementEpilogue());
@@ -1419,7 +1423,7 @@ export class Parser extends Tokenizer {
 
   ensureArrow() {
     if (this.hasLineTerminatorBeforeNext) {
-      throw this.createError(ErrorMessages.UNEXPECTED_LT);
+      throw this.createError(ErrorMessages.UNEXPECTED_LINE_TERMINATOR);
     }
     if (!this.match(TokenType.ARROW)) {
       this.expect(TokenType.ARROW);

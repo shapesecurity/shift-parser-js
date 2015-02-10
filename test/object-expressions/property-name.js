@@ -18,6 +18,7 @@ var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("property name", function () {
@@ -68,5 +69,75 @@ suite("Parser", function () {
         new Shift.Setter(new Shift.StaticPropertyName("__proto__"), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
       ])
     );
+
+    testParse("({[\"nUmBeR\"+9]:\"nein\"})", expr,
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("nUmBeR"), new Shift.LiteralNumericExpression(9))
+        ), new Shift.LiteralStringExpression("nein")),
+      ])
+    );
+
+    testParse("({[2*308]:0})", expr,
+      new Shift.ObjectExpression([
+        new Shift.DataProperty(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("*", new Shift.LiteralNumericExpression(2), new Shift.LiteralNumericExpression(308))
+        ), new Shift.LiteralNumericExpression(0)),
+      ])
+    );
+
+    testParse("({get [6+3]() {}, set [5/4](x) {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Getter(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(6), new Shift.LiteralNumericExpression(3))
+        ), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.ComputedPropertyName(
+          new Shift.BinaryExpression("/", new Shift.LiteralNumericExpression(5), new Shift.LiteralNumericExpression(4))
+        ), new Shift.Identifier("x"), new Shift.FunctionBody([], [])),
+      ])
+    );
+
+    testParse("({[6+3]() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.ComputedPropertyName(
+            new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(6), new Shift.LiteralNumericExpression(3))
+          ),
+          [], null, new Shift.FunctionBody([], []))
+      ])
+    );
+
+    testParse("({3() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("3"),
+          [], null, new Shift.FunctionBody([], []))
+      ])
+    );
+
+    testParse("({\"moo\"() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("moo"),
+          [], null, new Shift.FunctionBody([], []))
+      ])
+    );
+
+    testParse("({\"oink\"(that, little, piggy) {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("oink"),
+          [new Shift.BindingIdentifier(new Shift.Identifier("that")),
+            new Shift.BindingIdentifier(new Shift.Identifier("little")),
+            new Shift.BindingIdentifier(new Shift.Identifier("piggy"))],
+          null, new Shift.FunctionBody([], []))
+      ])
+    );
+
+    testParseFailure("({[1,2]:3})", "Unexpected token ,");
   });
 });

@@ -28,7 +28,6 @@
     "commonjs-everywhere": "0.9.7",
     "esmangle": "1.0.1",
     "esprima": "1.2.2",
-    "everything.js": "0.0.4",
     "expect.js": "0.3.1",
     "istanbul": "0.3.5",
     "mocha": "2.0.1",

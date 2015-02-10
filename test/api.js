@@ -216,7 +216,8 @@ suite("API", function () {
   }
 
   test("location sanity test", function () {
-    var source = require("fs").readFileSync(require.resolve("everything.js"), "utf-8");
+    // TODO: everything.js once the ES6 version is ready
+    var source = require("fs").readFileSync(require.resolve("../dist/parser"), "utf-8");
     var tree = ShiftParser.default(source, {loc: true});
     locationSanityCheck(tree);
   });

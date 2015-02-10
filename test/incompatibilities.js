@@ -21,9 +21,9 @@ var stmt = require("./helpers").stmt;
 var testParseFailure = require('./assertions').testParseFailure;
 var testParse = require('./assertions').testParse;
 
-suite("Parser", function () {
+suite("Parser", function() {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
-  suite("ES5 backward incompatibilities", function () {
+  suite("ES5 backward incompatibilities", function() {
     // ES3: zero-width non-breaking space is allowed in an identifier
     // ES5: zero-width non-breaking space is a whitespace character
     testParseFailure("_\uFEFF_", "Unexpected identifier");
@@ -34,7 +34,7 @@ suite("Parser", function () {
   });
 
   // programs where we choose to diverge from the ES5 specification
-  suite("ES5 divergences", function () {
+  suite("ES5 divergences", function() {
     // ES5: assignment to computed member expression
     // ES6: variable declaration statement
     testParse("let[a] = b;", stmt,
@@ -66,7 +66,7 @@ suite("Parser", function () {
   });
 
   // programs that parse according to ES5 but either fail or parse differently according to ES6
-  suite("ES6 backward incompatibilities", function () {
+  suite("ES6 backward incompatibilities", function() {
     // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
     // ES6: yield has been moved from the future reserved words list to the keywords list
     testParse("var yield = function yield(){};", stmt,
@@ -102,5 +102,29 @@ suite("Parser", function () {
     testParseFailure("(a+b)=c", "Invalid left-hand side in assignment");
     testParseFailure("f()++", "Invalid left-hand side in assignment");
     testParseFailure("--f()", "Invalid left-hand side in assignment");
+
+    // ES5: allows any initializers in for-in and for-of head
+    // ES6: disallow initializer
+    testParseFailure("for(var x=1 in [1,2,3]) 0", "Invalid variable declaration in for-in statement");
+    testParseFailure("for(let x=1 in [1,2,3]) 0", "Invalid variable declaration in for-in statement");
+    testParseFailure("for(var x=1 of [1,2,3]) 0", "Invalid variable declaration in for-of statement");
+    testParseFailure("for(let x=1 of [1,2,3]) 0", "Invalid variable declaration in for-of statement");
+
+    testParse("for(var x in [1,2]) 0", stmt, new Shift.ForInStatement(
+      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]), 
+      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
+    testParse("for(let x in [1,2]) 0", stmt, new Shift.ForInStatement(
+      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]), 
+      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
+    testParse("for(var x of [1,2]) 0", stmt, new Shift.ForOfStatement(
+      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]), 
+      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
+    testParse("for(let x of [1,2]) 0", stmt, new Shift.ForOfStatement(
+      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]), 
+      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
   });
 });

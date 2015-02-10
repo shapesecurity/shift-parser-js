@@ -97,6 +97,47 @@ suite("Parser", function () {
       ])
     );
 
+    testParse("({[6+3]() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.ComputedPropertyName(
+            new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(6), new Shift.LiteralNumericExpression(3))
+          ),
+          [], null, new Shift.FunctionBody([], []))
+      ])
+    );
+
+    testParse("({3() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("3"),
+          [], null, new Shift.FunctionBody([], []))
+      ])
+    );
+
+    testParse("({\"moo\"() {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("moo"),
+          [], null, new Shift.FunctionBody([], []))
+      ])
+    );
+
+    testParse("({\"oink\"(that, little, piggy) {}})", expr,
+      new Shift.ObjectExpression([
+        new Shift.Method(
+          false,
+          new Shift.StaticPropertyName("oink"),
+          [new Shift.BindingIdentifier(new Shift.Identifier("that")),
+            new Shift.BindingIdentifier(new Shift.Identifier("little")),
+            new Shift.BindingIdentifier(new Shift.Identifier("piggy"))],
+          null, new Shift.FunctionBody([], []))
+      ])
+    );
+
     testParseFailure("({[1,2]:3})", "Unexpected token ,");
   });
 });

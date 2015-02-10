@@ -1714,11 +1714,16 @@ export class Parser extends Tokenizer {
       }
     }
 
-    // PropertyName[?Yield] : AssignmentExpression[In,?Yield]
     let key = this.parseObjectPropertyKey();
-    this.expect(TokenType.COLON);
-    let value = this.parseAssignmentExpression();
-    return this.markLocation(new Shift.DataProperty(key, value), startTokenIndex);
+    if (this.eat(TokenType.COLON)) {
+      // PropertyName[?Yield] : AssignmentExpression[In,?Yield]
+      let value = this.parseAssignmentExpression();
+      return this.markLocation(new Shift.DataProperty(key, value), startTokenIndex);
+    }
+    this.match(TokenType.LPAREN);
+    let parmInfo = this.parseParams(null);
+    let [body, isStrict] = this.parseFunctionBody();
+    return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startTokenIndex);
   }
 
   parseFunction(isExpression) {

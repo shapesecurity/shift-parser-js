@@ -81,26 +81,31 @@ suite("Parser", function () {
         new Shift.Getter(new Shift.StaticPropertyName("if"), new Shift.FunctionBody([], [])),
       ])
     );
+
     testParse("({ get true() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.StaticPropertyName("true"), new Shift.FunctionBody([], [])),
       ])
     );
+
     testParse("({ get false() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.StaticPropertyName("false"), new Shift.FunctionBody([], [])),
       ])
     );
+
     testParse("({ get null() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.StaticPropertyName("null"), new Shift.FunctionBody([], [])),
       ])
     );
+
     testParse("({ get \"undef\"() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.StaticPropertyName("undef"), new Shift.FunctionBody([], [])),
       ])
     );
+
     testParse("({ get 10() {} })", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.StaticPropertyName("10"), new Shift.FunctionBody([], [])),
@@ -114,6 +119,7 @@ suite("Parser", function () {
         ])),
       ])
     );
+
     testParse("({ set if(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.StaticPropertyName("if"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
@@ -121,6 +127,7 @@ suite("Parser", function () {
         ])),
       ])
     );
+
     testParse("({ set true(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.StaticPropertyName("true"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
@@ -128,6 +135,7 @@ suite("Parser", function () {
         ])),
       ])
     );
+
     testParse("({ set false(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.StaticPropertyName("false"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
@@ -135,6 +143,7 @@ suite("Parser", function () {
         ])),
       ])
     );
+
     testParse("({ set null(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.StaticPropertyName("null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
@@ -142,6 +151,7 @@ suite("Parser", function () {
         ])),
       ])
     );
+
     testParse("({ set \"null\"(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.StaticPropertyName("null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
@@ -149,6 +159,7 @@ suite("Parser", function () {
         ])),
       ])
     );
+
     testParse("({ set 10(w) { w } })", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(new Shift.StaticPropertyName("10"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
@@ -202,6 +213,7 @@ suite("Parser", function () {
         new Shift.ShorthandProperty(new Shift.Identifier("a")),
       ])
     );
+
     testParse("({a, b: 0, c})", expr,
       new Shift.ObjectExpression([
         new Shift.ShorthandProperty(new Shift.Identifier("a")),
@@ -212,6 +224,7 @@ suite("Parser", function () {
         new Shift.ShorthandProperty(new Shift.Identifier("c")),
       ])
     );
+
     testParse("({a, b})", expr,
       new Shift.ObjectExpression([
         new Shift.ShorthandProperty(new Shift.Identifier("a")),
@@ -230,6 +243,7 @@ suite("Parser", function () {
         )
       ])
     );
+
     testParse("({a(){let a;}})", expr,
       new Shift.ObjectExpression([
         new Shift.Method(
@@ -249,6 +263,7 @@ suite("Parser", function () {
         )
       ])
     );
+
     testParse("({a(b){}})", expr,
       new Shift.ObjectExpression([
         new Shift.Method(
@@ -260,6 +275,7 @@ suite("Parser", function () {
         )
       ])
     );
+
     testParse("({a(b,...c){}})", expr,
       new Shift.ObjectExpression([
         new Shift.Method(
@@ -271,6 +287,7 @@ suite("Parser", function () {
         )
       ])
     );
+
     testParse("({a(b,c){}})", expr,
       new Shift.ObjectExpression([
         new Shift.Method(
@@ -285,6 +302,7 @@ suite("Parser", function () {
         )
       ])
     );
+
     testParse("({a(b,c){let d;}})", expr,
       new Shift.ObjectExpression([
         new Shift.Method(

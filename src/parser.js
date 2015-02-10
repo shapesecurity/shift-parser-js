@@ -1706,9 +1706,7 @@ export class Parser extends Tokenizer {
         ), startTokenIndex);
 
       } else if(this.match(TokenType.LPAREN)) {
-        let parmInfo = this.parseParams(null);
-        let [body, isStrict] = this.parseFunctionBody();
-        return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startTokenIndex);
+        return this.parseMethod(key, startTokenIndex);
       } else {
         return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(key.value)), startTokenIndex);
       }
@@ -1721,8 +1719,12 @@ export class Parser extends Tokenizer {
       return this.markLocation(new Shift.DataProperty(key, value), startTokenIndex);
     }
     this.match(TokenType.LPAREN);
+    return this.parseMethod(key, startTokenIndex);
+  }
+
+  parseMethod(key, startTokenIndex) {
     let parmInfo = this.parseParams(null);
-    let [body, isStrict] = this.parseFunctionBody();
+    let [body/*, isStrict*/] = this.parseFunctionBody();
     return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startTokenIndex);
   }
 

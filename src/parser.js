@@ -492,8 +492,6 @@ export class Parser extends Tokenizer {
   }
 
   static isDestructuringAssignmentTarget(node) {
-    if (Parser.isValidSimpleAssignmentTarget(node))
-        return true;
     switch (node.type) {
       case "ObjectExpression":
         return node.properties.every(p =>
@@ -516,6 +514,7 @@ export class Parser extends Tokenizer {
       case "BindingPropertyIdentifier":
       case "BindingPropertyProperty":
       case "BindingWithDefault":
+      case "IdentifierExpression":
       case "ObjectBinding":
         return true;
     }
@@ -1031,7 +1030,7 @@ export class Parser extends Tokenizer {
     }
 
     if (isOperator) {
-      if (!Parser.isDestructuringAssignmentTarget(node)) {
+      if (!Parser.isDestructuringAssignmentTarget(node) && node.type !== "ComputedMemberExpression" && node.type !== "StaticMemberExpression") {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
       node = Parser.transformDestructuringAssignment(node);

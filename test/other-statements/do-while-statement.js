@@ -34,7 +34,11 @@ suite("Parser", function () {
       ]))
     );
 
-    // NOTE: ES6 will allow the following:
-    testParseFailure("{do ; while(false) false}", "Unexpected token false");
+    testParse("{do ; while(false) false}", stmt,
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(false)),
+        new Shift.ExpressionStatement(new Shift.LiteralBooleanExpression(false))
+      ]))
+    );
   });
 });

@@ -349,8 +349,8 @@ suite("Parser", function () {
     testParseFailure("let", "Unexpected end of input");
     testParseFailure("const", "Unexpected end of input");
     testParseFailure("{ ;  ;  ", "Unexpected end of input");
-    testParseFailure("({get +:3})", "Property name in object literal must be identifier, string literal or number literal");
-    testParseFailure("({get +:3})", "Property name in object literal must be identifier, string literal or number literal");
+    testParseFailure("({get +:3})", "Unexpected token +");
+    testParseFailure("({get +:3})", "Unexpected token +");
     testParseFailure("function t() { ;  ;  ", "Unexpected end of input");
     testParseFailure("#=", "Unexpected token ILLEGAL");
     testParseFailure("**", "Unexpected token *");

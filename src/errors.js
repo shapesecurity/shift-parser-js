@@ -28,7 +28,6 @@ export const ErrorMessages = {
   UNTERMINATED_REG_EXP: "Invalid regular expression: missing /",
   INVALID_LHS_IN_ASSIGNMENT: "Invalid left-hand side in assignment",
   INVALID_LHS_IN_FOR_IN: "Invalid left-hand side in for-in",
-  INVALID_PROPERTY_NAME: "Property name in object literal must be identifier, string literal or number literal",
   MULTIPLE_DEFAULTS_IN_SWITCH: "More than one default clause in switch statement",
   NO_CATCH_OR_FINALLY: "Missing catch or finally after try",
   UNKNOWN_LABEL: "Undefined label '{0}'",

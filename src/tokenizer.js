@@ -19,11 +19,9 @@ import {getHexValue, isLineTerminator, isWhitespace, isIdentifierStart, isIdenti
 import {ErrorMessages} from "./errors";
 
 export const TokenClass = {
-  BooleanLiteral: {name: "Boolean"},
   Eof: {name: "<End>"},
-  Ident: {name: "Identifier"},
-  Keyword: {name: "Keyword"},
-  NullLiteral: {name: "Null"},
+  Ident: {name: "Identifier", isIdentifierName: true},
+  Keyword: {name: "Keyword", isIdentifierName: true},
   NumericLiteral: {name: "Numeric"},
   Punctuator: {name: "Punctuator"},
   StringLiteral: {name: "String"},
@@ -112,9 +110,10 @@ export const TokenType = {
   VAR: {klass: TokenClass.Keyword, name: "var"},
   WHILE: {klass: TokenClass.Keyword, name: "while"},
   WITH: {klass: TokenClass.Keyword, name: "with"},
-  NULL_LITERAL: {klass: TokenClass.NullLiteral, name: "null"},
-  TRUE_LITERAL: {klass: TokenClass.BooleanLiteral, name: "true"},
-  FALSE_LITERAL: {klass: TokenClass.BooleanLiteral, name: "false"},
+  NULL: {klass: TokenClass.Keyword, name: "null"},
+  TRUE: {klass: TokenClass.Keyword, name: "true"},
+  FALSE: {klass: TokenClass.Keyword, name: "false"},
+  YIELD: {klass: TokenClass.Keyword, name: "yield"},
   NUMBER: {klass: TokenClass.NumericLiteral, name: ""},
   STRING: {klass: TokenClass.StringLiteral, name: ""},
   REGEXP: {klass: TokenClass.RegularExpression, name: ""},
@@ -174,24 +173,6 @@ export class IdentifierLikeToken extends Token {
 export class IdentifierToken extends IdentifierLikeToken {
   constructor(slice) {
     super(TokenType.IDENTIFIER, slice);
-  }
-}
-
-export class NullLiteralToken extends IdentifierLikeToken {
-  constructor(slice) {
-    super(TokenType.NULL_LITERAL, slice);
-  }
-}
-
-export class TrueLiteralToken extends IdentifierLikeToken {
-  constructor(slice) {
-    super(TokenType.TRUE_LITERAL, slice);
-  }
-}
-
-export class FalseLiteralToken extends IdentifierLikeToken {
-  constructor(slice) {
-    super(TokenType.FALSE_LITERAL, slice);
   }
 }
 
@@ -437,6 +418,13 @@ class Tokenizer {
           case "t":
             if (Tokenizer.cse3(id, "h", "i", "s")) {
               return TokenType.THIS;
+            } else if (Tokenizer.cse3(id, "r", "u", "e")) {
+              return TokenType.TRUE;
+            }
+            break;
+          case "n":
+            if (Tokenizer.cse3(id, "u", "l", "l")) {
+              return TokenType.NULL;
             }
             break;
           case "e":
@@ -475,6 +463,11 @@ class Tokenizer {
           case "b": // BREAK
             if (Tokenizer.cse4(id, "r", "e", "a", "k")) {
               return TokenType.BREAK;
+            }
+            break;
+          case "f": // FALSE
+            if (Tokenizer.cse4(id, "a", "l", "s", "e")) {
+              return TokenType.FALSE;
             }
             break;
           case "c": // CATCH
@@ -872,18 +865,6 @@ class Tokenizer {
     let subType = Tokenizer.getKeyword(id, this.strict);
     if (subType !== TokenType.ILLEGAL) {
       return new KeywordToken(subType, slice);
-    }
-
-    if (id.length === 4) {
-      if ("null" === id) {
-        return new NullLiteralToken(slice);
-      } else if ("true" === id) {
-        return new TrueLiteralToken(slice);
-      }
-    }
-
-    if (id.length === 5 && "false" === id) {
-      return new FalseLiteralToken(slice);
     }
 
     return new IdentifierToken(slice);

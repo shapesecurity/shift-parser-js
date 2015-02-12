@@ -19,6 +19,7 @@ var Shift = require("shift-ast");
 var expr = require("./helpers").expr;
 var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
 var testParse = require('./assertions').testParse;
+var testParseFailure = require('./assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("automatic semicolon insertion", function () {
@@ -33,6 +34,7 @@ suite("Parser", function () {
     testEsprimaEquiv("while (true) { break\nthere; }");
     testEsprimaEquiv("while (true) { break // Comment\nthere; }");
     testEsprimaEquiv("while (true) { break /* Multiline\nComment */there; }");
+    testEsprimaEquiv("0 ;");
 
     testParse("(function(){ return\nx; })", expr,
       new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
@@ -56,6 +58,10 @@ suite("Parser", function () {
     testEsprimaEquiv("{ throw error\nerror; }");
     testEsprimaEquiv("{ throw error// Comment\nerror; }");
     testEsprimaEquiv("{ throw error/* Multiline\nComment */error; }");
+    testParseFailure("throw /* \n */ e", "Illegal newline after throw");
+    testParseFailure("throw /* \u2028 */ e", "Illegal newline after throw");
+    testParseFailure("throw /* \u2029 */ e", "Illegal newline after throw");
+    testEsprimaEquiv("throw /* \u202a */ e");
   });
 
   suite("whitespace characters", function () {

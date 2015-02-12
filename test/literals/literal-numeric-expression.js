@@ -41,5 +41,6 @@ suite("Parser", function () {
     testEsprimaEquiv("012");
     testEsprimaEquiv("0012");
     testEsprimaEquiv("\n    42\n\n");
+    testEsprimaEquiv("0.");
   });
 });

@@ -20,5 +20,6 @@ suite("Parser", function () {
   suite("do while statement", function () {
     testEsprimaEquiv("do keep(); while (true);");
     testEsprimaEquiv("do continue; while(1);");
+    testEsprimaEquiv("do ; while (true)");
   });
 });

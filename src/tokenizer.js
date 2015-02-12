@@ -279,7 +279,7 @@ class Tokenizer {
   }
 
   trackBackLineNumber(position) {
-    for (let line = this.lineStarts.length - 1; line >= 0; line--) {
+    for (let line = this.lineStarts.length - 1; line > 0; line--) {
       if ((position >= this.getLineStart(line))) {
         return line;
       }
@@ -314,7 +314,7 @@ class Tokenizer {
       default:
         break;
     }
-    return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.value || token.type.name);
+    return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.value);
   }
 
   createError(message, arg) {
@@ -370,6 +370,8 @@ class Tokenizer {
     if (id.length === 1 || id.length > 10) {
       return TokenType.ILLEGAL;
     }
+
+    // istanbul ignore next
     switch (id.length) {
       case 2:
         switch (id.charAt(0)) {
@@ -654,7 +656,7 @@ class Tokenizer {
             i++;
             this.lineStarts.push(this.index);
             break;
-          case 12: // "\r":
+          case 13: // "\r":
             this.hasLineTerminatorBeforeNext = true;
             if (i < length - 1 && this.source.charAt(i + 1) === "\n") {
               i++;
@@ -666,6 +668,7 @@ class Tokenizer {
             i++;
         }
       } else if (chCode === 0x2028 || chCode === 0x2029) {
+        this.hasLineTerminatorBeforeNext = true;
         i++;
         this.lineStarts.push(this.index);
       } else {
@@ -939,6 +942,7 @@ class Tokenizer {
               return TokenType.ASSIGN_BIT_XOR;
             case "&":
               return TokenType.ASSIGN_BIT_AND;
+            // istanbul ignore next
             default:
               break; //failed
           }

@@ -417,7 +417,7 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.LPAREN);
     let test = this.parseExpression();
     this.expect(TokenType.RPAREN);
-    this.expect(TokenType.SEMICOLON);
+    this.consumeSemicolon();
 
     return new Shift.DoWhileStatement(body, test);
   }

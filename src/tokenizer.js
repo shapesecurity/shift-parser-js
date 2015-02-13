@@ -729,30 +729,6 @@ export default class Tokenizer {
     }
   }
 
-  scanHexEscape4() {
-    if (this.index + 4 > this.source.length) {
-      return -1;
-    }
-    let r1 = getHexValue(this.source.charAt(this.index));
-    if (r1 === -1) {
-      return -1;
-    }
-    let r2 = getHexValue(this.source.charAt(this.index + 1));
-    if (r2 === -1) {
-      return -1;
-    }
-    let r3 = getHexValue(this.source.charAt(this.index + 2));
-    if (r3 === -1) {
-      return -1;
-    }
-    let r4 = getHexValue(this.source.charAt(this.index + 3));
-    if (r4 === -1) {
-      return -1;
-    }
-    this.index += 4;
-    return r1 << 12 | r2 << 8 | r3 << 4 | r4;
-  }
-
   scanHexEscape2() {
     if (this.index + 2 > this.source.length) {
       return -1;
@@ -767,6 +743,54 @@ export default class Tokenizer {
     }
     this.index += 2;
     return r1 << 4 | r2;
+  }
+
+  scanUnicode() {
+    if (this.source.charAt(this.index) === "{") {
+      //\u{HexDigits}
+      let i = this.index + 1;
+      let hexDigits = 0, ch;
+      while (i < this.source.length) {
+        ch = this.source.charAt(i);
+        let hex = getHexValue(ch);
+        if (hex === -1) {
+          break;
+        }
+        hexDigits = (hexDigits << 4) | hex;
+        if (hexDigits > 0x10FFFF) {
+          throw this.createILLEGAL();
+        }
+        i++;
+      }
+      if (ch !== "}") {
+        return -1;
+      }
+      this.index = i + 1;
+      return hexDigits;
+    } else {
+      //\uHex4Digits
+      if (this.index + 4 > this.source.length) {
+        return -1;
+      }
+      let r1 = getHexValue(this.source.charAt(this.index));
+      if (r1 === -1) {
+        return -1;
+      }
+      let r2 = getHexValue(this.source.charAt(this.index + 1));
+      if (r2 === -1) {
+        return -1;
+      }
+      let r3 = getHexValue(this.source.charAt(this.index + 2));
+      if (r3 === -1) {
+        return -1;
+      }
+      let r4 = getHexValue(this.source.charAt(this.index + 3));
+      if (r4 === -1) {
+        return -1;
+      }
+      this.index += 4;
+      return r1 << 12 | r2 << 8 | r3 << 4 | r4;
+    }
   }
 
   getEscapedIdentifier() {
@@ -786,7 +810,7 @@ export default class Tokenizer {
       if (this.index >= this.source.length) {
         throw this.createILLEGAL();
       }
-      let ich = this.scanHexEscape4();
+      let ich = this.scanUnicode();
       if (ich < 0 || ich === 0x005C /* "\\" */  || !isIdentifierStart(ich)) {
         throw this.createILLEGAL();
       }
@@ -811,7 +835,7 @@ export default class Tokenizer {
         if (this.index >= this.source.length) {
           throw this.createILLEGAL();
         }
-        let ich = this.scanHexEscape4();
+        let ich = this.scanUnicode();
         if (ich < 0 || ich === 0x005C /* "\\" */ || !isIdentifierPart(ich)) {
           throw this.createILLEGAL();
         }
@@ -1212,7 +1236,7 @@ export default class Tokenizer {
               if (this.index >= this.source.length) {
                 throw this.createILLEGAL();
               }
-              unescaped = ch === "u" ? this.scanHexEscape4() : this.scanHexEscape2();
+              unescaped = ch === "u" ? this.scanUnicode() : this.scanHexEscape2();
               if (unescaped >= 0) {
                 str += String.fromCharCode(unescaped);
               } else {

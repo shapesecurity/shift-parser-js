@@ -16,6 +16,17 @@
 
 import {Parser} from "./parser";
 
-export default function parse(code) {
-  return new Parser(code).parseScript();
+import * as Shift from "shift-ast";
+
+export function parseScript(code, {loc = false} = {}) {
+  let parser = new Parser(code);
+  if (loc) {
+    parser.markLocation = function (node, location) {
+      node.loc = new Shift.SourceSpan(location, new Shift.SourceLocation(this.lastIndex, this.lastLine + 1, this.lastIndex - this.lastLineStart));
+      return node;
+    };
+  }
+  return parser.parseScript();
 }
+
+export default parseScript;

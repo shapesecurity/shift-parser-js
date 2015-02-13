@@ -32,10 +32,17 @@ suite("Parser", function () {
     testParse("('\\\u2028')", expr, new Shift.LiteralStringExpression(""));
     testParse("('\\\u2029')", expr, new Shift.LiteralStringExpression(""));
     testParse("('\u202a')", expr, new Shift.LiteralStringExpression("\u202a"));
+    testParse("('\\u{00F8}')", expr, new Shift.LiteralStringExpression("\u00F8"));
+    testParse("('\\u{0}')", expr, new Shift.LiteralStringExpression("\u0000"));
+    testParse("('\\u{10FFFF}')", expr, new Shift.LiteralStringExpression(String.fromCharCode(0x10FFFF)));
+    testParse("('\\u{0000000000F8}')", expr, new Shift.LiteralStringExpression("\u00F8"));
 
     testParseFailure("(')", "Unexpected token ILLEGAL");
     testParseFailure("('\n')", "Unexpected token ILLEGAL");
     testParseFailure("('\u2028')", "Unexpected token ILLEGAL");
     testParseFailure("('\u2029')", "Unexpected token ILLEGAL");
+    testParseFailure("('\\u{110001}')","Unexpected token ILLEGAL"); // out of range
+    testParseFailure("('\\u{FFFFFFF}')", "Unexpected token ILLEGAL");
+
   });
 });

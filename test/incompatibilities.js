@@ -107,15 +107,5 @@ suite("Parser", function () {
       )
     );
 
-    // ES5: requires do-while statement to end with semicolon
-    // ES6: allows do-while statement with an optional trailing semicolon
-    testParseFailure("{do ; while(false) false}", "Unexpected token false");
-    testParse("{do ; while(false); false}", stmt, 
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(false)),
-        new Shift.ExpressionStatement(new Shift.LiteralBooleanExpression(false))
-      ]))
-    );
-
   });
 });

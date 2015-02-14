@@ -14,12 +14,27 @@
  * limitations under the License.
  */
 
+var Shift = require("shift-ast");
+
+var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParseFailure = require('../assertions').testParseFailure;
+var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("do while statement", function () {
     testEsprimaEquiv("do keep(); while (true);");
     testEsprimaEquiv("do continue; while(1);");
     testEsprimaEquiv("do ; while (true)");
+    testEsprimaEquiv("do {} while (true)");
+    testParse("{do ; while(false); false}", stmt,
+      new Shift.BlockStatement(new Shift.Block([
+        new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(false)),
+        new Shift.ExpressionStatement(new Shift.LiteralBooleanExpression(false))
+      ]))
+    );
+
+    // NOTE: ES6 will allow the following:
+    testParseFailure("{do ; while(false) false}", "Unexpected token false");
   });
 });

@@ -103,8 +103,8 @@ suite("Parser", function() {
     testParseFailure("f()++", "Invalid left-hand side in assignment");
     testParseFailure("--f()", "Invalid left-hand side in assignment");
 
-    // ES5: allows any initializers in for-in and for-of head
-    // ES6: disallow initializer
+    // ES5: allows initializers in for-in and for-of head
+    // ES6: disallows initializers in for-in and for-of head
     testParseFailure("for(var x=1 in [1,2,3]) 0", "Invalid variable declaration in for-in statement");
     testParseFailure("for(let x=1 in [1,2,3]) 0", "Invalid variable declaration in for-in statement");
     testParseFailure("for(var x=1 of [1,2,3]) 0", "Invalid variable declaration in for-of statement");
@@ -126,5 +126,9 @@ suite("Parser", function() {
       new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
       new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
       new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
+
+    // ES5: allows unicode escape sequences in regular expression flags
+    // ES6: disallowes unicode escape sequences in regular expression flags
+    testParseFailure("/a/\\u0000", "Invalid regular expression");
   });
 });

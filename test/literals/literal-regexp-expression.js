@@ -18,25 +18,25 @@ var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
 var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 suite("Parser", function () {
   suite("literal regexp expression", function () {
     // Regular Expression Literals
-    testEsprimaEquiv("/a/");
-    testEsprimaEquiv("/a/;");
-    testEsprimaEquiv("/a/i");
-    testEsprimaEquiv("/a/i;");
-    testEsprimaEquiv("/[a-z]/i");
-    testEsprimaEquiv("/[x-z]/i");
-    testEsprimaEquiv("/[a-c]/i");
-    testEsprimaEquiv("/[P QR]/i");
-    testParse("/[\\]/]/", expr,
-      new Shift.LiteralRegExpExpression("/[\\]/]/")
+    testParse("/a/", expr, new Shift.LiteralRegExpExpression("a", ""));
+    testParse("/a/;", expr, new Shift.LiteralRegExpExpression("a", ""));
+    testParse("/a/i", expr, new Shift.LiteralRegExpExpression("a", "i"));
+    testParse("/a/i;", expr, new Shift.LiteralRegExpExpression("a", "i"));
+    testParse("/[a-z]/i", expr, new Shift.LiteralRegExpExpression("[a-z]", "i"));
+    testParse("/[x-z]/i", expr, new Shift.LiteralRegExpExpression("[x-z]", "i"));
+    testParse("/[a-c]/i", expr, new Shift.LiteralRegExpExpression("[a-c]", "i"));
+    testParse("/[P QR]/i", expr, new Shift.LiteralRegExpExpression("[P QR]", "i"));
+    testParse("/[\\]/]/", expr, new Shift.LiteralRegExpExpression("[\\]/]", ""));
+    testParse("/foo\\/bar/", expr, new Shift.LiteralRegExpExpression("foo/bar", ""));
+    testParse("/=([^=\\s])+/g", expr, new Shift.LiteralRegExpExpression("=([^=\\s])+", "g"));
+    testParse("/42/g.test", expr,
+      new Shift.StaticMemberExpression(new Shift.LiteralRegExpExpression("42", "g"), new Shift.Identifier("test"))
     );
-    testEsprimaEquiv("/foo\\/bar/");
-    testEsprimaEquiv("/=([^=\\s])+/g");
-    // testEsprimaEquiv("/[P QR]/\\g");
-    testEsprimaEquiv("/42/g.test");
   });
 });

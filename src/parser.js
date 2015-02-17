@@ -1308,13 +1308,15 @@ export class Parser extends Tokenizer {
       case TokenType.ASSIGN_DIV:
         this.lookahead = this.scanRegExp(this.lookahead.type === TokenType.DIV ? "/" : "/=");
         let token = this.lex();
+        let lastSlash = token.value.lastIndexOf("/");
+        let pattern = token.value.slice(1, lastSlash).replace("\\/", "/");
+        let flags = token.value.slice(lastSlash + 1);
         try {
-          let lastSlash = token.value.lastIndexOf("/");
-          RegExp(token.value.slice(1, lastSlash), token.value.slice(lastSlash + 1));
+          RegExp(pattern, flags);
         } catch (unused) {
           throw this.createErrorWithLocation(token, ErrorMessages.INVALID_REGULAR_EXPRESSION);
         }
-        return this.markLocation(new Shift.LiteralRegExpExpression(token.value), startLocation);
+        return this.markLocation(new Shift.LiteralRegExpExpression(pattern, flags), startLocation);
       default:
         throw this.createUnexpected(this.lex());
     }

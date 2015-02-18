@@ -28,10 +28,6 @@ import Tokenizer, {
     NumericLiteralToken,
     StringLiteralToken} from "./tokenizer";
 
-const INIT_MASK = 1;
-const GETTER_MASK = 2;
-const SETTER_MASK = 4;
-
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = "CoverParenthesizedExpressionAndArrowParameterList";
 
@@ -292,8 +288,9 @@ export class Parser extends Tokenizer {
         return this.markLocation(this.parseWhileStatement(), startLocation);
       case TokenType.WITH:
         return this.markLocation(this.parseWithStatement(), startLocation);
-      default:
-      {
+      case TokenType.CLASS:
+        return this.parseClass(false);
+      default: {
         let expr = this.parseExpression();
 
         // 12.12 Labelled Statements;
@@ -517,7 +514,6 @@ export class Parser extends Tokenizer {
 
   static isValidSimpleAssignmentTarget(node) {
     switch (node.type) {
-      case "BindingIdentifier":
       case "IdentifierExpression":
       case "ComputedMemberExpression":
       case "StaticMemberExpression":
@@ -1321,6 +1317,8 @@ export class Parser extends Tokenizer {
           throw this.createErrorWithLocation(token, ErrorMessages.INVALID_REGULAR_EXPRESSION);
         }
         return this.markLocation(new Shift.LiteralRegExpExpression(pattern, flags), startLocation);
+      case TokenType.CLASS:
+        return this.parseClass(true);
       default:
         throw this.createUnexpected(this.lex());
     }
@@ -1349,7 +1347,7 @@ export class Parser extends Tokenizer {
   }
 
   parseIdentifierName() {
-    let startLocation = this.tokenIndex;
+    let startLocation = this.getLocation();
     if (this.lookahead.type.klass.isIdentifierName) {
       return this.markLocation(new Shift.Identifier(this.lex().value), startLocation);
     } else {
@@ -1375,7 +1373,7 @@ export class Parser extends Tokenizer {
       if (this.match(TokenType.RPAREN) || this.eof()) {
         return result;
       }
-      let startLocation = this.tokenIndex;
+      let startLocation = this.getLocation();
       let arg;
       if (this.eat(TokenType.ELLIPSIS)) {
         arg = this.parseAssignmentExpression();
@@ -1424,7 +1422,7 @@ export class Parser extends Tokenizer {
     }
 
     let possibleBindings = !this.match(TokenType.LPAREN);
-    let startLocation = this.tokenIndex;
+    let startLocation = this.getLocation();
     let group = this.parseAssignmentExpression();
     let params = [group];
 
@@ -1522,7 +1520,7 @@ export class Parser extends Tokenizer {
       if (this.eat(TokenType.COMMA)) {
         el = null;
       } else {
-        let startLocation = this.tokenIndex;
+        let startLocation = this.getLocation();
         if (this.eat(TokenType.ELLIPSIS)) {
           el = this.parseAssignmentExpression();
           el = this.markLocation(new Shift.SpreadElement(el), startLocation);
@@ -1542,8 +1540,7 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.LBRACE);
 
-    let propertyMap = Object.create(null);
-    let properties = this.parseObjectExpressionItems(propertyMap);
+    let properties = this.parseObjectExpressionItems();
 
     this.expect(TokenType.RBRACE);
 
@@ -1551,55 +1548,55 @@ export class Parser extends Tokenizer {
   }
 
 
-  parseObjectExpressionItems(propertyMap) {
+  parseObjectExpressionItems() {
     let result = [];
+    let has__proto__ = [false];
     while (!this.match(TokenType.RBRACE)) {
-      result.push(this.parseObjectExpressionItem(propertyMap));
+      result.push(this.parseObjectExpressionItem(has__proto__));
+      if (!this.match(TokenType.RBRACE)) {
+        this.expect(TokenType.COMMA);
+      }
     }
     return result;
   }
 
-  parseObjectExpressionItem(propertyMap) {
-    let property = this.parseObjectProperty();
-    let type = property.type;
-    let key = "$" + (type === "BindingPropertyIdentifier" ? property.identifier.identifier.name : property.name.value);
-    let value = {}.hasOwnProperty.call(propertyMap, key) ? propertyMap[key] : 0;
-
-    if ({}.hasOwnProperty.call(propertyMap, key)) {
-      if ((value & INIT_MASK) !== 0) {
-        if (type === "DataProperty" && key === "$__proto__") {
-          throw this.createError(ErrorMessages.DUPLICATE_PROTO_PROPERTY);
-        } else if (type !== "DataProperty") {
-          throw this.createError(ErrorMessages.ACCESSOR_DATA_PROPERTY);
+  parseObjectExpressionItem(has__proto__) {
+    let startLocation = this.getLocation();
+    let token = this.lookahead;
+    let {methodOrKey, kind} = this.parseMethodDefinition();
+    switch (kind) {
+      case "method":
+        return methodOrKey;
+      case "identifier": // IdentifierReference,
+        if (this.eat(TokenType.ASSIGN)) {
+          // CoverInitializedName
+          return this.markLocation(new Shift.BindingPropertyIdentifier(
+              new Shift.BindingIdentifier(new Shift.Identifier(methodOrKey.value)),
+              this.parseAssignmentExpression()),
+            startLocation);
+        } else if (!this.match(TokenType.COLON)) {
+          return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(methodOrKey.value)), startLocation);
         }
-      } else {
-        if (type === "DataProperty") {
-          throw this.createError(ErrorMessages.ACCESSOR_DATA_PROPERTY);
-        } else if ((value & GETTER_MASK) !== 0 && type == "Getter"
-            || (value & SETTER_MASK) !== 0 && type == "Setter") {
-          throw this.createError(ErrorMessages.ACCESSOR_GET_SET);
+    }
+
+    // DataProperty
+    this.expect(TokenType.COLON);
+    if (methodOrKey.type === "StaticPropertyName") {
+      if (methodOrKey.value === "__proto__") {
+        if (!has__proto__[0]) {
+          has__proto__[0] = true;
+        } else {
+          throw this.createErrorWithLocation(token, ErrorMessages.DUPLICATE_PROTO_PROPERTY);
         }
       }
     }
-    switch (type) {
-      case "DataProperty":
-        propertyMap[key] = value | INIT_MASK;
-        break;
-      case "Getter":
-        propertyMap[key] = value | GETTER_MASK;
-        break;
-      case "Setter":
-        propertyMap[key] = value | SETTER_MASK;
-        break;
-    }
-
-    if (!this.match(TokenType.RBRACE)) {
-      this.expect(TokenType.COMMA);
-    }
-    return property;
+    return this.markLocation(new Shift.DataProperty(
+        methodOrKey,
+        this.parseAssignmentExpression()),
+      startLocation);
   }
 
-  parseObjectPropertyKey() {
+  parsePropertyName() {
     // PropertyName[Yield,GeneratorParameter]:
     let token = this.lookahead;
     let startLocation = this.getLocation();
@@ -1618,6 +1615,8 @@ export class Parser extends Tokenizer {
         let previousGeneratorParameter = this.paramGeneratorParameter;
         let previousYield = this.paramYield;
         this.expect(TokenType.LBRACK);
+        // TODO(bzhang): generator support
+        // istanbul ignore next
         if (this.paramGeneratorParameter) {
           // [+GeneratorParameter] ComputedPropertyName
           this.paramGeneratorParameter = false;
@@ -1633,66 +1632,158 @@ export class Parser extends Tokenizer {
     return this.markLocation(new Shift.StaticPropertyName(this.parseIdentifierName().name), startLocation);
   }
 
-  parseObjectProperty() {
+  /**
+   * Test if lookahead can be the beginning of a `PropertyName`.
+   * @returns {boolean}
+   */
+  lookaheadPropertyName() {
+    switch (this.lookahead.type) {
+      case TokenType.NUMBER:
+      case TokenType.STRING:
+      case TokenType.LBRACK:
+        return true;
+      default:
+        return this.lookahead.type.klass.isIdentifierName;
+    }
+  }
+
+  /**
+   * Try to parse a method definition.
+   *
+   * If it turns out to be one of:
+   *  * `IdentifierReference`
+   *  * `CoverInitializedName` (`IdentifierReference "=" AssignmentExpression`)
+   *  * `PropertyName : AssignmentExpression`
+   * The the parser will stop at the end of the leading `Identifier` or `PropertyName` and return it.
+   *
+   * @returns {{methodOrKey: (Shift.Method|Shift.PropertyName), kind: string}}
+   */
+  parseMethodDefinition() {
     let token = this.lookahead;
     let startLocation = this.getLocation();
 
-    let key = this.parseObjectPropertyKey();
+    // TODO(bzhang): GeneratorMethod (lookahead='*')
+
+    let key = this.parsePropertyName();
 
     if (token.type === TokenType.IDENTIFIER) {
       let name = token.value;
       if (name.length === 3) {
         // Property Assignment: Getter and Setter.
-        if ("get" === name && !this.match(TokenType.COLON)) {
-          key = this.parseObjectPropertyKey();
+        if ("get" === name && this.lookaheadPropertyName()) {
+          key = this.parsePropertyName();
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
           let [body] = this.parseFunctionBody();
-          return this.markLocation(new Shift.Getter(key, body), startLocation);
-        } else if ("set" === name && !this.match(TokenType.COLON)) {
-          key = this.parseObjectPropertyKey();
+          return {
+            methodOrKey: this.markLocation(new Shift.Getter(key, body), startLocation),
+            kind: "method"
+          };
+        } else if ("set" === name && this.lookaheadPropertyName()) {
+          key = this.parsePropertyName();
           this.expect(TokenType.LPAREN);
-          token = this.lookahead;
-          if (token.type !== TokenType.IDENTIFIER) {
-            this.expect(TokenType.RPAREN);
-            throw this.createErrorWithLocation(token, ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
-          } else {
-            let param = this.parseVariableIdentifier();
-            this.expect(TokenType.RPAREN);
-            let [body, isStrict] = this.parseFunctionBody();
-            if ((this.strict || isStrict) && isRestrictedWord(param.name)) {
-              throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
+          let param = this.parseParam();
+          let info = {};
+          this.checkParam(param, token, [], info);
+          this.expect(TokenType.RPAREN);
+          let [body, isStrict] = this.parseFunctionBody();
+          if (isStrict) {
+            if (info.firstRestricted) {
+              throw this.createErrorWithLocation(info.firstRestricted, info.message);
             }
-            return this.markLocation(new Shift.Setter(key, param, body), startLocation);
           }
+          return {
+            methodOrKey: this.markLocation(new Shift.Setter(key, param, body), startLocation),
+            kind: "method"
+          };
         }
       }
+    }
 
-      if (this.eat(TokenType.ASSIGN)) {
-        return this.markLocation(new Shift.BindingPropertyIdentifier(
-          this.markLocation(new Shift.BindingIdentifier(this.markLocation(new Shift.Identifier(key.value), startLocation)), startLocation),
-          this.parseAssignmentExpression()
-        ), startLocation);
-      } else if (!this.match(TokenType.LPAREN) && !this.match(TokenType.COLON)) {
-        return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(key.value)), startLocation);
+    if (this.match(TokenType.LPAREN)) {
+      let paramInfo = this.parseParams(null);
+      let [body, isStrict] = this.parseFunctionBody();
+      if (isStrict) {
+        if (paramInfo.firstRestricted) {
+          throw this.createErrorWithLocation(paramInfo.firstRestricted, paramInfo.message);
+        }
       }
+      return {
+        methodOrKey: this.markLocation(new Shift.Method(false, key, paramInfo.params, paramInfo.rest, body), startLocation),
+        kind: "method"
+      };
     }
 
-    if (this.eat(TokenType.COLON)) {
-      // PropertyName[?Yield] : AssignmentExpression[In,?Yield]
-      let value = this.parseAssignmentExpression();
-      return this.markLocation(new Shift.DataProperty(key, value), startLocation);
-    } else if (this.match(TokenType.LPAREN)) {
-      return this.parseMethod(key, startLocation);
-    }
-
-    throw this.createUnexpected(token);
+    return {
+      methodOrKey: key,
+      kind: token.type === TokenType.IDENTIFIER ? "identifier" : "property"
+    };
   }
 
-  parseMethod(key, startLocation) {
-    let parmInfo = this.parseParams(null);
-    let [body] = this.parseFunctionBody();
-    return this.markLocation(new Shift.Method(false, key, parmInfo.params, parmInfo.rest, body), startLocation);
+  parseClass(isExpr) {
+    let location = this.getLocation();
+    this.expect(TokenType.CLASS);
+    let id = null;
+    let heritage = null;
+    if (!isExpr || this.match(TokenType.IDENTIFIER)) {
+      id = this.parseVariableIdentifier();
+    }
+
+
+    let oldParamYield = this.paramYield;
+    // TODO(bzhang): generator support
+    // istanbul ignore next
+    if (this.paramGeneratorParameter) {
+      this.paramYield = false;
+    }
+    if (this.eat(TokenType.EXTENDS)) {
+      heritage = this.parseLeftHandSideExpressionAllowCall();
+    }
+
+    this.expect(TokenType.LBRACE);
+    let originalStrict = this.strict;
+    this.strict = true;
+    let methods = [];
+    let hasConstructor = false;
+    while (!this.eat(TokenType.RBRACE)) {
+      if (this.eat(TokenType.SEMICOLON)) {
+        continue;
+      }
+      let methodToken = this.lookahead;
+      let isStatic = false;
+      let {methodOrKey, kind} = this.parseMethodDefinition();
+      if (kind === 'identifier' && methodOrKey.value === 'static') {
+        isStatic = true;
+        ({methodOrKey, kind} = this.parseMethodDefinition());
+      }
+      switch (kind) {
+        case "method":
+          let key = methodOrKey.name;
+          if (!isStatic) {
+            if (key.type === "StaticPropertyName" && key.value === "constructor") {
+              if (methodOrKey.type !== "Method") {
+                throw this.createErrorWithLocation(methodToken, "Constructors cannot be generators, getters or setters");
+              }
+              if (hasConstructor) {
+                throw this.createErrorWithLocation(methodToken, "Only one constructor is allowed in a class");
+              } else {
+                hasConstructor = true;
+              }
+            }
+          } else {
+            if (key.type === "StaticPropertyName" && key.value === "prototype") {
+              throw this.createErrorWithLocation(methodToken, "Static class methods cannot be named 'prototype'");
+            }
+          }
+          methods.push(new Shift.ClassElement(isStatic, methodOrKey));
+          break;
+        default:
+          throw this.createError("Only methods are allowed in classes");
+      }
+    }
+    this.strict = originalStrict;
+    this.paramYield = oldParamYield;
+    return this.markLocation(new (isExpr ? Shift.ClassExpression : Shift.ClassDeclaration)(id, heritage, methods), location);
   }
 
   parseFunction(isExpression) {
@@ -1743,6 +1834,47 @@ export class Parser extends Tokenizer {
     );
   }
 
+  parseParam(bound, info) {
+    let token = this.lookahead;
+    if (this.match(TokenType.LPAREN)) {
+      throw this.createUnexpected(this.lookahead);
+    }
+    let param = this.parseLeftHandSideExpression();
+    if (this.eat(TokenType.ASSIGN)) {
+      param = this.markLocation(new Shift.AssignmentExpression("=", param, this.parseAssignmentExpression()));
+    }
+    if (!Parser.isDestructuringAssignmentTargetWithDefault(param)) {
+      throw this.createUnexpected(token);
+    }
+    return Parser.transformDestructuringAssignment(param);
+  }
+
+  checkParam(param, token, bound, info) {
+    let newBound = Parser.boundNames(param);
+    [].push.apply(bound, newBound);
+
+    if (firstDuplicate(newBound) != null) {
+      throw this.createErrorWithLocation(token, ErrorMessages.DUPLICATE_BINDING, firstDuplicate(newBound));
+    }
+    if (this.strict) {
+      if (newBound.some(isRestrictedWord)) {
+        throw this.createErrorWithLocation(token, ErrorMessages.STRICT_PARAM_NAME);
+      } else if (firstDuplicate(bound) != null) {
+        throw this.createErrorWithLocation(token, ErrorMessages.STRICT_PARAM_DUPE);
+      }
+    } else if (info.firstRestricted == null) {
+      if (newBound.some(isRestrictedWord)) {
+        info.firstRestricted = token;
+        info.message = ErrorMessages.STRICT_PARAM_NAME;
+      } else if (hasStrictModeReservedWord(newBound)) {
+        info.firstRestricted = token;
+        info.message = ErrorMessages.STRICT_RESERVED_WORD;
+      } else if (firstDuplicate(bound) != null) {
+        info.firstRestricted = token;
+        info.message = ErrorMessages.STRICT_PARAM_DUPE;
+      }
+    }
+  }
 
   parseParams(fr) {
     let info = {params: [], rest: null};
@@ -1755,7 +1887,7 @@ export class Parser extends Tokenizer {
 
       while (!this.eof()) {
         let token = this.lookahead;
-        let startLocation = this.tokenIndex;
+        let startLocation = this.getLocation();
         let param;
         if (this.eat(TokenType.ELLIPSIS)) {
           token = this.lookahead;
@@ -1763,46 +1895,10 @@ export class Parser extends Tokenizer {
           cpLoc(param.identifier, param);
           seenRest = true;
         } else {
-          if (this.match(TokenType.LPAREN)) {
-            throw this.createUnexpected(this.lookahead);
-          }
-          param = this.parseLeftHandSideExpression();
-          if (this.eat(TokenType.ASSIGN)) {
-            param = this.markLocation(new Shift.AssignmentExpression("=", param, this.parseAssignmentExpression()));
-          }
+          param = this.parseParam();
         }
 
-        if (!Parser.isDestructuringAssignmentTargetWithDefault(param)) {
-          throw this.createUnexpected(token);
-        }
-        param = Parser.transformDestructuringAssignment(param);
-
-        let newBound = Parser.boundNames(param);
-        [].push.apply(bound, newBound);
-
-        if (firstDuplicate(newBound) != null) {
-          throw this.createErrorWithLocation(token, ErrorMessages.DUPLICATE_BINDING, firstDuplicate(newBound));
-        }
-        if (this.strict) {
-          if (newBound.some(isRestrictedWord)) {
-            info.stricted = token;
-            info.message = ErrorMessages.STRICT_PARAM_NAME;
-          } else if (firstDuplicate(bound) != null) {
-            info.stricted = token;
-            info.message = ErrorMessages.STRICT_PARAM_DUPE;
-          }
-        } else if (info.firstRestricted == null) {
-          if (newBound.some(isRestrictedWord)) {
-            info.firstRestricted = token;
-            info.message = ErrorMessages.STRICT_PARAM_NAME;
-          } else if (hasStrictModeReservedWord(newBound)) {
-            info.firstRestricted = token;
-            info.message = ErrorMessages.STRICT_RESERVED_WORD;
-          } else if (firstDuplicate(bound) != null) {
-            info.firstRestricted = token;
-            info.message = ErrorMessages.STRICT_PARAM_DUPE;
-          }
-        }
+        this.checkParam(param, token, bound, info);
 
         if (seenRest) {
           info.rest = param;
@@ -1819,6 +1915,4 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.RPAREN);
     return info;
   }
-
-
 }

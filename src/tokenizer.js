@@ -93,11 +93,13 @@ export const TokenType = {
   BREAK: {klass: TokenClass.Keyword, name: "break"},
   CASE: {klass: TokenClass.Keyword, name: "case"},
   CATCH: {klass: TokenClass.Keyword, name: "catch"},
+  CLASS: {klass: TokenClass.Keyword, name: "class"},
   CONTINUE: {klass: TokenClass.Keyword, name: "continue"},
   DEBUGGER: {klass: TokenClass.Keyword, name: "debugger"},
   DEFAULT: {klass: TokenClass.Keyword, name: "default"},
   DO: {klass: TokenClass.Keyword, name: "do"},
   ELSE: {klass: TokenClass.Keyword, name: "else"},
+  EXTENDS: {klass: TokenClass.Keyword, name: "extends"},
   FINALLY: {klass: TokenClass.Keyword, name: "finally"},
   FOR: {klass: TokenClass.Keyword, name: "for"},
   FUNCTION: {klass: TokenClass.Keyword, name: "function"},
@@ -115,6 +117,7 @@ export const TokenType = {
   TRUE: {klass: TokenClass.Keyword, name: "true"},
   FALSE: {klass: TokenClass.Keyword, name: "false"},
   YIELD: {klass: TokenClass.Keyword, name: "yield"},
+  LET: {klass: TokenClass.Keyword, name: "let"},
   NUMBER: {klass: TokenClass.NumericLiteral, name: ""},
   STRING: {klass: TokenClass.StringLiteral, name: ""},
   REGEXP: {klass: TokenClass.RegularExpression, name: ""},
@@ -122,7 +125,6 @@ export const TokenType = {
   FUTURE_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   FUTURE_STRICT_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   CONST: {klass: TokenClass.Keyword, name: "const"},
-  LET: {klass: TokenClass.Keyword, name: "let"},
   ILLEGAL: {klass: TokenClass.Illegal, name: ""}
 };
 
@@ -155,9 +157,6 @@ export class Token {
     this.type = type;
     this.slice = slice;
     this.octal = octal;
-  }
-
-  get value() {
   }
 }
 
@@ -209,10 +208,6 @@ export class NumericLiteralToken extends Token {
     super(TokenType.NUMBER, slice, octal);
     this._value = value;
   }
-
-  get value() {
-    return this._value.toString();
-  }
 }
 
 export class StringLiteralToken extends Token {
@@ -220,19 +215,11 @@ export class StringLiteralToken extends Token {
     super(TokenType.STRING, slice, octal);
     this._value = value;
   }
-
-  get value() {
-    return this._value;
-  }
 }
 
 export class EOFToken extends Token {
   constructor(slice) {
     super(TokenType.EOS, slice, false);
-  }
-
-  get value() {
-    return "";
   }
 }
 
@@ -263,6 +250,16 @@ export default class Tokenizer {
     this.hasLineTerminatorBeforeNext = false;
     this.prevToken = null;
     this.tokenIndex = 0;
+    this.lineStarts = [0];
+  }
+
+  trackBackLineNumber(position) {
+    for (let line = this.lineStarts.length - 1; line > 0; line--) {
+      if ((position >= this.getLineStart(line))) {
+        return line;
+      }
+    }
+    return 0;
   }
 
   createILLEGAL() {
@@ -292,10 +289,7 @@ export default class Tokenizer {
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
       case TokenClass.Punctuator:
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
-      default:
-        break;
     }
-    return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.value);
   }
 
   createError(message, arg) {
@@ -465,7 +459,7 @@ export default class Tokenizer {
             } else if (Tokenizer.cse4(id, "o", "n", "s", "t")) {
               return TokenType.CONST;
             } else if (Tokenizer.cse4(id, "l", "a", "s", "s")) {
-              return TokenType.FUTURE_RESERVED_WORD;
+              return TokenType.CLASS;
             }
             break;
           case "t": // THROW
@@ -507,8 +501,8 @@ export default class Tokenizer {
           case "s":
             if (Tokenizer.cse5(id, "w", "i", "t", "c", "h")) {
               return TokenType.SWITCH;
-            } else if (strict && Tokenizer.cse5(id, "t", "a", "t", "i", "c")) {
-              return TokenType.FUTURE_STRICT_RESERVED_WORD;
+            } else if (Tokenizer.cse5(id, "t", "a", "t", "i", "c")) {
+              return strict ? TokenType.FUTURE_STRICT_RESERVED_WORD : TokenType.IDENTIFIER;
             }
             break;
           case "e":
@@ -544,7 +538,7 @@ export default class Tokenizer {
             break;
           case "e": // extends
             if (Tokenizer.cse6(id, "x", "t", "e", "n", "d", "s")) {
-              return TokenType.FUTURE_RESERVED_WORD;
+              return TokenType.EXTENDS;
             }
             break;
           case "p":

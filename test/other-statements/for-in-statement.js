@@ -60,6 +60,22 @@ suite("Parser", function () {
     );
 
     testEsprimaEquiv("for(a in b);");
-    testEsprimaEquiv("for(a.b in b);");
+
+    // TODO: a should be a BindingIdentifier, not an IdentifierExpression
+    testParse("for(a in b);", stmt,
+      new Shift.ForInStatement(
+        new Shift.IdentifierExpression(new Shift.Identifier("a")),
+        new Shift.IdentifierExpression(new Shift.Identifier("b")),
+        new Shift.EmptyStatement
+      )
+    );
+
+    testParse("for(a.b in c);", stmt,
+      new Shift.ForInStatement(
+        new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "b"),
+        new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        new Shift.EmptyStatement
+      )
+    );
   });
 });

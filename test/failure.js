@@ -125,18 +125,18 @@ suite("Parser", function () {
     testParseFailure("({ set: s() { } })", "Unexpected token {");
     testParseFailure("({ set: s(a, b) { } })", "Unexpected token {");
     testParseFailure("({ get: g(d) { } })", "Unexpected token {");
-    testParseFailure("({ get i() { }, i: 42 })",
-        "Object literal may not have data and accessor property with the same name");
-    testParseFailure("({ i: 42, get i() { } })",
-        "Object literal may not have data and accessor property with the same name");
-    testParseFailure("({ set i(x) { }, i: 42 })",
-        "Object literal may not have data and accessor property with the same name");
-    testParseFailure("({ i: 42, set i(x) { } })",
-        "Object literal may not have data and accessor property with the same name");
-    testParseFailure("({ get i() { }, get i() { } })",
-        "Object literal may not have multiple get/set accessors with the same name");
-    testParseFailure("({ set i(x) { }, set i(x) { } })",
-        "Object literal may not have multiple get/set accessors with the same name");
+    // testParseFailure("({ get i() { }, i: 42 })",
+    //     "Object literal may not have data and accessor property with the same name");
+    // testParseFailure("({ i: 42, get i() { } })",
+    //     "Object literal may not have data and accessor property with the same name");
+    // testParseFailure("({ set i(x) { }, i: 42 })",
+    //     "Object literal may not have data and accessor property with the same name");
+    // testParseFailure("({ i: 42, set i(x) { } })",
+    //     "Object literal may not have data and accessor property with the same name");
+    // testParseFailure("({ get i() { }, get i() { } })",
+    //     "Object literal may not have multiple get/set accessors with the same name");
+    // testParseFailure("({ set i(x) { }, set i(x) { } })",
+    //     "Object literal may not have multiple get/set accessors with the same name");
     // TODO: ES6:
     // testParseFailure("((a)) => 42", "Unexpected token =>");
     // testParseFailure("(a, (b)) => 42", "Unexpected token =>");
@@ -170,7 +170,7 @@ suite("Parser", function () {
     testParseFailure("a b;", "Unexpected identifier");
     testParseFailure("if.a;", "Unexpected token .");
     testParseFailure("a if;", "Unexpected token if");
-    testParseFailure("a class;", "Unexpected reserved word");
+    testParseFailure("a class;", "Unexpected token class");
     testParseFailure("break\n", "Illegal break statement");
     testParseFailure("break 1;", "Unexpected number");
     testParseFailure("continue\n", "Illegal continue statement");
@@ -355,6 +355,7 @@ suite("Parser", function () {
     testParseFailure("#=", "Unexpected token ILLEGAL");
     testParseFailure("**", "Unexpected token *");
     testParseFailure("({a = 0})", "Unexpected token )");
+    testParseFailure("1 / %", "Unexpected token %");
     //testParseFailure("({a(b,c){let b;}})", "Duplicate parameter binding in method definition");
     //testParseFailure("({a(b,c){let d; let b;}})", "Duplicate parameter binding in method definition");
     //testParseFailure("({a(b,c){let d,e,b;}})", "Duplicate parameter binding in method definition");

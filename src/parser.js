@@ -1254,7 +1254,11 @@ export class Parser extends Tokenizer {
 
   parseNonComputedMember() {
     this.expect(TokenType.PERIOD);
-    return this.parseNonComputedProperty();
+    if (!this.lookahead.type.klass.isIdentifierName) {
+      throw this.createUnexpected(this.lookahead);
+    } else {
+      return this.lex().value;
+    }
   }
 
   parseComputedMember() {
@@ -1388,16 +1392,6 @@ export class Parser extends Tokenizer {
   }
 
   // 11.2 Left-Hand-Side Expressions;
-
-  parseNonComputedProperty() {
-    let startLocation = this.getLocation();
-
-    if (!this.lookahead.type.klass.isIdentifierName) {
-      throw this.createUnexpected(this.lookahead);
-    } else {
-      return this.markLocation(new Shift.Identifier(this.lex().value), startLocation);
-    }
-  }
 
   ensureArrow() {
     if (this.hasLineTerminatorBeforeNext) {

@@ -14,16 +14,37 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var Shift = require("shift-ast");
+
+var expr = require("../helpers").expr;
+var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("static member expression", function () {
-    testEsprimaEquiv("universe.milkyway");
-    testEsprimaEquiv("universe.milkyway.solarsystem");
-    testEsprimaEquiv("universe.milkyway.solarsystem.Earth");
-    testEsprimaEquiv("universe.if");
-    testEsprimaEquiv("universe.true");
-    testEsprimaEquiv("universe.false");
-    testEsprimaEquiv("universe.null");
+    testParse("a.b", expr,
+      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "b")
+    );
+    testParse("a.b.c", expr,
+      new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("a")), "b"), "c"
+      )
+    );
+    testParse("a.$._.B0", expr,
+      new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("a")), "$"), "_"), "B0"
+      )
+    );
+    testParse("a.if", expr,
+      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "if")
+    );
+    testParse("a.true", expr,
+      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "true")
+    );
+    testParse("a.false", expr,
+      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "false")
+    );
+    testParse("a.null", expr,
+      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "null")
+    );
   });
 });

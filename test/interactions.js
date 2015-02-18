@@ -25,21 +25,113 @@ var testParse = require('./assertions').testParse;
 suite("Parser", function () {
   suite("interactions", function () {
     // LiteralNumericExpression and StaticMemberExpression
-    testEsprimaEquiv("0..toString");
-    testEsprimaEquiv("01.toString");
+
+    testParse("0..toString", expr,
+      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(0), "toString")
+    );
+
+    testParse("01.toString", expr,
+      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(1), "toString")
+    );
+
     testParseFailure("0.toString", "Unexpected token ILLEGAL");
 
     // LeftHandSideExpressions
-    testEsprimaEquiv("a.b(b,c)");
+
+    testParse("a.b(b, c)", expr,
+      new Shift.CallExpression(
+        new Shift.StaticMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          "b"
+        ),
+        [
+          new Shift.IdentifierExpression(new Shift.Identifier("b")),
+          new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        ]
+      )
+    );
+
     testEsprimaEquiv("a[b](b,c)");
-    testEsprimaEquiv("new foo().bar()");
+
+    testParse("new foo().bar()", expr,
+      new Shift.CallExpression(
+        new Shift.StaticMemberExpression(
+          new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("foo")), []),
+          "bar"
+        ),
+        []
+      )
+    );
+
     testEsprimaEquiv("new foo[bar]");
-    testEsprimaEquiv("new foo.bar()");
-    testEsprimaEquiv("( new foo).bar()");
-    testEsprimaEquiv("universe[42].galaxies");
-    testEsprimaEquiv("universe(42).galaxies");
-    testEsprimaEquiv("universe(42).galaxies(14, 3, 77).milkyway");
-    testEsprimaEquiv("earth.asia.Indonesia.prepareForElection(2014)");
+
+    testParse("new foo.bar()", expr,
+      new Shift.NewExpression(
+        new Shift.StaticMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("foo")),
+          "bar"
+        ),
+        []
+      )
+    );
+
+    testParse("(new foo).bar()", expr,
+      new Shift.CallExpression(
+        new Shift.StaticMemberExpression(
+          new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("foo")), []),
+          "bar"
+        ),
+        []
+      )
+    );
+
+    testParse("a[42].b", expr,
+      new Shift.StaticMemberExpression(
+        new Shift.ComputedMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          new Shift.LiteralNumericExpression(42)
+        ),
+        "b"
+      )
+    );
+
+    testParse("a(42).b", expr,
+      new Shift.StaticMemberExpression(
+        new Shift.CallExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          [new Shift.LiteralNumericExpression(42)]
+        ),
+        "b"
+      )
+    );
+
+    testParse("a(42).b(14, 3, 77).c", expr,
+      new Shift.StaticMemberExpression(
+        new Shift.CallExpression(
+          new Shift.StaticMemberExpression(
+            new Shift.CallExpression(
+              new Shift.IdentifierExpression(new Shift.Identifier("a")),
+              [new Shift.LiteralNumericExpression(42)]
+            ),
+            "b"
+          ),
+          [
+            new Shift.LiteralNumericExpression(14),
+            new Shift.LiteralNumericExpression(3),
+            new Shift.LiteralNumericExpression(77),
+          ]
+        ),
+        "c"
+      )
+    );
+
+    testParse("a.b.c(2014)", expr,
+      new Shift.CallExpression(
+        new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("a")), "b"), "c"),
+        [new Shift.LiteralNumericExpression(2014)]
+      )
+    );
 
     // BinaryExpressions
     testEsprimaEquiv("a || b && c | d ^ e & f == g < h >>> i + j * k");
@@ -90,7 +182,7 @@ suite("Parser", function () {
               new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("version")), new Shift.LiteralNumericExpression(1)),
             ])),
           ])),
-          new Shift.Identifier("call")
+          "call"
         ), [new Shift.ThisExpression]
       )
     );
@@ -102,7 +194,7 @@ suite("Parser", function () {
               new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("version")), new Shift.LiteralNumericExpression(1)),
             ])),
           ])),
-          new Shift.Identifier("call")
+          "call"
         ), [new Shift.ThisExpression]
       )
     );

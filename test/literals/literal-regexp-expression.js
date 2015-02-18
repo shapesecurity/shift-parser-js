@@ -36,7 +36,7 @@ suite("Parser", function () {
     testParse("/foo\\/bar/", expr, new Shift.LiteralRegExpExpression("foo/bar", ""));
     testParse("/=([^=\\s])+/g", expr, new Shift.LiteralRegExpExpression("=([^=\\s])+", "g"));
     testParse("/42/g.test", expr,
-      new Shift.StaticMemberExpression(new Shift.LiteralRegExpExpression("42", "g"), new Shift.Identifier("test"))
+      new Shift.StaticMemberExpression(new Shift.LiteralRegExpExpression("42", "g"), "test")
     );
   });
 });

@@ -124,6 +124,18 @@ suite("Parser", function () {
       new Shift.LiteralNumericExpression(0)
     ));
 
+    testParse("(x)=>{'use strict';}", expr, new Shift.ArrowExpression([
+        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+      ], null,
+      new Shift.FunctionBody([new Shift.Directive('use strict')], [])
+    ));
+
+    testParse("'use strict';(x)=>0", expr, new Shift.ArrowExpression([
+        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+      ], null,
+      new Shift.LiteralNumericExpression(0)
+    ));
+
     testParseFailure("[]=>0", "Unexpected token =>");
     testParseFailure("() + 1", "Unexpected token +");
     testParseFailure("1 + ()", "Unexpected end of input");

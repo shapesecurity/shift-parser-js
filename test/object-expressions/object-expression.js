@@ -19,6 +19,7 @@ var Shift = require("shift-ast");
 var expr = require("../helpers").expr;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("object expression", function () {
@@ -114,57 +115,72 @@ suite("Parser", function () {
 
     testParse("({ set width(w) { w } })", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("width"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
-        ])),
+        new Shift.Setter(
+          new Shift.StaticPropertyName("width"),
+          new Shift.BindingIdentifier(new Shift.Identifier("w")),
+          new Shift.FunctionBody([], [
+            new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+          ])),
       ])
     );
 
     testParse("({ set if(w) { w } })", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("if"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
-        ])),
+        new Shift.Setter(new Shift.StaticPropertyName("if"),
+          new Shift.BindingIdentifier(new Shift.Identifier("w")),
+          new Shift.FunctionBody([], [
+            new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+          ])),
       ])
     );
 
     testParse("({ set true(w) { w } })", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("true"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
-        ])),
+        new Shift.Setter(new Shift.StaticPropertyName("true"),
+          new Shift.BindingIdentifier(new Shift.Identifier("w")),
+          new Shift.FunctionBody([], [
+            new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+          ])),
       ])
     );
 
     testParse("({ set false(w) { w } })", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("false"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
-        ])),
+        new Shift.Setter(new Shift.StaticPropertyName("false"),
+          new Shift.BindingIdentifier(new Shift.Identifier("w")),
+          new Shift.FunctionBody([], [
+            new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+          ])),
       ])
     );
 
     testParse("({ set null(w) { w } })", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
-        ])),
+        new Shift.Setter(new Shift.StaticPropertyName("null"),
+          new Shift.BindingIdentifier(new Shift.Identifier("w")),
+          new Shift.FunctionBody([], [
+            new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+          ])),
       ])
     );
 
     testParse("({ set \"null\"(w) { w } })", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("null"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
-        ])),
+        new Shift.Setter(new Shift.StaticPropertyName("null"),
+          new Shift.BindingIdentifier(new Shift.Identifier("w")),
+          new Shift.FunctionBody([], [
+            new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+          ])),
       ])
     );
 
     testParse("({ set 10(w) { w } })", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("10"), new Shift.Identifier("w"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
-        ])),
+        new Shift.Setter(new Shift.StaticPropertyName("10"),
+          new Shift.BindingIdentifier(new Shift.Identifier("w")),
+          new Shift.FunctionBody([], [
+            new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("w"))),
+          ])),
       ])
     );
 
@@ -194,9 +210,11 @@ suite("Parser", function () {
         new Shift.Getter(new Shift.StaticPropertyName("width"), new Shift.FunctionBody([], [
           new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("width"))),
         ])),
-        new Shift.Setter(new Shift.StaticPropertyName("width"), new Shift.Identifier("width"), new Shift.FunctionBody([], [
-          new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("width"))),
-        ])),
+        new Shift.Setter(new Shift.StaticPropertyName("width"),
+          new Shift.BindingIdentifier(new Shift.Identifier("width")),
+          new Shift.FunctionBody([], [
+            new Shift.ReturnStatement(new Shift.IdentifierExpression(new Shift.Identifier("width"))),
+          ])),
       ])
     );
 
@@ -204,7 +222,9 @@ suite("Parser", function () {
       new Shift.ObjectExpression([
         new Shift.DataProperty(new Shift.StaticPropertyName("a"), new Shift.LiteralNumericExpression(0)),
         new Shift.Getter(new Shift.StaticPropertyName("b"), new Shift.FunctionBody([], [])),
-        new Shift.Setter(new Shift.StaticPropertyName("3"), new Shift.Identifier("d"), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.StaticPropertyName("3"),
+          new Shift.BindingIdentifier(new Shift.Identifier("d")),
+          new Shift.FunctionBody([], [])),
       ])
     );
 
@@ -256,7 +276,7 @@ suite("Parser", function () {
             [new Shift.VariableDeclarationStatement(
               new Shift.VariableDeclaration(
                 "let",
-                [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")),null)]
+                [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)]
               )
             )]
           )
@@ -325,5 +345,15 @@ suite("Parser", function () {
         )
       ])
     );
+
+    testParseFailure("({set a(eval){'use strict';}})", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("({set a([eval]){'use strict';}})", "Parameter name eval or arguments is not allowed in strict mode");
+    testParse("({set a(eval){}})", expr, new Shift.ObjectExpression([
+      new Shift.Setter(
+        new Shift.StaticPropertyName("a"),
+        new Shift.BindingIdentifier(new Shift.Identifier("eval")),
+        new Shift.FunctionBody([], [])
+      )
+    ]));
   });
 });

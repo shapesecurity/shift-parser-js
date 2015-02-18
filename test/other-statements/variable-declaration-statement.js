@@ -65,12 +65,11 @@ suite("Parser", function () {
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("package")), null),
       ]))
     );
-    testParse("var private, protected, public, static", stmt,
+    testParse("var private, protected, public", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("private")), null),
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("protected")), null),
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("public")), null),
-        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("static")), null),
       ]))
     );
     testParse("var yield;", stmt,
@@ -128,12 +127,17 @@ suite("Parser", function () {
         ])),
       ]))
     );
-
+    testParse("var static;", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("static")), null),
+      ]))
+    );
     // FIXME(bzhang): testParseFailure("var a[0]=0;", "Unexpected token 'a'");
     // FIXME(bzhang): testParseFailure("var (a)=0;", "Unexpected token '('");
     testParseFailure("var new A = 0;", "Unexpected token new");
     testParseFailure("var (x)", "Unexpected token (");
     testParseFailure("var this", "Unexpected token this");
     testParseFailure("var a.b;", "Unexpected identifier");
+    testParseFailure("'use strict'; var enum;", "Unexpected reserved word");
   });
 });

@@ -261,7 +261,7 @@ export class Parser extends Tokenizer {
         return this.markLocation(this.parseWithStatement(), startLocation);
       default:
       {
-        let expr = this.parseExpression().expr;
+        let expr = this.parseExpression();
 
         // 12.12 Labelled Statements;
         if (expr.type === "IdentifierExpression" && this.match(TokenType.COLON)) {
@@ -305,7 +305,7 @@ export class Parser extends Tokenizer {
   }
 
   parseExpressionStatement() {
-    let {expr} = this.parseExpression();
+    let expr = this.parseExpression();
     this.consumeSemicolon();
     return new Shift.ExpressionStatement(expr);
   }
@@ -409,11 +409,31 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.WHILE);
     this.expect(TokenType.LPAREN);
-    let test = this.parseExpression().expr;
+    let test = this.parseExpression();
     this.expect(TokenType.RPAREN);
     this.consumeSemicolon();
 
     return new Shift.DoWhileStatement(body, test);
+  }
+
+  static isLeftHandSide(expr) {
+    switch (expr.type) {
+      case "CallExpression":
+      case "NewExpression":
+      case "StaticMemberExpression":
+      case "ComputedMemberExpression":
+      case "ArrayExpression":
+      case "FunctionExpression":
+      case "IdentifierExpression":
+      case "LiteralBooleanExpression":
+      case "LiteralStringExpression":
+      case "LiteralNullExpression":
+      case "LiteralRegExpExpression":
+      case "ObjectExpression":
+      case "ThisExpression":
+        return true;
+    }
+    return false;
   }
 
   parseForStatement() {
@@ -424,11 +444,11 @@ export class Parser extends Tokenizer {
     if (this.match(TokenType.SEMICOLON)) {
       this.lex();
       if (!this.match(TokenType.SEMICOLON)) {
-        test = this.parseExpression().expr;
+        test = this.parseExpression();
       }
       this.expect(TokenType.SEMICOLON);
       if (!this.match(TokenType.RPAREN)) {
-        right = this.parseExpression().expr;
+        right = this.parseExpression();
       }
       return new Shift.ForStatement(
           null,
@@ -445,43 +465,43 @@ export class Parser extends Tokenizer {
 
         if (initDecl.declarators.length === 1 && this.match(TokenType.IN)) {
           this.lex();
-          right = this.parseExpression().expr;
+          right = this.parseExpression();
           return new Shift.ForInStatement(initDecl, right, this.getIteratorStatementEpilogue());
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
-            test = this.parseExpression().expr;
+            test = this.parseExpression();
           }
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.RPAREN)) {
-            right = this.parseExpression().expr;
+            right = this.parseExpression();
           }
           return new Shift.ForStatement(initDecl, test, right, this.getIteratorStatementEpilogue());
         }
       } else {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
-        let {expr, isLeftHandSide} = this.parseExpression();
+        let init = this.parseExpression();
         this.allowIn = previousAllowIn;
 
         if (this.match(TokenType.IN)) {
-          if (!isLeftHandSide) {
+          if (!Parser.isLeftHandSide(init)) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
           }
 
           this.lex();
-          right = this.parseExpression().expr;
-          return new Shift.ForInStatement(expr, right, this.getIteratorStatementEpilogue());
+          right = this.parseExpression();
+          return new Shift.ForInStatement(init, right, this.getIteratorStatementEpilogue());
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
-            test = this.parseExpression().expr;
+            test = this.parseExpression();
           }
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.RPAREN)) {
-            right = this.parseExpression().expr;
+            right = this.parseExpression();
           }
-          return new Shift.ForStatement(expr, test, right, this.getIteratorStatementEpilogue());
+          return new Shift.ForStatement(init, test, right, this.getIteratorStatementEpilogue());
         }
       }
     }
@@ -499,7 +519,7 @@ export class Parser extends Tokenizer {
   parseIfStatement() {
     this.expect(TokenType.IF);
     this.expect(TokenType.LPAREN);
-    let test = this.parseExpression().expr;
+    let test = this.parseExpression();
 
     this.expect(TokenType.RPAREN);
     let consequent = this.parseStatement();
@@ -525,7 +545,7 @@ export class Parser extends Tokenizer {
 
     if (!this.match(TokenType.SEMICOLON)) {
       if (!this.match(TokenType.RBRACE) && !this.eof()) {
-        argument = this.parseExpression().expr;
+        argument = this.parseExpression();
       }
     }
 
@@ -540,7 +560,7 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.WITH);
     this.expect(TokenType.LPAREN);
-    let object = this.parseExpression().expr;
+    let object = this.parseExpression();
     this.expect(TokenType.RPAREN);
     let body = this.parseStatement();
 
@@ -550,7 +570,7 @@ export class Parser extends Tokenizer {
   parseSwitchStatement() {
     this.expect(TokenType.SWITCH);
     this.expect(TokenType.LPAREN);
-    let discriminant = this.parseExpression().expr;
+    let discriminant = this.parseExpression();
     this.expect(TokenType.RPAREN);
     this.expect(TokenType.LBRACE);
 
@@ -590,7 +610,7 @@ export class Parser extends Tokenizer {
   parseSwitchCase() {
     let startLocation = this.getLocation();
     this.expect(TokenType.CASE);
-    return this.markLocation(new Shift.SwitchCase(this.parseExpression().expr, this.parseSwitchCaseBody()), startLocation);
+    return this.markLocation(new Shift.SwitchCase(this.parseExpression(), this.parseSwitchCaseBody()), startLocation);
   }
 
   parseSwitchDefault() {
@@ -620,7 +640,7 @@ export class Parser extends Tokenizer {
       throw this.createErrorWithLocation(token, ErrorMessages.NEWLINE_AFTER_THROW);
     }
 
-    let argument = this.parseExpression().expr;
+    let argument = this.parseExpression();
 
     this.consumeSemicolon();
 
@@ -659,7 +679,7 @@ export class Parser extends Tokenizer {
   parseWhileStatement() {
     this.expect(TokenType.WHILE);
     this.expect(TokenType.LPAREN);
-    return new Shift.WhileStatement(this.parseExpression().expr, this.getIteratorStatementEpilogue());
+    return new Shift.WhileStatement(this.parseExpression(), this.getIteratorStatementEpilogue());
   }
 
   parseCatchClause() {
@@ -731,10 +751,10 @@ export class Parser extends Tokenizer {
     let init = null;
     if (kind == "const") {
       this.expect(TokenType.ASSIGN);
-      init = this.parseAssignmentExpression().expr;
+      init = this.parseAssignmentExpression();
     } else if (this.match(TokenType.ASSIGN)) {
       this.lex();
-      init = this.parseAssignmentExpression().expr;
+      init = this.parseAssignmentExpression();
     }
     return this.markLocation(new Shift.VariableDeclarator(id, init), startLocation);
   }
@@ -742,27 +762,27 @@ export class Parser extends Tokenizer {
   parseExpression() {
     let startLocation = this.getLocation();
 
-    let {expr, isLeftHandSide} = this.parseAssignmentExpression();
+    let expr = this.parseAssignmentExpression();
 
     if (this.match(TokenType.COMMA)) {
-      isLeftHandSide = false;
       while (!this.eof()) {
         if (!this.match(TokenType.COMMA)) {
           break;
         }
         this.lex();
-        expr = this.markLocation(new Shift.BinaryExpression(",", expr, this.parseAssignmentExpression().expr),
+        expr = this.markLocation(new Shift.BinaryExpression(",", expr, this.parseAssignmentExpression()),
             startLocation);
       }
     }
-    return {expr, isLeftHandSide};
+    return expr;
   }
 
   parseAssignmentExpression() {
     let token = this.lookahead;
     let startLocation = this.getLocation();
 
-    let {expr, isLeftHandSide} = this.parseConditionalExpression();
+    let isParenthesised = token.type === TokenType.LPAREN;
+    let node = this.parseConditionalExpression();
 
     let isOperator = false;
     let operator = this.lookahead;
@@ -784,41 +804,39 @@ export class Parser extends Tokenizer {
     }
 
     if (isOperator) {
-      if (!isLeftHandSide) {
+      if (!isParenthesised && !Parser.isLeftHandSide(node)) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
 
       // 11.13.1;
-      if (expr.type === "IdentifierExpression") {
-        if (this.strict && isRestrictedWord(expr.identifier.name)) {
+      if (node.type === "IdentifierExpression") {
+        if (this.strict && isRestrictedWord(node.identifier.name)) {
           throw this.createErrorWithLocation(token, ErrorMessages.STRICT_LHS_ASSIGNMENT);
         }
       }
 
       this.lex();
-      let right = this.parseAssignmentExpression().expr;
-      expr = this.markLocation(new Shift.AssignmentExpression(operator.type.name, expr, right), startLocation);
-      isLeftHandSide = false;
+      let right = this.parseAssignmentExpression();
+      return this.markLocation(new Shift.AssignmentExpression(operator.type.name, node, right), startLocation);
     }
-    return {expr, isLeftHandSide};
+    return node;
   }
 
   parseConditionalExpression() {
     let startLocation = this.getLocation();
-    let {expr, isLeftHandSide} = this.parseBinaryExpression();
+    let expr = this.parseBinaryExpression();
     if (this.match(TokenType.CONDITIONAL)) {
       this.lex();
       let previousAllowIn = this.allowIn;
       this.allowIn = true;
-      let consequent = this.parseAssignmentExpression().expr;
+      let consequent = this.parseAssignmentExpression();
       this.allowIn = previousAllowIn;
       this.expect(TokenType.COLON);
-      let alternate = this.parseAssignmentExpression().expr;
-      expr = this.markLocation(new Shift.ConditionalExpression(expr, consequent, alternate), startLocation);
-      isLeftHandSide = false;
+      let alternate = this.parseAssignmentExpression();
+      return this.markLocation(new Shift.ConditionalExpression(expr, consequent, alternate), startLocation);
     }
 
-    return {expr, isLeftHandSide};
+    return expr;
   }
 
   isBinaryOperator(type) {
@@ -855,19 +873,19 @@ export class Parser extends Tokenizer {
 
   parseBinaryExpression() {
     let location = this.getLocation();
-    let {expr: left, isLeftHandSide} = this.parseUnaryExpression();
+    let left = this.parseUnaryExpression();
     let operator = this.lookahead.type;
 
     let isBinaryOperator = this.isBinaryOperator(operator);
     if (!isBinaryOperator) {
-      return {expr: left, isLeftHandSide};
+      return left;
     }
 
     this.lex();
     let stack = [];
     stack.push({location, left, operator, precedence: BinaryPrecedence[operator.name]});
     location = this.getLocation();
-    let right = this.parseUnaryExpression().expr;
+    let right = this.parseUnaryExpression();
 
     operator = this.lookahead.type;
     isBinaryOperator = this.isBinaryOperator(this.lookahead.type);
@@ -887,18 +905,16 @@ export class Parser extends Tokenizer {
       this.lex();
       stack.push({location, left: right, operator, precedence});
       location = this.getLocation();
-      right = this.parseUnaryExpression().expr;
+      right = this.parseUnaryExpression();
 
       operator = this.lookahead.type;
       isBinaryOperator = this.isBinaryOperator(operator);
     }
 
     // Final reduce to clean-up the stack.
-    return {expr: stack.reduceRight(
-      (expr, stackItem) => this.markLocation(
-        new Shift.BinaryExpression(stackItem.operator.name, stackItem.left, expr),
-        stackItem.location),
-      right), isLeftHandSide: false};
+    return stack.reduceRight((expr, stackItem) =>
+      this.markLocation(new Shift.BinaryExpression(stackItem.operator.name, stackItem.left, expr), stackItem.location),
+      right);
   }
 
   static isPrefixOperator(type) {
@@ -927,7 +943,7 @@ export class Parser extends Tokenizer {
       return this.parsePostfixExpression();
     }
     this.lex();
-    let expr = this.parseUnaryExpression().expr;
+    let expr = this.parseUnaryExpression();
     switch (operator.type) {
       case TokenType.INC:
       case TokenType.DEC:
@@ -936,6 +952,10 @@ export class Parser extends Tokenizer {
           if (this.strict && isRestrictedWord(expr.identifier.name)) {
             throw this.createError(ErrorMessages.STRICT_LHS_PREFIX);
           }
+        }
+
+        if (!Parser.isLeftHandSide(expr)) {
+          throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
         }
         break;
       case TokenType.DELETE:
@@ -947,8 +967,7 @@ export class Parser extends Tokenizer {
         break;
     }
 
-    expr = this.markLocation(new Shift.PrefixExpression(operator.type.name, expr), startLocation);
-    return {expr, isLeftHandSide: false};
+    return this.markLocation(new Shift.PrefixExpression(operator.value, expr), startLocation);
   }
 
   parsePostfixExpression() {
@@ -957,12 +976,12 @@ export class Parser extends Tokenizer {
     let expr = this.parseLeftHandSideExpressionAllowCall();
 
     if (this.hasLineTerminatorBeforeNext) {
-      return {expr, isLeftHandSide: true};
+      return expr;
     }
 
     let operator = this.lookahead;
     if ((operator.type !== TokenType.INC) && (operator.type !== TokenType.DEC)) {
-      return {expr, isLeftHandSide: true};
+      return expr;
     }
     this.lex();
     // 11.3.1, 11.3.2;
@@ -971,8 +990,10 @@ export class Parser extends Tokenizer {
         throw this.createError(ErrorMessages.STRICT_LHS_POSTFIX);
       }
     }
-    expr = this.markLocation(new Shift.PostfixExpression(expr, operator.type.name), startLocation);
-    return {expr, isLeftHandSide: false};
+    if (!Parser.isLeftHandSide(expr)) {
+      throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+    }
+    return this.markLocation(new Shift.PostfixExpression(expr, operator.value), startLocation);
   }
 
   parseLeftHandSideExpressionAllowCall() {
@@ -1020,7 +1041,7 @@ export class Parser extends Tokenizer {
 
   parseComputedMember() {
     this.expect(TokenType.LBRACK);
-    let {expr} = this.parseExpression();
+    let expr = this.parseExpression();
     this.expect(TokenType.RBRACK);
     return expr;
   }
@@ -1098,9 +1119,9 @@ export class Parser extends Tokenizer {
       throw this.createErrorWithLocation(this.lookahead, ErrorMessages.STRICT_OCTAL_LITERAL);
     }
     let token2 = this.lex();
-    let node = token2.value === 1/0
+    let node = token2._value === 1/0
       ? new Shift.LiteralInfinityExpression
-      : new Shift.LiteralNumericExpression(token2.value);
+      : new Shift.LiteralNumericExpression(token2._value);
     return this.markLocation(node, startLocation);
   }
 
@@ -1110,7 +1131,7 @@ export class Parser extends Tokenizer {
       throw this.createErrorWithLocation(this.lookahead, ErrorMessages.STRICT_OCTAL_LITERAL);
     }
     let token2 = this.lex();
-    return this.markLocation(new Shift.LiteralStringExpression(token2.value, token2.slice.text),
+    return this.markLocation(new Shift.LiteralStringExpression(token2._value, token2.slice.text),
         startLocation);
   }
 
@@ -1132,8 +1153,8 @@ export class Parser extends Tokenizer {
       if (this.match(TokenType.RPAREN) || this.eof()) {
         return result;
       }
-      let {expr} = this.parseAssignmentExpression();
-      result.push(expr);
+      let arg = this.parseAssignmentExpression();
+      result.push(arg);
       if (!this.eat(TokenType.COMMA)) {
         break;
       }
@@ -1157,7 +1178,7 @@ export class Parser extends Tokenizer {
 
   parseGroupExpression() {
     this.expect(TokenType.LPAREN);
-    let {expr} = this.parseExpression();
+    let expr = this.parseExpression();
     this.expect(TokenType.RPAREN);
     return expr;
   }
@@ -1187,7 +1208,7 @@ export class Parser extends Tokenizer {
         this.lex();
         el = null;
       } else {
-        el = this.parseAssignmentExpression().expr;
+        el = this.parseAssignmentExpression();
         if (!this.match(TokenType.RBRACK)) {
           this.expect(TokenType.COMMA);
         }
@@ -1314,7 +1335,7 @@ export class Parser extends Tokenizer {
       }
 
       this.expect(TokenType.COLON);
-      let value = this.parseAssignmentExpression().expr;
+      let value = this.parseAssignmentExpression();
       return this.markLocation(new Shift.DataProperty(key, value), startLocation);
     }
     if (this.eof() || token.type.klass == TokenClass.Punctuator) {
@@ -1322,12 +1343,12 @@ export class Parser extends Tokenizer {
     } else {
       let key = this.parseObjectPropertyKey();
       this.expect(TokenType.COLON);
-      let value = this.parseAssignmentExpression().expr;
+      let value = this.parseAssignmentExpression();
       return this.markLocation(new Shift.DataProperty(key, value), startLocation);
     }
   }
 
-  parseFunction(isExpr) {
+  parseFunction(isExpression) {
     let startLocation = this.getLocation();
 
     this.expect(TokenType.FUNCTION);
@@ -1335,7 +1356,7 @@ export class Parser extends Tokenizer {
     let id = null;
     let message = null;
     let firstRestricted = null;
-    if (!isExpr || !this.match(TokenType.LPAREN)) {
+    if (!isExpression || !this.match(TokenType.LPAREN)) {
       let token = this.lookahead;
       id = this.parseVariableIdentifier();
       if (this.strict) {
@@ -1369,7 +1390,7 @@ export class Parser extends Tokenizer {
       }
     }
     this.strict = previousStrict;
-    return this.markLocation(new (isExpr ? Shift.FunctionExpression : Shift.FunctionDeclaration)(id, info.params, body),
+    return this.markLocation(new (isExpression ? Shift.FunctionExpression : Shift.FunctionDeclaration)(id, info.params, body),
         startLocation);
   }
 

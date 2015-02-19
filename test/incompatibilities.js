@@ -107,30 +107,5 @@ suite("Parser", function () {
       )
     );
 
-    // ES5: requires do-while statement to end with semicolon
-    // ES6: allows do-while statement with an optional trailing semicolon
-    testParse("do ; while (true)", stmt,
-      new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(true)));
-    testParseFailure("{do ; while(false) false}", "Unexpected token false");
-    testParse("{do ; while(false); false}", stmt, 
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(false)),
-        new Shift.ExpressionStatement(new Shift.LiteralBooleanExpression(false))
-      ]))
-    );
-
-    // ES5: recognizes `(a+b)` to be a proper left hans side.
-    testParse("for((a+b)in c);", stmt,
-      new Shift.ForInStatement(
-        new Shift.BinaryExpression(
-          "+",
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          new Shift.IdentifierExpression(new Shift.Identifier("b"))
-        ),
-        new Shift.IdentifierExpression(new Shift.Identifier("c")),
-        new Shift.EmptyStatement()
-      )
-    );
-
   });
 });

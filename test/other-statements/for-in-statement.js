@@ -34,34 +34,16 @@ suite("Parser", function () {
           new Shift.VariableDeclarator(
             new Shift.Identifier("i"),
             new Shift.FunctionExpression(null, [], new Shift.FunctionBody([], [
-              new Shift.ReturnStatement(
-                new Shift.BinaryExpression("in", new Shift.LiteralNumericExpression(10), new Shift.ArrayExpression([])))
+              new Shift.ReturnStatement(new Shift.BinaryExpression("in", new Shift.LiteralNumericExpression(10), new Shift.ArrayExpression([])))
             ]))
           )
         ]),
         new Shift.IdentifierExpression(new Shift.Identifier("list")),
         new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("process")),
-          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+          new Shift.IdentifierExpression(new Shift.Identifier("process")), [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
         ))
-      ));
-    testParse("for ((1 + 2) in x);", stmt,
-      new Shift.ForInStatement(
-        new Shift.BinaryExpression("+",
-          new Shift.LiteralNumericExpression(1),
-          new Shift.LiteralNumericExpression(2)
-        ),
-        new Shift.IdentifierExpression(new Shift.Identifier("x")),
-        new Shift.EmptyStatement()
-      ));
-    testParse("for ((++a) in x);", stmt,
-      new Shift.ForInStatement(
-        new Shift.PrefixExpression("++",
-          new Shift.IdentifierExpression(new Shift.Identifier("a"))
-        ),
-        new Shift.IdentifierExpression(new Shift.Identifier("x")),
-        new Shift.EmptyStatement()
-      ));
+      )
+    );
     testEsprimaEquiv("for(var a in b);");
     testEsprimaEquiv("for(var a = c in b);");
     testEsprimaEquiv("for(a in b);");

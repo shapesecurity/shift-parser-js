@@ -154,18 +154,12 @@ export class Token {
     this.slice = slice;
     this.octal = octal;
   }
-
-  get value() {
-  }
 }
 
 export class IdentifierLikeToken extends Token {
   constructor(type, slice) {
     super(type, slice, false);
-  }
-
-  get value() {
-    return this.slice.text;
+    this.value = this.slice.text;
   }
 }
 
@@ -203,52 +197,32 @@ export class PunctuatorToken extends Token {
   constructor(type, slice) {
     super(type, slice, false);
   }
-
-  get value() {
-    return this.type.name;
-  }
 }
 
 export class RegularExpressionLiteralToken extends Token {
   constructor(slice, value) {
     super(TokenType.REGEXP, slice, false);
-    this._value = value;
-  }
-
-  get value() {
-    return this._value;
+    this.value = value;
   }
 }
 
 export class NumericLiteralToken extends Token {
   constructor(slice, value = +slice.text, octal = false) {
     super(TokenType.NUMBER, slice, octal);
-    this._value = value;
-  }
-
-  get value() {
-    return this._value.toString();
+    this.value = value;
   }
 }
 
 export class StringLiteralToken extends Token {
   constructor(slice, value, octal) {
     super(TokenType.STRING, slice, octal);
-    this._value = value;
-  }
-
-  get value() {
-    return this._value;
+    this.value = value;
   }
 }
 
 export class EOFToken extends Token {
   constructor(slice) {
     super(TokenType.EOS, slice, false);
-  }
-
-  get value() {
-    return "";
   }
 }
 
@@ -1372,9 +1346,6 @@ export default class Tokenizer {
   }
 
   lex() {
-    if (this.prevToken !== null && this.prevToken.type === TokenType.EOS) {
-      return this.prevToken;
-    }
     this.prevToken = this.lookahead;
     this.lookahead = this.advance();
     this.tokenIndex++;

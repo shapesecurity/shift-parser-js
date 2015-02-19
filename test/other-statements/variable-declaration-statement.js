@@ -17,6 +17,7 @@
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
+var expr = require("../helpers").expr;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 var testParse = require('../assertions').testParse;
 var testParseFailure = require('../assertions').testParseFailure;
@@ -132,6 +133,14 @@ suite("Parser", function () {
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("static")), null),
       ]))
     );
+
+    testParse("(let[a])", expr,
+      new Shift.ComputedMemberExpression(
+        new Shift.IdentifierExpression(new Shift.Identifier("let")),
+        new Shift.IdentifierExpression(new Shift.Identifier("a"))
+      )
+    );
+
     // FIXME(bzhang): testParseFailure("var a[0]=0;", "Unexpected token 'a'");
     // FIXME(bzhang): testParseFailure("var (a)=0;", "Unexpected token '('");
     testParseFailure("var new A = 0;", "Unexpected token new");

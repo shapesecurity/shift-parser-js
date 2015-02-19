@@ -53,7 +53,13 @@ suite("Parser", function() {
         ),
       ]))
     );
-    testParseFailure("var let", "Unexpected token let");
+
+    testParse("var let", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var",[
+        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("let")), null)
+      ])));
+
+    testParseFailure("'use strict'; var let", "Use of future reserved word in strict mode");
     testParseFailure("var const", "Unexpected token const");
 
     // ES5: invalid program

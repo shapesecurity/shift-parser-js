@@ -57,16 +57,5 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(42)
       )
     );
-    testParse("(1 + 2) = 3", expr,
-      new Shift.AssignmentExpression(
-        "=",
-        new Shift.BinaryExpression(
-          "+",
-          new Shift.LiteralNumericExpression(1),
-          new Shift.LiteralNumericExpression(2)
-        ),
-        new Shift.LiteralNumericExpression(3)
-      )
-    );
   });
 });

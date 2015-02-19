@@ -101,38 +101,10 @@ suite("Parser", function () {
     // testParseFailure("1--", "Invalid left-hand side in assignment");
     // testParseFailure("++1", "Invalid left-hand side in assignment");
     // testParseFailure("--1", "Invalid left-hand side in assignment");
-    //testParseFailure("--(1+1)", "Invalid left-hand side in assignment");
-    //testParseFailure("(1+1)--", "Invalid left-hand side in assignment");
+    testParseFailure("--(1+1)", "Invalid left-hand side in assignment");
+    testParseFailure("(1+1)--", "Invalid left-hand side in assignment");
 
-    //testParseFailure("for((1 + 1) in list) process(x);", "Invalid left-hand side in for-in");
-    testParseFailure("[", "Unexpected end of input");
-    testParseFailure("[,", "Unexpected end of input");
-    testParseFailure("1 + {", "Unexpected end of input");
-    testParseFailure("1 + { t:t ", "Unexpected end of input");
-    testParseFailure("1 + { t:t,", "Unexpected end of input");
-    testParseFailure("var x = /\n/", "Invalid regular expression: missing /");
-    testParseFailure("var x = \"\n", "Unexpected token ILLEGAL");
-    testParseFailure("var if = 42", "Unexpected token if");
-    testParseFailure("i #= 42", "Unexpected token ILLEGAL");
-    testParseFailure("1 + (", "Unexpected end of input");
-    testParseFailure("\n\n\n{", "Unexpected end of input");
-    testParseFailure("\n/* Some multiline\ncomment */\n)", "Unexpected token )");
-    testParseFailure("{ set 1 }", "Unexpected number");
-    testParseFailure("{ get 2 }", "Unexpected number");
-    testParseFailure("({ set: s(if) { } })", "Unexpected token if");
-    testParseFailure("({ set s(.) { } })", "Unexpected token .");
-    testParseFailure("({ set s() { } })", "Unexpected token )");
-    testParseFailure("({ set: s() { } })", "Unexpected token {");
-    testParseFailure("({ set: s(a, b) { } })", "Unexpected token {");
-    testParseFailure("({ get: g(d) { } })", "Unexpected token {");
-    testParseFailure("({ get i() { }, i: 42 })", "Object literal may not have data and accessor property with the same name");
-
-    testParseFailure("1 + 2 = 4", "Invalid left-hand side in assignment");
-    testParseFailure("(1) + 2 = 4", "Invalid left-hand side in assignment");
-    testParseFailure("for((1) + 1 in list) process(x);", "Invalid left-hand side in for-in");
-    testParseFailure("for(++a in list) process(x);", "Invalid left-hand side in for-in");
-    testParseFailure("for(a++ in list) process(x);", "Invalid left-hand side in for-in");
-
+    testParseFailure("for((1 + 1) in list) process(x);", "Invalid left-hand side in for-in");
     testParseFailure("[", "Unexpected end of input");
     testParseFailure("[,", "Unexpected end of input");
     testParseFailure("1 + {", "Unexpected end of input");

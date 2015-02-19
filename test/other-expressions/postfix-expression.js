@@ -15,9 +15,6 @@
  */
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var Shift = require("shift-ast");
-var expr = require("../helpers").expr;
-var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("postfix expression", function () {
@@ -28,22 +25,5 @@ suite("Parser", function () {
     testEsprimaEquiv("eval--");
     testEsprimaEquiv("arguments++");
     testEsprimaEquiv("arguments--");
-    testParse("(x--)--", expr,
-      {
-        type: 'PostfixExpression',
-        operator: '--',
-        operand: {
-          type: 'PostfixExpression',
-          operator: '--',
-          operand: {
-            type: 'IdentifierExpression',
-            identifier: {
-              type: 'Identifier',
-              name: 'x'
-            }
-          }
-        }
-      }
-    );
   });
 });

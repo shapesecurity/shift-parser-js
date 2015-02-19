@@ -14,10 +14,10 @@
   ],
   "scripts": {
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --recursive test",
-    "build": "babel --modules commonStrict --source-maps-inline --out-dir dist src",
-    "watch": "babel --watch --modules commonStrict --source-maps-inline --out-dir dist src",
+    "build": "babel --auxiliary-comment 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src",
+    "watch": "babel --auxiliary-comment 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src --watch",
     "generate-coverage": "istanbul cover _mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot --recursive test",
-    "check-coverage": "istanbul check-coverage --statements 98 --functions 97 --branches 97 --lines 99",
+    "check-coverage": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100",
     "cjsify": "cjsify --export ShiftParser dist/index.js > shift-parser.js"
   },
   "dependencies": {

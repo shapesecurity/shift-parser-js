@@ -748,7 +748,7 @@ export default class Tokenizer {
         i++;
       }
       if (ch !== "}") {
-        return -1;
+        throw this.createILLEGAL();
       }
       this.index = i + 1;
       return hexDigits;

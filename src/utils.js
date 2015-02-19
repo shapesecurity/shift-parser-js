@@ -39,8 +39,8 @@ export function isDecimalDigit(ch) {
   return '0' <= ch && ch <= '9';
 }
 
-// 7.3 Line Terminators
 export function isLineTerminator(ch) {
+  // 7.3 Line Terminators
   return (ch == 0x0D) || (ch == 0x0A) || (ch == 0x2028) || (ch == 0x2029);
 }
 

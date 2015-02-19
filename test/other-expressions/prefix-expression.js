@@ -15,6 +15,10 @@
  */
 
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var expr = require("../helpers").expr;
+var Shift = require("shift-ast");
+var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("prefix expression", function () {
@@ -27,5 +31,7 @@ suite("Parser", function () {
     testEsprimaEquiv("++a");
     testEsprimaEquiv("-a");
     testEsprimaEquiv("--a");
+    testParse("+++prefix", expr, new Shift.PrefixExpression('++', new Shift.PrefixExpression('+', new Shift.IdentifierExpression(new Shift.Identifier('prefix')))));
+    testParse("++++prefix", expr, new Shift.PrefixExpression('++', new Shift.PrefixExpression('++', new Shift.IdentifierExpression(new Shift.Identifier('prefix')))));
   });
 });

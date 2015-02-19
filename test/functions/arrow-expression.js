@@ -117,13 +117,6 @@ suite("Parser", function () {
             null,
             new Shift.LiteralNumericExpression(0)))));
 
-    testParse("(a,a)=>0", expr, new Shift.ArrowExpression([
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
-        new Shift.BindingIdentifier(new Shift.Identifier("a"))
-      ], null,
-      new Shift.LiteralNumericExpression(0)
-    ));
-
     testParse("(x)=>{'use strict';}", expr, new Shift.ArrowExpression([
         new Shift.BindingIdentifier(new Shift.Identifier("x")),
       ], null,
@@ -154,21 +147,17 @@ suite("Parser", function () {
     testParseFailure("(a,...a)/*\r*/ => 0", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\u202a*/", "Unexpected end of input");
 
-    testParseFailure("'use strict';([a],...a)=>0", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("'use strict';(a,...a)=>0", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("'use strict';([a],...a)=>0", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("'use strict';eval=>0", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict';arguments=>0", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict';package=>0", "Use of future reserved word in strict mode");
-    testParseFailure("'use strict';(eval)=>0", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict';(arguments)=>0", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict';(package)=>0", "Use of future reserved word in strict mode");
-    testParseFailure("(a,...a)=>{'use strict';}", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("(a,a)=>{'use strict';}", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("([a],[a])=>{'use strict';}", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("eval=>{'use strict';}", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("arguments=>{'use strict';}", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("package=>{'use strict';}", "Use of future reserved word in strict mode");
+    testParseFailure("(a,a)=>0", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("([a],...a)=>0", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("(a,...a)=>0", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("([a],...a)=>0", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("eval=>0", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("arguments=>0", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("package=>0", "Use of future reserved word in strict mode");
+    testParseFailure("(eval)=>0", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("(arguments)=>0", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("(package)=>0", "Use of future reserved word in strict mode");
+    testParseFailure("([let])=>0", "Use of future reserved word in strict mode");
 
   });
 });

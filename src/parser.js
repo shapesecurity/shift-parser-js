@@ -289,14 +289,11 @@ export class Parser extends Tokenizer {
         return this.markLocation(this.parseWithStatement(), startLocation);
       case TokenType.CLASS:
         return this.parseClass(false);
-      case TokenType.IDENTIFIER: {
+
+      default: {
         if (this.lookahead.value === 'let') {
           return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
         }
-        // fallthrough
-      }
-
-      default: {
         let expr = this.parseExpression();
 
         // 12.12 Labelled Statements;
@@ -940,21 +937,15 @@ export class Parser extends Tokenizer {
     let arrow = this.expect(TokenType.ARROW);
 
     // Convert param list.
-    let {params = null, rest = null, dup = null, strict_reserved_word = false, strict_restricted_word = false} = head;
+    let {params = null, rest = null} = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
       if (head.type === "IdentifierExpression") {
         let name = head.identifier.name;
         if (STRICT_MODE_RESERVED_WORD.hasOwnProperty(name)) {
-          strict_reserved_word = true;
-          if (this.strict) {
-            throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
-          }
+          throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
         }
         if (isRestrictedWord(name)) {
-          strict_restricted_word = true;
-          if (this.strict) {
-            throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
-          }
+          throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
         }
         head = Parser.transformDestructuringAssignment(head);
         params = [head];
@@ -964,18 +955,7 @@ export class Parser extends Tokenizer {
     }
 
     if (this.eat(TokenType.LBRACE)) {
-      let [body, isStrict] = this.parseBody();
-      if (isStrict) {
-        if (dup) {
-          throw this.createError(ErrorMessages.STRICT_PARAM_DUPE);
-        }
-        if (strict_reserved_word) {
-          throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
-        }
-        if (strict_restricted_word) {
-          throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
-        }
-      }
+      let [body] = this.parseBody();
       this.expect(TokenType.RBRACE);
       return this.markLocation(new Shift.ArrowExpression(params, rest, body), startLocation);
     } else {
@@ -1473,27 +1453,25 @@ export class Parser extends Tokenizer {
       }
 
       let dup = firstDuplicate(allBoundNames);
-      if (this.strict && dup) {
+      if (dup) {
         throw this.createError(ErrorMessages.STRICT_PARAM_DUPE);
       }
 
       let strict_restricted_word = allBoundNames.some(isRestrictedWord);
-      if (this.strict && strict_restricted_word) {
+      if (strict_restricted_word) {
         throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
       }
 
       let strict_reserved_word = hasStrictModeReservedWord(allBoundNames);
-      if (this.strict && strict_reserved_word) {
+      if (strict_reserved_word) {
         throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
       }
 
       return {
         type: ARROW_EXPRESSION_PARAMS,
         params,
-        rest,
-        dup,
-        strict_reserved_word,
-        strict_restricted_word};
+        rest
+      };
     } else {
       if (rest) {
         this.ensureArrow();
@@ -1708,11 +1686,9 @@ export class Parser extends Tokenizer {
 
     if (this.match(TokenType.LPAREN)) {
       let paramInfo = this.parseParams(null);
-      let [body, isStrict] = this.parseFunctionBody();
-      if (isStrict) {
-        if (paramInfo.firstRestricted) {
-          throw this.createErrorWithLocation(paramInfo.firstRestricted, paramInfo.message);
-        }
+      let [body] = this.parseFunctionBody();
+      if (paramInfo.firstRestricted) {
+        throw this.createErrorWithLocation(paramInfo.firstRestricted, paramInfo.message);
       }
       return {
         methodOrKey: this.markLocation(new Shift.Method(false, key, paramInfo.params, paramInfo.rest, body), startLocation),
@@ -1828,9 +1804,6 @@ export class Parser extends Tokenizer {
     if (message != null) {
       if ((this.strict || isStrict) && info.firstRestricted != null) {
         throw this.createErrorWithLocation(info.firstRestricted, message);
-      }
-      if ((this.strict || isStrict) && info.stricted != null) {
-        throw this.createErrorWithLocation(info.stricted, message);
       }
     }
     this.strict = previousStrict;

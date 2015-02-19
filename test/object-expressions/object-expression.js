@@ -355,5 +355,6 @@ suite("Parser", function () {
         new Shift.FunctionBody([], [])
       )
     ]));
+    testParseFailure("({a(eval){}})", "Parameter name eval or arguments is not allowed in strict mode");
   });
 });

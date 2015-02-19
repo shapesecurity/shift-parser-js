@@ -281,7 +281,6 @@ export class Parser extends Tokenizer {
       case TokenType.TRY:
         return this.markLocation(this.parseTryStatement(), startLocation);
       case TokenType.VAR:
-      case TokenType.LET:
       case TokenType.CONST:
         return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
       case TokenType.WHILE:
@@ -290,6 +289,13 @@ export class Parser extends Tokenizer {
         return this.markLocation(this.parseWithStatement(), startLocation);
       case TokenType.CLASS:
         return this.parseClass(false);
+      case TokenType.IDENTIFIER: {
+        if (this.lookahead.value === 'let') {
+          return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
+        }
+        // fallthrough
+      }
+
       default: {
         let expr = this.parseExpression();
 
@@ -581,7 +587,7 @@ export class Parser extends Tokenizer {
           this.getIteratorStatementEpilogue()
       );
     } else {
-      if (this.match(TokenType.VAR) || this.match(TokenType.LET)) {
+      if (this.match(TokenType.VAR) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === 'let') {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
         let initDecl = this.parseVariableDeclaration();

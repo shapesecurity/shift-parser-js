@@ -117,7 +117,6 @@ export const TokenType = {
   TRUE: {klass: TokenClass.Keyword, name: "true"},
   FALSE: {klass: TokenClass.Keyword, name: "false"},
   YIELD: {klass: TokenClass.Keyword, name: "yield"},
-  LET: {klass: TokenClass.Keyword, name: "let"},
   NUMBER: {klass: TokenClass.NumericLiteral, name: ""},
   STRING: {klass: TokenClass.StringLiteral, name: ""},
   REGEXP: {klass: TokenClass.RegularExpression, name: ""},
@@ -253,15 +252,6 @@ export default class Tokenizer {
     this.lineStarts = [0];
   }
 
-  trackBackLineNumber(position) {
-    for (let line = this.lineStarts.length - 1; line > 0; line--) {
-      if ((position >= this.getLineStart(line))) {
-        return line;
-      }
-    }
-    return 0;
-  }
-
   createILLEGAL() {
     this.startIndex = this.index;
     this.startLine = this.line;
@@ -361,6 +351,7 @@ export default class Tokenizer {
             if (id.charAt(1) === "f") {
               return TokenType.OF;
             }
+            break;
           default:
             break;
         }
@@ -388,8 +379,8 @@ export default class Tokenizer {
             }
             break;
           case "l":
-            if (Tokenizer.cse2(id, "e", "t")) {
-              return strict ? TokenType.FUTURE_STRICT_RESERVED_WORD : TokenType.LET;
+            if (strict && Tokenizer.cse2(id, "e", "t")) {
+              return TokenType.FUTURE_STRICT_RESERVED_WORD;
             }
             break;
           default:

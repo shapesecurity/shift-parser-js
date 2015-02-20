@@ -460,7 +460,7 @@ export default class Tokenizer {
             break;
           case "y": // YIELD
             if (Tokenizer.cse4(id, "i", "e", "l", "d")) {
-              return strict ? TokenType.FUTURE_STRICT_RESERVED_WORD : TokenType.ILLEGAL;
+              return TokenType.YIELD;
             }
             break;
           case "s": // SUPER

@@ -39,13 +39,6 @@ suite("Parser", function () {
         null
       )
     );
-    testParse("if (morning) function a(){}", stmt,
-      new Shift.IfStatement(
-        new Shift.IdentifierExpression(new Shift.Identifier("morning")),
-        new Shift.FunctionDeclaration(false, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([], [])),
-        null
-      )
-    );
     testEsprimaEquiv("if (morning) goodMorning(); else goodDay()");
     testEsprimaEquiv("if(a)b;");
     testEsprimaEquiv("if(a)b;else c;");

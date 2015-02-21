@@ -167,7 +167,10 @@ export class Parser extends Tokenizer {
 
   parseScript() {
     let location = this.getLocation();
-    let [body] = this.parseBody(true);
+    let [body] = this.parseBody();
+    if (!this.match(TokenType.EOS)) {
+      throw this.createUnexpected(this.lookahead);
+    }
     return this.markLocation(new Shift.Script(body), location);
   }
 
@@ -199,7 +202,7 @@ export class Parser extends Tokenizer {
     return [body, isStrict];
   }
 
-  parseBody(acceptEOF = false) {
+  parseBody() {
     let location = this.getLocation();
     let directives = [];
     let statements = [];
@@ -207,20 +210,14 @@ export class Parser extends Tokenizer {
     let isStrict = this.strict;
     let firstRestricted = null;
     while (true) {
-      if (acceptEOF) {
-        if (this.eof()) {
-          break;
-        }
-      } else {
-        if (this.match(TokenType.RBRACE)) {
-          break;
-        }
+      if (this.eof() || this.match(TokenType.RBRACE)) {
+        break;
       }
       let token = this.lookahead;
       let text = token.slice.text;
       let isStringLiteral = token.type === TokenType.STRING;
       let directiveLocation = this.getLocation();
-      let stmt = this.parseStatement();
+      let stmt = this.parseStatementListItem();
       if (parsingDirectives) {
         if (isStringLiteral && stmt.type === "ExpressionStatement" &&
             stmt.expression.type === "LiteralStringExpression") {
@@ -246,6 +243,25 @@ export class Parser extends Tokenizer {
     return [this.markLocation(new Shift.FunctionBody(directives, statements), location), isStrict];
   }
 
+  parseStatementListItem() {
+    let startLocation = this.getLocation();
+    if (this.eof()) {
+      throw this.createUnexpected(this.lookahead);
+    }
+    switch (this.lookahead.type) {
+      case TokenType.FUNCTION:
+        return this.markLocation(this.parseFunction(false), startLocation);
+      case TokenType.CONST:
+        return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
+      case TokenType.CLASS:
+        return this.parseClass(false);
+      default:
+        if (this.lookahead.value === 'let') {
+          return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
+        }
+        return this.parseStatement();
+    }
+  }
 
   parseStatement() {
     let startLocation = this.getLocation();
@@ -269,8 +285,6 @@ export class Parser extends Tokenizer {
         return this.markLocation(this.parseDoWhileStatement(), startLocation);
       case TokenType.FOR:
         return this.markLocation(this.parseForStatement(), startLocation);
-      case TokenType.FUNCTION:
-        return this.markLocation(this.parseFunction(false), startLocation);
       case TokenType.IF:
         return this.markLocation(this.parseIfStatement(), startLocation);
       case TokenType.RETURN:
@@ -282,19 +296,17 @@ export class Parser extends Tokenizer {
       case TokenType.TRY:
         return this.markLocation(this.parseTryStatement(), startLocation);
       case TokenType.VAR:
-      case TokenType.CONST:
         return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
       case TokenType.WHILE:
         return this.markLocation(this.parseWhileStatement(), startLocation);
       case TokenType.WITH:
         return this.markLocation(this.parseWithStatement(), startLocation);
+      case TokenType.CONST:
+      case TokenType.FUNCTION:
       case TokenType.CLASS:
-        return this.parseClass(false);
+        throw this.createUnexpected(this.lookahead);
 
       default: {
-        if (this.lookahead.value === 'let') {
-          return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
-        }
         let expr = this.parseExpression();
 
         // 12.12 Labelled Statements;
@@ -305,7 +317,12 @@ export class Parser extends Tokenizer {
           }
 
           this.labelSet[key] = true;
-          let labeledBody = this.parseStatement();
+          let labeledBody;
+          if (this.match(TokenType.FUNCTION)) {
+            labeledBody = this.parseFunction(false, false);
+          } else {
+            labeledBody = this.parseStatement();
+          }
           delete this.labelSet[key];
           return this.markLocation(new Shift.LabeledStatement(expr.identifier, labeledBody), startLocation);
         } else {
@@ -851,7 +868,7 @@ export class Parser extends Tokenizer {
 
     let body = [];
     while (!this.match(TokenType.RBRACE)) {
-      body.push(this.parseStatement());
+      body.push(this.parseStatementListItem());
     }
     this.expect(TokenType.RBRACE);
 
@@ -1851,7 +1868,7 @@ export class Parser extends Tokenizer {
     return this.markLocation(new (isExpr ? Shift.ClassExpression : Shift.ClassDeclaration)(id, heritage, methods), location);
   }
 
-  parseFunction(isExpr) {
+  parseFunction(isExpr, allowGenerator = true) {
     let startLocation = this.getLocation();
 
     this.expect(TokenType.FUNCTION);
@@ -1859,7 +1876,7 @@ export class Parser extends Tokenizer {
     let id = null;
     let message = null;
     let firstRestricted = null;
-    let isGenerator = !!this.eat(TokenType.MUL);
+    let isGenerator = allowGenerator && !!this.eat(TokenType.MUL);
     let previousGeneratorParameter = this.inGeneratorParameter;
     let previousYield = this.allowYieldExpression;
     let previousInGeneratorBody = this.inGeneratorBody;

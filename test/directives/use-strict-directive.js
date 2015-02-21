@@ -31,34 +31,34 @@ suite("Parser", function () {
 
     testParse("\"Hello\"", directives, [new Shift.UnknownDirective("Hello")]);
 
-    testParse("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"", directives, [new Shift.UnknownDirective("\n\r\t\v\b\f\\\'\"\0")]);
-    testParse("\"\\u0061\"", directives, [new Shift.UnknownDirective("a")]);
-    testParse("\"\\x61\"", directives, [new Shift.UnknownDirective("a")]);
-    testParse("\"\\u00\"", directives, [new Shift.UnknownDirective("u00")]);
-    testParse("\"\\xt\"", directives, [new Shift.UnknownDirective("xt")]);
-    testParse("\"Hello\\nworld\"", directives, [new Shift.UnknownDirective("Hello\nworld")]);
-    testParse("\"Hello\\\nworld\"", directives, [new Shift.UnknownDirective("Helloworld")]);
-    testParse("\"Hello\\02World\"", directives, [new Shift.UnknownDirective("Hello\x02World")]);
-    testParse("\"Hello\\012World\"", directives, [new Shift.UnknownDirective("Hello\nWorld")]);
-    testParse("\"Hello\\122World\"", directives, [new Shift.UnknownDirective("HelloRWorld")]);
-    testParse("\"Hello\\0122World\"", directives, [new Shift.UnknownDirective("Hello\n2World")]);
-    testParse("\"Hello\\312World\"", directives, [new Shift.UnknownDirective("Hello\xCAWorld")]);
-    testParse("\"Hello\\412World\"", directives, [new Shift.UnknownDirective("Hello!2World")]);
-    testParse("\"Hello\\812World\"", directives, [new Shift.UnknownDirective("Hello812World")]);
-    testParse("\"Hello\\712World\"", directives, [new Shift.UnknownDirective("Hello92World")]);
-    testParse("\"Hello\\0World\"", directives, [new Shift.UnknownDirective("Hello\0World")]);
-    testParse("\"Hello\\\r\nworld\"", directives, [new Shift.UnknownDirective("Helloworld")]);
-    testParse("\"Hello\\1World\"", directives, [new Shift.UnknownDirective("Hello\1World")]);
+    testParse("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"", directives, [new Shift.UnknownDirective("\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0")]);
+    testParse("\"\\u0061\"", directives, [new Shift.UnknownDirective("\\u0061")]);
+    testParse("\"\\x61\"", directives, [new Shift.UnknownDirective("\\x61")]);
+    testParse("\"\\u00\"", directives, [new Shift.UnknownDirective("\\u00")]);
+    testParse("\"\\xt\"", directives, [new Shift.UnknownDirective("\\xt")]);
+    testParse("\"Hello\\nworld\"", directives, [new Shift.UnknownDirective("Hello\\nworld")]);
+    testParse("\"Hello\\\nworld\"", directives, [new Shift.UnknownDirective("Hello\\\nworld")]);
+    testParse("\"Hello\\02World\"", directives, [new Shift.UnknownDirective("Hello\\02World")]);
+    testParse("\"Hello\\012World\"", directives, [new Shift.UnknownDirective("Hello\\012World")]);
+    testParse("\"Hello\\122World\"", directives, [new Shift.UnknownDirective("Hello\\122World")]);
+    testParse("\"Hello\\0122World\"", directives, [new Shift.UnknownDirective("Hello\\0122World")]);
+    testParse("\"Hello\\312World\"", directives, [new Shift.UnknownDirective("Hello\\312World")]);
+    testParse("\"Hello\\412World\"", directives, [new Shift.UnknownDirective("Hello\\412World")]);
+    testParse("\"Hello\\812World\"", directives, [new Shift.UnknownDirective("Hello\\812World")]);
+    testParse("\"Hello\\712World\"", directives, [new Shift.UnknownDirective("Hello\\712World")]);
+    testParse("\"Hello\\0World\"", directives, [new Shift.UnknownDirective("Hello\\0World")]);
+    testParse("\"Hello\\\r\nworld\"", directives, [new Shift.UnknownDirective("Hello\\\r\nworld")]);
+    testParse("\"Hello\\1World\"", directives, [new Shift.UnknownDirective("Hello\\1World")]);
 
     testParseFailure("(function () { 'use strict'; with (i); })", "Strict mode code may not include a with statement");
 
     testParse("(function () { 'use\\x20strict'; with (i); })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use strict")], [
+      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use\\x20strict")], [
         new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),
       ]))
     );
     testParse("(function () { 'use\\nstrict'; with (i); })", expr,
-      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use\nstrict")], [
+      new Shift.FunctionExpression(null, [], new Shift.FunctionBody([new Shift.UnknownDirective("use\\nstrict")], [
         new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),
       ]))
     );

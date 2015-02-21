@@ -199,7 +199,7 @@ export class Parser extends Tokenizer {
               throw this.createErrorWithLocation(firstRestricted, ErrorMessages.STRICT_OCTAL_LITERAL);
             }
           } else {
-            directives.push(this.markLocation(new Shift.UnknownDirective(text.slice(1, -1)), directiveLocation));
+            directives.push(this.markLocation(new Shift.UnknownDirective(stmt.expression.value), directiveLocation));
             if (firstRestricted == null && token.octal) {
               firstRestricted = token.slice.startLocation;
             }

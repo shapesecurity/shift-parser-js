@@ -32,9 +32,9 @@ suite("Parser", function () {
     }
 
     testParse("(class {})", expr, new Shift.ClassExpression(null, null, []));
-    testParse("(class A{})", expr, new Shift.ClassExpression(new Shift.Identifier("A"), null, []));
+    testParse("(class A{})", expr, new Shift.ClassExpression(new Shift.BindingIdentifier(new Shift.Identifier("A")), null, []));
     testParse("(class extends A {})", expr, new Shift.ClassExpression(null, new Shift.IdentifierExpression(new Shift.Identifier("A")), []));
-    testParse("(class A extends A {})", expr, new Shift.ClassExpression(new Shift.Identifier("A"), new Shift.IdentifierExpression(new Shift.Identifier("A")), []));
+    testParse("(class A extends A {})", expr, new Shift.ClassExpression(new Shift.BindingIdentifier(new Shift.Identifier("A")), new Shift.IdentifierExpression(new Shift.Identifier("A")), []));
 
     testParse("(class {;;;\n;\n})", expr, new Shift.ClassExpression(null, null, []));
     testParse("(class {;;;\n;a(){}})", expr,

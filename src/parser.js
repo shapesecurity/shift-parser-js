@@ -1947,6 +1947,7 @@ export class Parser extends Tokenizer {
 
     if (!isExpr || !this.match(TokenType.LPAREN)) {
       let token = this.lookahead;
+      let startLocation = this.getLocation();
       id = this.parseIdentifier();
       if (this.strict) {
         if (isRestrictedWord(id.name)) {
@@ -1961,6 +1962,7 @@ export class Parser extends Tokenizer {
           message = ErrorMessages.STRICT_RESERVED_WORD;
         }
       }
+      id = this.markLocation(new Shift.BindingIdentifier(id), startLocation);
     }
     this.inGeneratorParameter = isGenerator;
     this.allowYieldExpression = isGenerator;

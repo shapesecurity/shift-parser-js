@@ -66,7 +66,7 @@ suite("Parser", function() {
     // ES6: function declaration within a block
     testParse("{ function f(){} }", stmt,
       new Shift.BlockStatement(new Shift.Block([
-        new Shift.FunctionDeclaration(false, new Shift.Identifier("f"), [], null, new Shift.FunctionBody([], []))
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], []))
       ]))
     );
   });
@@ -79,7 +79,7 @@ suite("Parser", function() {
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(
           new Shift.BindingIdentifier(new Shift.Identifier("yield")),
-          new Shift.FunctionExpression(false, new Shift.Identifier("yield"), [], null, new Shift.FunctionBody([], []))
+          new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("yield")), [], null, new Shift.FunctionBody([], []))
         )
       ]))
     );

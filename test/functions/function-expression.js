@@ -26,21 +26,21 @@ suite("Parser", function () {
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))
     );
     testParse("(function x() { y; z() });", expr,
-      new Shift.FunctionExpression(false, new Shift.Identifier("x"), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("x")), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("y"))),
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
     testParse("(function eval() { });", expr,
-      new Shift.FunctionExpression(false, new Shift.Identifier("eval"), [], null, new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("eval")), [], null, new Shift.FunctionBody([], []))
     );
     testParse("(function arguments() { });", expr,
-      new Shift.FunctionExpression(false, new Shift.Identifier("arguments"), [], null, new Shift.FunctionBody([], []))
+      new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("arguments")), [], null, new Shift.FunctionBody([], []))
     );
     testParse("(function x(y, z) { })", expr,
       new Shift.FunctionExpression(
         false,
-        new Shift.Identifier("x"),
+        new Shift.BindingIdentifier(new Shift.Identifier("x")),
         [
           new Shift.BindingIdentifier(new Shift.Identifier("y")),
           new Shift.BindingIdentifier(new Shift.Identifier("z"))
@@ -52,7 +52,8 @@ suite("Parser", function () {
 
     testParse("(function(a = b){})", expr,
       new Shift.FunctionExpression(
-        false, null,
+        false,
+        null,
         [
           new Shift.BindingWithDefault(
             new Shift.BindingIdentifier(new Shift.Identifier("a")),

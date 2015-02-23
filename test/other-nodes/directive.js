@@ -27,7 +27,7 @@ function directives(program) {
 }
 
 suite("Parser", function () {
-  suite("use strict", function () {
+  suite("directives", function () {
     testParse("\"Hello\"", directives, [new Shift.Directive("Hello")]);
     testParse("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"", directives, [new Shift.Directive("\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0")]);
     testParse("\"\\u0061\"", directives, [new Shift.Directive("\\u0061")]);
@@ -62,7 +62,7 @@ suite("Parser", function () {
     );
 
     testParse("function a() {'use strict';return 0;};", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
+      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))
     );
@@ -72,7 +72,7 @@ suite("Parser", function () {
       ]))
     );
     testParse("(function a() {'use strict';return 0;});", expr,
-      new Shift.FunctionExpression(false, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
+      new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))
     );

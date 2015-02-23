@@ -199,7 +199,7 @@ suite("Parser", function () {
       )
     );
     testParse("function f() { /* infinite */ while (true) { } /* bar */ var each; }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.Identifier("f"), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], [
         new Shift.WhileStatement(new Shift.LiteralBooleanExpression(true), new Shift.BlockStatement(new Shift.Block([]))),
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("each")), null)

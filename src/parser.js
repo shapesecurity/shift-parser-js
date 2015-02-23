@@ -1069,6 +1069,7 @@ export class Parser extends Tokenizer {
       case TokenType.THIS:
       case TokenType.TRUE:
       case TokenType.YIELD:
+      case TokenType.TEMPLATE:
         return true;
     }
     return false;
@@ -1242,7 +1243,7 @@ export class Parser extends Tokenizer {
   parsePostfixExpression() {
     let startLocation = this.getLocation();
 
-    let expr = this.parseLeftHandSideExpressionAllowCall();
+    let expr = this.parseLeftHandSideExpression(true);
 
     if (this.hasLineTerminatorBeforeNext) {
       return expr;
@@ -1265,16 +1266,16 @@ export class Parser extends Tokenizer {
     return this.markLocation(new Shift.PostfixExpression(expr, operator.value), startLocation);
   }
 
-  parseLeftHandSideExpressionAllowCall() {
+  parseLeftHandSideExpression(allowCall) {
     let startLocation = this.getLocation();
     let previousAllowIn = this.allowIn;
-    this.allowIn = true;
+    this.allowIn = allowCall;
 
-    let expr, token = this.lookahead;;
+    let expr, token = this.lookahead;
 
     if (this.eat(TokenType.SUPER)) {
       expr = this.markLocation(new Shift.Super, startLocation);
-      if (this.inConstructor && this.match(TokenType.LPAREN)) {
+      if (allowCall && this.inConstructor && this.match(TokenType.LPAREN)) {
         expr = this.markLocation(new Shift.CallExpression(expr, this.parseArgumentList()), startLocation);
       } else if (this.inMethod && this.match(TokenType.LBRACK)) {
         expr = this.markLocation(new Shift.ComputedMemberExpression(expr, this.parseComputedMember()), startLocation);
@@ -1290,12 +1291,14 @@ export class Parser extends Tokenizer {
     }
 
     while (true) {
-      if (this.match(TokenType.LPAREN)) {
+      if (allowCall && this.match(TokenType.LPAREN)) {
         expr = this.markLocation(new Shift.CallExpression(expr, this.parseArgumentList()), startLocation);
       } else if (this.match(TokenType.LBRACK)) {
         expr = this.markLocation(new Shift.ComputedMemberExpression(expr, this.parseComputedMember()), startLocation);
       } else if (this.match(TokenType.PERIOD)) {
         expr = this.markLocation(new Shift.StaticMemberExpression(expr, this.parseNonComputedMember()), startLocation);
+      } else if (this.match(TokenType.TEMPLATE)) {
+        expr = this.markLocation(new Shift.TemplateString(expr, this.parseTemplateElements()), startLocation);
       } else {
         break;
       }
@@ -1306,19 +1309,32 @@ export class Parser extends Tokenizer {
     return expr;
   }
 
-  parseLeftHandSideExpression() {
+  parseTemplateElements() {
     let startLocation = this.getLocation();
-
-    let expr = this.match(TokenType.NEW) ? this.parseNewExpression() : this.parsePrimaryExpression();
-
-    while (this.match(TokenType.PERIOD) || this.match(TokenType.LBRACK)) {
-      expr = this.markLocation(
-          this.match(TokenType.LBRACK) ?
-              new Shift.ComputedMemberExpression(expr, this.parseComputedMember()) :
-              new Shift.StaticMemberExpression(expr, this.parseNonComputedMember()), startLocation);
+    let token = this.lookahead;
+    if (token.tail) {
+      this.lex();
+      return [this.markLocation(new Shift.TemplateLiteral(token.value.slice(1, -1)), startLocation)];
     }
-
-    return expr;
+    let result = [this.markLocation(new Shift.TemplateLiteral(this.lex().value.slice(1, -2)), startLocation)];
+    while (true) {
+      result.push(this.parseExpression());
+      if (!this.match(TokenType.RBRACE)) {
+        throw this.createILLEGAL();
+      }
+      this.index = this.startIndex;
+      this.line = this.startLine;
+      this.lineStart = this.startLineStart;
+      this.lookahead = this.scanTemplateLiteral();
+      startLocation = this.getLocation();
+      token = this.lex();
+      if (token.tail) {
+        result.push(this.markLocation(new Shift.TemplateLiteral(token.value.slice(1, -1)), startLocation));
+        return result;
+      } else {
+        result.push(this.markLocation(new Shift.TemplateLiteral(token.value.slice(1, -2)), startLocation));
+      }
+    }
   }
 
   parseNonComputedMember() {
@@ -1378,6 +1394,8 @@ export class Parser extends Tokenizer {
         return this.parseArrayExpression();
       case TokenType.LBRACE:
         return this.parseObjectExpression();
+      case TokenType.TEMPLATE:
+        return this.markLocation(new Shift.TemplateString(null, this.parseTemplateElements()), startLocation);
       case TokenType.DIV:
       case TokenType.ASSIGN_DIV:
         this.lookahead = this.scanRegExp(this.lookahead.type === TokenType.DIV ? "/" : "/=");
@@ -1863,7 +1881,7 @@ export class Parser extends Tokenizer {
       this.allowYieldExpression = false;
     }
     if (this.eat(TokenType.EXTENDS)) {
-      heritage = this.parseLeftHandSideExpressionAllowCall();
+      heritage = this.parseLeftHandSideExpression(true);
     }
 
     this.expect(TokenType.LBRACE);

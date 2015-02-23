@@ -117,9 +117,12 @@ suite("Parser", function () {
 
     testParseFailure("super()", "Unexpected token super");
     testParseFailure("function f() { super() }", "Unexpected token super");
+    testParseFailure("function f() { (super)() }", "Unexpected token super");
     testParseFailure("(class { constructor() { super(); } });", "Unexpected token super");
     testParseFailure("class A { constructor() { super(); } }", "Unexpected token super");
     testParseFailure("class A extends B { constructor() { super; } }", "Unexpected token super");
+    testParseFailure("class A extends B { constructor() { (super)(); } }", "Unexpected token super");
+    testParseFailure("class A extends B { constructor() { new super(); } }", "Unexpected token super");
     testParseFailure("class A extends B { *constructor() { super(); } }", "Unexpected token super");
     testParseFailure("class A extends B { static constructor() { super(); } }", "Unexpected token super");
     testParseFailure("class A extends B { [constructor]() { super(); } }", "Unexpected token super");
@@ -215,12 +218,44 @@ suite("Parser", function () {
       )
     );
 
+    testParse("class A { a() { new super.b; } }", stmt,
+      new Shift.ClassDeclaration(
+        new Shift.BindingIdentifier(new Shift.Identifier("A")),
+        null,
+        [
+          new Shift.ClassElement(false,
+            new Shift.Method(false, new Shift.StaticPropertyName("a"), [], null, new Shift.FunctionBody([], [
+              new Shift.ExpressionStatement(
+                new Shift.NewExpression(new Shift.StaticMemberExpression(new Shift.Super, "b"), []))
+            ]))
+          ),
+        ]
+      )
+    );
+
+    testParse("class A { a() { new super.b(); } }", stmt,
+      new Shift.ClassDeclaration(
+        new Shift.BindingIdentifier(new Shift.Identifier("A")),
+        null,
+        [
+          new Shift.ClassElement(false,
+            new Shift.Method(false, new Shift.StaticPropertyName("a"), [], null, new Shift.FunctionBody([], [
+              new Shift.ExpressionStatement(
+                  new Shift.NewExpression(new Shift.StaticMemberExpression(new Shift.Super, "b"), []))
+            ]))
+          ),
+        ]
+      )
+    );
+
     testParseFailure("super.a", "Unexpected token super");
     testParseFailure("super[0]()", "Unexpected token super");
     testParseFailure("class A extends B { a() { function x(){ super.b(); } } }", "Unexpected token super");
     testParseFailure("class A extends B { a() { function* x(){ super.b(); } } }", "Unexpected token super");
     testParseFailure("({ a() { function x(){ super.b(); } } });", "Unexpected token super");
     testParseFailure("({ a() { function* x(){ super.b(); } } });", "Unexpected token super");
+    testParseFailure("({ a() { (super).b(); } });", "Unexpected token super");
+    testParseFailure("class A extends B { constructor() { (super)(); } }", "Unexpected token super");
 
   });
 });

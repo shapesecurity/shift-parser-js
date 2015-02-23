@@ -24,6 +24,7 @@ export const TokenClass = {
   Ident: {name: "Identifier", isIdentifierName: true},
   Keyword: {name: "Keyword", isIdentifierName: true},
   NumericLiteral: {name: "Numeric"},
+  TemplateLiteral: {name: "Template"},
   Punctuator: {name: "Punctuator"},
   StringLiteral: {name: "String"},
   RegularExpression: {name: "RegularExpression"},
@@ -125,6 +126,7 @@ export const TokenType = {
   FUTURE_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   FUTURE_STRICT_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   CONST: {klass: TokenClass.Keyword, name: "const"},
+  TEMPLATE: {klass: TokenClass.TemplateLiteral, name: ""},
   ILLEGAL: {klass: TokenClass.Illegal, name: ""}
 };
 
@@ -214,6 +216,14 @@ export class StringLiteralToken extends Token {
   constructor(slice, value, octal) {
     super(TokenType.STRING, slice, octal);
     this._value = value;
+  }
+}
+
+export class TemplateToken extends Token {
+  constructor(tail, slice) {
+    super(TokenType.TEMPLATE, slice);
+    this.tail = tail;
+    this.value = slice.text;
   }
 }
 
@@ -600,8 +610,7 @@ export default class Tokenizer {
       this.index++;
       if (isLineTerminator(chCode)) {
         this.hasLineTerminatorBeforeNext = true;
-        if (chCode === 0x000D /* "\r" */ && this.index < this.source.length && this.source.charCodeAt(this.index)
-            === 0x000A /*"\n" */) {
+        if (chCode === 0xD /* "\r" */ && this.source.charCodeAt(this.index) === 0xA /*"\n" */) {
           this.index++;
         }
         this.lineStart = this.index;
@@ -621,7 +630,7 @@ export default class Tokenizer {
         switch (chCode) {
           case 42:  // "*"
             // Block comment ends with "*/'.
-            if (this.index + 1 < length && this.source.charAt(this.index + 1) === "/") {
+            if (this.source.charAt(this.index + 1) === "/") {
               this.index = this.index + 2;
               return;
             }
@@ -635,7 +644,7 @@ export default class Tokenizer {
             break;
           case 13: // "\r":
             this.hasLineTerminatorBeforeNext = true;
-            if (this.index < length - 1 && this.source.charAt(this.index + 1) === "\n") {
+            if (this.source.charAt(this.index + 1) === "\n") {
               this.index++;
             }
             this.index++;
@@ -671,7 +680,7 @@ export default class Tokenizer {
       } else if (isLineTerminator(chCode)) {
         this.hasLineTerminatorBeforeNext = true;
         this.index++;
-        if (chCode === 13 /* "\r" */ && this.index < length && this.source.charAt(this.index) === "\n") {
+        if (chCode === 13 /* "\r" */ && this.source.charAt(this.index) === "\n") {
           this.index++;
         }
         this.lineStart = this.index;
@@ -702,9 +711,7 @@ export default class Tokenizer {
           break;
         }
       } else if (chCode === 60 /* "<" */) {
-        if (this.index + 4 <= length && this.source.charAt(this.index + 1) === "!" && this.source.charAt(this.index + 2)
-            === "-"
-            && this.source.charAt(this.index + 3) === "-") {
+        if (this.source.slice(this.index + 1, this.index + 4) === "!--") {
           this.skipSingleLineComment(4);
         } else {
           break;
@@ -797,7 +804,7 @@ export default class Tokenizer {
         throw this.createILLEGAL();
       }
       let ich = this.scanUnicode();
-      if (ich < 0 || ich === 0x005C /* "\\" */  || !isIdentifierStart(ich)) {
+      if (ich < 0 || ich === 0x5C /* "\\" */ || !isIdentifierStart(ich)) {
         throw this.createILLEGAL();
       }
       ch = String.fromCharCode(ich);
@@ -822,7 +829,7 @@ export default class Tokenizer {
           throw this.createILLEGAL();
         }
         let ich = this.scanUnicode();
-        if (ich < 0 || ich === 0x005C /* "\\" */ || !isIdentifierPart(ich)) {
+        if (ich < 0 || ich === 0x5C /* "\\" */ || !isIdentifierPart(ich)) {
           throw this.createILLEGAL();
         }
         ch = String.fromCharCode(ich);
@@ -1177,6 +1184,91 @@ export default class Tokenizer {
     return new NumericLiteralToken(this.getSlice(start, startLocation));
   }
 
+  scanStringEscape(str, octal) {
+    this.index++;
+    if (this.index === this.source.length) {
+      throw this.createILLEGAL();
+    }
+    let ch = this.source.charAt(this.index);
+    if (!isLineTerminator(ch.charCodeAt(0))) {
+      switch (ch) {
+        case "n":
+          str += "\n";
+          this.index++;
+          break;
+        case "r":
+          str += "\r";
+          this.index++;
+          break;
+        case "t":
+          str += "\t";
+          this.index++;
+          break;
+        case "u":
+        case "x":
+          let restore = this.index;
+          let unescaped;
+          this.index++;
+          if (this.index >= this.source.length) {
+            throw this.createILLEGAL();
+          }
+          unescaped = ch === "u" ? this.scanUnicode() : this.scanHexEscape2();
+          if (unescaped >= 0) {
+            str += String.fromCharCode(unescaped);
+          } else {
+            this.index = restore;
+            str += ch;
+            this.index++;
+          }
+          break;
+        case "b":
+          str += "\b";
+          this.index++;
+          break;
+        case "f":
+          str += "\f";
+          this.index++;
+          break;
+        case "v":
+          str += "\u000B";
+          this.index++;
+          break;
+        default:
+          if ("0" <= ch && ch <= "7") {
+            octal = true;
+            let octLen = 1;
+            // 3 digits are only allowed when string starts
+            // with 0, 1, 2, 3
+            if ("0" <= ch && ch <= "3") {
+              octLen = 0;
+            }
+            let code = 0;
+            while (octLen < 3 && "0" <= ch && ch <= "7") {
+              code *= 8;
+              octLen++;
+              code += ch - "0";
+              this.index++;
+              if (this.index === this.source.length) {
+                throw this.createILLEGAL();
+              }
+              ch = this.source.charAt(this.index);
+            }
+            str += String.fromCharCode(code);
+          } else {
+            str += ch;
+            this.index++;
+          }
+      }
+    } else {
+      this.index++;
+      if (ch === "\r" && this.source.charAt(this.index) === "\n") {
+        this.index++;
+      }
+      this.lineStart = this.index;
+      this.line++;
+    }
+    return [str, octal];
+  }
   // 7.8.4 String Literals
   scanStringLiteral() {
     let str = "";
@@ -1195,89 +1287,7 @@ export default class Tokenizer {
         this.index++;
         return new StringLiteralToken(this.getSlice(start, startLocation), str, octal);
       } else if (ch === "\\") {
-        this.index++;
-        if (this.index === this.source.length) {
-          throw this.createILLEGAL();
-        }
-        ch = this.source.charAt(this.index);
-        if (!isLineTerminator(ch.charCodeAt(0))) {
-          switch (ch) {
-            case "n":
-              str += "\n";
-              this.index++;
-              break;
-            case "r":
-              str += "\r";
-              this.index++;
-              break;
-            case "t":
-              str += "\t";
-              this.index++;
-              break;
-            case "u":
-            case "x":
-              let restore = this.index;
-              let unescaped;
-              this.index++;
-              if (this.index >= this.source.length) {
-                throw this.createILLEGAL();
-              }
-              unescaped = ch === "u" ? this.scanUnicode() : this.scanHexEscape2();
-              if (unescaped >= 0) {
-                str += String.fromCharCode(unescaped);
-              } else {
-                this.index = restore;
-                str += ch;
-                this.index++;
-              }
-              break;
-            case "b":
-              str += "\b";
-              this.index++;
-              break;
-            case "f":
-              str += "\f";
-              this.index++;
-              break;
-            case "v":
-              str += "\u000B";
-              this.index++;
-              break;
-            default:
-              if ("0" <= ch && ch <= "7") {
-                octal = true;
-                let octLen = 1;
-                // 3 digits are only allowed when string starts
-                // with 0, 1, 2, 3
-                if ("0" <= ch && ch <= "3") {
-                  octLen = 0;
-                }
-                let code = 0;
-                while (octLen < 3 && "0" <= ch && ch <= "7") {
-                  code *= 8;
-                  octLen++;
-                  code += ch - "0";
-                  this.index++;
-                  if (this.index === this.source.length) {
-                    throw this.createILLEGAL();
-                  }
-                  ch = this.source.charAt(this.index);
-                }
-                str += String.fromCharCode(code);
-              } else {
-                str += ch;
-                this.index++;
-              }
-          }
-        } else {
-          this.hasLineTerminatorBeforeNext = true;
-          this.index++;
-          if (ch === "\r" && this.source.charAt(this.index) === "\n") {
-            this.index++;
-          }
-          this.lineStart = this.index;
-          this.line++;
-        }
+        ([str, octal] = this.scanStringEscape(str, octal));
       } else if (isLineTerminator(ch.charCodeAt(0))) {
         throw this.createILLEGAL();
       } else {
@@ -1289,8 +1299,41 @@ export default class Tokenizer {
     throw this.createILLEGAL();
   }
 
-  scanRegExp(str) {
+  scanTemplateLiteral() {
+    let startLocation = this.getLocation();
+    let start = this.index;
+    this.index++;
+    while (this.index < this.source.length) {
+      let ch = this.source.charCodeAt(this.index);
+      switch (ch) {
+        case 0x60:  // `
+          this.index++;
+          return new TemplateToken(true, this.getSlice(start, startLocation));
+        case 0x24:  // $
+          if (this.source.charCodeAt(this.index + 1) === 0x7B) {  // {
+            this.index += 2;
+            return new TemplateToken(false, this.getSlice(start, startLocation));
+          }
+          this.index++;
+          break;
+        case 0x5C:  // \\
+        {
+          let location = this.getLocation();
+          let [_, octal] = this.scanStringEscape('', false);
+          if (octal) {
+            throw this.createErrorWithLocation(location, ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN);
+          }
+          break;
+        }
+        default:
+          this.index++;
+      }
+    }
 
+    throw this.createILLEGAL();
+  }
+
+  scanRegExp(str) {
     let startLocation = this.getLocation();
     let start = this.index;
 
@@ -1375,7 +1418,7 @@ export default class Tokenizer {
 
       // Dot (.) U+002E can also start a floating-polet number, hence the need
       // to check the next character.
-      if (charCode === 0x002E) {
+      if (charCode === 0x2E) {
         if (this.index + 1 < this.source.length && isDecimalDigit(this.source.charAt(this.index + 1))) {
           return this.scanNumericLiteral();
         }
@@ -1383,11 +1426,16 @@ export default class Tokenizer {
       }
 
       // String literal starts with single quote (U+0027) or double quote (U+0022).
-      if (charCode === 0x0027 || charCode === 0x0022) {
+      if (charCode === 0x27 || charCode === 0x22) {
         return this.scanStringLiteral();
       }
 
-      if (0x0030 /* '0' */ <= charCode && charCode <= 0x0039 /* '9' */) {
+      // Template literal starts with back quote (U+0060)
+      if (charCode === 0x60) {
+        return this.scanTemplateLiteral();
+      }
+
+      if (0x30 /* '0' */ <= charCode && charCode <= 0x39 /* '9' */) {
         return this.scanNumericLiteral();
       }
 

@@ -1356,9 +1356,18 @@ export class Parser extends Tokenizer {
   parseNewExpression() {
     let startLocation = this.getLocation();
     this.expect(TokenType.NEW);
+    if (this.inFunctionBody && this.eat(TokenType.PERIOD)) {
+      let ident = this.expect(TokenType.IDENTIFIER);
+      if (ident.value !== "target") {
+        throw this.createUnexpected(ident);
+      }
+      return this.markLocation(new Shift.NewTargetExpression, startLocation);
+    }
     let callee = this.parseLeftHandSideExpression();
-    return this.markLocation(new Shift.NewExpression(callee, this.match(TokenType.LPAREN) ? this.parseArgumentList() :
-        []), startLocation);
+    return this.markLocation(new Shift.NewExpression(
+      callee,
+      this.match(TokenType.LPAREN) ? this.parseArgumentList() : []
+    ), startLocation);
   }
 
   parsePrimaryExpression() {

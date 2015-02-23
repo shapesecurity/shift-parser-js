@@ -124,6 +124,9 @@ export class Parser extends Tokenizer {
     this.inIteration = false;
     this.inSwitch = false;
     this.inFunctionBody = false;
+    this.inMethod = false;
+    this.inConstructor = false;
+    this.hasClassHeritage = false;
     this.inGeneratorParameter = false;
     this.inGeneratorBody = false;
     this.allowYieldExpression = false;
@@ -1266,7 +1269,25 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     let previousAllowIn = this.allowIn;
     this.allowIn = true;
-    let expr = this.match(TokenType.NEW) ? this.parseNewExpression() : this.parsePrimaryExpression();
+
+    let expr, token = this.lookahead;;
+
+    if (this.eat(TokenType.SUPER)) {
+      expr = this.markLocation(new Shift.Super, startLocation);
+      if (this.inConstructor && this.match(TokenType.LPAREN)) {
+        expr = this.markLocation(new Shift.CallExpression(expr, this.parseArgumentList()), startLocation);
+      } else if (this.inMethod && this.match(TokenType.LBRACK)) {
+        expr = this.markLocation(new Shift.ComputedMemberExpression(expr, this.parseComputedMember()), startLocation);
+      } else if (this.inMethod && this.match(TokenType.PERIOD)) {
+        expr = this.markLocation(new Shift.StaticMemberExpression(expr, this.parseNonComputedMember()), startLocation);
+      } else {
+        throw this.createUnexpected(token);
+      }
+    } else if (this.match(TokenType.NEW)) {
+      expr = this.parseNewExpression();
+    } else {
+      expr = this.parsePrimaryExpression();
+    }
 
     while (true) {
       if (this.match(TokenType.LPAREN)) {
@@ -1627,7 +1648,8 @@ export class Parser extends Tokenizer {
   parsePropertyDefinition(has__proto__) {
     let startLocation = this.getLocation();
     let token = this.lookahead;
-    let {methodOrKey, kind} = this.parseMethodDefinition();
+
+    let {methodOrKey, kind} = this.parseMethodDefinition(false);
     switch (kind) {
       case "method":
         return methodOrKey;
@@ -1723,7 +1745,7 @@ export class Parser extends Tokenizer {
    *
    * @returns {{methodOrKey: (Shift.Method|Shift.PropertyName), kind: string}}
    */
-  parseMethodDefinition() {
+  parseMethodDefinition(isClassProtoMethod) {
     let token = this.lookahead;
     let startLocation = this.getLocation();
 
@@ -1739,7 +1761,13 @@ export class Parser extends Tokenizer {
           key = this.parsePropertyName();
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
+          let previousInConstructor = this.inConstructor;
+          this.inConstructor = false;
+          let previousInMethod = this.inMethod;
+          this.inMethod = true;
           let [body] = this.parseFunctionBody();
+          this.inConstructor = previousInConstructor;
+          this.inMethod = previousInMethod;
           return {
             methodOrKey: this.markLocation(new Shift.Getter(key, body), startLocation),
             kind: "method"
@@ -1753,8 +1781,14 @@ export class Parser extends Tokenizer {
           this.expect(TokenType.RPAREN);
           let previousYield = this.allowYieldExpression;
           this.allowYieldExpression = false;
+          let previousInConstructor = this.inConstructor;
+          this.inConstructor = false;
+          let previousInMethod = this.inMethod;
+          this.inMethod = true;
           let [body, isStrict] = this.parseFunctionBody();
           this.allowYieldExpression = previousYield;
+          this.inConstructor = previousInConstructor;
+          this.inMethod = previousInMethod;
           if (isStrict) {
             if (info.firstRestricted) {
               throw this.createErrorWithLocation(info.firstRestricted, info.message);
@@ -1778,13 +1812,22 @@ export class Parser extends Tokenizer {
       this.allowYieldExpression = previousYield;
 
       let previousInGeneratorBody = this.inGeneratorBody;
+      let previousInConstructor = this.inConstructor;
+      let previousInMethod = this.inMethod;
       this.allowYieldExpression = isGenerator;
+      this.inConstructor =
+        isClassProtoMethod && !isGenerator && this.hasClassHeritage &&
+        key.type === "StaticPropertyName" && key.value === "constructor";
+      this.inMethod = true;
+
       if (isGenerator) {
         this.inGeneratorBody = true;
       }
       let [body] = this.parseFunctionBody();
       this.allowYieldExpression = previousYield;
       this.inGeneratorBody = previousInGeneratorBody;
+      this.inConstructor = previousInConstructor;
+      this.inMethod = previousInMethod;
 
       if (paramInfo.firstRestricted) {
         throw this.createErrorWithLocation(paramInfo.firstRestricted, paramInfo.message);
@@ -1808,11 +1851,13 @@ export class Parser extends Tokenizer {
     let id = null;
     let heritage = null;
     if (!isExpr || this.match(TokenType.IDENTIFIER)) {
-      id = this.parseIdentifier();
+      let location = this.getLocation();
+      id = this.markLocation(new Shift.BindingIdentifier(this.parseIdentifier()), location);
     }
 
     let previousInGeneratorParameter = this.inGeneratorParameter;
     let previousParamYield = this.allowYieldExpression;
+    let previousHasClassHeritage = this.hasClassHeritage;
     if (isExpr) {
       this.inGeneratorParameter = false;
       this.allowYieldExpression = false;
@@ -1826,16 +1871,17 @@ export class Parser extends Tokenizer {
     this.strict = true;
     let methods = [];
     let hasConstructor = false;
+    this.hasClassHeritage = heritage != null;
     while (!this.eat(TokenType.RBRACE)) {
       if (this.eat(TokenType.SEMICOLON)) {
         continue;
       }
       let methodToken = this.lookahead;
       let isStatic = false;
-      let {methodOrKey, kind} = this.parseMethodDefinition();
+      let {methodOrKey, kind} = this.parseMethodDefinition(true);
       if (kind === 'identifier' && methodOrKey.value === 'static') {
         isStatic = true;
-        ({methodOrKey, kind} = this.parseMethodDefinition());
+        ({methodOrKey, kind} = this.parseMethodDefinition(false));
       }
       switch (kind) {
         case "method":
@@ -1913,8 +1959,14 @@ export class Parser extends Tokenizer {
     if (isGenerator) {
       this.inGeneratorBody = true;
     }
+    let previousInConstructor = this.inConstructor;
+    this.inConstructor = false;
+    let previousInMethod = this.inMethod;
+    this.inMethod = false;
     let [body, isStrict] = this.parseFunctionBody();
     this.inGeneratorBody = previousInGeneratorBody;
+    this.inConstructor = previousInConstructor;
+    this.inMethod = previousInMethod;
 
     this.allowYieldExpression = previousYield;
     if (message != null) {

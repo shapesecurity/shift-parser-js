@@ -106,6 +106,7 @@ export const TokenType = {
   IF: {klass: TokenClass.Keyword, name: "if"},
   NEW: {klass: TokenClass.Keyword, name: "new"},
   RETURN: {klass: TokenClass.Keyword, name: "return"},
+  SUPER: {klass: TokenClass.Keyword, name: "super"},
   SWITCH: {klass: TokenClass.Keyword, name: "switch"},
   THIS: {klass: TokenClass.Keyword, name: "this"},
   THROW: {klass: TokenClass.Keyword, name: "throw"},
@@ -465,7 +466,7 @@ export default class Tokenizer {
             break;
           case "s": // SUPER
             if (Tokenizer.cse4(id, "u", "p", "e", "r")) {
-              return TokenType.FUTURE_RESERVED_WORD;
+              return TokenType.SUPER;
             }
             break;
           default:

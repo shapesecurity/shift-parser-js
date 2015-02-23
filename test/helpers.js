@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+var expect = require("expect.js");
+
 function expr(program) {
   return stmt(program).expression;
 }

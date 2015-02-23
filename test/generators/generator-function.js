@@ -25,22 +25,22 @@ var stmt = require("../helpers").stmt;
 suite("Parser", function () {
   var emptyBody = new Shift.FunctionBody([], []);
   suite("generator declaration", function () {
-    testParse('function* a(){}', stmt, new Shift.FunctionDeclaration(true, new Shift.Identifier("a"), [], null, emptyBody));
+    testParse('function* a(){}', stmt, new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, emptyBody));
     testParse('function* a(){yield}', stmt,
-      new Shift.FunctionDeclaration(true, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.YieldExpression(null))
       ])));
     testParse('function* a(){yield a}', stmt,
-      new Shift.FunctionDeclaration(true, new Shift.Identifier("a"), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.YieldExpression(new Shift.IdentifierExpression(new Shift.Identifier("a"))))
       ])));
     testParse('function* yield(){}', stmt,
-      new Shift.FunctionDeclaration(true, new Shift.Identifier("yield"), [], null, emptyBody));
+      new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("yield")), [], null, emptyBody));
 
     testParse('function* a(a=yield){}', stmt,
       new Shift.FunctionDeclaration(
         true,
-        new Shift.Identifier("a"),
+        new Shift.BindingIdentifier(new Shift.Identifier("a")),
         [new Shift.BindingWithDefault(new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.IdentifierExpression(new Shift.Identifier('yield')))],
         null,
         emptyBody));
@@ -48,7 +48,7 @@ suite("Parser", function () {
     testParse('function* a({[yield]:a}){}', stmt,
       new Shift.FunctionDeclaration(
         true,
-        new Shift.Identifier("a"),
+        new Shift.BindingIdentifier(new Shift.Identifier("a")),
         [new Shift.ObjectBinding([
           new Shift.BindingPropertyProperty(
             new Shift.ComputedPropertyName(new Shift.IdentifierExpression(new Shift.Identifier('yield'))),

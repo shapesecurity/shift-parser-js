@@ -34,7 +34,7 @@ suite("Parser", function () {
     testParse('a: function a(){}', stmt,
       new Shift.LabeledStatement(
         new Shift.Identifier('a'),
-        new Shift.FunctionDeclaration(false, new Shift.Identifier('a'), [], null, new Shift.FunctionBody([], []))));
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier('a')), [], null, new Shift.FunctionBody([], []))));
 
     testParse('{ let a; }', stmt,
       new Shift.BlockStatement(

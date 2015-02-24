@@ -319,7 +319,7 @@ suite("Parser", function () {
     testParseFailure("function hello() { \"use strict\"; var public; }", "Use of future reserved word in strict mode");
     testParseFailure("function hello() { \"use strict\"; var static; }", "Use of future reserved word in strict mode");
     testParseFailure("function hello() { \"use strict\"; var yield; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var let; }", "Use of future reserved word in strict mode");
+    testParseFailure("function hello() { \"use strict\"; var let; }", "Unexpected token let");
     testParseFailure("function hello(static) { \"use strict\"; }", "Use of future reserved word in strict mode");
     testParseFailure("function static() { \"use strict\"; }", "Use of future reserved word in strict mode");
     testParseFailure("function eval(a) { \"use strict\"; }", "Function name may not be eval or arguments in strict mode");

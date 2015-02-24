@@ -25,11 +25,10 @@ function markLocation(node, location) {
 
 export function parseModule(code, {loc = false} = {}) {
   let parser = new Parser(code);
-  parser.module = true;
   if (loc) {
     parser.markLocation = markLocation;
   }
-  return parser.parse();
+  return parser.parseModule();
 }
 
 export function parseScript(code, {loc = false} = {}) {
@@ -37,7 +36,7 @@ export function parseScript(code, {loc = false} = {}) {
   if (loc) {
     parser.markLocation = markLocation;
   }
-  return parser.parse();
+  return parser.parseScript();
 }
 
 export default parseScript;

@@ -141,6 +141,10 @@ function expectSourceSpanContains(parent, loc) {
   }
 }
 
+function moduleItem(mod) {
+  return mod.moduleItems[0];
+}
+
 function checkLocation(loc) {
   if (!loc) {
     expect().fail("Node has no location");
@@ -191,6 +195,7 @@ function locationSanityCheck(node, parentSpan, prevLocation) {
   }
 }
 
+exports.moduleItem = moduleItem;
 exports.expr = expr;
 exports.stmt = stmt;
 exports.locationSanityCheck = locationSanityCheck;

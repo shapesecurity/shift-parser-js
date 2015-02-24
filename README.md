@@ -12,7 +12,7 @@ parser that produces a [Shift format](https://github.com/shapesecurity/shift-spe
 
 [Stable](http://nodejs.org/api/documentation.html#documentation_stability_index).
 
-The parser supports version 5.1 of the ECMA-262 standard. ECMAScript 6 support is planned.
+The parser supports version 6 (release candidate 1) of the ECMA-262 standard.
 
 
 ## Installation
@@ -27,6 +27,12 @@ npm install shift-parser
 ```js
 import parse from "shift-parser";
 let ast = parse("/* ECMAScript program text */");
+```
+
+```js
+import {parseScript, parseModule} from "shift-parser";
+let scriptAST = parseScript("/* ECMAScript Script text */");
+let moduleAST = parseModule("/* ECMAScript Module text */");
 ```
 
 

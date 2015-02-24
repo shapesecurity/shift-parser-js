@@ -20,6 +20,8 @@ var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
 var testParseFailure = require('./assertions').testParseFailure;
 var testParse = require('./assertions').testParse;
+var testParseModule = require('./assertions').testParseModule;
+var testParseModuleFailure = require('./assertions').testParseModuleFailure;
 
 suite("Parser", function() {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
@@ -136,5 +138,33 @@ suite("Parser", function() {
     // ES5: allows unicode escape sequences in regular expression flags
     // ES6: disallowes unicode escape sequences in regular expression flags
     testParseFailure("/a/\\u0000", "Invalid regular expression");
+
+
+    // ES5: disallow HTML-like comment
+    // ES6: allowed in Script.
+    testParse("<!--", stmt, undefined);
+    testParse("-->", stmt, undefined);
+    testParseFailure("a -->", 'Unexpected end of input');
+    testParseFailure(";/**/-->", 'Unexpected token >');
+    testParse("\n  -->", stmt, undefined);
+    testParse("/*\n*/-->", stmt, undefined);
+    testParse("a<!--b", expr, new Shift.IdentifierExpression(new Shift.Identifier('a')));
+
+    testParseModuleFailure("<!--", 'Unexpected token <');
+    testParseModuleFailure("-->", 'Unexpected token >');
+
+    testParseModule("a<!--b", function (m) {
+        return m.moduleItems[0].expression;
+      },
+      new Shift.BinaryExpression('<',
+        new Shift.IdentifierExpression(new Shift.Identifier('a')),
+        new Shift.PrefixExpression('!',
+          new Shift.PrefixExpression('--',
+            new Shift.IdentifierExpression(new Shift.Identifier('b'))
+          )
+        )
+      )
+    );
+
   });
 });

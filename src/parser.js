@@ -191,6 +191,8 @@ export class Parser extends Tokenizer {
   parseModule() {
     this.module = true;
     this.strict = true;
+
+    this.lookahead = this.advance();
     let location = this.getLocation();
     let items = [];
     while (!this.eof()) {
@@ -200,6 +202,8 @@ export class Parser extends Tokenizer {
   }
 
   parseScript() {
+    this.lookahead = this.advance();
+
     let location = this.getLocation();
     let [body] = this.parseBody();
     if (!this.match(TokenType.EOS)) {

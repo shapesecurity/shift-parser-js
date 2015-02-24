@@ -258,7 +258,6 @@ export default class Tokenizer {
     this.lastIndex = 0;
     this.lastLine = 0;
     this.lastLineStart = 0;
-    this.lookahead = this.advance();
     this.strict = false;
     this.hasLineTerminatorBeforeNext = false;
     this.prevToken = null;
@@ -626,7 +625,7 @@ export default class Tokenizer {
   skipMultiLineComment() {
     this.index += 2;
     const length = this.source.length;
-
+    let isLineStart = false;
     while (this.index < length) {
       let chCode = this.source.charCodeAt(this.index);
       if (chCode < 0x80) {
@@ -635,17 +634,20 @@ export default class Tokenizer {
             // Block comment ends with "*/'.
             if (this.source.charAt(this.index + 1) === "/") {
               this.index = this.index + 2;
-              return;
+              debugger
+              return isLineStart;
             }
             this.index++;
             break;
           case 10:  // "\n"
+            isLineStart = true;
             this.hasLineTerminatorBeforeNext = true;
             this.index++;
             this.lineStart = this.index;
             this.line++;
             break;
           case 13: // "\r":
+            isLineStart = true;
             this.hasLineTerminatorBeforeNext = true;
             if (this.source.charAt(this.index + 1) === "\n") {
               this.index++;
@@ -658,6 +660,7 @@ export default class Tokenizer {
             this.index++;
         }
       } else if (chCode === 0x2028 || chCode === 0x2029) {
+        isLineStart = true;
         this.hasLineTerminatorBeforeNext = true;
         this.index++;
         this.lineStart = this.index;
@@ -698,11 +701,11 @@ export default class Tokenizer {
           this.skipSingleLineComment(2);
           isLineStart = true;
         } else if (chCode === 42 /* "*" */) {
-          this.skipMultiLineComment();
+          isLineStart = this.skipMultiLineComment() || isLineStart;
         } else {
           break;
         }
-      } else if (isLineStart && chCode === 45 /* "-" */) {
+      } else if (!this.module && isLineStart && chCode === 45 /* "-" */) {
         if (this.index + 2 >= length) {
           break;
         }
@@ -713,7 +716,7 @@ export default class Tokenizer {
         } else {
           break;
         }
-      } else if (chCode === 60 /* "<" */) {
+      } else if (!this.module && chCode === 60 /* "<" */) {
         if (this.source.slice(this.index + 1, this.index + 4) === "!--") {
           this.skipSingleLineComment(4);
         } else {

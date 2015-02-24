@@ -153,9 +153,7 @@ suite("Parser", function() {
     testParseModuleFailure("<!--", 'Unexpected token <');
     testParseModuleFailure("-->", 'Unexpected token >');
 
-    testParseModule("a<!--b", function (m) {
-        return m.moduleItems[0].expression;
-      },
+    testParseModule("a<!--b", function (m) { return m.items[0].expression; },
       new Shift.BinaryExpression('<',
         new Shift.IdentifierExpression(new Shift.Identifier('a')),
         new Shift.PrefixExpression('!',

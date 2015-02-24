@@ -24,49 +24,60 @@ var testParseModuleFailure = require('../assertions').testParseModuleFailure;
 var moduleItem = require("../helpers").moduleItem;
 var locationSanityCheck = require('../helpers').locationSanityCheck;
 
+function locationSanityTest(source) {
+  test(source, function() {
+    var tree = ShiftParser.parseModule(source, {loc: true});
+    locationSanityCheck(tree);
+  });
+}
+
+function testExportDecl(code, tree) {
+  testParseModule(code, moduleItem, tree);
+  locationSanityTest(code);
+}
+
 suite("Parser", function () {
-
-  function locationSanityTest(source) {
-    test(source, function() {
-      var tree = ShiftParser.parseModule(source, {loc: true});
-      locationSanityCheck(tree);
-    });
-  }
-
-  function testExportDecl(code, tree) {
-    testParseModule(code, moduleItem, tree);
-    locationSanityTest(code);
-  }
-
   suite("export declaration", function () {
+
     testExportDecl('export * from "a"', new Shift.ExportAllFrom("a"));
+
     testExportDecl('export * from "a";', new Shift.ExportAllFrom("a"));
+
     testExportDecl('export {} from "a"', new Shift.ExportFrom([], "a"));
+
     testExportDecl('export {a} from "a"', new Shift.ExportFrom([
       new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
     ], "a"));
+
     testExportDecl('export {a,} from "a"', new Shift.ExportFrom([
       new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
     ], "a"));
+
     testExportDecl('export {a,b} from "a"', new Shift.ExportFrom([
       new Shift.ExportSpecifier(null, new Shift.Identifier('a')),
       new Shift.ExportSpecifier(null, new Shift.Identifier('b'))
     ], "a"));
+
     testExportDecl('export {a as b} from "a"', new Shift.ExportFrom([
       new Shift.ExportSpecifier(new Shift.Identifier('a'), new Shift.Identifier('b'))
     ], "a"));
+
     testExportDecl('export {as as as} from "as"', new Shift.ExportFrom([
       new Shift.ExportSpecifier(new Shift.Identifier('as'), new Shift.Identifier('as'))
     ], "as"));
+
     testExportDecl('export {as as function} from "as"', new Shift.ExportFrom([
       new Shift.ExportSpecifier(new Shift.Identifier('as'), new Shift.Identifier('function'))
     ], "as"));
+
     testExportDecl('export {a}', new Shift.ExportFrom([
       new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
     ], null));
+
     testExportDecl('export {a,}', new Shift.ExportFrom([
       new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
     ], null));
+
     testExportDecl('export {a,b,}', new Shift.ExportFrom([
       new Shift.ExportSpecifier(null, new Shift.Identifier('a')),
       new Shift.ExportSpecifier(null, new Shift.Identifier('b'))
@@ -183,5 +194,6 @@ suite("Parser", function () {
     testParseModuleFailure('export default function a(){}', 'Unexpected identifier');
     testParseModuleFailure('export default class a{}', 'Unexpected identifier');
     testParseModuleFailure('export default function* a{}', 'Unexpected identifier');
+
   });
 });

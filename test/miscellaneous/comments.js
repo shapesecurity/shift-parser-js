@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
+var testEsprimaEquiv = require('./../assertions').testEsprimaEquiv;
 
 suite("Parser", function () {
   suite("Comments", function () {

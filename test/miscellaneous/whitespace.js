@@ -16,11 +16,11 @@
 
 var Shift = require("shift-ast");
 
-var expr = require("./helpers").expr;
-var stmt = require("./helpers").stmt;
-var testEsprimaEquiv = require('./assertions').testEsprimaEquiv;
-var testParse = require('./assertions').testParse;
-var testParseFailure = require('./assertions').testParseFailure;
+var expr = require("./../helpers").expr;
+var stmt = require("./../helpers").stmt;
+var testEsprimaEquiv = require('./../assertions').testEsprimaEquiv;
+var testParse = require('./../assertions').testParse;
+var testParseFailure = require('./../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("automatic semicolon insertion", function () {

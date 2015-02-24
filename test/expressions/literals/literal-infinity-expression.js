@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var Shift = require("shift-ast");
 
-suite("Parser", function () {
-  suite("literal null expression", function () {
-    testEsprimaEquiv("null");
-    testEsprimaEquiv("null;");
-    testEsprimaEquiv("null\n");
+var expr = require("../../helpers").expr;
+var testParse = require('../../assertions').testParse;
+
+suite("Parser", function() {
+  suite("literal infinity expression", function () {
+    testParse("2e308", expr,
+      new Shift.LiteralInfinityExpression
+    );
   });
 });

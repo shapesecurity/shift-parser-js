@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
+var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
-var expr = require("../helpers").expr;
-var testParse = require('../assertions').testParse;
+suite("Parser", function () {
+  suite("identifier expression", function () {
+    testEsprimaEquiv("x");
+    testEsprimaEquiv("x;");
+  });
 
-suite("Parser", function() {
-  suite("literal infinity expression", function () {
-    testParse("2e308", expr,
-      new Shift.LiteralInfinityExpression
-    );
+  suite("unicode identifier", function () {
+    // Unicode
+    testEsprimaEquiv("日本語");
+    testEsprimaEquiv("T\u203F");
+    testEsprimaEquiv("T\u200C");
+    testEsprimaEquiv("T\u200D");
+    testEsprimaEquiv("\u2163\u2161");
+    testEsprimaEquiv("\u2163\u2161\u200A; \u2009");
   });
 });

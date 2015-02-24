@@ -19,9 +19,10 @@ var Shift = require("shift-ast");
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 var testParse = require('../assertions').testParse;
+var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
-  suite("function declaration", function () {
+  suite("hoistable declaration", function () {
     testParse("function hello() { z(); }", stmt,
       new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("hello")), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
@@ -71,4 +72,17 @@ suite("Parser", function () {
       ]))
     );
   });
+
+  suite("function declaration in labeled statement", function () {
+    testParse('a: function a(){}', stmt,
+      new Shift.LabeledStatement(
+        new Shift.Identifier('a'),
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier('a')), [], null, new Shift.FunctionBody([], []))));
+
+    testParseFailure('a: function* a(){}', 'Unexpected token *');
+
+    testParseFailure('while(true) function a(){}', 'Unexpected token function');
+    testParseFailure('with(true) function a(){}', 'Unexpected token function');
+    testParseFailure('a: function* a(){}', 'Unexpected token *');
+  })
 });

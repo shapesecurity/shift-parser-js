@@ -125,40 +125,6 @@ suite("Parser", function () {
     testParseFailure("({ set: s() { } })", "Unexpected token {");
     testParseFailure("({ set: s(a, b) { } })", "Unexpected token {");
     testParseFailure("({ get: g(d) { } })", "Unexpected token {");
-    // testParseFailure("({ get i() { }, i: 42 })",
-    //     "Object literal may not have data and accessor property with the same name");
-    // testParseFailure("({ i: 42, get i() { } })",
-    //     "Object literal may not have data and accessor property with the same name");
-    // testParseFailure("({ set i(x) { }, i: 42 })",
-    //     "Object literal may not have data and accessor property with the same name");
-    // testParseFailure("({ i: 42, set i(x) { } })",
-    //     "Object literal may not have data and accessor property with the same name");
-    // testParseFailure("({ get i() { }, get i() { } })",
-    //     "Object literal may not have multiple get/set accessors with the same name");
-    // testParseFailure("({ set i(x) { }, set i(x) { } })",
-    //     "Object literal may not have multiple get/set accessors with the same name");
-    // TODO: ES6:
-    // testParseFailure("((a)) => 42", "Unexpected token =>");
-    // testParseFailure("(a, (b)) => 42", "Unexpected token =>");
-    // testParseFailure("\"use strict\"; (eval = 10) => 42", "Assignment to eval or arguments is not allowed in strict mode");
-    // strict mode, using eval when IsSimpleParameterList is true
-    // testParseFailure("\"use strict\"; eval => 42", "Parameter name eval or arguments is not allowed in strict mode");
-    // strict mode, using arguments when IsSimpleParameterList is true
-    // testParseFailure("\"use strict\"; arguments => 42", "Parameter name eval or arguments is not allowed in strict mode");
-    // strict mode, using eval when IsSimpleParameterList is true
-    // testParseFailure("\"use strict\"; (eval, a) => 42", "Parameter name eval or arguments is not allowed in strict mode");
-    // strict mode, using arguments when IsSimpleParameterList is true
-    // testParseFailure("\"use strict\"; (arguments, a) => 42", "Parameter name eval or arguments is not allowed in strict mode");
-    // testParseFailure("(a, a) => 42", "Strict mode function may not have duplicate parameter names");
-    // testParseFailure("\"use strict\"; (a, a) => 42", "Strict mode function may not have duplicate parameter names");
-    // testParseFailure("\"use strict\"; (a) => 00", "Octal literals are not allowed in strict mode.");
-    // testParseFailure("() <= 42", "Unexpected token <=");
-    // testParseFailure("() ? 42", "Unexpected token ?");
-    // testParseFailure("() + 42", "Unexpected token +");
-    // testParseFailure("(10) => 00", "Unexpected token =>");
-    // testParseFailure("(10, 20) => 00", "Unexpected token =>");
-    // testParseFailure("\"use strict\"; (eval) => 42", "Parameter name eval or arguments is not allowed in strict mode");
-    // testParseFailure("(eval) => { \"use strict\"; 42 }", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("function t(if) { }", "Unexpected token if");
     testParseFailure("function t(true) { }", "Unexpected token true");
     testParseFailure("function t(false) { }", "Unexpected token false");
@@ -196,8 +162,6 @@ suite("Parser", function () {
     testParseFailure("const x = 12, y;", "Unexpected token ;");
     testParseFailure("const x, y = 12;", "Unexpected token ,");
     testParseFailure("const x;", "Unexpected token ;");
-    // TODO : testParseFailure("if(true) let a = 1;", "Unexpected token let");
-    // TODO : testParseFailure("if(true) const a = 1;", "Unexpected token const");
     testParseFailure("switch (c) { default: default: }", "More than one default clause in switch statement");
     testParseFailure("new X().\"s\"", "Unexpected string");
     testParseFailure("/*", "Unexpected token ILLEGAL");

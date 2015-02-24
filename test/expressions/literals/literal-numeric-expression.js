@@ -16,10 +16,10 @@
 
 var Shift = require("shift-ast");
 
-var expr = require("../helpers").expr;
-var testParse = require('../assertions').testParse;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParseFailure = require("../assertions").testParseFailure;
+var expr = require("../../helpers").expr;
+var testParse = require('../../assertions').testParse;
+var testEsprimaEquiv = require('../../assertions').testEsprimaEquiv;
+var testParseFailure = require("../../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("literal numeric expression", function () {

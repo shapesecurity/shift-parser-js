@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var ShiftParser = require('../..');
+var ShiftParser = require('../../dist/index.js');
 var Shift = require("shift-ast");
 var testParse = require('../assertions').testParse;
 var testParseFailure = require('../assertions').testParseFailure;

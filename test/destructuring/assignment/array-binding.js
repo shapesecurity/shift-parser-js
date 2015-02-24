@@ -16,16 +16,14 @@
 
 var Shift = require("shift-ast");
 
-var expr = require("../helpers").expr;
-var stmt = require("../helpers").stmt;
-var testParse = require('../assertions').testParse;
-var testParseFailure = require('../assertions').testParseFailure;
+var expr = require("../../helpers").expr;
+var stmt = require("../../helpers").stmt;
+var testParse = require('../../assertions').testParse;
+var testParseFailure = require('../../assertions').testParseFailure;
 
 suite("Parser", function () {
   suite("array binding", function () {
-
     suite("assignment", function () {
-
       testParse("[x] = 0", expr,
         new Shift.AssignmentExpression(
           "=",
@@ -89,6 +87,7 @@ suite("Parser", function () {
         )
       );
 
+      // TODO(bzhang): should fail
       testParse("[, x, ...y,] = 0", expr,
         new Shift.AssignmentExpression(
           "=",
@@ -121,77 +120,10 @@ suite("Parser", function () {
       testParseFailure("[] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[x, x] = 0", "Duplicate binding 'x'");
       testParseFailure("[x, ...x] = 0", "Duplicate binding 'x'");
-      testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment");
+      testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment"); // TODO(bzhang): Unexpected token ,
       testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...x,,] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...[x]] = 0", "Invalid left-hand side in assignment");
-
     });
-
-    suite("variable declarator", function () {
-
-      testParse("var [,a];", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([null, new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
-            null
-          ),
-        ]))
-      );
-
-      testParse("var [a]=[1];", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
-            new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1)], null)
-          ),
-        ]))
-      );
-
-      testParse("var [[a]]=0;", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([
-              new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null)
-            ], null),
-            new Shift.LiteralNumericExpression(0)
-          ),
-        ]))
-      );
-
-      testParseFailure("var [a.b]", "Unexpected token [");
-      testParseFailure("var ([x])", "Unexpected token (");
-      testParseFailure("var [a, a]", "Duplicate binding \'a\'");
-      testParseFailure("var [a, a] = 0;", "Duplicate binding \'a\'");
-
-    });
-
-    suite("catch clause", function () {
-
-      testParse("try {} catch ([e]) {}", stmt,
-        new Shift.TryCatchStatement(
-          new Shift.Block([]),
-          new Shift.CatchClause(
-            new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("e"))], null),
-            new Shift.Block([])
-          )
-        )
-      );
-
-      testParse("try {} catch ([e, ...a]) {}", stmt,
-        new Shift.TryCatchStatement(
-          new Shift.Block([]),
-          new Shift.CatchClause(
-            new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("e"))],
-              new Shift.BindingIdentifier(new Shift.Identifier("a"))),
-            new Shift.Block([])
-          )
-        )
-      );
-
-      testParseFailure("try {} catch ([e,e]) {}", "Duplicate binding \'e\'");
-
-    });
-
   });
 });

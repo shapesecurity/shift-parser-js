@@ -20,7 +20,7 @@ exports.testParse = function testParse(program, accessor, expected) {
     expect(args).to.be(testParse.length);
     expect(accessor(parse(program))).to.eql(expected);
   });
-}
+};
 
 exports.testParseModule = function testParseModule(program, accessor, expected) {
   var args = arguments.length;
@@ -28,7 +28,7 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
     expect(args).to.be(testParseModule.length);
     expect(accessor(parseModule(program))).to.eql(expected);
   });
-}
+};
 
 exports.testParseFailure = function testParseFailure(source, message) {
   var args = arguments.length;
@@ -46,7 +46,7 @@ exports.testParseFailure = function testParseFailure(source, message) {
 
 exports.testParseModuleFailure = function testParseModuleFailure(source, message) {
   var args = arguments.length;
-  test(source, function () {
+  test('Expect failure: ' + source, function () {
     expect(args).to.be(testParseModuleFailure.length);
     try {
       parseModule(source);

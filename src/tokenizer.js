@@ -100,11 +100,14 @@ export const TokenType = {
   DEFAULT: {klass: TokenClass.Keyword, name: "default"},
   DO: {klass: TokenClass.Keyword, name: "do"},
   ELSE: {klass: TokenClass.Keyword, name: "else"},
+  EXPORT: {klass: TokenClass.Keyword, name: "export"},
   EXTENDS: {klass: TokenClass.Keyword, name: "extends"},
   FINALLY: {klass: TokenClass.Keyword, name: "finally"},
   FOR: {klass: TokenClass.Keyword, name: "for"},
   FUNCTION: {klass: TokenClass.Keyword, name: "function"},
   IF: {klass: TokenClass.Keyword, name: "if"},
+  IMPORT: {klass: TokenClass.Keyword, name: "import"},
+  LET: {klass: TokenClass.Keyword, name: "let"},
   NEW: {klass: TokenClass.Keyword, name: "new"},
   RETURN: {klass: TokenClass.Keyword, name: "return"},
   SUPER: {klass: TokenClass.Keyword, name: "super"},
@@ -391,7 +394,7 @@ export default class Tokenizer {
             break;
           case "l":
             if (strict && Tokenizer.cse2(id, "e", "t")) {
-              return TokenType.FUTURE_STRICT_RESERVED_WORD;
+              return TokenType.LET;
             }
             break;
           default:
@@ -509,12 +512,12 @@ export default class Tokenizer {
             break;
           case "e":
             if (Tokenizer.cse5(id, "x", "p", "o", "r", "t")) {
-              return TokenType.FUTURE_RESERVED_WORD;
+              return TokenType.EXPORT;
             }
             break;
           case "i":
             if (Tokenizer.cse5(id, "m", "p", "o", "r", "t")) {
-              return TokenType.FUTURE_RESERVED_WORD;
+              return TokenType.IMPORT;
             }
             break;
           case "p":

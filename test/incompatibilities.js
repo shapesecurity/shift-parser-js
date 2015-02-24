@@ -59,7 +59,7 @@ suite("Parser", function() {
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("let")), null)
       ])));
 
-    testParseFailure("'use strict'; var let", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; var let", "Unexpected token let");
     testParseFailure("var const", "Unexpected token const");
 
     // ES5: invalid program

@@ -25,7 +25,8 @@ function id(x) {
 
 suite("Parser", function () {
   suite("module", function () {
-    testParseModule("", id, new Shift.Module(new Shift.FunctionBody([], [])));
+    testParseModule("", id, new Shift.Module([]));
+
     testParseModuleFailure("/*", "Unexpected token ILLEGAL");
     testParseModuleFailure("var eval;", "Variable name may not be eval or arguments in strict mode");
   });

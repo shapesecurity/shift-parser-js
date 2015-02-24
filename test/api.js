@@ -53,18 +53,14 @@ suite("API", function () {
   test("for location information", function () {
     expect(ShiftParser.parseModule("0", {loc: true})).to.eql(
       withLoc(new Shift.Module(
-        withLoc(new Shift.FunctionBody(
-          [],
           [
-            withLoc(new Shift.ExpressionStatement(
-              withLoc(new Shift.LiteralNumericExpression(0),
-                span(0, 1, 0, 1, 1, 1)
-              )
-            ), span(0, 1, 0, 1, 1, 1))
-          ]
-        ), span(0, 1, 0, 1, 1, 1))
-      ), span(0, 1, 0, 1, 1, 1))
-    );
+            withLoc(
+              new Shift.ExpressionStatement(
+                withLoc(new Shift.LiteralNumericExpression(0), span(0, 1, 0, 1, 1, 1))
+              ), span(0, 1, 0, 1, 1, 1))
+          ],
+          span(0, 1, 0, 1, 1, 1)),
+        span(0, 1, 0, 1, 1, 1)));
   });
 
 

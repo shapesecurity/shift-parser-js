@@ -130,6 +130,8 @@ export class Parser extends Tokenizer {
     this.inGeneratorParameter = false;
     this.inGeneratorBody = false;
     this.allowYieldExpression = false;
+    this.module = false;
+    this.strict = false;
   }
 
   eat(tokenType) {
@@ -168,28 +170,31 @@ export class Parser extends Tokenizer {
     return node;
   }
 
-  parseScript() {
+  parse() {
+    this.strict = this.module;
     let location = this.getLocation();
     let [body] = this.parseBody();
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
-    return this.markLocation(new Shift.Script(body), location);
+    return this.markLocation(new (this.module ? Shift.Module : Shift.Script)(body), location);
   }
 
   parseFunctionBody() {
-    let previousStrict = this.strict;
     let startLocation = this.getLocation();
 
     let oldLabelSet = this.labelSet;
     let oldInIteration = this.inIteration;
     let oldInSwitch = this.inSwitch;
     let oldInFunctionBody = this.inFunctionBody;
+    let previousStrict = this.strict;
+    let oldModule = this.module;
 
     this.labelSet = Object.create(null);
     this.inIteration = false;
     this.inSwitch = false;
     this.inFunctionBody = true;
+    this.module = false;
 
     this.expect(TokenType.LBRACE);
     let [body, isStrict] = this.parseBody();
@@ -202,6 +207,7 @@ export class Parser extends Tokenizer {
     this.inSwitch = oldInSwitch;
     this.inFunctionBody = oldInFunctionBody;
     this.strict = previousStrict;
+    this.module = oldModule;
     return [body, isStrict];
   }
 

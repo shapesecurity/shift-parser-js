@@ -50,6 +50,23 @@ suite("API", function () {
     );
   });
 
+  test("for location information", function () {
+    expect(ShiftParser.parseModule("0", {loc: true})).to.eql(
+      withLoc(new Shift.Module(
+        withLoc(new Shift.FunctionBody(
+          [],
+          [
+            withLoc(new Shift.ExpressionStatement(
+              withLoc(new Shift.LiteralNumericExpression(0),
+                span(0, 1, 0, 1, 1, 1)
+              )
+            ), span(0, 1, 0, 1, 1, 1))
+          ]
+        ), span(0, 1, 0, 1, 1, 1))
+      ), span(0, 1, 0, 1, 1, 1))
+    );
+  });
+
 
   test("location sanity test", function () {
     // TODO: everything.js once the ES6 version is ready

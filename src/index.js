@@ -18,15 +18,26 @@ import {Parser} from "./parser";
 
 import * as Shift from "shift-ast";
 
+function markLocation(node, location) {
+  node.loc = new Shift.SourceSpan(location, new Shift.SourceLocation(this.lastIndex, this.lastLine + 1, this.lastIndex - this.lastLineStart));
+  return node;
+}
+
+export function parseModule(code, {loc = false} = {}) {
+  let parser = new Parser(code);
+  parser.module = true;
+  if (loc) {
+    parser.markLocation = markLocation;
+  }
+  return parser.parse();
+}
+
 export function parseScript(code, {loc = false} = {}) {
   let parser = new Parser(code);
   if (loc) {
-    parser.markLocation = function (node, location) {
-      node.loc = new Shift.SourceSpan(location, new Shift.SourceLocation(this.lastIndex, this.lastLine + 1, this.lastIndex - this.lastLineStart));
-      return node;
-    };
+    parser.markLocation = markLocation;
   }
-  return parser.parseScript();
+  return parser.parse();
 }
 
 export default parseScript;

@@ -24,21 +24,21 @@ var testParseModuleFailure = require('../assertions').testParseModuleFailure;
 var moduleItem = require("../helpers").moduleItem;
 var locationSanityCheck = require('../helpers').locationSanityCheck;
 
+function locationSanityTest(source) {
+  test(source, function() {
+    var tree = ShiftParser.parseModule(source, {loc: true});
+    locationSanityCheck(tree);
+  });
+}
+
+function testImportDecl(code, tree) {
+  testParseModule(code, moduleItem, tree);
+  locationSanityTest(code);
+}
+
 suite("Parser", function () {
-
-  function locationSanityTest(source) {
-    test(source, function() {
-      var tree = ShiftParser.parseModule(source, {loc: true});
-      locationSanityCheck(tree);
-    });
-  }
-
-  function testImportDecl(code, tree) {
-    testParseModule(code, moduleItem, tree);
-    locationSanityTest(code);
-  }
-
   suite("import declaration", function () {
+
     testImportDecl('import "a"', new Shift.Import(null, [], "a"));
 
     testImportDecl(
@@ -139,6 +139,7 @@ suite("Parser", function () {
         ],
         "d"));
 
+    testParseFailure('import "a"', 'Unexpected token import');
     testParseModuleFailure('import', 'Unexpected end of input');
     testParseModuleFailure('import;', 'Unexpected token ;');
     testParseModuleFailure('import {}', 'Unexpected end of input');
@@ -156,6 +157,6 @@ suite("Parser", function () {
     testParseModuleFailure('import * as b, a from "a"', 'Unexpected token ,');
     testParseModuleFailure('import a as b from "a"', 'Unexpected identifier');
     testParseModuleFailure('import a, b from "a"', 'Unexpected identifier');
-    testParseFailure('import "a"', 'Unexpected token import');
+
   });
 });

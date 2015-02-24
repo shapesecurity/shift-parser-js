@@ -24,7 +24,7 @@ export const TokenClass = {
   Ident: {name: "Identifier", isIdentifierName: true},
   Keyword: {name: "Keyword", isIdentifierName: true},
   NumericLiteral: {name: "Numeric"},
-  TemplateLiteral: {name: "Template"},
+  TemplateElement: {name: "Template"},
   Punctuator: {name: "Punctuator"},
   StringLiteral: {name: "String"},
   RegularExpression: {name: "RegularExpression"},
@@ -129,7 +129,7 @@ export const TokenType = {
   FUTURE_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   FUTURE_STRICT_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   CONST: {klass: TokenClass.Keyword, name: "const"},
-  TEMPLATE: {klass: TokenClass.TemplateLiteral, name: ""},
+  TEMPLATE: {klass: TokenClass.TemplateElement, name: ""},
   ILLEGAL: {klass: TokenClass.Illegal, name: ""}
 };
 
@@ -1305,7 +1305,7 @@ export default class Tokenizer {
     throw this.createILLEGAL();
   }
 
-  scanTemplateLiteral() {
+  scanTemplateElement() {
     let startLocation = this.getLocation();
     let start = this.index;
     this.index++;
@@ -1438,7 +1438,7 @@ export default class Tokenizer {
 
       // Template literal starts with back quote (U+0060)
       if (charCode === 0x60) {
-        return this.scanTemplateLiteral();
+        return this.scanTemplateElement();
       }
 
       if (0x30 /* '0' */ <= charCode && charCode <= 0x39 /* '9' */) {

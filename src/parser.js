@@ -1504,7 +1504,7 @@ export class Parser extends Tokenizer {
       } else if (this.match(TokenType.PERIOD)) {
         expr = this.markLocation(new Shift.StaticMemberExpression(expr, this.parseNonComputedMember()), startLocation);
       } else if (this.match(TokenType.TEMPLATE)) {
-        expr = this.markLocation(new Shift.TemplateString(expr, this.parseTemplateElements()), startLocation);
+        expr = this.markLocation(new Shift.TemplateExpression(expr, this.parseTemplateElements()), startLocation);
       } else {
         break;
       }
@@ -1520,9 +1520,9 @@ export class Parser extends Tokenizer {
     let token = this.lookahead;
     if (token.tail) {
       this.lex();
-      return [this.markLocation(new Shift.TemplateLiteral(token.value.slice(1, -1)), startLocation)];
+      return [this.markLocation(new Shift.TemplateElement(token.value.slice(1, -1)), startLocation)];
     }
-    let result = [this.markLocation(new Shift.TemplateLiteral(this.lex().value.slice(1, -2)), startLocation)];
+    let result = [this.markLocation(new Shift.TemplateElement(this.lex().value.slice(1, -2)), startLocation)];
     while (true) {
       result.push(this.parseExpression());
       if (!this.match(TokenType.RBRACE)) {
@@ -1531,14 +1531,14 @@ export class Parser extends Tokenizer {
       this.index = this.startIndex;
       this.line = this.startLine;
       this.lineStart = this.startLineStart;
-      this.lookahead = this.scanTemplateLiteral();
+      this.lookahead = this.scanTemplateElement();
       startLocation = this.getLocation();
       token = this.lex();
       if (token.tail) {
-        result.push(this.markLocation(new Shift.TemplateLiteral(token.value.slice(1, -1)), startLocation));
+        result.push(this.markLocation(new Shift.TemplateElement(token.value.slice(1, -1)), startLocation));
         return result;
       } else {
-        result.push(this.markLocation(new Shift.TemplateLiteral(token.value.slice(1, -2)), startLocation));
+        result.push(this.markLocation(new Shift.TemplateElement(token.value.slice(1, -2)), startLocation));
       }
     }
   }
@@ -1610,7 +1610,7 @@ export class Parser extends Tokenizer {
       case TokenType.LBRACE:
         return this.parseObjectExpression();
       case TokenType.TEMPLATE:
-        return this.markLocation(new Shift.TemplateString(null, this.parseTemplateElements()), startLocation);
+        return this.markLocation(new Shift.TemplateExpression(null, this.parseTemplateElements()), startLocation);
       case TokenType.DIV:
       case TokenType.ASSIGN_DIV:
         this.lookahead = this.scanRegExp(this.lookahead.type === TokenType.DIV ? "/" : "/=");

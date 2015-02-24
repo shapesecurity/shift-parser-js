@@ -73,7 +73,7 @@ suite("Parser", function () {
       return p.body.statements[0].parameters[0].init.super;
     }, new Shift.IdentifierExpression(new Shift.Identifier('yield')));
     testParse('function *a({[class extends yield{}]:a}){}', function (p) {
-      return p.body.statements[0].parameters[0].properties[0].name.value.super;
+      return p.body.statements[0].parameters[0].properties[0].name.expression.super;
     }, new Shift.IdentifierExpression(new Shift.Identifier('yield')));
     testParseFailure('function* a(){function a(a=yield){}}', 'Unexpected token yield');
     testParseFailure('function* a(){function* a(yield){}}', 'Unexpected token yield');

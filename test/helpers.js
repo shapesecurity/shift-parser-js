@@ -142,7 +142,7 @@ function expectSourceSpanContains(parent, loc) {
 }
 
 function moduleItem(mod) {
-  return mod.moduleItems[0];
+  return mod.items[0];
 }
 
 function checkLocation(loc) {

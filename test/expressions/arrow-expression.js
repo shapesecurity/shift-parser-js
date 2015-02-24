@@ -146,7 +146,6 @@ suite("Parser", function () {
     testParseFailure("(a,...a)/*\n*/ => 0", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\r*/ => 0", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\u202a*/", "Unexpected end of input");
-
     testParseFailure("(a,a)=>0", "Strict mode function may not have duplicate parameter names");
     testParseFailure("([a],...a)=>0", "Strict mode function may not have duplicate parameter names");
     testParseFailure("(a,...a)=>0", "Strict mode function may not have duplicate parameter names");
@@ -158,6 +157,10 @@ suite("Parser", function () {
     testParseFailure("(arguments)=>0", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("(package)=>0", "Use of future reserved word in strict mode");
     testParseFailure("([let])=>0", "Use of future reserved word in strict mode");
-
+    testParseFailure("() <= 42", "Unexpected token <=");
+    testParseFailure("() ? 42", "Unexpected token ?");
+    testParseFailure("() + 42", "Unexpected token +");
+    testParseFailure("(10) => 00", "Illegal arrow function parameter list");
+    testParseFailure("(10, 20) => 00", "Illegal arrow function parameter list");
   });
 });

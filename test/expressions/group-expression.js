@@ -17,8 +17,10 @@
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 suite("Parser", function () {
-  suite("identifier expression", function () {
-    testEsprimaEquiv("x");
-    testEsprimaEquiv("x;");
+  suite("grouping", function () {
+    testEsprimaEquiv("((((((((((((((((((((((((((((((((((((((((((((((((((0))))))))))))))))))))))))))))))))))))))))))))))))))");
+    testEsprimaEquiv("(1 + 2 ) * 3");
+    testEsprimaEquiv("(1) + (2  ) + 3");
+    testEsprimaEquiv("4 + 5 << (6)");
   });
 });

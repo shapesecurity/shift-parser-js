@@ -31,11 +31,6 @@ suite("Parser", function () {
         ]))
     );
 
-    testParse('a: function a(){}', stmt,
-      new Shift.LabeledStatement(
-        new Shift.Identifier('a'),
-        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier('a')), [], null, new Shift.FunctionBody([], []))));
-
     testParse('{ let a; }', stmt,
       new Shift.BlockStatement(
         new Shift.Block([
@@ -59,9 +54,6 @@ suite("Parser", function () {
     testParseFailure('with(true) class a {}', 'Unexpected token class');
 
     testParseFailure('a: let a', 'Unexpected identifier');
-    testParseFailure('while(true) function a(){}', 'Unexpected token function');
-    testParseFailure('with(true) function a(){}', 'Unexpected token function');
-    testParseFailure('a: function* a(){}', 'Unexpected token *');
 
   });
 });

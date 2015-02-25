@@ -345,7 +345,7 @@ export class Parser extends Tokenizer {
       case TokenType.IDENTIFIER:
         defaultBinding = this.expect(TokenType.IDENTIFIER).value;
         if (!this.eat(TokenType.COMMA)) {
-          return this.markLocation(new Shift.ImportNamespace(defaultBinding, null, this.parseFromClause()), startLocation);
+          return this.markLocation(new Shift.Import(defaultBinding, [], this.parseFromClause()), startLocation);
         }
         break;
     }

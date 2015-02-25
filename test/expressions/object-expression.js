@@ -346,8 +346,6 @@ suite("Parser", function () {
       ])
     );
 
-    testParseFailure("({set a(eval){'use strict';}})", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("({set a([eval]){'use strict';}})", "Parameter name eval or arguments is not allowed in strict mode");
     testParse("({set a(eval){}})", expr, new Shift.ObjectExpression([
       new Shift.Setter(
         new Shift.StaticPropertyName("a"),
@@ -355,6 +353,5 @@ suite("Parser", function () {
         new Shift.FunctionBody([], [])
       )
     ]));
-    testParseFailure("({a(eval){}})", "Parameter name eval or arguments is not allowed in strict mode");
   });
 });

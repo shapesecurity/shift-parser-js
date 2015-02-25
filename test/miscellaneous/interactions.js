@@ -26,6 +26,14 @@ suite("Parser", function () {
   suite("interactions", function () {
     // LiteralNumericExpression and StaticMemberExpression
 
+    testParse("0 .toString", expr,
+      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(0), "toString")
+    );
+
+    testParse("0.0.toString", expr,
+      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(0), "toString")
+    );
+
     testParse("0..toString", expr,
       new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(0), "toString")
     );

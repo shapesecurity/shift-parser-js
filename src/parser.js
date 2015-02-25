@@ -1663,7 +1663,7 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     if (this.match(TokenType.YIELD)) {
       if (this.strict) {
-        this.lookahead.type = TokenType.FUTURE_STRICT_RESERVED_WORD;
+        this.lookahead.type = TokenType.YIELD;
         throw this.createUnexpected(this.lookahead);
       } else if (this.allowYieldExpression) {
         throw this.createUnexpected(this.lookahead);

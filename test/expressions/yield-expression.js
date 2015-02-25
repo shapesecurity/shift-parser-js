@@ -16,8 +16,8 @@
 
 var Shift = require("shift-ast");
 
-var testParse = require('../assertions').testParse;
-var testParseFailure = require('../assertions').testParseFailure;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 
@@ -35,36 +35,34 @@ suite("Parser", function () {
       return p.body.statements[0].body.statements[0].expression.expression;
     }
 
-    testParse('function*a(){yield\na}', yd, [new Shift.YieldExpression(null), new Shift.IdentifierExpression(new Shift.Identifier('a'))]);
-    testParse('function*a(){yield*a}', yd, [new Shift.YieldGeneratorExpression(new Shift.IdentifierExpression(new Shift.Identifier('a')))]);
-    testParse('function a(){yield*a}', yd, [new Shift.BinaryExpression('*', new Shift.IdentifierExpression(new Shift.Identifier('yield')), new Shift.IdentifierExpression(new Shift.Identifier('a')))]);
-    testParseFailure('function*a(yield){}', 'Unexpected token yield');
+    testParse("function*a(){yield\na}", yd, [new Shift.YieldExpression(null), new Shift.IdentifierExpression(new Shift.Identifier("a"))]);
+    testParse("function*a(){yield*a}", yd, [new Shift.YieldGeneratorExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")))]);
+    testParse("function a(){yield*a}", yd, [new Shift.BinaryExpression("*", new Shift.IdentifierExpression(new Shift.Identifier("yield")), new Shift.IdentifierExpression(new Shift.Identifier("a")))]);
 
     // yield as an Identifier cannot show up in body of a generator or in strict mode.
-    testParse('({set a(yield){}})', expr,
+    testParse("({set a(yield){}})", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(
           new Shift.StaticPropertyName("a"),
-          new Shift.BindingIdentifier(new Shift.Identifier('yield')),
+          new Shift.BindingIdentifier(new Shift.Identifier("yield")),
           emptyBody)
       ]));
-    testParseFailure('function *a(){ return ({set a(yield){}}); }', 'Unexpected token yield');
-    testParseFailure('class A{set a(yield){}}', 'Use of future reserved word in strict mode');
-
-    testParseFailure('function *a(){yield\n*a}', 'Unexpected token *');
-    testParseFailure('function *a(){yield*}', 'Unexpected token }');
-    testParse('function *a(){yield 0}', yde, new Shift.LiteralNumericExpression(0));
-    testParse('function *a(){yield null}', yde, new Shift.LiteralNullExpression());
-    testParse('function *a(){yield true}', yde, new Shift.LiteralBooleanExpression(true));
-    testParse('function *a(){yield false}', yde, new Shift.LiteralBooleanExpression(false));
-    testParse('function *a(){yield "a"}', yde, new Shift.LiteralStringExpression('a'));
-    testParse('function *a(){yield a}', yde, new Shift.IdentifierExpression(new Shift.Identifier('a')));
-    testParse('function *a(){yield+0}', yde, new Shift.PrefixExpression('+', new Shift.LiteralNumericExpression(0)));
-    testParse('function *a(){yield-0}', yde, new Shift.PrefixExpression('-', new Shift.LiteralNumericExpression(0)));
-    testParse('function *a(){yield 2e308}', yde, new Shift.LiteralInfinityExpression());
-    testParse('function *a(){yield(0)}', yde, new Shift.LiteralNumericExpression(0));
-    testParse('function *a(){yield/a/}', yde, new Shift.LiteralRegExpExpression('a', ''));
-    testParse('function *a(){yield/=3/}', yde, new Shift.LiteralRegExpExpression('=3', ''));
-    testParse('function *a(){yield class{}}', yde, new Shift.ClassExpression(null, null, []));
+    // TODO: figure out which early error applies here
+    testParseFailure("function *a(){ return ({set a(yield){}}); }", "Unexpected token yield");
+    testParseFailure("function *a(){yield\n*a}", "Unexpected token *");
+    testParseFailure("function *a(){yield*}", "Unexpected token }");
+    testParse("function *a(){yield 0}", yde, new Shift.LiteralNumericExpression(0));
+    testParse("function *a(){yield null}", yde, new Shift.LiteralNullExpression());
+    testParse("function *a(){yield true}", yde, new Shift.LiteralBooleanExpression(true));
+    testParse("function *a(){yield false}", yde, new Shift.LiteralBooleanExpression(false));
+    testParse("function *a(){yield \"a\"}", yde, new Shift.LiteralStringExpression("a"));
+    testParse("function *a(){yield a}", yde, new Shift.IdentifierExpression(new Shift.Identifier("a")));
+    testParse("function *a(){yield+0}", yde, new Shift.PrefixExpression("+", new Shift.LiteralNumericExpression(0)));
+    testParse("function *a(){yield-0}", yde, new Shift.PrefixExpression("-", new Shift.LiteralNumericExpression(0)));
+    testParse("function *a(){yield 2e308}", yde, new Shift.LiteralInfinityExpression());
+    testParse("function *a(){yield(0)}", yde, new Shift.LiteralNumericExpression(0));
+    testParse("function *a(){yield/a/}", yde, new Shift.LiteralRegExpExpression("a", ""));
+    testParse("function *a(){yield/=3/}", yde, new Shift.LiteralRegExpExpression("=3", ""));
+    testParse("function *a(){yield class{}}", yde, new Shift.ClassExpression(null, null, []));
   });
 });

@@ -16,9 +16,10 @@
 
 var testParseFailure = require('./assertions').testParseFailure;
 
+// TODO: make sense of this file
 suite("Parser", function () {
+  suite("syntax errors", function () {
 
-  suite("error handling", function () {
     testParseFailure("/*", "Unexpected token ILLEGAL");
     testParseFailure("/*\r", "Unexpected token ILLEGAL");
     testParseFailure("/*\r\n", "Unexpected token ILLEGAL");
@@ -62,7 +63,6 @@ suite("Parser", function () {
     testParseFailure("0a", "Unexpected token ILLEGAL");
     testParseFailure("08a", "Unexpected token ILLEGAL");
     testParseFailure("\u0008", "Unexpected token ILLEGAL");
-
     testParseFailure("{", "Unexpected end of input");
     testParseFailure("}", "Unexpected token }");
     testParseFailure("3ea", "Unexpected token ILLEGAL");
@@ -90,18 +90,15 @@ suite("Parser", function () {
     testParseFailure("var x = /[a-z\n]/\\ux", "Invalid regular expression: missing /");
     testParseFailure("var x = /[a-z]/\\\\ux", "Invalid regular expression");
     testParseFailure("var x = /[P QR]/\\\\u0067", "Invalid regular expression");
-
-    // testParseFailure("3 = 4", "Invalid left-hand side in assignment");
-    // testParseFailure("func() = 4", "Invalid left-hand side in assignment");
-    // testParseFailure("(1 + 1) = 10", "Invalid left-hand side in assignment");
-
-    // testParseFailure("1++", "Invalid left-hand side in assignment");
-    // testParseFailure("1--", "Invalid left-hand side in assignment");
-    // testParseFailure("++1", "Invalid left-hand side in assignment");
-    // testParseFailure("--1", "Invalid left-hand side in assignment");
+    testParseFailure("3 = 4", "Invalid left-hand side in assignment");
+    testParseFailure("func() = 4", "Invalid left-hand side in assignment");
+    testParseFailure("(1 + 1) = 10", "Invalid left-hand side in assignment");
+    testParseFailure("1++", "Invalid left-hand side in assignment");
+    testParseFailure("1--", "Invalid left-hand side in assignment");
+    testParseFailure("++1", "Invalid left-hand side in assignment");
+    testParseFailure("--1", "Invalid left-hand side in assignment");
     testParseFailure("--(1+1)", "Invalid left-hand side in assignment");
     testParseFailure("(1+1)--", "Invalid left-hand side in assignment");
-
     testParseFailure("for((1 + 1) in list) process(x);", "Invalid left-hand side in for-in");
     testParseFailure("[", "Unexpected end of input");
     testParseFailure("[,", "Unexpected end of input");
@@ -282,7 +279,7 @@ suite("Parser", function () {
     testParseFailure("function hello() { \"use strict\"; var protected; }", "Use of future reserved word in strict mode");
     testParseFailure("function hello() { \"use strict\"; var public; }", "Use of future reserved word in strict mode");
     testParseFailure("function hello() { \"use strict\"; var static; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var yield; }", "Use of future reserved word in strict mode");
+    testParseFailure("function hello() { \"use strict\"; var yield; }", "Unexpected token yield");
     testParseFailure("function hello() { \"use strict\"; var let; }", "Unexpected token let");
     testParseFailure("function hello(static) { \"use strict\"; }", "Use of future reserved word in strict mode");
     testParseFailure("function static() { \"use strict\"; }", "Use of future reserved word in strict mode");
@@ -320,8 +317,6 @@ suite("Parser", function () {
     testParseFailure("**", "Unexpected token *");
     testParseFailure("({a = 0})", "Unexpected token )");
     testParseFailure("1 / %", "Unexpected token %");
-    //testParseFailure("({a(b,c){let b;}})", "Duplicate parameter binding in method definition");
-    //testParseFailure("({a(b,c){let d; let b;}})", "Duplicate parameter binding in method definition");
-    //testParseFailure("({a(b,c){let d,e,b;}})", "Duplicate parameter binding in method definition");
+
   });
 });

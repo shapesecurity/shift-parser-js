@@ -22,7 +22,7 @@ var testParse = require('../assertions').testParse;
 var testParseFailure = require('../assertions').testParseFailure;
 
 suite("Parser", function () {
-  suite("hoistable declaration", function () {
+  suite("function declaration", function () {
     testParse("function hello() { z(); }", stmt,
       new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("hello")), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),

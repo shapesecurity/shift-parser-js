@@ -33,6 +33,5 @@ suite("Parser", function () {
     testEsprimaEquiv("a: while (0) { continue /*\r\n*/ b; }");
     testEsprimaEquiv("a: while (0) { continue /*\u2028*/ b; }");
     testEsprimaEquiv("a: while (0) { continue /*\u2029*/ b; }");
-    testParseFailure("a: while (0) { continue /*\u202a*/ b; }", "Undefined label \'b\'");
   });
 });

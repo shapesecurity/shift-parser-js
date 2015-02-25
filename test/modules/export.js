@@ -191,6 +191,8 @@ suite("Parser", function () {
     testParseModuleFailure('export default default', 'Unexpected token default');
     testParseModuleFailure('export default function', 'Unexpected end of input');
     testParseModuleFailure('export default let', 'Unexpected token let');
+
+    // TODO: these should definitely pass
     testParseModuleFailure('export default function a(){}', 'Unexpected identifier');
     testParseModuleFailure('export default class a{}', 'Unexpected identifier');
     testParseModuleFailure('export default function* a{}', 'Unexpected identifier');

@@ -36,8 +36,6 @@ suite("Parser", function () {
         new Shift.IdentifierExpression(new Shift.Identifier('yield'))), [], null, new Shift.FunctionBody([], []))
     ]));
 
-    testParseFailure('({*a([yield]){}})', 'Unexpected token yield');
-    testParseFailure('class A { *constructor(){} }', 'Constructors cannot be generators, getters or setters');
   });
 
 });

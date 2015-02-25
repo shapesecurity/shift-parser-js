@@ -284,11 +284,7 @@ suite("Parser", function () {
       testParseFailure("({'a'} = 0)", "Unexpected token }");
       testParseFailure("({var} = 0)", "Unexpected token var");
       testParseFailure("({a.b} = 0)", "Unexpected token .");
-      testParseFailure("({a: b.c} = 0)", "Invalid left-hand side in assignment");
       testParseFailure("({0} = 0)", "Unexpected token }");
-      testParseFailure("({get a(){}} = 0)", "Invalid left-hand side in assignment");
-      testParseFailure("({set a(b){}} = 0)", "Invalid left-hand side in assignment");
-      testParseFailure("({a(b){}} = 0)", "Invalid left-hand side in assignment");
     });
   });
 });

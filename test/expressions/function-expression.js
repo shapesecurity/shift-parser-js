@@ -17,26 +17,32 @@
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
+var stmt = require("../helpers").stmt;
 var testParseFailure = require("../assertions").testParseFailure;
 var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("function expression", function () {
+
     testParse("(function(){})", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))
     );
+
     testParse("(function x() { y; z() });", expr,
       new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("x")), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("y"))),
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("z")), [])),
       ]))
     );
+
     testParse("(function eval() { });", expr,
       new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("eval")), [], null, new Shift.FunctionBody([], []))
     );
+
     testParse("(function arguments() { });", expr,
       new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("arguments")), [], null, new Shift.FunctionBody([], []))
     );
+
     testParse("(function x(y, z) { })", expr,
       new Shift.FunctionExpression(
         false,
@@ -63,16 +69,19 @@ suite("Parser", function () {
         null, new Shift.FunctionBody([], [])
       )
     );
+
     testParse("(function(...a){})", expr,
       new Shift.FunctionExpression(
         false, null, [], new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.FunctionBody([], [])
       )
     );
+
     testParse("(function(a, ...b){})", expr,
       new Shift.FunctionExpression(
         false, null, [new Shift.BindingIdentifier(new Shift.Identifier("a"))], new Shift.BindingIdentifier(new Shift.Identifier("b")), new Shift.FunctionBody([], [])
       )
     );
+
     testParse("(function({a}){})", expr,
       new Shift.FunctionExpression(
         false,
@@ -89,6 +98,7 @@ suite("Parser", function () {
         new Shift.FunctionBody([], [])
       )
     );
+
     testParse("(function({a: x, a: y}){})", expr,
       new Shift.FunctionExpression(
         false,
@@ -109,6 +119,7 @@ suite("Parser", function () {
         new Shift.FunctionBody([], [])
       )
     );
+
     testParse("(function([a]){})", expr,
       new Shift.FunctionExpression(
         false,
@@ -123,6 +134,7 @@ suite("Parser", function () {
         new Shift.FunctionBody([], [])
       )
     );
+
     testParse("(function({a = 0}){})", expr,
       new Shift.FunctionExpression(
         false,
@@ -140,14 +152,20 @@ suite("Parser", function () {
       )
     );
 
+    testParse("label: !function(){ label:; };", stmt,
+      new Shift.LabeledStatement(
+        new Shift.Identifier("label"),
+        new Shift.ExpressionStatement(new Shift.PrefixExpression("!",
+          new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
+            new Shift.LabeledStatement(new Shift.Identifier("label"), new Shift.EmptyStatement),
+          ]))
+        ))
+      )
+    )
+
     testParseFailure("(function([]){})", "Unexpected token [");
-    testParseFailure("(function([a, a]){})", "Duplicate binding 'a'");
-    testParseFailure("'use strict'; (function(a, a){})", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("(function({a: x, b: x}){})", "Duplicate binding 'x'");
-    testParseFailure("'use strict'; (function({a: x}, {b: x}){})", "Strict mode function may not have duplicate parameter names");
     testParseFailure("(function(...a, b){})", "Unexpected token ,");
     testParseFailure("(function((a)){})", "Unexpected token (");
-    testParseFailure("(function(eval){'use strict';})", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("(function(package){'use strict';})", "Use of future reserved word in strict mode");
   });
 });

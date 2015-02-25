@@ -49,8 +49,12 @@ suite("Parser", function () {
         "a"));
 
     testImportDecl(
-      'import a from "a"',
-            new Shift.ImportNamespace("a", null, "a"));
+      'import a from "c"',
+      new Shift.Import("a", [], "c"));
+
+    testImportDecl(
+      'import a, {} from "c"',
+      new Shift.Import("a", [], "c"));
 
     testImportDecl(
       'import {} from "a"',
@@ -62,13 +66,6 @@ suite("Parser", function () {
         "a",
         new Shift.BindingIdentifier(new Shift.Identifier('b')),
         "a"));
-
-    testImportDecl(
-      'import a, {} from "c"',
-            new Shift.Import(
-        "a",
-        [],
-        "c"));
 
     testImportDecl(
       'import a, {b} from "c"',

@@ -73,8 +73,6 @@ suite("Parser", function () {
     testParseFailure("3x", "Unexpected token ILLEGAL");
     testParseFailure("3x0", "Unexpected token ILLEGAL");
     testParseFailure("0x", "Unexpected token ILLEGAL");
-    testParseFailure("09", "Unexpected token ILLEGAL");
-    testParseFailure("018", "Unexpected token ILLEGAL");
     testParseFailure("01a", "Unexpected token ILLEGAL");
     testParseFailure("3in[]", "Unexpected token ILLEGAL");
     testParseFailure("0x3in[]", "Unexpected token ILLEGAL");
@@ -269,6 +267,8 @@ suite("Parser", function () {
         "Octal literals are not allowed in strict mode.");
     testParseFailure("function hello() { \'use strict\'; ({ 021: 42 }); }",
         "Octal literals are not allowed in strict mode.");
+    testParseFailure("function hello() { \'use strict\'; ({ 08: 42 }); }",
+      "Octal literals are not allowed in strict mode.");
     testParseFailure("function hello() { \"octal directive\\1\"; \"use strict\"; }",
         "Octal literals are not allowed in strict mode.");
     testParseFailure("function hello() { \"octal directive\\1\"; \"octal directive\\2\"; \"use strict\"; }",

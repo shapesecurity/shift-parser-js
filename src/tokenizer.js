@@ -209,8 +209,8 @@ export class RegularExpressionLiteralToken extends Token {
 }
 
 export class NumericLiteralToken extends Token {
-  constructor(slice, value = +slice.text, octal = false) {
-    super(TokenType.NUMBER, slice, octal);
+  constructor(slice, value = +slice.text, legacyOctal = false) {
+    super(TokenType.NUMBER, slice, legacyOctal);
     this._value = value;
   }
 }
@@ -1071,26 +1071,42 @@ export default class Tokenizer {
   }
 
   scanOctalLiteral(start, startLocation) {
-    var offset = this.index - start;
+    while (this.index < this.source.length) {
+      let ch = this.source.charAt(this.index);
+      if ("0" <= ch && ch <= "7") {
+        this.index++;
+      } else if (isIdentifierPart(ch.charCodeAt(0))) {
+        throw this.createILLEGAL();
+      } else {
+        break;
+      }
+    }
+
+    if (this.index - start === 2) {
+      throw this.createILLEGAL();
+    }
+
+    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(2), 8), false);
+  }
+
+  scanLegacyOctalLiteral(start, startLocation) {
+    let isOctal = true;
 
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if (!("0" <= ch && ch <= "7")) {
+      if ("0" <= ch && ch <= "7") {
+        this.index++;
+      } else if (ch === '8' || ch === '9') {
+        isOctal = false;
+        this.index++
+      } else if (isIdentifierPart(ch.charCodeAt(0))) {
+        throw this.createILLEGAL();
+      } else {
         break;
       }
-      this.index++;
     }
 
-    if (offset === 2 && this.index - start === 2) {
-      throw this.createILLEGAL();
-    }
-
-    if (this.index < this.source.length && (isIdentifierStart(this.source.charCodeAt(this.index))
-        || isDecimalDigit(this.source.charAt(this.index)))) {
-      throw this.createILLEGAL();
-    }
-
-    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(offset), 8), true);
+    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(1), isOctal ? 8 : 10), true);
   }
 
   scanNumericLiteral() {
@@ -1113,7 +1129,10 @@ export default class Tokenizer {
           this.index++;
           return this.scanOctalLiteral(start, startLocation);
         } else if ("0" <= ch && ch <= "9") {
-          return this.scanOctalLiteral(start, startLocation);
+          if (this.strict) {
+            throw this.createErrorWithLocation(startLocation, ErrorMessages.STRICT_OCTAL_LITERAL);
+          }
+          return this.scanLegacyOctalLiteral(start, startLocation);
         }
       } else {
         return new NumericLiteralToken(this.getSlice(start, startLocation));

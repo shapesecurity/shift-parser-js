@@ -74,9 +74,12 @@ suite("Parser", function () {
 
     // Octal Numeric Literal
     testParse("0o0", expr, new Shift.LiteralNumericExpression(0));
+    testParse("(0o0)", expr, new Shift.LiteralNumericExpression(0));
     testParse("0o1", expr, new Shift.LiteralNumericExpression(1));
     testParse("0o10", expr, new Shift.LiteralNumericExpression(8));
     testParse("0O0", expr, new Shift.LiteralNumericExpression(0));
+    testParse("09", expr, new Shift.LiteralNumericExpression(9));
+    testParse("018", expr, new Shift.LiteralNumericExpression(18));
 
     testParseFailure("0o", "Unexpected token ILLEGAL");
     testParseFailure("0o1a", "Unexpected token ILLEGAL");

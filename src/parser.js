@@ -682,7 +682,7 @@ export class Parser extends Tokenizer {
         if (last != null && last.type === "SpreadElement") {
           return cpLoc(node, new Shift.ArrayBinding(
             node.elements.slice(0, -1).map(e => e && Parser.transformDestructuringAssignment(e)),
-            cpLoc(last.expression, new Shift.BindingIdentifier(last.expression.identifier))
+            cpLoc(last.expression, Parser.transformDestructuringAssignment(last.expression))
           ));
         } else {
           return cpLoc(node, new Shift.ArrayBinding(
@@ -716,9 +716,9 @@ export class Parser extends Tokenizer {
         if (!node.elements.slice(0, -1).filter(e => e != null).every(Parser.isDestructuringAssignmentTargetWithDefault))
           return false;
         let last = node.elements[node.elements.length - 1];
-        return last != null && last.type === "SpreadElement"
-          ? last.expression.type === "IdentifierExpression"
-          : last == null || Parser.isDestructuringAssignmentTargetWithDefault(last);
+        return last == null ||
+          last.type === "SpreadElement" && Parser.isDestructuringAssignmentTarget(last.expression) ||
+          Parser.isDestructuringAssignmentTargetWithDefault(last);
       case "ArrayBinding":
       case "BindingIdentifier":
       case "BindingPropertyIdentifier":
@@ -757,7 +757,7 @@ export class Parser extends Tokenizer {
         let names = [];
         node.elements.filter(e => e != null).forEach(e => [].push.apply(names, Parser.boundNames(e)));
         if (node.restElement != null) {
-          names.push(node.restElement.identifier.name);
+          [].push.apply(names, Parser.boundNames(node.restElement));
         }
         return names;
       }

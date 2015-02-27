@@ -145,9 +145,34 @@ suite("Parser", function () {
         )
       );
 
+      testParse("[x, x] = 0", expr,
+        new Shift.AssignmentExpression(
+          "=",
+          new Shift.ArrayBinding(
+            [
+              new Shift.BindingIdentifier(new Shift.Identifier("x")),
+              new Shift.BindingIdentifier(new Shift.Identifier("x")),
+            ],
+            null
+          ),
+          new Shift.LiteralNumericExpression(0)
+        )
+      );
+
+      testParse("[x, ...x] = 0", expr,
+        new Shift.AssignmentExpression(
+          "=",
+          new Shift.ArrayBinding(
+            [
+              new Shift.BindingIdentifier(new Shift.Identifier("x")),
+            ],
+            new Shift.BindingIdentifier(new Shift.Identifier("x"))
+          ),
+          new Shift.LiteralNumericExpression(0)
+        )
+      );
+
       testParseFailure("[] = 0", "Invalid left-hand side in assignment");
-      testParseFailure("[x, x] = 0", "Duplicate binding 'x'");
-      testParseFailure("[x, ...x] = 0", "Duplicate binding 'x'");
       testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment"); // TODO(bzhang): Unexpected token ,
       testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...x,,] = 0", "Invalid left-hand side in assignment");

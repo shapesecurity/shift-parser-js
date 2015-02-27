@@ -202,6 +202,23 @@ suite("Parser", function () {
         )
       );
 
+      testParse("({0: x, 1: x} = 0)", expr,
+        new Shift.AssignmentExpression(
+          "=",
+          new Shift.ObjectBinding([
+            new Shift.BindingPropertyProperty(
+              new Shift.StaticPropertyName("0"),
+              new Shift.BindingIdentifier(new Shift.Identifier("x"))
+            ),
+            new Shift.BindingPropertyProperty(
+              new Shift.StaticPropertyName("1"),
+              new Shift.BindingIdentifier(new Shift.Identifier("x"))
+            ),
+          ]),
+          new Shift.LiteralNumericExpression(0)
+        )
+      );
+
       testParse("({x: y = 0} = 1)", expr,
         new Shift.AssignmentExpression(
           "=",

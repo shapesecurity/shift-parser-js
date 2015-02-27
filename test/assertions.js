@@ -32,7 +32,7 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
 
 exports.testParseFailure = function testParseFailure(source, message) {
   var args = arguments.length;
-  test(source, function () {
+  test('Expect failure in Script: ' + source, function () {
     expect(args).to.be(testParseFailure.length);
     try {
       parse(source);
@@ -40,13 +40,13 @@ exports.testParseFailure = function testParseFailure(source, message) {
       expect(e.description).to.be(message);
       return;
     }
-    throw new Error("Expecting error");
+    throw new Error("Expecting error in Script: " + source);
   });
 };
 
 exports.testParseModuleFailure = function testParseModuleFailure(source, message) {
   var args = arguments.length;
-  test('Expect failure: ' + source, function () {
+  test('Expect failure in Module: ' + source, function () {
     expect(args).to.be(testParseModuleFailure.length);
     try {
       parseModule(source);
@@ -54,6 +54,6 @@ exports.testParseModuleFailure = function testParseModuleFailure(source, message
       expect(e.description).to.be(message);
       return;
     }
-    throw new Error("Expecting error");
+    throw new Error("Expecting error in Module: " + source);
   });
 };

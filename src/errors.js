@@ -45,6 +45,7 @@ export const ErrorMessages = {
   STRICT_DELETE: "Delete of an unqualified identifier in strict mode.",
   DUPLICATE_PROTO_PROPERTY: "Duplicate __proto__ property in object literal not allowed",
   DUPLICATE_BINDING: "Duplicate binding '{0}'",
+  LEXICALLY_BOUND_LET: "Invalid lexical binding name 'let'",
   ACCESSOR_DATA_PROPERTY: "Object literal may not have data and accessor property with the same name",
   ACCESSOR_GET_SET: "Object literal may not have multiple get/set accessors with the same name",
   STRICT_LHS_ASSIGNMENT: "Assignment to eval or arguments is not allowed in strict mode",
@@ -53,5 +54,12 @@ export const ErrorMessages = {
   STRICT_RESERVED_WORD: "Use of future reserved word in strict mode",
   ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list",
   INVALID_VAR_INIT_FOR_IN: "Invalid variable declaration in for-in statement",
-  INVALID_VAR_INIT_FOR_OF: "Invalid variable declaration in for-of statement"
+  INVALID_VAR_INIT_FOR_OF: "Invalid variable declaration in for-of statement",
+  UNEXPECTED_SUPER_CALL: "Unexpected super call",
+  UNEXPECTED_SUPER_PROPERTY: "Unexpected super property",
+  IMPORT_DUPE: "Duplicate imported names in import declaration",
+  UNEXPECTED_NEW_TARGET: "Unexpected new . target",
+  DUPLICATE_EXPORTED_NAME: "Duplicate export of '{0}'",
+  MODULE_EXPORT_UNDEFINED: "Export '{0}' is not defined in module",
+  DUPLICATE_CATCH_BINDING: "Catch parameter '{0}' redeclared as var in for-of loop",
 };

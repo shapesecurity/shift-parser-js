@@ -65,6 +65,16 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(0)
       )
     );
+    testParse("x.x *= 0", expr,
+      new Shift.AssignmentExpression(
+        "*=",
+        new Shift.StaticMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("x")),
+          "x"
+        ),
+        new Shift.LiteralNumericExpression(0)
+      )
+    );
     testParse("x /= 0", expr,
       new Shift.AssignmentExpression(
         "/=",

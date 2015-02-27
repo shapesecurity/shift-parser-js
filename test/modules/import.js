@@ -103,9 +103,9 @@ suite("Parser", function () {
         "c"));
 
     testImportDecl(
-      'import as, {as as as} from "as"',
+      'import {as as as} from "as"',
             new Shift.Import(
-        "as",
+        null,
         [new Shift.ImportSpecifier(new Shift.Identifier("as"), new Shift.BindingIdentifier(new Shift.Identifier('as')))],
         "as"));
 

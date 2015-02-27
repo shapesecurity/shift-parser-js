@@ -90,6 +90,21 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
+    testParse("for(var a = 0;;) { let a; }", stmt,
+      new Shift.ForStatement(
+        new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.LiteralNumericExpression(0))
+        ]),
+        null,
+        null,
+        new Shift.BlockStatement(new Shift.Block([
+          new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let",
+          [
+            new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+          ]))
+        ]))
+      )
+    );
     testEsprimaEquiv("for(;b;c);");
   });
 });

@@ -28,15 +28,58 @@ suite("Parser", function () {
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
             new Shift.ObjectBinding([
-              new Shift.BindingPropertyIdentifier(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+              new Shift.BindingPropertyIdentifier(new Shift.BindingIdentifier(new Shift.Identifier("a")), null),
             ]),
             null
           ),
         ]))
       );
 
-      testParseFailure("var {a,x:{y:a}} = 0;", "Duplicate binding \'a\'");
-      testParseFailure("var {a: b.c};", "Unexpected token {");
+      testParse("var {a, x: {y: a}};", stmt,
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.ObjectBinding([
+              new Shift.BindingPropertyIdentifier(new Shift.BindingIdentifier(new Shift.Identifier("a")), null),
+              new Shift.BindingPropertyProperty(
+                new Shift.StaticPropertyName("x"),
+                new Shift.ObjectBinding([
+                  new Shift.BindingPropertyProperty(
+                    new Shift.StaticPropertyName("y"),
+                    new Shift.BindingIdentifier(new Shift.Identifier("a"))
+                  ),
+                ])
+              ),
+            ]),
+            null
+          ),
+        ]))
+      );
+
+      testParse("var a, {x: {y: a}};", stmt,
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("a")),
+            null
+          ),
+          new Shift.VariableDeclarator(
+            new Shift.ObjectBinding([
+              new Shift.BindingPropertyProperty(
+                new Shift.StaticPropertyName("x"),
+                new Shift.ObjectBinding([
+                  new Shift.BindingPropertyProperty(
+                    new Shift.StaticPropertyName("y"),
+                    new Shift.BindingIdentifier(new Shift.Identifier("a"))
+                  ),
+                ])
+              ),
+            ]),
+            null
+          ),
+        ]))
+      );
+
+      testParseFailure("let {a, x: {y: a}};", "Duplicate binding 'a'");
+      testParseFailure("let a, {x: {y: a}};", "Duplicate binding 'a'");
     });
 
     suite("catch clause", function () {

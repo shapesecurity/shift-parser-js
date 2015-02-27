@@ -1099,6 +1099,16 @@ export class Parser extends Tokenizer {
     while (true) {
       result.push(this.parseVariableDeclarator(kind));
       if (!this.eat(TokenType.COMMA)) {
+
+        let bound = [].concat.apply([], result.map(declarator => Parser.boundNames(declarator.binding)));
+        if (kind !== "var" && firstDuplicate(bound) != null) {
+          throw this.createErrorWithLocation(this.lookahead, ErrorMessages.DUPLICATE_BINDING, firstDuplicate(bound));
+        }
+
+        if (this.strict && bound.some(isRestrictedWord)) {
+          throw this.createErrorWithLocation(this.lookahead, ErrorMessages.STRICT_VAR_NAME);
+        }
+
         return result;
       }
     }
@@ -1118,17 +1128,8 @@ export class Parser extends Tokenizer {
     }
     id = Parser.transformDestructuringAssignment(id);
 
-    let bound = Parser.boundNames(id);
-    if (firstDuplicate(bound) != null) {
-      throw this.createErrorWithLocation(token, ErrorMessages.DUPLICATE_BINDING, firstDuplicate(bound));
-    }
-
-    if (this.strict && bound.some(isRestrictedWord)) {
-      throw this.createErrorWithLocation(token, ErrorMessages.STRICT_VAR_NAME);
-    }
-
     let init = null;
-    if (kind == "const") {
+    if (kind === "const") {
       this.expect(TokenType.ASSIGN);
       init = this.parseAssignmentExpression();
     } else if (this.eat(TokenType.ASSIGN)) {

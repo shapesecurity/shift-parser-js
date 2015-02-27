@@ -53,10 +53,54 @@ suite("Parser", function () {
         ]))
       );
 
+      testParse("var a, [a];", stmt,
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.BindingIdentifier(new Shift.Identifier("a")),
+            null
+          ),
+          new Shift.VariableDeclarator(
+            new Shift.ArrayBinding([
+              new Shift.BindingIdentifier(new Shift.Identifier("a")),
+            ], null),
+            null
+          ),
+        ]))
+      );
+
+      testParse("var [a, a];", stmt,
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.ArrayBinding([
+              new Shift.BindingIdentifier(new Shift.Identifier("a")),
+              new Shift.BindingIdentifier(new Shift.Identifier("a")),
+            ], null),
+            null
+          ),
+        ]))
+      );
+
+      testParse("var [a, ...a];", stmt,
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.ArrayBinding(
+              [
+                new Shift.BindingIdentifier(new Shift.Identifier("a")),
+              ],
+              new Shift.BindingIdentifier(new Shift.Identifier("a"))
+            ),
+            null
+          ),
+        ]))
+      );
+
       testParseFailure("var [a.b]", "Unexpected token [");
       testParseFailure("var ([x])", "Unexpected token (");
-      testParseFailure("var [a, a]", "Duplicate binding \'a\'");
-      testParseFailure("var [a, a] = 0;", "Duplicate binding \'a\'");
+      // TODO: move these to early-errors.js
+      testParseFailure("let a, [a];", "Duplicate binding 'a'");
+      testParseFailure("let [a, a];", "Duplicate binding 'a'");
+      testParseFailure("let [a, ...a];", "Duplicate binding 'a'");
+
     });
 
     suite("catch clause", function () {

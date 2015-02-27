@@ -1227,10 +1227,6 @@ export class Parser extends Tokenizer {
       node = Parser.transformDestructuringAssignment(node);
 
       let bound = Parser.boundNames(node);
-      if (firstDuplicate(bound) != null) {
-        throw this.createErrorWithLocation(token, ErrorMessages.DUPLICATE_BINDING, firstDuplicate(bound));
-      }
-
       if (this.strict && bound.some(isRestrictedWord)) {
         throw this.createErrorWithLocation(token, ErrorMessages.STRICT_LHS_ASSIGNMENT);
       }

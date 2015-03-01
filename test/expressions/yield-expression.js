@@ -36,8 +36,6 @@ suite("Parser", function () {
     }
 
     testParse("function*a(){yield\na}", yd, [new Shift.YieldExpression(null), new Shift.IdentifierExpression(new Shift.Identifier("a"))]);
-    testParse("function*a(){yield*a}", yd, [new Shift.YieldGeneratorExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")))]);
-    testParse("function a(){yield*a}", yd, [new Shift.BinaryExpression("*", new Shift.IdentifierExpression(new Shift.Identifier("yield")), new Shift.IdentifierExpression(new Shift.Identifier("a")))]);
 
     // yield as an Identifier cannot show up in body of a generator or in strict mode.
     testParse("({set a(yield){}})", expr,
@@ -47,9 +45,6 @@ suite("Parser", function () {
           new Shift.BindingIdentifier(new Shift.Identifier("yield")),
           emptyBody)
       ]));
-    testParseFailure("function *a(){ return ({set a(yield){}}); }", "Unexpected token yield");
-    testParseFailure("function *a(){yield\n*a}", "Unexpected token *");
-    testParseFailure("function *a(){yield*}", "Unexpected token }");
     testParse("function *a(){yield 0}", yde, new Shift.LiteralNumericExpression(0));
     testParse("function *a(){yield null}", yde, new Shift.LiteralNullExpression());
     testParse("function *a(){yield true}", yde, new Shift.LiteralBooleanExpression(true));
@@ -63,5 +58,7 @@ suite("Parser", function () {
     testParse("function *a(){yield/a/}", yde, new Shift.LiteralRegExpExpression("a", ""));
     testParse("function *a(){yield/=3/}", yde, new Shift.LiteralRegExpExpression("=3", ""));
     testParse("function *a(){yield class{}}", yde, new Shift.ClassExpression(null, null, []));
+
+    testParseFailure("function *a(){ return ({set a(yield){}}); }", "Unexpected token yield");
   });
 });

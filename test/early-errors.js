@@ -339,7 +339,7 @@ suite("Parser", function () {
     //  (see Annex B 3.5)
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the VarDeclaredNames of Block.
     //  (see Annex B 3.5)
-    // TODO: https://bugs.ecmascript.org/show_bug.cgi?id=4087#c2
+    // TODO: add early error text from ES6 draft 35; https://bugs.ecmascript.org/show_bug.cgi?id=4087#c2
     testParseFailure("try {} catch ([e, e]) {}", "Duplicate binding 'e'");
     testParseFailure("try {} catch ({e, e}) {}", "Duplicate binding 'e'");
     testParseFailure("try {} catch ({a: e, b: e}) {}", "Duplicate binding 'e'");
@@ -605,7 +605,6 @@ suite("Parser", function () {
     testParseModuleFailure("export default 0; export default function f(){};", "Duplicate export of 'default'");
     testParseModuleFailure("export default 0; export default class a {};", "Duplicate export of 'default'");
     // It is a Syntax Error if any element of the ExportedBindings of ModuleItemList does not also occur in either the VarDeclaredNames of ModuleItemList, or the LexicallyDeclaredNames of ModuleItemList.
-    // TODO: Is this valid export? testParseModuleFailure("export a;", "Export 'a' is not defined in module");
     testParseModuleFailure("export {a};", "Export 'a' is not defined in module");
     testParseModuleFailure("var a; export {b as a};", "Export 'b' is not defined in module");
     testParseModuleFailure("export {a as b}; var b;", "Export 'a' is not defined in module");

@@ -47,7 +47,6 @@ suite("Parser", function () {
           new Shift.BindingIdentifier(new Shift.Identifier("yield")),
           emptyBody)
       ]));
-    // TODO: figure out which early error applies here
     testParseFailure("function *a(){ return ({set a(yield){}}); }", "Unexpected token yield");
     testParseFailure("function *a(){yield\n*a}", "Unexpected token *");
     testParseFailure("function *a(){yield*}", "Unexpected token }");

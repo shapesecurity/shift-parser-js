@@ -18,7 +18,6 @@ var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
 var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParseFailure = require('../assertions').testParseFailure;
 var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {

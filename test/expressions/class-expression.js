@@ -247,12 +247,7 @@ suite("Parser", function () {
             new Shift.FunctionBody([], [])
           ))]));
 
-    testParseFailure("(class {a(eval){'use strict';}})", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("(class {set a(eval){'use strict';}})", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("(class {a:0})", "Only methods are allowed in classes");
-    testParseFailure("(class {get constructor(){}})", "Constructors cannot be generators, getters or setters");
-    testParseFailure("(class {constructor(){}a(){}constructor(){}})", "Only one constructor is allowed in a class");
-    testParseFailure("(class {static prototype(){}})", "Static class methods cannot be named \'prototype\'");
     testParseFailure("(class {a=0})", "Only methods are allowed in classes");
     testParseFailure("(class {a})", "Only methods are allowed in classes");
     testParseFailure("(class {3:0})", "Only methods are allowed in classes");

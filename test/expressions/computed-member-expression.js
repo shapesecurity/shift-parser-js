@@ -18,7 +18,7 @@ var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
 
 suite("Parser", function () {
   suite("computed member expression", function () {
-    testEsprimaEquiv("universe[galaxyName, otherUselessName]");
-    testEsprimaEquiv("universe[galaxyName]");
+    testEsprimaEquiv("a[b, c]");
+    testEsprimaEquiv("a[b]");
   });
 });

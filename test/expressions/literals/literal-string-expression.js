@@ -52,8 +52,6 @@ suite("Parser", function () {
     testParseFailure("('\n')", "Unexpected token ILLEGAL");
     testParseFailure("('\u2028')", "Unexpected token ILLEGAL");
     testParseFailure("('\u2029')", "Unexpected token ILLEGAL");
-    testParseFailure("('\\u{110001}')","Unexpected token ILLEGAL"); // out of range
-    testParseFailure("('\\u{FFFFFFF}')", "Unexpected token ILLEGAL");
     testParseFailure("('\\u{2028')", "Unexpected token ILLEGAL");
     testParseFailure("'use strict'; ('\\1')", "Octal literals are not allowed in strict mode.");
 

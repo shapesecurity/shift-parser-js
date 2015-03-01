@@ -48,8 +48,6 @@ suite("Parser", function () {
     testParse("\"Hello\\\r\nworld\"", directives, [new Shift.Directive("Hello\\\r\nworld")]);
     testParse("\"Hello\\1World\"", directives, [new Shift.Directive("Hello\\1World")]);
 
-    testParseFailure("(function () { 'use strict'; with (i); })", "Strict mode code may not include a with statement");
-
     testParse("(function () { 'use\\x20strict'; with (i); })", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([new Shift.Directive("use\\x20strict")], [
         new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),

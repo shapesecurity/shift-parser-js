@@ -80,6 +80,7 @@ suite("Parser", function () {
 
       testParseFailure("let {a, x: {y: a}};", "Duplicate binding 'a'");
       testParseFailure("let a, {x: {y: a}};", "Duplicate binding 'a'");
+      testParseFailure("var {a: b.c};", "Unexpected token {");
     });
 
     suite("catch clause", function () {
@@ -113,9 +114,6 @@ suite("Parser", function () {
         )
       );
 
-      testParseFailure("try {} catch ({e, e}) {}", "Duplicate binding \'e\'");
-      testParseFailure("try {} catch ({a: e, b: e}) {}", "Duplicate binding \'e\'");
-      testParseFailure("try {} catch ({e = 0, a: e}) {}", "Duplicate binding \'e\'");
     });
 
   });

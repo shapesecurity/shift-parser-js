@@ -96,11 +96,6 @@ suite("Parser", function () {
 
       testParseFailure("var [a.b]", "Unexpected token [");
       testParseFailure("var ([x])", "Unexpected token (");
-      // TODO: move these to early-errors.js
-      testParseFailure("let a, [a];", "Duplicate binding 'a'");
-      testParseFailure("let [a, a];", "Duplicate binding 'a'");
-      testParseFailure("let [a, ...a];", "Duplicate binding 'a'");
-
     });
 
     suite("catch clause", function () {
@@ -125,7 +120,6 @@ suite("Parser", function () {
         )
       );
 
-      testParseFailure("try {} catch ([e,e]) {}", "Duplicate binding \'e\'");
     });
 
   });

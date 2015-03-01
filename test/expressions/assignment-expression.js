@@ -65,6 +65,16 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(0)
       )
     );
+    testParse("x.x *= 0", expr,
+      new Shift.AssignmentExpression(
+        "*=",
+        new Shift.StaticMemberExpression(
+          new Shift.IdentifierExpression(new Shift.Identifier("x")),
+          "x"
+        ),
+        new Shift.LiteralNumericExpression(0)
+      )
+    );
     testParse("x /= 0", expr,
       new Shift.AssignmentExpression(
         "/=",
@@ -135,13 +145,6 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(0)
       )
     );
-
-    testParseFailure("'use strict'; [eval] = 0", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict'; [,,,eval,] = 0", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict'; ({eval} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict'; ({eval = 0} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict'; ({a: eval} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("'use strict'; ({a: eval = 0} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
 
     testParse("'use strict'; eval[0] = 0", expr,
       new Shift.AssignmentExpression(

@@ -40,6 +40,31 @@ suite("Parser", function () {
         )
       )
     );
+
+    testParse("try { } catch (e) { let a; }", stmt,
+      new Shift.TryCatchStatement(
+        new Shift.Block([]),
+        new Shift.CatchClause(
+          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          new Shift.Block([
+            new Shift.VariableDeclarationStatement(
+              new Shift.VariableDeclaration(
+                "let",
+                [
+                  new Shift.VariableDeclarator(
+                    new Shift.BindingIdentifier(
+                      new Shift.Identifier("a")
+                    ),
+                    null
+                  )
+                ]
+              )
+            )
+          ])
+        )
+      )
+    );
+
     testParse("try { } catch (eval) { }", stmt,
       new Shift.TryCatchStatement(
         new Shift.Block([]),

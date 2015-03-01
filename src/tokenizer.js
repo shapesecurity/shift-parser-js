@@ -634,7 +634,6 @@ export default class Tokenizer {
             // Block comment ends with "*/'.
             if (this.source.charAt(this.index + 1) === "/") {
               this.index = this.index + 2;
-              debugger
               return isLineStart;
             }
             this.index++;

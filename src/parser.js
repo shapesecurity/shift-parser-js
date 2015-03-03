@@ -301,7 +301,7 @@ export class Parser extends Tokenizer {
         let text = token.slice.text;
         let isStringLiteral = token.type === TokenType.STRING;
         let directiveLocation = this.getLocation();
-        let stmt = this.parseStatementListItem();
+        let stmt = this.parseStatementListItem({isTopLevel: true});
         if (parsingDirectives) {
           if (isStringLiteral && stmt.type === "ExpressionStatement" &&
             stmt.expression.type === "LiteralStringExpression") {
@@ -487,7 +487,7 @@ export class Parser extends Tokenizer {
         break;
       case TokenType.FUNCTION:
         // export HoistableDeclaration
-        decl = new Shift.Export(this.parseFunction({isExpr: false}));
+        decl = new Shift.Export(this.parseFunction({isExpr: false, isTopLevel: true}));
         if ({}.hasOwnProperty.call(exportedNames, "$" + decl.declaration.name.identifier.name)) {
           throw this.createError(ErrorMessages.DUPLICATE_EXPORTED_NAME, decl.declaration.name.identifier.name);
         }
@@ -505,7 +505,7 @@ export class Parser extends Tokenizer {
         switch (this.lookahead.type) {
           case TokenType.FUNCTION:
             // export default HoistableDeclaration[Default]
-            decl = new Shift.ExportDefault(this.parseFunction({isExpr: false, inDefault: true}));
+            decl = new Shift.ExportDefault(this.parseFunction({isExpr: false, inDefault: true, isTopLevel: true}));
             key = decl.body.name.identifier.name;
             if (key != "*default*") {
               exportedBindings["$" + key] = true;
@@ -573,7 +573,7 @@ export class Parser extends Tokenizer {
     }
   }
 
-  parseStatementListItem() {
+  parseStatementListItem({isTopLevel = false} = {}) {
     let startLocation = this.getLocation();
     if (this.eof()) {
       throw this.createUnexpected(this.lookahead);
@@ -582,7 +582,7 @@ export class Parser extends Tokenizer {
     let decl = this.wrapVDN(() => {
       switch (this.lookahead.type) {
         case TokenType.FUNCTION:
-          return this.parseFunction({isExpr: false});
+          return this.parseFunction({isExpr: false, isTopLevel});
         case TokenType.CONST:
           return this.parseVariableDeclarationStatement();
         case TokenType.CLASS:
@@ -592,22 +592,22 @@ export class Parser extends Tokenizer {
           if (this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let") {
             return this.parseVariableDeclarationStatement();
           }
-          return this.parseStatement({allowLabeledFunction: true});
+          return this.parseStatement({allowLabeledFunction: true, isTopLevel});
       }
     }, this.checkBlockScope);
     return this.markLocation(decl, startLocation);
   }
 
-  parseStatement({allowLabeledFunction = false} = {}) {
+  parseStatement({allowLabeledFunction = false, isTopLevel = false} = {}) {
     let startLocation = this.getLocation();
     let originalLDN = this.LDN;
     this.LDN = [];
-    var stmt = this.wrapVDN(() => this.parseStatementHelper(allowLabeledFunction, originalLDN));
+    var stmt = this.wrapVDN(() => this.parseStatementHelper(allowLabeledFunction, originalLDN, isTopLevel));
     this.LDN = originalLDN;
     return this.markLocation(stmt, startLocation);
   }
 
-  parseStatementHelper(allowLabeledFunction, originalLDN) {
+  parseStatementHelper(allowLabeledFunction, originalLDN, isTopLevel) {
     if (this.eof()) {
       throw this.createUnexpected(this.lookahead);
     }
@@ -665,9 +665,9 @@ export class Parser extends Tokenizer {
             if (this.strict || !allowLabeledFunction) {
               throw this.createUnexpected(this.lookahead);
             }
-            labeledBody = this.parseFunction({isExpr: false, allowGenerator: false});
+            labeledBody = this.parseFunction({isExpr: false, allowGenerator: false, isTopLevel});
           } else {
-            labeledBody = this.parseStatement({allowLabeledFunction});
+            labeledBody = this.parseStatement({allowLabeledFunction, isTopLevel});
           }
           delete this.labelSet[key];
           return new Shift.LabeledStatement(expr.identifier, labeledBody);
@@ -2365,7 +2365,7 @@ export class Parser extends Tokenizer {
     return this.markLocation(new (isExpr ? Shift.ClassExpression : Shift.ClassDeclaration)(id, heritage, methods), location);
   }
 
-  parseFunction({isExpr, inDefault = false, allowGenerator = true}) {
+  parseFunction({isExpr, isTopLevel, inDefault = false, allowGenerator = true}) {
     let startLocation = this.getLocation();
 
     this.expect(TokenType.FUNCTION);
@@ -2437,7 +2437,12 @@ export class Parser extends Tokenizer {
     this.strict = previousStrict;
     let cons = isExpr ? Shift.FunctionExpression : Shift.FunctionDeclaration;
     if (!isExpr) {
-      this.VDN["$" + id.identifier.name] = true;
+      if (isTopLevel) {
+        this.VDN["$" + id.identifier.name] = true;
+      } else {
+        this.LDN.push(id.identifier.name);
+      }
+
     }
     return this.markLocation(
       new cons(isGenerator, id, info.params, info.rest, body),

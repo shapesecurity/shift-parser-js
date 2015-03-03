@@ -66,8 +66,23 @@ suite("API", function () {
 
   test("location sanity test", function () {
     // TODO: everything.js once the ES6 version is ready
-    var source = require("fs").readFileSync(require.resolve("../../dist/parser"), "utf-8");
-    var tree = ShiftParser.default(source, {loc: true});
+    var source = require("fs").readFileSync(require.resolve("../../src/parser"), "utf-8");
+    var tree = ShiftParser.parseModule(source, {loc: true});
     locationSanityCheck(tree);
   });
+
+  test("self parsing", function () {
+    function parseFile(name) {
+      var source = require("fs").readFileSync(require.resolve("../../src/" + name), "utf-8");
+      var tree = ShiftParser.parseModule(source, {loc: true});
+      locationSanityCheck(tree);
+    }
+
+    parseFile("utils");
+    parseFile("errors");
+    parseFile("parser");
+    parseFile("tokenizer");
+    parseFile("index");
+  });
+
 });

@@ -239,11 +239,15 @@ export class Parser extends Tokenizer {
     this.lookahead = this.advance();
 
     let location = this.getLocation();
+    let originalLDN = this.LDN;
+    this.LDN = [];
+
     let [body] = this.parseBody();
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
     this.checkBlockScope();
+    this.LDN = originalLDN;
     return this.markLocation(new Shift.Script(body), location);
   }
 
@@ -252,6 +256,10 @@ export class Parser extends Tokenizer {
 
     let oldVDN = this.VDN;
     this.VDN = Object.create(null);
+
+    let originalLDN = this.LDN;
+    this.LDN = [];
+
     boundParams.forEach(name => this.VDN["$" + name] = true);
 
     let oldLabelSet = this.labelSet;
@@ -272,7 +280,9 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.RBRACE);
 
     this.checkBlockScope();
+
     this.VDN = oldVDN;
+    this.LDN = originalLDN;
 
     body = this.markLocation(body, startLocation);
 

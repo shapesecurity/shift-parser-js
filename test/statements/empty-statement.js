@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("empty expression", function () {
-    // Empty Statement
-    testEsprimaEquiv(";");
+
+    testParse(";", stmt, { type: "EmptyStatement" });
+
   });
 });

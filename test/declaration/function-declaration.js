@@ -17,9 +17,8 @@
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParse = require('../assertions').testParse;
-var testParseFailure = require('../assertions').testParseFailure;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("function declaration", function () {
@@ -66,9 +65,9 @@ suite("Parser", function () {
       new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("universe")), [new Shift.BindingIdentifier(new Shift.Identifier("__proto__"))], null, new Shift.FunctionBody([], []))
     );
 
-    testParse("function test() { \"use strict\"\n + 42; }", stmt,
+    testParse("function test() { \"use strict\"\n + 0; }", stmt,
       new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("test")), [], null, new Shift.FunctionBody([], [
-        new Shift.ExpressionStatement(new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("use strict"), new Shift.LiteralNumericExpression(42))),
+        new Shift.ExpressionStatement(new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("use strict"), new Shift.LiteralNumericExpression(0))),
       ]))
     );
   });

@@ -16,16 +16,42 @@
 
 var Shift = require("shift-ast");
 
-var expr = require("./../helpers").expr;
-var stmt = require("./../helpers").stmt;
-var testEsprimaEquiv = require('./../assertions').testEsprimaEquiv;
-var testParse = require('./../assertions').testParse;
-var testParseFailure = require('./../assertions').testParseFailure;
+var expr = require("../helpers").expr;
+var stmt = require("../helpers").stmt;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("automatic semicolon insertion", function () {
-    testEsprimaEquiv("{ x\n++y }");
-    testEsprimaEquiv("{ x\n--y }");
+
+    testParse("{ x\n++y }", stmt,
+      { type: 'BlockStatement',
+        block:
+          { type: 'Block',
+            statements:
+              [ { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'x' } } },
+                { type: 'ExpressionStatement',
+                  expression:
+                    { type: 'PrefixExpression',
+                      operand: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'y' } },
+                      operator: '++' } } ] } }
+    );
+
+    testParse("{ x\n--y }", stmt,
+      { type: 'BlockStatement',
+        block:
+          { type: 'Block',
+            statements:
+              [ { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'x' } } },
+                { type: 'ExpressionStatement',
+                  expression:
+                    { type: 'PrefixExpression',
+                      operand: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'y' } },
+                      operator: '--' } } ] } }
+    );
+
     testParse("{ var x = 14, y = 3\nz; }", stmt,
       new Shift.BlockStatement(new Shift.Block([
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
@@ -42,14 +68,94 @@ suite("Parser", function () {
       ]))
     );
 
-    testEsprimaEquiv("while (true) { continue\nthere; }");
-    testEsprimaEquiv("while (true) { continue // Comment\nthere; }");
-    testEsprimaEquiv("while (true) { continue /* Multiline\nComment */there; }");
+    testParse("while (true) { continue\nthere; }", stmt,
+      { type: 'WhileStatement',
+        body:
+          { type: 'BlockStatement',
+            block:
+              { type: 'Block',
+                statements:
+                  [ { type: 'ContinueStatement', label: null },
+                    { type: 'ExpressionStatement',
+                      expression:
+                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
 
-    testEsprimaEquiv("while (true) { break\nthere; }");
-    testEsprimaEquiv("while (true) { break // Comment\nthere; }");
-    testEsprimaEquiv("while (true) { break /* Multiline\nComment */there; }");
-    testEsprimaEquiv("0 ;");
+    testParse("while (true) { continue // Comment\nthere; }", stmt,
+      { type: 'WhileStatement',
+        body:
+          { type: 'BlockStatement',
+            block:
+              { type: 'Block',
+                statements:
+                  [ { type: 'ContinueStatement', label: null },
+                    { type: 'ExpressionStatement',
+                      expression:
+                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
+
+    testParse("while (true) { continue /* Multiline\nComment */there; }", stmt,
+      { type: 'WhileStatement',
+        body:
+          { type: 'BlockStatement',
+            block:
+              { type: 'Block',
+                statements:
+                  [ { type: 'ContinueStatement', label: null },
+                    { type: 'ExpressionStatement',
+                      expression:
+                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
+
+
+    testParse("while (true) { break\nthere; }", stmt,
+      { type: 'WhileStatement',
+        body:
+          { type: 'BlockStatement',
+            block:
+              { type: 'Block',
+                statements:
+                  [ { type: 'BreakStatement', label: null },
+                    { type: 'ExpressionStatement',
+                      expression:
+                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
+
+    testParse("while (true) { break // Comment\nthere; }", stmt,
+      { type: 'WhileStatement',
+        body:
+          { type: 'BlockStatement',
+            block:
+              { type: 'Block',
+                statements:
+                  [ { type: 'BreakStatement', label: null },
+                    { type: 'ExpressionStatement',
+                      expression:
+                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
+
+    testParse("while (true) { break /* Multiline\nComment */there; }", stmt,
+      { type: 'WhileStatement',
+        body:
+          { type: 'BlockStatement',
+            block:
+              { type: 'Block',
+                statements:
+                  [ { type: 'BreakStatement', label: null },
+                    { type: 'ExpressionStatement',
+                      expression:
+                        { type: 'IdentifierExpression',
+                          identifier: { type: 'Identifier', name: 'there' } } } ] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
+
+    testParse("0 ;", expr, { type: 'LiteralNumericExpression', value: 0 });
+
 
     testParse("(function(){ return\nx; })", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
@@ -70,17 +176,69 @@ suite("Parser", function () {
       ]))
     );
 
-    testEsprimaEquiv("{ throw error\nerror; }");
-    testEsprimaEquiv("{ throw error// Comment\nerror; }");
-    testEsprimaEquiv("{ throw error/* Multiline\nComment */error; }");
+    testParse("{ throw error\nerror; }", stmt,
+      { type: 'BlockStatement',
+        block:
+          { type: 'Block',
+            statements:
+              [ { type: 'ThrowStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } } ] } }
+    );
+
+    testParse("{ throw error// Comment\nerror; }", stmt,
+      { type: 'BlockStatement',
+        block:
+          { type: 'Block',
+            statements:
+              [ { type: 'ThrowStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } } ] } }
+    );
+
+    testParse("{ throw error/* Multiline\nComment */error; }", stmt,
+      { type: 'BlockStatement',
+        block:
+          { type: 'Block',
+            statements:
+              [ { type: 'ThrowStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } } ] } }
+    );
+
     testParseFailure("throw /* \n */ e", "Illegal newline after throw");
     testParseFailure("throw /* \u2028 */ e", "Illegal newline after throw");
     testParseFailure("throw /* \u2029 */ e", "Illegal newline after throw");
-    testEsprimaEquiv("throw /* \u202a */ e");
+
+    testParse("throw /* \u202a */ e", stmt,
+      { type: 'ThrowStatement',
+        expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'e' } } }
+    );
+
   });
 
   suite("whitespace characters", function () {
-    testEsprimaEquiv("new\u0020\u0009\u000B\u000C\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFFa");
-    testEsprimaEquiv("{0\n1\r2\u20283\u20294}");
+
+    testParse("new\u0020\u0009\u000B\u000C\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFFa", expr,
+      { type: 'NewExpression',
+        callee: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'a' } },
+        arguments: [] }
+    );
+
+    testParse("{0\n1\r2\u20283\u20294}", stmt,
+      { type: 'BlockStatement',
+        block:
+          { type: 'Block',
+            statements:
+              [ { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
+                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 1 } },
+                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 2 } },
+                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 3 } },
+                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 4 } } ] } }
+    );
+
   });
 });

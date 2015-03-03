@@ -19,8 +19,8 @@ var Shift = require("shift-ast");
 var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
 
-var testParseFailure = require('./assertions').testParseFailure;
-var testParse = require('./assertions').testParse;
+var testParseFailure = require("./assertions").testParseFailure;
+var testParse = require("./assertions").testParse;
 
 function directives(program) {
   return program.body.directives;
@@ -74,5 +74,14 @@ suite("Parser", function () {
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))
     );
+
+    testParse("\"use strict\" + 0", expr,
+      new Shift.BinaryExpression(
+        "+",
+        new Shift.LiteralStringExpression("use strict"),
+        new Shift.LiteralNumericExpression(0)
+      )
+    );
+
   });
 });

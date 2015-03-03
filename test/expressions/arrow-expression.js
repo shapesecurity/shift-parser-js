@@ -16,24 +16,12 @@
 
 var Shift = require("shift-ast");
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParse = require('../assertions').testParse;
+var testParse = require("../assertions").testParse;
 var expr = require("../helpers").expr;
-var testParseFailure = require('../assertions').testParseFailure;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("arrow expression", function () {
-    testEsprimaEquiv("(a) + (b)");
-    testEsprimaEquiv("(a)");
-    testEsprimaEquiv("((a))");
-    testEsprimaEquiv("((a))()");
-    testEsprimaEquiv("((a))((a))");
-    testEsprimaEquiv("void (a)");
-    testEsprimaEquiv("(void a)");
-    testEsprimaEquiv("(a++)");
-    testEsprimaEquiv("(a)++");
-    testEsprimaEquiv("(a)--");
-    testEsprimaEquiv("(a) ? (b) : (c)");
 
     testParse("(()=>0)", expr, new Shift.ArrowExpression([], null, new Shift.LiteralNumericExpression(0)));
 
@@ -145,9 +133,9 @@ suite("Parser", function () {
     testParseFailure("(a,...a)/*\n*/ => 0", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\r*/ => 0", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\u202a*/", "Unexpected end of input");
-    testParseFailure("() <= 42", "Unexpected token <=");
-    testParseFailure("() ? 42", "Unexpected token ?");
-    testParseFailure("() + 42", "Unexpected token +");
+    testParseFailure("() <= 0", "Unexpected token <=");
+    testParseFailure("() ? 0", "Unexpected token ?");
+    testParseFailure("() + 0", "Unexpected token +");
     testParseFailure("(10) => 0", "Illegal arrow function parameter list");
     testParseFailure("(10, 20) => 0", "Illegal arrow function parameter list");
   });

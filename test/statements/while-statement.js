@@ -14,12 +14,52 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var stmt = require("../helpers").stmt;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("while statement", function () {
-    testEsprimaEquiv("while(1);");
-    testEsprimaEquiv("while (true) doSomething()");
-    testEsprimaEquiv("while (x < 10) { x++; y--; }");
+
+    testParse("while(1);", stmt,
+      { type: "WhileStatement",
+        body: { type: "EmptyStatement" },
+        test: { type: "LiteralNumericExpression", value: 1 } }
+    );
+
+    testParse("while (true) doSomething()", stmt,
+      { type: "WhileStatement",
+        body:
+          { type: "ExpressionStatement",
+            expression:
+              { type: "CallExpression",
+                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doSomething" } },
+                arguments: [] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
+    );
+
+    testParse("while (x < 10) { x++; y--; }", stmt,
+      { type: "WhileStatement",
+        body:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "ExpressionStatement",
+                      expression:
+                        { type: "PostfixExpression",
+                          operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+                          operator: "++" } },
+                    { type: "ExpressionStatement",
+                      expression:
+                        { type: "PostfixExpression",
+                          operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+                          operator: "--" } } ] } },
+        test:
+          { type: "BinaryExpression",
+            operator: "<",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "LiteralNumericExpression", value: 10 } } }
+    );
+
   });
 });

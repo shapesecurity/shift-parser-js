@@ -17,15 +17,33 @@
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var testParse = require('../assertions').testParse;
-var testParseFailure = require('../assertions').testParseFailure;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("call expression", function () {
-    testEsprimaEquiv("a(b,c)");
-    testEsprimaEquiv("foo(bar, baz)");
-    testEsprimaEquiv("(    foo  )()");
+    testParse("a(b,c)", expr,
+      { type: "CallExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        arguments:
+          [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+            { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } ] }
+    );
+
+    testParse("foo(bar, baz)", expr,
+      { type: "CallExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
+        arguments:
+          [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bar" } },
+            { type: "IdentifierExpression", identifier: { type: "Identifier", name: "baz" } } ] }
+    );
+
+    testParse("(    foo  )()", expr,
+      { type: "CallExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
+        arguments: [] }
+    );
+
 
     testParse("f(...a)", expr,
       new Shift.CallExpression(

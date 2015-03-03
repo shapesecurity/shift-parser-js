@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../../assertions').testEsprimaEquiv;
+var expr = require("../../helpers").expr;
+var testParse = require("../../assertions").testParse;
 
 suite("Parser", function () {
   suite("literal null expression", function () {
-    testEsprimaEquiv("null");
-    testEsprimaEquiv("null;");
-    testEsprimaEquiv("null\n");
+
+    testParse("null", expr, { type: "LiteralNullExpression" });
+    testParse("null;", expr, { type: "LiteralNullExpression" });
+    testParse("null\n", expr, { type: "LiteralNullExpression" });
+
   });
 });

@@ -14,13 +14,66 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("break statement", function () {
-    testEsprimaEquiv("while (true) { break }");
-    testEsprimaEquiv("done: while (true) { break done }");
-    testEsprimaEquiv("done: while (true) { break done; }");
-    testEsprimaEquiv("__proto__: while (true) { break __proto__; }");
+
+    testParse("while (true) { break }", stmt,
+      { type: "WhileStatement",
+        body:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements: [ { type: "BreakStatement", label: null } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
+    );
+
+    testParse("done: while (true) { break done }", stmt,
+      { type: "LabeledStatement",
+        label: { type: "Identifier", name: "done" },
+        body:
+          { type: "WhileStatement",
+            body:
+              { type: "BlockStatement",
+                block:
+                  { type: "Block",
+                    statements:
+                      [ { type: "BreakStatement",
+                          label: { type: "Identifier", name: "done" } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } } }
+    );
+
+    testParse("done: while (true) { break done; }", stmt,
+      { type: "LabeledStatement",
+        label: { type: "Identifier", name: "done" },
+        body:
+          { type: "WhileStatement",
+            body:
+              { type: "BlockStatement",
+                block:
+                  { type: "Block",
+                    statements:
+                      [ { type: "BreakStatement",
+                          label: { type: "Identifier", name: "done" } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } } }
+    );
+
+    testParse("__proto__: while (true) { break __proto__; }", stmt,
+      { type: "LabeledStatement",
+        label: { type: "Identifier", name: "__proto__" },
+        body:
+          { type: "WhileStatement",
+            body:
+              { type: "BlockStatement",
+                block:
+                  { type: "Block",
+                    statements:
+                      [ { type: "BreakStatement",
+                          label: { type: "Identifier", name: "__proto__" } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } } }
+    );
+
   });
 });

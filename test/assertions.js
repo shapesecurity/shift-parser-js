@@ -1,18 +1,6 @@
-var expect = require('expect.js');
-var esprima = require('esprima');
-var converters = require('shift-spidermonkey-converter');
-var parse = require('../').default;
-var parseModule = require('../').parseModule;
-
-exports.testEsprimaEquiv = function testEsprimaEquiv(source) {
-  var args = arguments.length;
-  test(source, function () {
-    expect(args).to.be(testEsprimaEquiv.length);
-    var tree = parse(source);
-    var oracle = converters.toShift(esprima.parse(source));
-    expect(tree).to.eql(oracle);
-  });
-};
+var expect = require("expect.js");
+var parse = require("../").default;
+var parseModule = require("../").parseModule;
 
 exports.testParse = function testParse(program, accessor, expected) {
   var args = arguments.length;

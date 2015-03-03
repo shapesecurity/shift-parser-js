@@ -14,12 +14,64 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("switch with default statement", function () {
-    testEsprimaEquiv("switch(a){case 1:default:case 2:}");
-    testEsprimaEquiv("switch(a){case 1:default:}");
-    testEsprimaEquiv("switch(a){default:case 2:}");
+
+    testParse("switch(a){case 1:default:case 2:}", stmt,
+      { type: "SwitchStatementWithDefault",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        preDefaultCases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 1 },
+              consequent: [] } ],
+        defaultCase: { type: "SwitchDefault", consequent: [] },
+        postDefaultCases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 2 },
+              consequent: [] } ] }
+    );
+
+    testParse("switch(a){case 1:default:}", stmt,
+      { type: "SwitchStatementWithDefault",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        preDefaultCases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 1 },
+              consequent: [] } ],
+        defaultCase: { type: "SwitchDefault", consequent: [] },
+        postDefaultCases: [] }
+    );
+
+    testParse("switch(a){default:case 2:}", stmt,
+      { type: "SwitchStatementWithDefault",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        preDefaultCases: [],
+        defaultCase: { type: "SwitchDefault", consequent: [] },
+        postDefaultCases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 2 },
+              consequent: [] } ] }
+    );
+
+    testParse("switch (answer) { case 0: hi(); break; default: break }", stmt,
+      { type: "SwitchStatementWithDefault",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        preDefaultCases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 0 },
+              consequent:
+                [ { type: "ExpressionStatement",
+                    expression:
+                      { type: "CallExpression",
+                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "hi" } },
+                        arguments: [] } },
+                  { type: "BreakStatement", label: null } ] } ],
+        defaultCase: { type: "SwitchDefault", consequent: [ { type: "BreakStatement", label: null } ] },
+        postDefaultCases: [] }
+    );
+
   });
 });

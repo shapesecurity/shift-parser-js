@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-var expect = require('expect.js');
-var ShiftParser = require('../../');
-var Shift = require('shift-ast');
-var locationSanityCheck = require('../helpers').locationSanityCheck;
+var expect = require("expect.js");
+var ShiftParser = require("../../");
+var Shift = require("shift-ast");
+var locationSanityCheck = require("../helpers").locationSanityCheck;
 
 suite("API", function () {
   test("should exist", function () {

@@ -14,17 +14,56 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var Shift = require("shift-ast");
+
+var testParse = require("../assertions").testParse;
+var expr = require("../helpers").expr;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("array expression", function () {
-    testEsprimaEquiv("[]");
-    testEsprimaEquiv("[ ]");
-    testEsprimaEquiv("[ 42 ]");
-    testEsprimaEquiv("[ 42, ]");
-    testEsprimaEquiv("[ ,, 42 ]");
-    testEsprimaEquiv("[ 1, 2, 3, ]");
-    testEsprimaEquiv("[ 1, 2,, 3, ]");
-    testEsprimaEquiv("[,,1,,,3,4,,]");
+
+    testParse("[]", expr, new Shift.ArrayExpression([]));
+
+    testParse("[ ]", expr, new Shift.ArrayExpression([]));
+
+    testParse("[ 0 ]", expr, new Shift.ArrayExpression([
+      new Shift.LiteralNumericExpression(0),
+    ]));
+
+    testParse("[ 0, ]", expr, new Shift.ArrayExpression([
+      new Shift.LiteralNumericExpression(0),
+    ]));
+
+    testParse("[ ,, 0 ]", expr, new Shift.ArrayExpression([
+      null,
+      null,
+      new Shift.LiteralNumericExpression(0),
+    ]));
+
+    testParse("[ 1, 2, 3, ]", expr, new Shift.ArrayExpression([
+      new Shift.LiteralNumericExpression(1),
+      new Shift.LiteralNumericExpression(2),
+      new Shift.LiteralNumericExpression(3),
+    ]));
+
+    testParse("[ 1, 2,, 3, ]", expr, new Shift.ArrayExpression([
+      new Shift.LiteralNumericExpression(1),
+      new Shift.LiteralNumericExpression(2),
+      null,
+      new Shift.LiteralNumericExpression(3),
+    ]));
+
+    testParse("[,,1,,,2,3,,]", expr, new Shift.ArrayExpression([
+      null,
+      null,
+      new Shift.LiteralNumericExpression(1),
+      null,
+      null,
+      new Shift.LiteralNumericExpression(2),
+      new Shift.LiteralNumericExpression(3),
+      null,
+    ]));
+
   });
 });

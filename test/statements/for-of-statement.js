@@ -17,7 +17,7 @@
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var testParse = require('../assertions').testParse;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("for in statement", function () {

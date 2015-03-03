@@ -14,13 +14,45 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var stmt = require("../helpers").stmt;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("with statement", function () {
-    testEsprimaEquiv("with(1);");
-    testEsprimaEquiv("with (x) foo");
-    testEsprimaEquiv("with (x) foo;");
-    testEsprimaEquiv("with (x) { foo }");
+
+    testParse("with(1);", stmt,
+      { type: "WithStatement",
+        object: { type: "LiteralNumericExpression", value: 1 },
+        body: { type: "EmptyStatement" } }
+    );
+
+    testParse("with (x) foo", stmt,
+      { type: "WithStatement",
+        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        body:
+          { type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } } } }
+    );
+
+    testParse("with (x) foo;", stmt,
+      { type: "WithStatement",
+        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        body:
+          { type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } } } }
+    );
+
+    testParse("with (x) { foo }", stmt,
+      { type: "WithStatement",
+        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        body:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "ExpressionStatement",
+                      expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } } } ] } } }
+    );
+
   });
 });

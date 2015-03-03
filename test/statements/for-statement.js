@@ -17,12 +17,23 @@
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var testParse = require('../assertions').testParse;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("for statement", function () {
-    testEsprimaEquiv("for(x, y;;);");
+
+    testParse("for(x, y;;);", stmt,
+      { type: "ForStatement",
+        body: { type: "EmptyStatement" },
+        init:
+          { type: "BinaryExpression",
+            operator: ",",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
+        test: null,
+        update: null }
+    );
+
     testParse("for(x = 0;;);", stmt,
       new Shift.ForStatement(
         new Shift.AssignmentExpression(
@@ -35,6 +46,7 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
+
     testParse("for(var x = 0;;);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
@@ -45,6 +57,7 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
+
     testParse("for(let x = 0;;);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("let", [
@@ -55,6 +68,7 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
+
     testParse("for(var x = 0, y = 1;;);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
@@ -66,10 +80,62 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
-    testEsprimaEquiv("for(x; x < 42;);");
-    testEsprimaEquiv("for(x; x < 42; x++);");
-    testEsprimaEquiv("for(x; x < 42; x++) process(x);");
-    testEsprimaEquiv("for(a;b;c);");
+
+    testParse("for(x; x < 0;);", stmt,
+      { type: "ForStatement",
+        body: { type: "EmptyStatement" },
+        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        test:
+          { type: "BinaryExpression",
+            operator: "<",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "LiteralNumericExpression", value: 0 } },
+        update: null }
+    );
+
+    testParse("for(x; x < 0; x++);", stmt,
+      { type: "ForStatement",
+        body: { type: "EmptyStatement" },
+        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        test:
+          { type: "BinaryExpression",
+            operator: "<",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "LiteralNumericExpression", value: 0 } },
+        update:
+          { type: "PostfixExpression",
+            operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            operator: "++" } }
+    );
+
+    testParse("for(x; x < 0; x++) process(x);", stmt,
+      { type: "ForStatement",
+        body:
+          { type: "ExpressionStatement",
+            expression:
+              { type: "CallExpression",
+                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "process" } },
+                arguments: [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } ] } },
+        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        test:
+          { type: "BinaryExpression",
+            operator: "<",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "LiteralNumericExpression", value: 0 } },
+        update:
+          { type: "PostfixExpression",
+            operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            operator: "++" } }
+    );
+
+    testParse("for(a;b;c);", stmt,
+      { type: "ForStatement",
+        body: { type: "EmptyStatement" },
+        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+        update: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+    );
+
     testParse("for(var a;b;c);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
@@ -80,6 +146,7 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
+
     testParse("for(var a = 0;b;c);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
@@ -90,6 +157,7 @@ suite("Parser", function () {
         new Shift.EmptyStatement
       )
     );
+
     testParse("for(var a = 0;;) { let a; }", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
@@ -105,6 +173,14 @@ suite("Parser", function () {
         ]))
       )
     );
-    testEsprimaEquiv("for(;b;c);");
+
+    testParse("for(;b;c);", stmt,
+      { type: "ForStatement",
+        body: { type: "EmptyStatement" },
+        init: null,
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+        update: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+    );
+
   });
 });

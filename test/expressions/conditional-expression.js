@@ -17,14 +17,36 @@
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParse = require('../assertions').testParse;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("conditional expression", function () {
-    testEsprimaEquiv("a?b:c");
-    testEsprimaEquiv("y ? 1 : 2");
-    testEsprimaEquiv("x && y ? 1 : 2");
+
+    testParse("a?b:c", expr,
+      { type: "ConditionalExpression",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        consequent: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+        alternate: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+    );
+
+    testParse("y ? 1 : 2", expr,
+      { type: "ConditionalExpression",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+        consequent: { type: "LiteralNumericExpression", value: 1 },
+        alternate: { type: "LiteralNumericExpression", value: 2 } }
+    );
+
+    testParse("x && y ? 1 : 2", expr,
+      { type: "ConditionalExpression",
+        test:
+          { type: "BinaryExpression",
+            operator: "&&",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
+        consequent: { type: "LiteralNumericExpression", value: 1 },
+        alternate: { type: "LiteralNumericExpression", value: 2 } }
+    );
+
     testParse("x = (0) ? 1 : 2", expr,
       new Shift.AssignmentExpression(
         "=",

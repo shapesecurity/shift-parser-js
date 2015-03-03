@@ -17,43 +17,43 @@
 var Shift = require("shift-ast");
 
 var expr = require("../../helpers").expr;
-var testParse = require('../../assertions').testParse;
-var testEsprimaEquiv = require('../../assertions').testEsprimaEquiv;
+var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("literal numeric expression", function () {
-    testEsprimaEquiv("0");
-    testEsprimaEquiv("0;");
-    testEsprimaEquiv("3");
-    testEsprimaEquiv("5");
-    testEsprimaEquiv("42");
-    testEsprimaEquiv("\n    42\n\n");
 
-    testEsprimaEquiv(".14");
-    testEsprimaEquiv("6.");
-    testEsprimaEquiv("0.");
-    testEsprimaEquiv("3.14159");
+    testParse("0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0;", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("3", expr, { type: "LiteralNumericExpression", value: 3 });
+    testParse("5", expr, { type: "LiteralNumericExpression", value: 5 });
+    testParse("0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("\n    0\n\n", expr, { type: "LiteralNumericExpression", value: 0 });
 
-    testEsprimaEquiv("6.02214179e+23");
-    testEsprimaEquiv("1.492417830e-10");
-    testEsprimaEquiv("0e+100 ");
-    testEsprimaEquiv("0e+100");
+    testParse(".14", expr, { type: "LiteralNumericExpression", value: 0.14 });
+    testParse("6.", expr, { type: "LiteralNumericExpression", value: 6 });
+    testParse("0.", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("3.14159", expr, { type: "LiteralNumericExpression", value: 3.14159 });
 
-    testEsprimaEquiv("0x0");
-    testEsprimaEquiv("0x0;");
-    testEsprimaEquiv("0xabc");
-    testEsprimaEquiv("0xdef");
-    testEsprimaEquiv("0X1A");
-    testEsprimaEquiv("0x10");
-    testEsprimaEquiv("0x100");
-    testEsprimaEquiv("0X04");
+    testParse("6.02214179e+23", expr, { type: "LiteralNumericExpression", value: 6.02214179e+23 });
+    testParse("1.492417830e-10", expr, { type: "LiteralNumericExpression", value: 1.49241783e-10 });
+    testParse("0e+100 ", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0e+100", expr, { type: "LiteralNumericExpression", value: 0 });
 
-    testEsprimaEquiv("02");
-    testEsprimaEquiv("012");
-    testEsprimaEquiv("0012");
-    testEsprimaEquiv("\n    42\n\n");
-    testEsprimaEquiv("0.");
+    testParse("0x0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0x0;", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0xabc", expr, { type: "LiteralNumericExpression", value: 0xABC });
+    testParse("0xdef", expr, { type: "LiteralNumericExpression", value: 0xDEF });
+    testParse("0X1A", expr, { type: "LiteralNumericExpression", value: 0x1A });
+    testParse("0x10", expr, { type: "LiteralNumericExpression", value: 0x10 });
+    testParse("0x100", expr, { type: "LiteralNumericExpression", value: 0x100 });
+    testParse("0X04", expr, { type: "LiteralNumericExpression", value: 0x4 });
+
+    testParse("02", expr, { type: "LiteralNumericExpression", value: 2 });
+    testParse("012", expr, { type: "LiteralNumericExpression", value: 10 });
+    testParse("0012", expr, { type: "LiteralNumericExpression", value: 10 });
+    testParse("\n    0\n\n", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0.", expr, { type: "LiteralNumericExpression", value: 0 });
 
     // Binary Numeric Literal
     testParse("0b0", expr, new Shift.LiteralNumericExpression(0));
@@ -89,5 +89,6 @@ suite("Parser", function () {
     testParseFailure("0O1a", "Unexpected token ILLEGAL");
     testParseFailure("0O9", "Unexpected token ILLEGAL");
     testParseFailure("0O18", "Unexpected token ILLEGAL");
+
   });
 });

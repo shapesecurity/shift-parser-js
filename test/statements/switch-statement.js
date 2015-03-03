@@ -50,5 +50,26 @@ suite("Parser", function () {
                   { type: "BreakStatement", label: null } ] } ] }
     );
 
+    testParse("switch (answer) { case 0: let a; }", stmt,
+      { type: "SwitchStatement",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        cases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 0 },
+              consequent:
+                [ { type: "VariableDeclarationStatement",
+                    declaration:
+                    { type: "VariableDeclaration",
+                      kind: "let",
+                      declarators: [
+                        { type: "VariableDeclarator",
+                          binding:
+                          { type: "BindingIdentifier", identifier: { type: "Identifier", name: "a" } },
+                          init: null
+                        } ]
+                    }
+                } ]
+          } ]
+      } );
   });
 });

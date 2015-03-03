@@ -190,6 +190,10 @@ suite("Parser", function () {
     testParseFailure("{ let a; const a = 0; }", "Duplicate binding 'a'");
     testParseFailure("{ const a = 0; let a; }", "Duplicate binding 'a'");
     testParseFailure("{ const a = 0; const a = 0; }", "Duplicate binding 'a'");
+    testParseFailure("{ function a(){} function a(){} }", "Duplicate binding 'a'");
+    testParseFailure("{ function a(){} function* a(){} }", "Duplicate binding 'a'");
+    testParseFailure("{ let a; function a(){} }", "Duplicate binding 'a'");
+    testParseFailure("{ const a = 0; function a(){} }", "Duplicate binding 'a'");
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of StatementList also occurs in the VarDeclaredNames of StatementList.
     testParseFailure("{ let a; var a; }", "Duplicate binding 'a'");
     testParseFailure("{ let a; { var a; } }", "Duplicate binding 'a'");
@@ -314,8 +318,13 @@ suite("Parser", function () {
     // 13.11.1
     // It is a Syntax Error if the LexicallyDeclaredNames of CaseClauses contains any duplicate entries.
     testParseFailure("switch(0) { case 0: let a; case 1: let a; }", "Duplicate binding 'a'");
+    testParseFailure("switch(0) { case 0: let a; case 1: function a(){} }", "Duplicate binding 'a'");
     testParseFailure("switch(0) { case 0: let a; default: let a; }", "Duplicate binding 'a'");
     testParseFailure("switch(0) { default: let a; case 0: let a; }", "Duplicate binding 'a'");
+    testParseFailure("switch(0) { default: let a; case 0: function a(){} }", "Duplicate binding 'a'");
+    testParseFailure("switch(0) { default: function a(){} case 0: let a  }", "Duplicate binding 'a'");
+    testParseFailure("switch(0) { default: function a(){} case 0: let a  }", "Duplicate binding 'a'");
+
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of CaseClauses also occurs in the VarDeclaredNames of CaseClauses.
     testParseFailure("switch(0) { case 0: let a; case 1: var a; }", "Duplicate binding 'a'");
     testParseFailure("switch(0) { case 0: var a; case 1: let a; }", "Duplicate binding 'a'");
@@ -650,6 +659,7 @@ suite("Parser", function () {
     // Annex B 3.5 (13.14.1)
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the LexicallyDeclaredNames of Block.
     testParseFailure("try {} catch(e) { let e; }", "Duplicate binding 'e'");
+    testParseFailure("try {} catch(e) { function e(){} }", "Duplicate binding 'e'");
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the VarDeclaredNames of Block,
     // unless that element is only bound by a VariableStatement or the VariableDeclarationList of a for statement,
     // or the ForBinding of a for-in statement.

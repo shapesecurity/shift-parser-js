@@ -20,6 +20,10 @@ var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 
+function id(x) {
+  return x;
+}
+
 suite("Parser", function () {
   suite("function declaration", function () {
     testParse("function hello() { z(); }", stmt,
@@ -68,6 +72,20 @@ suite("Parser", function () {
     testParse("function test() { \"use strict\"\n + 0; }", stmt,
       new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("test")), [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("use strict"), new Shift.LiteralNumericExpression(0))),
+      ]))
+    );
+
+    testParse("function a() {} function a() {}", id,
+      new Shift.Script(new Shift.FunctionBody([], [
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], []))
+      ]))
+    );
+
+    testParse("function a() { function a() {} function a() {} }", stmt,
+      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], []))
       ]))
     );
   });

@@ -20,6 +20,10 @@ var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var stmt = require("../helpers").stmt;
 
+function id(x) {
+  return x;
+}
+
 suite("Parser", function () {
   var emptyBody = new Shift.FunctionBody([], []);
   suite("generator declaration", function () {
@@ -74,6 +78,22 @@ suite("Parser", function () {
     testParse("function *a({[class extends yield{}]:a}){}", function (p) {
       return p.body.statements[0].parameters[0].properties[0].name.expression.super;
     }, new Shift.IdentifierExpression(new Shift.Identifier("yield")));
+
+
+    testParse("function* a() {} function a() {}", id,
+      new Shift.Script(new Shift.FunctionBody([], [
+        new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], []))
+      ]))
+    );
+
+    testParse("function a() { function* a() {} function a() {} }", stmt,
+      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [
+        new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], []))
+      ]))
+    );
+
     testParseFailure("function* a(){function a(a=yield){}}", "Unexpected token yield");
     testParseFailure("function* a(){function* a(yield){}}", "Unexpected token yield");
     testParseFailure("function* a([yield]){}", "Unexpected token yield");

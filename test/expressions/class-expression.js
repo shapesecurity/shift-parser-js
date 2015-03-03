@@ -109,7 +109,7 @@ suite("Parser", function () {
           new Shift.ClassElement(false, new Shift.Setter(
             new Shift.StaticPropertyName("a"),
             new Shift.BindingIdentifier(new Shift.Identifier("b")),
-            new Shift.FunctionBody([new Shift.Directive('use strict')], [])
+            new Shift.FunctionBody([new Shift.Directive("use strict")], [])
           ))
         ]
       )
@@ -125,7 +125,7 @@ suite("Parser", function () {
             new Shift.StaticPropertyName("a"),
             [new Shift.BindingIdentifier(new Shift.Identifier("b"))],
             null,
-            new Shift.FunctionBody([new Shift.Directive('use strict')], [])
+            new Shift.FunctionBody([new Shift.Directive("use strict")], [])
           ))
         ]
       )

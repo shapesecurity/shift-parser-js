@@ -17,7 +17,6 @@
 var Shift = require("shift-ast");
 
 var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
@@ -166,5 +165,7 @@ suite("Parser", function () {
         new Shift.LiteralNumericExpression(0)
       )
     );
+
+    // TODO: add some assignment failure tests
   });
 });

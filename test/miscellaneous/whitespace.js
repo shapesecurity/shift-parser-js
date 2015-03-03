@@ -25,31 +25,31 @@ suite("Parser", function () {
   suite("automatic semicolon insertion", function () {
 
     testParse("{ x\n++y }", stmt,
-      { type: 'BlockStatement',
+      { type: "BlockStatement",
         block:
-          { type: 'Block',
+          { type: "Block",
             statements:
-              [ { type: 'ExpressionStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'x' } } },
-                { type: 'ExpressionStatement',
+              [ { type: "ExpressionStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } },
+                { type: "ExpressionStatement",
                   expression:
-                    { type: 'PrefixExpression',
-                      operand: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'y' } },
-                      operator: '++' } } ] } }
+                    { type: "PrefixExpression",
+                      operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+                      operator: "++" } } ] } }
     );
 
     testParse("{ x\n--y }", stmt,
-      { type: 'BlockStatement',
+      { type: "BlockStatement",
         block:
-          { type: 'Block',
+          { type: "Block",
             statements:
-              [ { type: 'ExpressionStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'x' } } },
-                { type: 'ExpressionStatement',
+              [ { type: "ExpressionStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } },
+                { type: "ExpressionStatement",
                   expression:
-                    { type: 'PrefixExpression',
-                      operand: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'y' } },
-                      operator: '--' } } ] } }
+                    { type: "PrefixExpression",
+                      operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+                      operator: "--" } } ] } }
     );
 
     testParse("{ var x = 14, y = 3\nz; }", stmt,
@@ -69,92 +69,92 @@ suite("Parser", function () {
     );
 
     testParse("while (true) { continue\nthere; }", stmt,
-      { type: 'WhileStatement',
+      { type: "WhileStatement",
         body:
-          { type: 'BlockStatement',
+          { type: "BlockStatement",
             block:
-              { type: 'Block',
+              { type: "Block",
                 statements:
-                  [ { type: 'ContinueStatement', label: null },
-                    { type: 'ExpressionStatement',
+                  [ { type: "ContinueStatement", label: null },
+                    { type: "ExpressionStatement",
                       expression:
-                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
-        test: { type: 'LiteralBooleanExpression', value: true } }
+                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
     );
 
     testParse("while (true) { continue // Comment\nthere; }", stmt,
-      { type: 'WhileStatement',
+      { type: "WhileStatement",
         body:
-          { type: 'BlockStatement',
+          { type: "BlockStatement",
             block:
-              { type: 'Block',
+              { type: "Block",
                 statements:
-                  [ { type: 'ContinueStatement', label: null },
-                    { type: 'ExpressionStatement',
+                  [ { type: "ContinueStatement", label: null },
+                    { type: "ExpressionStatement",
                       expression:
-                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
-        test: { type: 'LiteralBooleanExpression', value: true } }
+                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
     );
 
     testParse("while (true) { continue /* Multiline\nComment */there; }", stmt,
-      { type: 'WhileStatement',
+      { type: "WhileStatement",
         body:
-          { type: 'BlockStatement',
+          { type: "BlockStatement",
             block:
-              { type: 'Block',
+              { type: "Block",
                 statements:
-                  [ { type: 'ContinueStatement', label: null },
-                    { type: 'ExpressionStatement',
+                  [ { type: "ContinueStatement", label: null },
+                    { type: "ExpressionStatement",
                       expression:
-                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
-        test: { type: 'LiteralBooleanExpression', value: true } }
+                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
     );
 
 
     testParse("while (true) { break\nthere; }", stmt,
-      { type: 'WhileStatement',
+      { type: "WhileStatement",
         body:
-          { type: 'BlockStatement',
+          { type: "BlockStatement",
             block:
-              { type: 'Block',
+              { type: "Block",
                 statements:
-                  [ { type: 'BreakStatement', label: null },
-                    { type: 'ExpressionStatement',
+                  [ { type: "BreakStatement", label: null },
+                    { type: "ExpressionStatement",
                       expression:
-                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
-        test: { type: 'LiteralBooleanExpression', value: true } }
+                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
     );
 
     testParse("while (true) { break // Comment\nthere; }", stmt,
-      { type: 'WhileStatement',
+      { type: "WhileStatement",
         body:
-          { type: 'BlockStatement',
+          { type: "BlockStatement",
             block:
-              { type: 'Block',
+              { type: "Block",
                 statements:
-                  [ { type: 'BreakStatement', label: null },
-                    { type: 'ExpressionStatement',
+                  [ { type: "BreakStatement", label: null },
+                    { type: "ExpressionStatement",
                       expression:
-                        { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'there' } } } ] } },
-        test: { type: 'LiteralBooleanExpression', value: true } }
+                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
     );
 
     testParse("while (true) { break /* Multiline\nComment */there; }", stmt,
-      { type: 'WhileStatement',
+      { type: "WhileStatement",
         body:
-          { type: 'BlockStatement',
+          { type: "BlockStatement",
             block:
-              { type: 'Block',
+              { type: "Block",
                 statements:
-                  [ { type: 'BreakStatement', label: null },
-                    { type: 'ExpressionStatement',
+                  [ { type: "BreakStatement", label: null },
+                    { type: "ExpressionStatement",
                       expression:
-                        { type: 'IdentifierExpression',
-                          identifier: { type: 'Identifier', name: 'there' } } } ] } },
-        test: { type: 'LiteralBooleanExpression', value: true } }
+                        { type: "IdentifierExpression",
+                          identifier: { type: "Identifier", name: "there" } } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
     );
 
-    testParse("0 ;", expr, { type: 'LiteralNumericExpression', value: 0 });
+    testParse("0 ;", expr, { type: "LiteralNumericExpression", value: 0 });
 
 
     testParse("(function(){ return\nx; })", expr,
@@ -177,36 +177,36 @@ suite("Parser", function () {
     );
 
     testParse("{ throw error\nerror; }", stmt,
-      { type: 'BlockStatement',
+      { type: "BlockStatement",
         block:
-          { type: 'Block',
+          { type: "Block",
             statements:
-              [ { type: 'ThrowStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } },
-                { type: 'ExpressionStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } } ] } }
+              [ { type: "ThrowStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } },
+                { type: "ExpressionStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } } ] } }
     );
 
     testParse("{ throw error// Comment\nerror; }", stmt,
-      { type: 'BlockStatement',
+      { type: "BlockStatement",
         block:
-          { type: 'Block',
+          { type: "Block",
             statements:
-              [ { type: 'ThrowStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } },
-                { type: 'ExpressionStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } } ] } }
+              [ { type: "ThrowStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } },
+                { type: "ExpressionStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } } ] } }
     );
 
     testParse("{ throw error/* Multiline\nComment */error; }", stmt,
-      { type: 'BlockStatement',
+      { type: "BlockStatement",
         block:
-          { type: 'Block',
+          { type: "Block",
             statements:
-              [ { type: 'ThrowStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } },
-                { type: 'ExpressionStatement',
-                  expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'error' } } } ] } }
+              [ { type: "ThrowStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } },
+                { type: "ExpressionStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } } ] } }
     );
 
     testParseFailure("throw /* \n */ e", "Illegal newline after throw");
@@ -214,8 +214,8 @@ suite("Parser", function () {
     testParseFailure("throw /* \u2029 */ e", "Illegal newline after throw");
 
     testParse("throw /* \u202a */ e", stmt,
-      { type: 'ThrowStatement',
-        expression: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'e' } } }
+      { type: "ThrowStatement",
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "e" } } }
     );
 
   });
@@ -223,21 +223,21 @@ suite("Parser", function () {
   suite("whitespace characters", function () {
 
     testParse("new\u0020\u0009\u000B\u000C\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFFa", expr,
-      { type: 'NewExpression',
-        callee: { type: 'IdentifierExpression', identifier: { type: 'Identifier', name: 'a' } },
+      { type: "NewExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
         arguments: [] }
     );
 
     testParse("{0\n1\r2\u20283\u20294}", stmt,
-      { type: 'BlockStatement',
+      { type: "BlockStatement",
         block:
-          { type: 'Block',
+          { type: "Block",
             statements:
-              [ { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 1 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 2 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 3 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 4 } } ] } }
+              [ { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
+                { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 1 } },
+                { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 2 } },
+                { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 3 } },
+                { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 4 } } ] } }
     );
 
   });

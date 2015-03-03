@@ -20,7 +20,7 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
 
 exports.testParseFailure = function testParseFailure(source, message) {
   var args = arguments.length;
-  test('Expect failure in Script: ' + source, function () {
+  test("Expect failure in Script: " + source, function () {
     expect(args).to.be(testParseFailure.length);
     try {
       parse(source);
@@ -34,7 +34,7 @@ exports.testParseFailure = function testParseFailure(source, message) {
 
 exports.testParseModuleFailure = function testParseModuleFailure(source, message) {
   var args = arguments.length;
-  test('Expect failure in Module: ' + source, function () {
+  test("Expect failure in Module: " + source, function () {
     expect(args).to.be(testParseModuleFailure.length);
     try {
       parseModule(source);

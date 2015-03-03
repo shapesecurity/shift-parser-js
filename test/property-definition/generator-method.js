@@ -17,23 +17,21 @@
 var Shift = require("shift-ast");
 
 var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
-var stmt = require("../helpers").stmt;
 
 
 suite("Parser", function () {
 
   suite("generator method", function () {
-    testParse('({*a(){}})', expr, new Shift.ObjectExpression([
-      new Shift.Method(true, new Shift.StaticPropertyName('a'), [], null, new Shift.FunctionBody([], []))
+    testParse("({*a(){}})", expr, new Shift.ObjectExpression([
+      new Shift.Method(true, new Shift.StaticPropertyName("a"), [], null, new Shift.FunctionBody([], []))
     ]));
-    testParse('({*yield(){}})', expr, new Shift.ObjectExpression([
-      new Shift.Method(true, new Shift.StaticPropertyName('yield'), [], null, new Shift.FunctionBody([], []))
+    testParse("({*yield(){}})", expr, new Shift.ObjectExpression([
+      new Shift.Method(true, new Shift.StaticPropertyName("yield"), [], null, new Shift.FunctionBody([], []))
     ]));
-    testParse('({*[yield](){}})', expr, new Shift.ObjectExpression([
+    testParse("({*[yield](){}})", expr, new Shift.ObjectExpression([
       new Shift.Method(true, new Shift.ComputedPropertyName(
-        new Shift.IdentifierExpression(new Shift.Identifier('yield'))), [], null, new Shift.FunctionBody([], []))
+        new Shift.IdentifierExpression(new Shift.Identifier("yield"))), [], null, new Shift.FunctionBody([], []))
     ]));
 
   });

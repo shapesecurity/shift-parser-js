@@ -21,7 +21,7 @@ var locationSanityCheck = require("../helpers").locationSanityCheck;
 
 suite("API", function () {
   test("should exist", function () {
-    expect(typeof ShiftParser.default).be('function');
+    expect(typeof ShiftParser.default).be("function");
   });
 
   function withLoc(x, loc) {

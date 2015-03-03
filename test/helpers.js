@@ -16,12 +16,12 @@
 
 var expect = require("expect.js");
 
-function expr(program) {
-  return stmt(program).expression;
-}
-
 function stmt(program) {
   return program.body.statements[0];
+}
+
+function expr(program) {
+  return stmt(program).expression;
 }
 
 
@@ -164,7 +164,7 @@ function locationSanityCheck(node, parentSpan, prevLocation) {
 
   checkLocation(node.loc);
 
-  if (sourceLocationCompare(node.loc.start, node.loc.end) != LT) {
+  if (sourceLocationCompare(node.loc.start, node.loc.end) !== LT) {
     expect().fail("Location information indicates that the node has zero-length");
   }
 

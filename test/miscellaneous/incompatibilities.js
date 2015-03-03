@@ -23,6 +23,10 @@ var testParseFailure = require("../assertions").testParseFailure;
 var testParseModule = require("../assertions").testParseModule;
 var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 
+function moduleExpr(m) {
+  return m.items[0].expression;
+}
+
 suite("Parser", function() {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
   suite("ES5 backward incompatibilities", function() {
@@ -57,7 +61,7 @@ suite("Parser", function() {
     );
 
     testParse("var let", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var",[
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("let")), null)
       ])));
 
@@ -144,21 +148,21 @@ suite("Parser", function() {
     // ES6: allowed in Script.
     testParse("<!--", stmt, undefined);
     testParse("-->", stmt, undefined);
-    testParseFailure("a -->", 'Unexpected end of input');
-    testParseFailure(";/**/-->", 'Unexpected token >');
+    testParseFailure("a -->", "Unexpected end of input");
+    testParseFailure(";/**/-->", "Unexpected token >");
     testParse("\n  -->", stmt, undefined);
     testParse("/*\n*/-->", stmt, undefined);
-    testParse("a<!--b", expr, new Shift.IdentifierExpression(new Shift.Identifier('a')));
+    testParse("a<!--b", expr, new Shift.IdentifierExpression(new Shift.Identifier("a")));
 
-    testParseModuleFailure("<!--", 'Unexpected token <');
-    testParseModuleFailure("-->", 'Unexpected token >');
+    testParseModuleFailure("<!--", "Unexpected token <");
+    testParseModuleFailure("-->", "Unexpected token >");
 
-    testParseModule("a<!--b", function (m) { return m.items[0].expression; },
-      new Shift.BinaryExpression('<',
-        new Shift.IdentifierExpression(new Shift.Identifier('a')),
-        new Shift.PrefixExpression('!',
-          new Shift.PrefixExpression('--',
-            new Shift.IdentifierExpression(new Shift.Identifier('b'))
+    testParseModule("a<!--b", moduleExpr,
+      new Shift.BinaryExpression("<",
+        new Shift.IdentifierExpression(new Shift.Identifier("a")),
+        new Shift.PrefixExpression("!",
+          new Shift.PrefixExpression("--",
+            new Shift.IdentifierExpression(new Shift.Identifier("b"))
           )
         )
       )

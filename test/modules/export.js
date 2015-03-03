@@ -46,79 +46,79 @@ suite("Parser", function () {
     testExportDecl("export {} from \"a\"; var a;", new Shift.ExportFrom([], "a"));
 
     testExportDecl("export {a} from \"a\"; var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
+      new Shift.ExportSpecifier(null, new Shift.Identifier("a"))
     ], "a"));
 
     testExportDecl("export {a,} from \"a\"; var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
+      new Shift.ExportSpecifier(null, new Shift.Identifier("a"))
     ], "a"));
 
     testExportDecl("export {a,b} from \"a\"; var a,b;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, new Shift.Identifier('a')),
-      new Shift.ExportSpecifier(null, new Shift.Identifier('b'))
+      new Shift.ExportSpecifier(null, new Shift.Identifier("a")),
+      new Shift.ExportSpecifier(null, new Shift.Identifier("b"))
     ], "a"));
 
     testExportDecl("export {a as b} from \"a\"; var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(new Shift.Identifier('a'), new Shift.Identifier('b'))
+      new Shift.ExportSpecifier(new Shift.Identifier("a"), new Shift.Identifier("b"))
     ], "a"));
 
     testExportDecl("export {as as as} from \"as\"; var as;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(new Shift.Identifier('as'), new Shift.Identifier('as'))
+      new Shift.ExportSpecifier(new Shift.Identifier("as"), new Shift.Identifier("as"))
     ], "as"));
 
     testExportDecl("export {as as function} from \"as\"; var as;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(new Shift.Identifier('as'), new Shift.Identifier('function'))
+      new Shift.ExportSpecifier(new Shift.Identifier("as"), new Shift.Identifier("function"))
     ], "as"));
 
     testExportDecl("export {a}\n var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
+      new Shift.ExportSpecifier(null, new Shift.Identifier("a"))
     ], null));
 
     testExportDecl("export {a,}\n var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, new Shift.Identifier('a'))
+      new Shift.ExportSpecifier(null, new Shift.Identifier("a"))
     ], null));
 
     testExportDecl("export {a,b,}\n var a,b;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, new Shift.Identifier('a')),
-      new Shift.ExportSpecifier(null, new Shift.Identifier('b'))
+      new Shift.ExportSpecifier(null, new Shift.Identifier("a")),
+      new Shift.ExportSpecifier(null, new Shift.Identifier("b"))
     ], null));
 
     testExportDecl(
       "export var a = 0, b;",
-      new Shift.Export(new Shift.VariableDeclaration('var', [
+      new Shift.Export(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(
-          new Shift.BindingIdentifier(new Shift.Identifier('a')),
+          new Shift.BindingIdentifier(new Shift.Identifier("a")),
           new Shift.LiteralNumericExpression(0)),
         new Shift.VariableDeclarator(
-          new Shift.BindingIdentifier(new Shift.Identifier('b')),
+          new Shift.BindingIdentifier(new Shift.Identifier("b")),
           null)])));
 
     testExportDecl(
       "export const a = 0, b = 0;",
-      new Shift.Export(new Shift.VariableDeclaration('const', [
+      new Shift.Export(new Shift.VariableDeclaration("const", [
         new Shift.VariableDeclarator(
-          new Shift.BindingIdentifier(new Shift.Identifier('a')),
+          new Shift.BindingIdentifier(new Shift.Identifier("a")),
           new Shift.LiteralNumericExpression(0)),
         new Shift.VariableDeclarator(
-          new Shift.BindingIdentifier(new Shift.Identifier('b')),
+          new Shift.BindingIdentifier(new Shift.Identifier("b")),
           new Shift.LiteralNumericExpression(0))])));
 
     testExportDecl(
       "export let a = 0, b = 0;",
-      new Shift.Export(new Shift.VariableDeclaration('let', [
+      new Shift.Export(new Shift.VariableDeclaration("let", [
         new Shift.VariableDeclarator(
-          new Shift.BindingIdentifier(new Shift.Identifier('a')),
+          new Shift.BindingIdentifier(new Shift.Identifier("a")),
           new Shift.LiteralNumericExpression(0)),
         new Shift.VariableDeclarator(
-          new Shift.BindingIdentifier(new Shift.Identifier('b')),
+          new Shift.BindingIdentifier(new Shift.Identifier("b")),
           new Shift.LiteralNumericExpression(0))])));
 
     testExportDecl(
       "export let[a] = 0;",
-      new Shift.Export(new Shift.VariableDeclaration('let', [
+      new Shift.Export(new Shift.VariableDeclaration("let", [
         new Shift.VariableDeclarator(
           new Shift.ArrayBinding([
-            new Shift.BindingIdentifier(new Shift.Identifier('a'))
+            new Shift.BindingIdentifier(new Shift.Identifier("a"))
           ], null),
           new Shift.LiteralNumericExpression(0))
       ])));
@@ -193,7 +193,7 @@ suite("Parser", function () {
       null,
       new Shift.FunctionBody([], []))));
 
-    testParseFailure("export * from \"a\"", 'Unexpected token export');
+    testParseFailure("export * from \"a\"", "Unexpected token export");
     testParseModuleFailure("{export default 3}", "Unexpected token export");
     testParseModuleFailure("while (1) export default 3", "Unexpected token export");
     testParseModuleFailure("export", "Unexpected end of input");

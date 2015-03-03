@@ -631,7 +631,7 @@ export default class Tokenizer {
       if (chCode < 0x80) {
         switch (chCode) {
           case 42:  // "*"
-            // Block comment ends with "*/'.
+            // Block comment ends with "*/".
             if (this.source.charAt(this.index + 1) === "/") {
               this.index = this.index + 2;
               return isLineStart;
@@ -708,7 +708,7 @@ export default class Tokenizer {
         if (this.index + 2 >= length) {
           break;
         }
-        // U+003E is ">'
+        // U+003E is ">"
         if ((this.source.charAt(this.index + 1) === "-") && (this.source.charAt(this.index + 2) === ">")) {
           // "-->" is a single-line comment
           this.skipSingleLineComment(3);
@@ -1004,7 +1004,7 @@ export default class Tokenizer {
           default:
             break; //failed
         }
-      } else if (ch1 === '=' && ch2 === '>') {
+      } else if (ch1 === "=" && ch2 === ">") {
         return TokenType.ARROW;
       }
     }
@@ -1095,7 +1095,7 @@ export default class Tokenizer {
       let ch = this.source.charAt(this.index);
       if ("0" <= ch && ch <= "7") {
         this.index++;
-      } else if (ch === '8' || ch === '9') {
+      } else if (ch === "8" || ch === "9") {
         isOctal = false;
         this.index++
       } else if (isIdentifierPart(ch.charCodeAt(0))) {
@@ -1137,7 +1137,7 @@ export default class Tokenizer {
         return new NumericLiteralToken(this.getSlice(start, startLocation));
       }
     } else if (ch !== ".") {
-      // Must be "1'..'9'
+      // Must be "1".."9"
       ch = this.source.charAt(this.index);
       while ("0" <= ch && ch <= "9") {
         this.index++;
@@ -1343,7 +1343,7 @@ export default class Tokenizer {
         case 0x5C:  // \\
         {
           let location = this.getLocation();
-          let [_, octal] = this.scanStringEscape('', false);
+          let octal = this.scanStringEscape("", false)[1];
           if (octal) {
             throw this.createErrorWithLocation(location, ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN);
           }
@@ -1459,7 +1459,7 @@ export default class Tokenizer {
         return this.scanTemplateElement();
       }
 
-      if (0x30 /* '0' */ <= charCode && charCode <= 0x39 /* '9' */) {
+      if (0x30 /* "0" */ <= charCode && charCode <= 0x39 /* "9" */) {
         return this.scanNumericLiteral();
       }
 

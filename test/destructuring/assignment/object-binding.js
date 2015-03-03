@@ -17,7 +17,6 @@
 var Shift = require("shift-ast");
 
 var expr = require("../../helpers").expr;
-var stmt = require("../../helpers").stmt;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
 
@@ -89,7 +88,7 @@ suite("Parser", function () {
           "=",
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
-              new Shift.ComputedPropertyName(new Shift.IdentifierExpression(new Shift.Identifier('a'))),
+              new Shift.ComputedPropertyName(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
               new Shift.BindingIdentifier(new Shift.Identifier("a"))
             ),
           ]),

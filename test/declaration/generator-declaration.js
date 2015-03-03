@@ -18,7 +18,6 @@ var Shift = require("shift-ast");
 
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
-var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
@@ -58,7 +57,7 @@ suite("Parser", function () {
         emptyBody));
 
     testParse("function* a(){({[yield]:a}=0)}", function (p) {
-        return p.body.statements[0].body.statements[0].expression
+        return p.body.statements[0].body.statements[0].expression;
       },
       new Shift.AssignmentExpression("=",
         new Shift.ObjectBinding([

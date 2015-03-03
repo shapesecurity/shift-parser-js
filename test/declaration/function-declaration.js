@@ -73,15 +73,15 @@ suite("Parser", function () {
   });
 
   suite("function declaration in labeled statement", function () {
-    testParse('a: function a(){}', stmt,
+    testParse("a: function a(){}", stmt,
       new Shift.LabeledStatement(
-        new Shift.Identifier('a'),
-        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier('a')), [], null, new Shift.FunctionBody([], []))));
+        new Shift.Identifier("a"),
+        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], []))));
 
-    testParseFailure('a: function* a(){}', 'Unexpected token *');
+    testParseFailure("a: function* a(){}", "Unexpected token *");
 
-    testParseFailure('while(true) function a(){}', 'Unexpected token function');
-    testParseFailure('with(true) function a(){}', 'Unexpected token function');
-    testParseFailure('a: function* a(){}', 'Unexpected token *');
-  })
+    testParseFailure("while(true) function a(){}", "Unexpected token function");
+    testParseFailure("with(true) function a(){}", "Unexpected token function");
+    testParseFailure("a: function* a(){}", "Unexpected token *");
+  });
 });

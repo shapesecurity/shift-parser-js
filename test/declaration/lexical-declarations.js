@@ -18,41 +18,40 @@ var Shift = require("shift-ast");
 
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
-var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("declarations", function () {
-    testParse('let a', stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration('let',
+    testParse("let a", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let",
         [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier('a')), null)
+          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
         ]))
     );
 
-    testParse('{ let a; }', stmt,
+    testParse("{ let a; }", stmt,
       new Shift.BlockStatement(
         new Shift.Block([
           new Shift.VariableDeclarationStatement(
             new Shift.VariableDeclaration(
-              'let',
-              [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier('a')), null)]))])));
+              "let",
+              [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)]))])));
 
-    // TODO: lookahead let [ : testParseFailure('while(true) let[a] = 0', 'Unexpected token let');
-    testParse('while(true) var a', stmt,
+    // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token let");
+    testParse("while(true) var a", stmt,
       new Shift.WhileStatement(
         new Shift.LiteralBooleanExpression(true),
         new Shift.VariableDeclarationStatement(
           new Shift.VariableDeclaration(
-            'var',
-            [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier('a')), null)]))));
+            "var",
+            [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)]))));
 
-    testParseFailure('while(true) let a', 'Unexpected identifier');
-    testParseFailure('while(true) const a', 'Unexpected token const');
-    testParseFailure('with(true) let a', 'Unexpected identifier');
-    testParseFailure('with(true) class a {}', 'Unexpected token class');
+    testParseFailure("while(true) let a", "Unexpected identifier");
+    testParseFailure("while(true) const a", "Unexpected token const");
+    testParseFailure("with(true) let a", "Unexpected identifier");
+    testParseFailure("with(true) class a {}", "Unexpected token class");
 
-    testParseFailure('a: let a', 'Unexpected identifier');
+    testParseFailure("a: let a", "Unexpected identifier");
 
   });
 });

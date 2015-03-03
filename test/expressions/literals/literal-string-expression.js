@@ -32,7 +32,7 @@ suite("Parser", function () {
     testParse("('\\\u2028')", expr, new Shift.LiteralStringExpression(""));
     testParse("('\\\u2029')", expr, new Shift.LiteralStringExpression(""));
     testParse("('\u202a')", expr, new Shift.LiteralStringExpression("\u202a"));
-    testParse("('\\0')", expr, new Shift.LiteralStringExpression("\0"));
+    testParse("('\\0')", expr, new Shift.LiteralStringExpression("\u0000"));
     testParse("('\\01')", expr, new Shift.LiteralStringExpression("\u0001"));
     testParse("('\\1')", expr, new Shift.LiteralStringExpression("\u0001"));
     testParse("('\\11')", expr, new Shift.LiteralStringExpression("\u0009"));

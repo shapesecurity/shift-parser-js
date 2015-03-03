@@ -20,13 +20,7 @@ import {isRestrictedWord, isStrictModeReservedWordES5} from "./utils";
 
 import {ErrorMessages} from "./errors";
 
-import Tokenizer, {
-    TokenClass,
-    TokenType,
-    IdentifierToken,
-    IdentifierLikeToken,
-    NumericLiteralToken,
-    StringLiteralToken} from "./tokenizer";
+import Tokenizer, { TokenClass, TokenType } from "./tokenizer";
 
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = "CoverParenthesizedExpressionAndArrowParameterList";
@@ -106,7 +100,7 @@ function firstDuplicate(strings) {
     return null;
   let map = {};
   for (let cursor = 0; cursor < strings.length; cursor++) {
-    let id = '$' + strings[cursor];
+    let id = "$" + strings[cursor];
     if (map.hasOwnProperty(id)) {
       return strings[cursor];
     }
@@ -340,10 +334,10 @@ export class Parser extends Tokenizer {
     if (this.lookahead.type === TokenType.IDENTIFIER) {
       identifier = this.parseIdentifier();
       if (!this.eatContextualKeyword("as")) {
-        if ({}.hasOwnProperty.call(boundNames, '$' + identifier.name)) {
+        if ({}.hasOwnProperty.call(boundNames, "$" + identifier.name)) {
           throw this.createErrorWithLocation(startLocation, ErrorMessages.IMPORT_DUPE);
         }
-        boundNames['$' + identifier.name] = true;
+        boundNames["$" + identifier.name] = true;
         return this.markLocation(
           new Shift.ImportSpecifier(
             null,
@@ -356,10 +350,10 @@ export class Parser extends Tokenizer {
 
     let location = this.getLocation();
     let boundName = this.parseIdentifier();
-    if ({}.hasOwnProperty.call(boundNames, '$' + boundName.name)) {
+    if ({}.hasOwnProperty.call(boundNames, "$" + boundName.name)) {
       throw this.createErrorWithLocation(location, ErrorMessages.IMPORT_DUPE);
     }
-    boundNames['$' + boundName.name] = true;
+    boundNames["$" + boundName.name] = true;
     return this.markLocation(
       new Shift.ImportSpecifier(
         identifier,
@@ -373,10 +367,10 @@ export class Parser extends Tokenizer {
     this.expectContextualKeyword("as");
     let identifierLocation = this.getLocation();
     let identifier = this.parseIdentifier();
-    if ({}.hasOwnProperty.call(boundNames, '$' + identifier.name)) {
+    if ({}.hasOwnProperty.call(boundNames, "$" + identifier.name)) {
       throw this.createErrorWithLocation(identifierLocation, ErrorMessages.IMPORT_DUPE);
     }
-    boundNames['$' + identifier.name] = true;
+    boundNames["$" + identifier.name] = true;
     return this.markLocation(new Shift.BindingIdentifier(identifier), startLocation);
   }
 
@@ -410,7 +404,7 @@ export class Parser extends Tokenizer {
         return this.markLocation(new Shift.Import(null, [], moduleSpecifier), startLocation);
       case TokenType.IDENTIFIER:
         defaultBinding = this.expect(TokenType.IDENTIFIER).value;
-        boundNames['$' + defaultBinding] = true;
+        boundNames["$" + defaultBinding] = true;
         if (!this.eat(TokenType.COMMA)) {
           return this.markLocation(new Shift.Import(defaultBinding, [], this.parseFromClause()), startLocation);
         }
@@ -429,7 +423,7 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     let name = this.parseIdentifier();
     exportedBindings["$" + name.name] = true;
-    if (this.eatContextualKeyword('as')) {
+    if (this.eatContextualKeyword("as")) {
       let exportedName = this.parseIdentifierName();
       if ({}.hasOwnProperty.call(exportedNames, "$" + exportedName.name)) {
         throw this.createError(ErrorMessages.DUPLICATE_EXPORTED_NAME, exportedName.name);
@@ -595,7 +589,7 @@ export class Parser extends Tokenizer {
           return this.parseClass({isExpr: false});
         default:
           // TODO: lookahead `let [` instead.
-          if (this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === 'let') {
+          if (this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let") {
             return this.parseVariableDeclarationStatement();
           }
           return this.parseStatement({allowLabeledFunction: true});
@@ -950,7 +944,7 @@ export class Parser extends Tokenizer {
       );
     } else {
       // TODO (bzhang): lookahead `let [`.
-      let isForDecl = this.match(TokenType.CONST) || this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === 'let';
+      let isForDecl = this.match(TokenType.CONST) || this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let";
       if (this.match(TokenType.VAR) || isForDecl) {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
@@ -1266,7 +1260,7 @@ export class Parser extends Tokenizer {
     let result = [];
     let [varDecl, allBound] = this.parseVariableDeclarator(kind, {allowConstWithoutBinding: inFor});
     result.push(varDecl);
-    if (inFor && kind === 'const' && varDecl.init === null) {
+    if (inFor && kind === "const" && varDecl.init === null) {
       return result;
     }
 
@@ -1385,7 +1379,7 @@ export class Parser extends Tokenizer {
     let token = this.lookahead;
     let startLocation = this.getLocation();
 
-    if (this.allowYieldExpression && !this.inGeneratorParameter && this.lookahead.value === 'yield') {
+    if (this.allowYieldExpression && !this.inGeneratorParameter && this.lookahead.value === "yield") {
       return this.parseYieldExpression();
     }
 
@@ -1416,7 +1410,7 @@ export class Parser extends Tokenizer {
       if (!Parser.isValidSimpleAssignmentTarget(node)) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
-      if (node.type === 'IdentifierExpression') {
+      if (node.type === "IdentifierExpression") {
         if (this.strict && isRestrictedWord(node.identifier.name)) {
           throw this.createErrorWithLocation(token, ErrorMessages.STRICT_LHS_ASSIGNMENT);
         }
@@ -2101,7 +2095,7 @@ export class Parser extends Tokenizer {
       case "identifier": // IdentifierReference,
         if (this.eat(TokenType.ASSIGN)) {
           // CoverInitializedName
-          if ((this.strict || this.allowYieldExpression) && methodOrKey.value === 'yield') {
+          if ((this.strict || this.allowYieldExpression) && methodOrKey.value === "yield") {
             throw this.createUnexpected(token);
           }
           return this.markLocation(new Shift.BindingPropertyIdentifier(
@@ -2110,7 +2104,7 @@ export class Parser extends Tokenizer {
             startLocation);
         } else if (!this.match(TokenType.COLON)) {
           if (token.type !== TokenType.IDENTIFIER && token.type !== TokenType.YIELD ||
-            (this.strict || this.allowYieldExpression) && methodOrKey.value === 'yield') {
+            (this.strict || this.allowYieldExpression) && methodOrKey.value === "yield") {
             throw this.createUnexpected(token);
           }
           return this.markLocation(new Shift.ShorthandProperty(new Shift.Identifier(methodOrKey.value)), startLocation);
@@ -2332,7 +2326,7 @@ export class Parser extends Tokenizer {
       let methodToken = this.lookahead;
       let isStatic = false;
       let {methodOrKey, kind} = this.parseMethodDefinition(true);
-      if (kind === 'identifier' && methodOrKey.value === 'static') {
+      if (kind === "identifier" && methodOrKey.value === "static") {
         isStatic = true;
         ({methodOrKey, kind} = this.parseMethodDefinition(false));
       }
@@ -2451,7 +2445,7 @@ export class Parser extends Tokenizer {
     );
   }
 
-  parseParam(bound, info) {
+  parseParam() {
     let token = this.lookahead;
     let originalInParameter = this.inParameter;
     this.inParameter = true;
@@ -2516,7 +2510,6 @@ export class Parser extends Tokenizer {
 
       while (!this.eof()) {
         let token = this.lookahead;
-        let startLocation = this.getLocation();
         let param;
         if (this.eat(TokenType.ELLIPSIS)) {
           isSimpleParameter = false;
@@ -2526,7 +2519,7 @@ export class Parser extends Tokenizer {
           seenRest = true;
         } else {
           param = this.parseParam();
-          if (param.type !== 'BindingIdentifier') {
+          if (param.type !== "BindingIdentifier") {
             isSimpleParameter = false;
           }
         }

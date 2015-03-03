@@ -19,16 +19,12 @@ var Shift = require("shift-ast");
 
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
-var expr = require("../helpers").expr;
-var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
-  var emptyBody = new Shift.FunctionBody([], []);
-
   suite("yield", function () {
     function yd(p) {
       return p.body.statements[0].body.statements.map(function (es) {
-        return es.expression
+        return es.expression;
       });
     }
 

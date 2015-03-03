@@ -161,7 +161,7 @@ suite("Parser", function () {
           ]))
         ))
       )
-    )
+    );
 
     testParseFailure("(function([]){})", "Unexpected token [");
     testParseFailure("(function(...a, b){})", "Unexpected token ,");

@@ -108,7 +108,7 @@ suite("Parser", function () {
     testParse("(x)=>{'use strict';}", expr, new Shift.ArrowExpression([
         new Shift.BindingIdentifier(new Shift.Identifier("x")),
       ], null,
-      new Shift.FunctionBody([new Shift.Directive('use strict')], [])
+      new Shift.FunctionBody([new Shift.Directive("use strict")], [])
     ));
 
     testParse("'use strict';(x)=>0", expr, new Shift.ArrowExpression([

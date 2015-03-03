@@ -16,7 +16,7 @@
 
 var Shift = require("shift-ast");
 
-var testParseModule = require('../assertions').testParseModule;
+var testParseModule = require("../assertions").testParseModule;
 var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 
 function id(x) {

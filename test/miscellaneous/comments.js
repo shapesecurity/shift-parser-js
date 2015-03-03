@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('./../assertions').testEsprimaEquiv;
+var Shift = require("shift-ast");
+
+var testParse = require("../assertions").testParse;
+
+function id(x) {
+  return x;
+}
 
 suite("Parser", function () {
   suite("Comments", function () {
-    testEsprimaEquiv(" /**/");
-    testEsprimaEquiv(" /****/");
-    testEsprimaEquiv(" /**\n\r\r\n**/");
-    testEsprimaEquiv(" //\n");
-    testEsprimaEquiv("<!-- foo");
-    testEsprimaEquiv("--> comment");
-    testEsprimaEquiv("<!-- comment");
-    testEsprimaEquiv(" \t --> comment");
-    testEsprimaEquiv(" \t /* block comment */  --> comment");
-    testEsprimaEquiv("/* block comment */--> comment");
+    testParse(" /**/", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse(" /****/", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse(" /**\n\r\r\n**/", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse(" //\n", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse("<!-- foo", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse("--> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse("<!-- comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse(" \t --> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse(" \t /* block comment */  --> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse("/* block comment */--> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
   });
 });

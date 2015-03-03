@@ -16,11 +16,14 @@
 
 var Shift = require("shift-ast");
 
-var expr = require("./../helpers").expr;
-var stmt = require("./../helpers").stmt;
-var testEsprimaEquiv = require('./../assertions').testEsprimaEquiv;
-var testParseFailure = require('./../assertions').testParseFailure;
-var testParse = require('./../assertions').testParse;
+var expr = require("../helpers").expr;
+var stmt = require("../helpers").stmt;
+var testParseFailure = require("../assertions").testParseFailure;
+var testParse = require("../assertions").testParse;
+
+function id(x) {
+  return x;
+}
 
 suite("Parser", function () {
   suite("interactions", function () {
@@ -59,7 +62,17 @@ suite("Parser", function () {
       )
     );
 
-    testEsprimaEquiv("a[b](b,c)");
+    testParse("a[b](b,c)", expr,
+      { type: "CallExpression",
+        callee:
+         { type: "ComputedMemberExpression",
+           object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+           expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
+        arguments:
+         [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+           { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } ] }
+    );
+
 
     testParse("new foo().bar()", expr,
       new Shift.CallExpression(
@@ -71,7 +84,15 @@ suite("Parser", function () {
       )
     );
 
-    testEsprimaEquiv("new foo[bar]");
+    testParse("new foo[bar]", expr,
+      { type: "NewExpression",
+        callee:
+          { type: "ComputedMemberExpression",
+            object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
+            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bar" } } },
+        arguments: [] }
+    );
+
 
     testParse("new foo.bar()", expr,
       new Shift.NewExpression(
@@ -93,33 +114,33 @@ suite("Parser", function () {
       )
     );
 
-    testParse("a[42].b", expr,
+    testParse("a[0].b", expr,
       new Shift.StaticMemberExpression(
         new Shift.ComputedMemberExpression(
           new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          new Shift.LiteralNumericExpression(42)
+          new Shift.LiteralNumericExpression(0)
         ),
         "b"
       )
     );
 
-    testParse("a(42).b", expr,
+    testParse("a(0).b", expr,
       new Shift.StaticMemberExpression(
         new Shift.CallExpression(
           new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          [new Shift.LiteralNumericExpression(42)]
+          [new Shift.LiteralNumericExpression(0)]
         ),
         "b"
       )
     );
 
-    testParse("a(42).b(14, 3, 77).c", expr,
+    testParse("a(0).b(14, 3, 77).c", expr,
       new Shift.StaticMemberExpression(
         new Shift.CallExpression(
           new Shift.StaticMemberExpression(
             new Shift.CallExpression(
               new Shift.IdentifierExpression(new Shift.Identifier("a")),
-              [new Shift.LiteralNumericExpression(42)]
+              [new Shift.LiteralNumericExpression(0)]
             ),
             "b"
           ),
@@ -142,13 +163,86 @@ suite("Parser", function () {
     );
 
     // BinaryExpressions
-    testEsprimaEquiv("a || b && c | d ^ e & f == g < h >>> i + j * k");
+    testParse("a || b && c | d ^ e & f == g < h >>> i + j * k", expr,
+      { type: "BinaryExpression",
+        operator: "||",
+        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        right:
+          { type: "BinaryExpression",
+            operator: "&&",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+            right:
+              { type: "BinaryExpression",
+                operator: "|",
+                left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } },
+                right:
+                  { type: "BinaryExpression",
+                    operator: "^",
+                    left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "d" } },
+                    right:
+                      { type: "BinaryExpression",
+                        operator: "&",
+                        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "e" } },
+                        right:
+                          { type: "BinaryExpression",
+                            operator: "==",
+                            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "f" } },
+                            right:
+                              { type: "BinaryExpression",
+                                operator: "<",
+                                left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "g" } },
+                                right:
+                                  { type: "BinaryExpression",
+                                    operator: ">>>",
+                                    left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "h" } },
+                                    right:
+                                      { type: "BinaryExpression",
+                                        operator: "+",
+                                        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "i" } },
+                                        right:
+                                          { type: "BinaryExpression",
+                                            operator: "*",
+                                            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "j" } },
+                                            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "k" } } } } } } } } } } } }
+    );
+
 
     // Comments
-    testEsprimaEquiv("//\n;a;");
-    testEsprimaEquiv("/* block comment */ 42");
-    testEsprimaEquiv("42 /* block comment 1 */ /* block comment 2 */");
-    testEsprimaEquiv("(a + /* assignment */b ) * c");
+    testParse("//\n;a;", id,
+      { type: "Script",
+        body:
+          { type: "FunctionBody",
+            directives: [],
+            statements:
+              [ { type: "EmptyStatement" },
+                { type: "ExpressionStatement",
+                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } } } ] } }
+    );
+
+    testParse("/* block comment */ 0", expr,
+      { type: "LiteralNumericExpression", value: 0 }
+    );
+
+    testParse("0 /* block comment 1 */ /* block comment 2 */", id,
+      { type: "Script",
+        body:
+          { type: "FunctionBody",
+            directives: [],
+            statements:
+              [ { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } } ] } }
+    );
+
+    testParse("(a + /* assignment */b ) * c", expr,
+      { type: "BinaryExpression",
+        operator: "*",
+        left:
+          { type: "BinaryExpression",
+            operator: "+",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
+        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+    );
+
     testParse("/* assignment */\n a = b", expr,
       new Shift.AssignmentExpression(
         "=",
@@ -156,32 +250,138 @@ suite("Parser", function () {
         new Shift.IdentifierExpression(new Shift.Identifier("b"))
       )
     );
-    testEsprimaEquiv("42 /*The*/ /*Answer*/");
-    testEsprimaEquiv("42 /*the*/ /*answer*/");
-    testEsprimaEquiv("42 /* the * answer */");
-    testEsprimaEquiv("42 /* The * answer */");
-    testEsprimaEquiv("/* multiline\ncomment\nshould\nbe\nignored */ 42");
-    testEsprimaEquiv("/*a\r\nb*/ 42");
-    testEsprimaEquiv("/*a\rb*/ 42");
-    testEsprimaEquiv("/*a\nb*/ 42");
-    testEsprimaEquiv("/*a\nc*/ 42");
-    testEsprimaEquiv("// line comment\n42");
-    testEsprimaEquiv("42 // line comment");
-    testEsprimaEquiv("// Hello, world!\n42");
-    testEsprimaEquiv("// Hello, world!\n");
-    testEsprimaEquiv("// Hallo, world!\n");
-    testEsprimaEquiv("//\n42");
-    testEsprimaEquiv("//");
-    testEsprimaEquiv("// ");
-    testEsprimaEquiv("/**/42");
-    testEsprimaEquiv("42/**/");
-    testEsprimaEquiv("// Hello, world!\n\n//   Another hello\n42");
-    testEsprimaEquiv("if (x) { doThat() // Some comment\n }");
-    testEsprimaEquiv("if (x) { // Some comment\ndoThat(); }");
-    testEsprimaEquiv("if (x) { /* Some comment */ doThat() }");
-    testEsprimaEquiv("if (x) { doThat() /* Some comment */ }");
-    testEsprimaEquiv("switch (answer) { case 42: /* perfect */ bingo() }");
-    testEsprimaEquiv("switch (answer) { case 42: bingo() /* perfect */ }");
+
+    testParse("0 /*The*/ /*Answer*/", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0 /*the*/ /*answer*/", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0 /* the * answer */", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0 /* The * answer */", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("/* multiline\ncomment\nshould\nbe\nignored */ 0", expr,
+      { type: "LiteralNumericExpression", value: 0 }
+    );
+    testParse("/*a\r\nb*/ 0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("/*a\rb*/ 0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("/*a\nb*/ 0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("/*a\nc*/ 0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("// line comment\n0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0 // line comment", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("// Hello, world!\n0", expr, { type: "LiteralNumericExpression", value: 0 });
+
+    testParse("// Hello, world!\n", id,
+      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+    );
+
+    testParse("// Hallo, world!\n", id,
+      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+    );
+
+    testParse("//\n0", expr, { type: "LiteralNumericExpression", value: 0 });
+
+    testParse("//", id,
+      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+    );
+
+    testParse("// ", id,
+      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+    );
+
+    testParse("/**/0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0/**/", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("// Hello, world!\n\n//   Another hello\n0", expr,
+      { type: "LiteralNumericExpression", value: 0 }
+    );
+
+    testParse("if (x) { doThat() // Some comment\n }", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        consequent:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "ExpressionStatement",
+                      expression:
+                        { type: "CallExpression",
+                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          arguments: [] } } ] } },
+        alternate: null }
+    );
+
+    testParse("if (x) { // Some comment\ndoThat(); }", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        consequent:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "ExpressionStatement",
+                      expression:
+                        { type: "CallExpression",
+                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          arguments: [] } } ] } },
+        alternate: null }
+    );
+
+    testParse("if (x) { /* Some comment */ doThat() }", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        consequent:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "ExpressionStatement",
+                      expression:
+                        { type: "CallExpression",
+                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          arguments: [] } } ] } },
+        alternate: null }
+    );
+
+    testParse("if (x) { doThat() /* Some comment */ }", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        consequent:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "ExpressionStatement",
+                      expression:
+                        { type: "CallExpression",
+                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          arguments: [] } } ] } },
+        alternate: null }
+    );
+
+    testParse("switch (answer) { case 0: /* perfect */ bingo() }", stmt,
+      { type: "SwitchStatement",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        cases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 0 },
+              consequent:
+                [ { type: "ExpressionStatement",
+                    expression:
+                      { type: "CallExpression",
+                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bingo" } },
+                        arguments: [] } } ] } ] }
+    );
+
+    testParse("switch (answer) { case 0: bingo() /* perfect */ }", stmt,
+      { type: "SwitchStatement",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        cases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 0 },
+              consequent:
+                [ { type: "ExpressionStatement",
+                    expression:
+                      { type: "CallExpression",
+                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bingo" } },
+                        arguments: [] } } ] } ] }
+    );
+
     testParse("/* header */ (function(){ var version = 1; }).call(this)", expr,
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(
@@ -215,12 +415,42 @@ suite("Parser", function () {
       ]))
     );
 
-    testEsprimaEquiv("while (i-->0) {}");
+    testParse("while (i-->0) {}", stmt,
+      { type: "WhileStatement",
+        body: { type: "BlockStatement", block: { type: "Block", statements: [] } },
+        test:
+         { type: "BinaryExpression",
+           operator: ">",
+           left:
+            { type: "PostfixExpression",
+              operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "i" } },
+              operator: "--" },
+           right: { type: "LiteralNumericExpression", value: 0 } } }
+    );
+
     testParse("var x = 1<!--foo", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(1)),
       ]))
     );
-    testEsprimaEquiv("/* not comment*/; i-->0");
+
+    testParse("/* not comment*/; i-->0", id,
+      { type: "Script",
+        body:
+          { type: "FunctionBody",
+            directives: [],
+            statements:
+              [ { type: "EmptyStatement" },
+                { type: "ExpressionStatement",
+                  expression:
+                    { type: "BinaryExpression",
+                      operator: ">",
+                      left:
+                        { type: "PostfixExpression",
+                          operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "i" } },
+                          operator: "--" },
+                      right: { type: "LiteralNumericExpression", value: 0 } } } ] } }
+    );
+
   });
 });

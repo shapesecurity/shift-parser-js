@@ -17,7 +17,7 @@
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var testParse = require('../assertions').testParse;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("static member expression", function () {

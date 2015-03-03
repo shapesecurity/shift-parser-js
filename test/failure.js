@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var testParseFailure = require('./assertions').testParseFailure;
+var testParseFailure = require("./assertions").testParseFailure;
 
 // TODO: make sense of this file
 suite("Parser", function () {
@@ -56,7 +56,7 @@ suite("Parser", function () {
     testParseFailure("1.e", "Unexpected token ILLEGAL");
     testParseFailure("1.e+", "Unexpected token ILLEGAL");
     testParseFailure("1.e+z", "Unexpected token ILLEGAL");
-    testParseFailure("/\\\n42", "Invalid regular expression: missing /");
+    testParseFailure("/\\\n0", "Invalid regular expression: missing /");
     testParseFailure("0x", "Unexpected token ILLEGAL");
     testParseFailure("0xz", "Unexpected token ILLEGAL");
     testParseFailure("0x1z", "Unexpected token ILLEGAL");
@@ -107,8 +107,8 @@ suite("Parser", function () {
     testParseFailure("1 + { t:t,", "Unexpected end of input");
     testParseFailure("var x = /\n/", "Invalid regular expression: missing /");
     testParseFailure("var x = \"\n", "Unexpected token ILLEGAL");
-    testParseFailure("var if = 42", "Unexpected token if");
-    testParseFailure("i #= 42", "Unexpected token ILLEGAL");
+    testParseFailure("var if = 0", "Unexpected token if");
+    testParseFailure("i #= 0", "Unexpected token ILLEGAL");
     testParseFailure("1 + (", "Unexpected end of input");
     testParseFailure("\n\n\n{", "Unexpected end of input");
     testParseFailure("\n/* Some multiline\ncomment */\n)", "Unexpected token )");
@@ -150,7 +150,7 @@ suite("Parser", function () {
     testParseFailure("for(;;)", "Unexpected end of input");
     testParseFailure("with(x)", "Unexpected end of input");
     testParseFailure("try { }", "Missing catch or finally after try");
-    testParseFailure("try {} catch (42) {} ", "Unexpected number");
+    testParseFailure("try {} catch (0) {} ", "Unexpected number");
     testParseFailure("try {} catch (answer()) {} ", "Unexpected token (");
     testParseFailure("try {} catch (-x) {} ", "Unexpected token -");
     testParseFailure("\u203F = 10", "Unexpected token ILLEGAL");
@@ -260,11 +260,11 @@ suite("Parser", function () {
     testParseFailure(" \"\\1\"; \'use strict\';", "Octal literals are not allowed in strict mode.");
     testParseFailure("function hello() { \'use strict\'; \"\\1\"; }", "Octal literals are not allowed in strict mode.");
     testParseFailure("function hello() { \'use strict\'; 021; }", "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; ({ \"\\1\": 42 }); }",
+    testParseFailure("function hello() { \'use strict\'; ({ \"\\1\": 0 }); }",
         "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; ({ 021: 42 }); }",
+    testParseFailure("function hello() { \'use strict\'; ({ 021: 0 }); }",
         "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; ({ 08: 42 }); }",
+    testParseFailure("function hello() { \'use strict\'; ({ 08: 0 }); }",
       "Octal literals are not allowed in strict mode.");
     testParseFailure("function hello() { \"octal directive\\1\"; \"use strict\"; }",
         "Octal literals are not allowed in strict mode.");
@@ -300,7 +300,7 @@ suite("Parser", function () {
     testParseFailure("(function a(eval) { \"use strict\"; })",
         "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("(function a(package) { \"use strict\"; })", "Use of future reserved word in strict mode");
-    testParseFailure("__proto__: __proto__: 42;", "Label \'__proto__\' has already been declared");
+    testParseFailure("__proto__: __proto__: 0;", "Label \'__proto__\' has already been declared");
     testParseFailure("\"use strict\"; function t(__proto__, __proto__) { }",
         "Strict mode function may not have duplicate parameter names");
     testParseFailure("({__proto__:1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");

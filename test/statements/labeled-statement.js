@@ -14,13 +14,50 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("labeled statement", function () {
-    testEsprimaEquiv("start: for (;;) break start");
-    testEsprimaEquiv("start: while (true) break start");
-    testEsprimaEquiv("__proto__: test");
-    testEsprimaEquiv("a:{break a;}");
+
+    testParse("start: for (;;) break start", stmt,
+      { type: "LabeledStatement",
+        label: { type: "Identifier", name: "start" },
+        body:
+          { type: "ForStatement",
+            body: { type: "BreakStatement", label: { type: "Identifier", name: "start" } },
+            init: null,
+            test: null,
+            update: null } }
+    );
+
+    testParse("start: while (true) break start", stmt,
+      { type: "LabeledStatement",
+        label: { type: "Identifier", name: "start" },
+        body:
+          { type: "WhileStatement",
+            body: { type: "BreakStatement", label: { type: "Identifier", name: "start" } },
+            test: { type: "LiteralBooleanExpression", value: true } } }
+    );
+
+    testParse("__proto__: test", stmt,
+      { type: "LabeledStatement",
+        label: { type: "Identifier", name: "__proto__" },
+        body:
+          { type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "test" } } } }
+    );
+
+    testParse("a:{break a;}", stmt,
+      { type: "LabeledStatement",
+        label: { type: "Identifier", name: "a" },
+        body:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "BreakStatement", label: { type: "Identifier", name: "a" } } ] } } }
+    );
+
   });
 });

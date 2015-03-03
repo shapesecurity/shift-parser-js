@@ -16,13 +16,24 @@
 
 var Shift = require("shift-ast");
 
+var testParse = require("../assertions").testParse;
 var stmt = require("../helpers").stmt;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("if statement", function () {
-    testEsprimaEquiv("if (morning) goodMorning()");
+
+    testParse("if (morning) goodMorning()", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "morning" } },
+        consequent:
+          { type: "ExpressionStatement",
+            expression:
+              { type: "CallExpression",
+                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "goodMorning" } },
+                arguments: [] } },
+        alternate: null }
+    );
+
     testParse("if (morning) (function(){})", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
@@ -30,6 +41,7 @@ suite("Parser", function () {
         null
       )
     );
+
     testParse("if (morning) var x = 0;", stmt,
       new Shift.IfStatement(
         new Shift.IdentifierExpression(new Shift.Identifier("morning")),
@@ -39,8 +51,43 @@ suite("Parser", function () {
         null
       )
     );
-    testEsprimaEquiv("if (morning) goodMorning(); else goodDay()");
-    testEsprimaEquiv("if(a)b;");
-    testEsprimaEquiv("if(a)b;else c;");
+
+    testParse("if (morning) goodMorning(); else goodDay()", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "morning" } },
+        consequent:
+          { type: "ExpressionStatement",
+            expression:
+              { type: "CallExpression",
+                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "goodMorning" } },
+                arguments: [] } },
+        alternate:
+          { type: "ExpressionStatement",
+            expression:
+              { type: "CallExpression",
+                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "goodDay" } },
+                arguments: [] } } }
+    );
+
+    testParse("if(a)b;", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        consequent:
+          { type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
+        alternate: null }
+    );
+
+    testParse("if(a)b;else c;", stmt,
+      { type: "IfStatement",
+        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        consequent:
+          { type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
+        alternate:
+          { type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } } }
+    );
+
   });
 });

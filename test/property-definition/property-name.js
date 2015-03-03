@@ -17,8 +17,8 @@
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var testParse = require('../assertions').testParse;
-var testParseFailure = require('../assertions').testParseFailure;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("property name", function () {

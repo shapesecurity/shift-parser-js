@@ -16,13 +16,26 @@
 
 var Shift = require("shift-ast");
 
+var testParse = require("../assertions").testParse;
 var stmt = require("../helpers").stmt;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParse = require('../assertions').testParse;
 
 suite("Parser", function () {
   suite("for in statement", function () {
-    testEsprimaEquiv("for(x in list) process(x);");
+
+    testParse("for(x in list) process(x);", stmt,
+      { type: "ForInStatement",
+        body:
+          { type: "ExpressionStatement",
+            expression:
+              { type: "CallExpression",
+                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "process" } },
+                arguments:
+                  [ { type: "IdentifierExpression",
+                    identifier: { type: "Identifier", name: "x" } } ] } },
+        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "list" } } }
+    );
+
     testParse("for (var x in list) process(x);", stmt,
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("var", [
@@ -59,7 +72,12 @@ suite("Parser", function () {
       )
     );
 
-    testEsprimaEquiv("for(a in b);");
+    testParse("for(a in b);", stmt,
+      { type: "ForInStatement",
+        body: { type: "EmptyStatement" },
+        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } }
+    );
 
     // TODO: a should be a BindingIdentifier, not an IdentifierExpression
     testParse("for(a in b);", stmt,

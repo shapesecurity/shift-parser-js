@@ -14,15 +14,48 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var expr = require("../helpers").expr;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("postfix expression", function () {
-    testEsprimaEquiv("x++");
-    testEsprimaEquiv("x--");
-    testEsprimaEquiv("eval++");
-    testEsprimaEquiv("eval--");
-    testEsprimaEquiv("arguments++");
-    testEsprimaEquiv("arguments--");
+
+    testParse("x++", expr,
+      { type: "PostfixExpression",
+        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        operator: "++" }
+    );
+
+    testParse("x--", expr,
+      { type: "PostfixExpression",
+        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        operator: "--" }
+    );
+
+    testParse("eval++", expr,
+      { type: "PostfixExpression",
+        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "eval" } },
+        operator: "++" }
+    );
+
+    testParse("eval--", expr,
+      { type: "PostfixExpression",
+        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "eval" } },
+        operator: "--" }
+    );
+
+    testParse("arguments++",
+      expr,
+      { type: "PostfixExpression",
+        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "arguments" } },
+        operator: "++" }
+    );
+
+    testParse("arguments--", expr,
+      { type: "PostfixExpression",
+        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "arguments" } },
+        operator: "--" }
+    );
+
   });
 });

@@ -14,13 +14,29 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("throw statement", function () {
-    testEsprimaEquiv("throw this");
-    testEsprimaEquiv("throw x;");
-    testEsprimaEquiv("throw x * y");
-    testEsprimaEquiv("throw {}");
+
+    testParse("throw this", stmt, { type: "ThrowStatement", expression: { type: "ThisExpression" } });
+
+    testParse( "throw x;", stmt,
+      { type: "ThrowStatement",
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } }
+    );
+
+    testParse("throw x * y", stmt,
+      { type: "ThrowStatement",
+        expression:
+          { type: "BinaryExpression",
+            operator: "*",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } } }
+    );
+
+    testParse("throw {}", stmt, { type: "ThrowStatement", expression: { type: "ObjectExpression", properties: [] } });
+
   });
 });

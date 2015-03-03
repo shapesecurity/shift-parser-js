@@ -14,21 +14,47 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var expr = require("../helpers").expr;
 
 suite("Parser", function () {
   suite("identifier expression", function () {
-    testEsprimaEquiv("x");
-    testEsprimaEquiv("x;");
+
+    testParse("x", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } }
+    );
+
+    testParse("x;", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } }
+    );
+
   });
 
   suite("unicode identifier", function () {
     // Unicode
-    testEsprimaEquiv("日本語");
-    testEsprimaEquiv("T\u203F");
-    testEsprimaEquiv("T\u200C");
-    testEsprimaEquiv("T\u200D");
-    testEsprimaEquiv("\u2163\u2161");
-    testEsprimaEquiv("\u2163\u2161\u200A; \u2009");
+    testParse("日本語", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "日本語" } }
+    );
+
+    testParse("T\u203F", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "T\u203F" } }
+    );
+
+    testParse("T\u200C", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "T\u200C" } }
+    );
+
+    testParse("T\u200D", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "T\u200D" } }
+    );
+
+    testParse("\u2163\u2161", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "\u2163\u2161" } }
+    );
+
+    testParse("\u2163\u2161\u200A", expr,
+      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "\u2163\u2161" } }
+    );
+
   });
 });

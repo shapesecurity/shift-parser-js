@@ -16,12 +16,12 @@
 
 var Shift = require("shift-ast");
 
-var expr = require("./../helpers").expr;
-var stmt = require("./../helpers").stmt;
-var testParseFailure = require('./../assertions').testParseFailure;
-var testParse = require('./../assertions').testParse;
-var testParseModule = require('./../assertions').testParseModule;
-var testParseModuleFailure = require('./../assertions').testParseModuleFailure;
+var expr = require("../helpers").expr;
+var stmt = require("../helpers").stmt;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
+var testParseModule = require("../assertions").testParseModule;
+var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 
 suite("Parser", function() {
   // programs that parse according to ES3 but either fail or parse differently according to ES5
@@ -105,7 +105,7 @@ suite("Parser", function() {
     // ES5: allows any LeftHandSideExpression on the left of an assignment
     // ES6: allows only valid bindings on the left of an assignment
     testParseFailure("a+b=c", "Invalid left-hand side in assignment");
-    testParseFailure("+i = 42", "Invalid left-hand side in assignment");
+    testParseFailure("+i = 0", "Invalid left-hand side in assignment");
     testParseFailure("new a=b", "Invalid left-hand side in assignment");
     testParseFailure("(a+b)=c", "Invalid left-hand side in assignment");
     testParseFailure("f()++", "Invalid left-hand side in assignment");

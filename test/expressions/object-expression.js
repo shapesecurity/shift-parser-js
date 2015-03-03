@@ -17,45 +17,55 @@
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParse = require('../assertions').testParse;
-var testParseFailure = require('../assertions').testParseFailure;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("object expression", function () {
-    testEsprimaEquiv("({})");
-    testEsprimaEquiv("+{}");
-    testEsprimaEquiv("+{ }");
 
-    testParse("({ answer: 42 })", expr,
+    testParse("({})", expr, { type: "ObjectExpression", properties: [] });
+
+    testParse("+{}", expr,
+      { type: "PrefixExpression",
+        operand: { type: "ObjectExpression", properties: [] },
+        operator: "+" }
+    );
+
+    testParse("+{ }", expr,
+      { type: "PrefixExpression",
+        operand: { type: "ObjectExpression", properties: [] },
+        operator: "+" }
+    );
+
+    testParse("({ answer: 0 })", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("answer"), new Shift.LiteralNumericExpression(42)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("answer"), new Shift.LiteralNumericExpression(0)),
       ])
     );
 
-    testParse("({ if: 42 })", expr,
+    testParse("({ if: 0 })", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("if"), new Shift.LiteralNumericExpression(42)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("if"), new Shift.LiteralNumericExpression(0)),
       ])
     );
-    testParse("({ true: 42 })", expr,
+    testParse("({ true: 0 })", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("true"), new Shift.LiteralNumericExpression(42)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("true"), new Shift.LiteralNumericExpression(0)),
       ])
     );
-    testParse("({ false: 42 })", expr,
+    testParse("({ false: 0 })", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("false"), new Shift.LiteralNumericExpression(42)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("false"), new Shift.LiteralNumericExpression(0)),
       ])
     );
-    testParse("({ null: 42 })", expr,
+    testParse("({ null: 0 })", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("null"), new Shift.LiteralNumericExpression(42)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("null"), new Shift.LiteralNumericExpression(0)),
       ])
     );
-    testParse("({ \"answer\": 42 })", expr,
+    testParse("({ \"answer\": 0 })", expr,
       new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("answer"), new Shift.LiteralNumericExpression(42)),
+        new Shift.DataProperty(new Shift.StaticPropertyName("answer"), new Shift.LiteralNumericExpression(0)),
       ])
     );
     testParse("({ x: 1, x: 2 })", expr,

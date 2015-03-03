@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-var testParseFailure = require('./assertions').testParseFailure;
-var testParseModuleFailure = require('./assertions').testParseModuleFailure;
+var testParseFailure = require("./assertions").testParseFailure;
+var testParseModuleFailure = require("./assertions").testParseModuleFailure;
 
 suite("Parser", function () {
   suite("early errors", function () {

@@ -18,8 +18,8 @@ var Shift = require("shift-ast");
 
 var expr = require("../../helpers").expr;
 var stmt = require("../../helpers").stmt;
-var testParse = require('../../assertions').testParse;
-var testParseFailure = require('../../assertions').testParseFailure;
+var testParse = require("../../assertions").testParse;
+var testParseFailure = require("../../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("object binding", function () {

@@ -17,17 +17,57 @@
 var Shift = require("shift-ast");
 
 var expr = require("../helpers").expr;
-var testParse = require('../assertions').testParse;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("new expression", function () {
-    testEsprimaEquiv("new a(b,c)");
-    testEsprimaEquiv("new Button");
-    testEsprimaEquiv("new Button()");
-    testEsprimaEquiv("new Button(a)");
-    testEsprimaEquiv("new new foo");
-    testEsprimaEquiv("new new foo()");
+
+    testParse("new a(b,c)", expr,
+      { type: "NewExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        arguments:
+          [ { type: "IdentifierExpression",
+            identifier: { type: "Identifier", name: "b" } },
+            { type: "IdentifierExpression",
+              identifier: { type: "Identifier", name: "c" } } ] }
+    );
+
+    testParse("new Button", expr,
+      { type: "NewExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "Button" } },
+        arguments: [] }
+    );
+
+    testParse("new Button()", expr,
+      { type: "NewExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "Button" } },
+        arguments: [] }
+    );
+
+    testParse("new Button(a)", expr,
+      { type: "NewExpression",
+        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "Button" } },
+        arguments: [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } } ] }
+    );
+
+    testParse("new new foo", expr,
+      { type: "NewExpression",
+        callee:
+          { type: "NewExpression",
+            callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
+            arguments: [] },
+        arguments: [] }
+    );
+
+    testParse("new new foo()", expr,
+      { type: "NewExpression",
+        callee:
+          { type: "NewExpression",
+            callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
+            arguments: [] },
+        arguments: [] }
+    );
+
 
     testParse("new f(...a)", expr,
       new Shift.NewExpression(

@@ -17,7 +17,7 @@
 var Shift = require("shift-ast");
 
 var expr = require("../../helpers").expr;
-var testParse = require('../../assertions').testParse;
+var testParse = require("../../assertions").testParse;
 
 suite("Parser", function () {
   suite("literal regexp expression", function () {
@@ -33,6 +33,6 @@ suite("Parser", function () {
     testParse("/[\\]/]/", expr, new Shift.LiteralRegExpExpression("[\\]/]", ""));
     testParse("/foo\\/bar/", expr, new Shift.LiteralRegExpExpression("foo/bar", ""));
     testParse("/=([^=\\s])+/g", expr, new Shift.LiteralRegExpExpression("=([^=\\s])+", "g"));
-    testParse("/42/g.test", expr, new Shift.StaticMemberExpression(new Shift.LiteralRegExpExpression("42", "g"), "test"));
+    testParse("/0/g.test", expr, new Shift.StaticMemberExpression(new Shift.LiteralRegExpExpression("0", "g"), "test"));
   });
 });

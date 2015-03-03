@@ -17,15 +17,42 @@
 var Shift = require("shift-ast");
 
 var stmt = require("../helpers").stmt;
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
-var testParse = require('../assertions').testParse;
+var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("do while statement", function () {
-    testEsprimaEquiv("do keep(); while (true);");
-    testEsprimaEquiv("do continue; while(1);");
-    testEsprimaEquiv("do ; while (true)");
-    testEsprimaEquiv("do {} while (true)");
+
+    testParse("do keep(); while (true);", stmt,
+      { type: "DoWhileStatement",
+        body:
+          { type: "ExpressionStatement",
+            expression:
+              { type: "CallExpression",
+                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "keep" } },
+                arguments: [] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
+    );
+
+    testParse("do continue; while(1);", stmt,
+      { type: "DoWhileStatement",
+        body: { type: "ContinueStatement", label: null },
+        test: { type: "LiteralNumericExpression", value: 1 } }
+    );
+
+    testParse("do ; while (true)", stmt,
+      { type: "DoWhileStatement",
+        body: { type: "EmptyStatement" },
+        test: { type: "LiteralBooleanExpression", value: true } }
+    );
+
+    testParse("do {} while (true)", stmt,
+      { type: "DoWhileStatement",
+        body:
+          { type: "BlockStatement",
+            block: { type: "Block", statements: [] } },
+            test: { type: "LiteralBooleanExpression", value: true } }
+    );
+
     testParse("{do ; while(false); false}", stmt,
       new Shift.BlockStatement(new Shift.Block([
         new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(false)),

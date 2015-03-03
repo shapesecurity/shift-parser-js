@@ -17,12 +17,12 @@
 var Shift = require("shift-ast");
 var ShiftParser = require("../../");
 
-var testParseFailure = require('../assertions').testParseFailure;
-var testParseModule = require('../assertions').testParseModule;
-var testParseModuleFailure = require('../assertions').testParseModuleFailure;
+var testParseFailure = require("../assertions").testParseFailure;
+var testParseModule = require("../assertions").testParseModule;
+var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 
 var moduleItem = require("../helpers").moduleItem;
-var locationSanityCheck = require('../helpers').locationSanityCheck;
+var locationSanityCheck = require("../helpers").locationSanityCheck;
 
 function locationSanityTest(source) {
   test(source, function() {

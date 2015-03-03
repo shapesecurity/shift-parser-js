@@ -14,13 +14,41 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("switch statement", function () {
-    testEsprimaEquiv("switch (x) {}");
-    testEsprimaEquiv("switch(a){case 1:}");
-    testEsprimaEquiv("switch (answer) { case 42: hi(); break; }");
-    testEsprimaEquiv("switch (answer) { case 42: hi(); break; default: break }");
+
+    testParse("switch (x) {}", stmt,
+      { type: "SwitchStatement",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        cases: [] }
+    );
+
+    testParse("switch(a){case 1:}", stmt,
+      { type: "SwitchStatement",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        cases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 1 },
+              consequent: [] } ] }
+    );
+
+    testParse("switch (answer) { case 0: hi(); break; }", stmt,
+      { type: "SwitchStatement",
+        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        cases:
+          [ { type: "SwitchCase",
+              test: { type: "LiteralNumericExpression", value: 0 },
+              consequent:
+                [ { type: "ExpressionStatement",
+                    expression:
+                      { type: "CallExpression",
+                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "hi" } },
+                        arguments: [] } },
+                  { type: "BreakStatement", label: null } ] } ] }
+    );
+
   });
 });

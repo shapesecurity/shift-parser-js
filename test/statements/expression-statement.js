@@ -14,16 +14,45 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("expression statement", function () {
-    // Expression Statement
-    testEsprimaEquiv("x");
-    testEsprimaEquiv("x, y");
-    testEsprimaEquiv("\\u0061");
-    testEsprimaEquiv("a\\u0061");
-    testEsprimaEquiv("\\u0061a");
-    testEsprimaEquiv("\\u0061a ");
+
+    testParse("x", stmt,
+      { type: "ExpressionStatement",
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } }
+    );
+
+    testParse("x, y", stmt,
+      { type: "ExpressionStatement",
+        expression:
+          { type: "BinaryExpression",
+            operator: ",",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } } }
+    );
+
+    testParse("\\u0061", stmt,
+      { type: "ExpressionStatement",
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } } }
+    );
+
+    testParse("a\\u0061", stmt,
+      { type: "ExpressionStatement",
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "aa" } } }
+    );
+
+    testParse("\\u0061a", stmt,
+      { type: "ExpressionStatement",
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "aa" } } }
+    );
+
+    testParse("\\u0061a ", stmt,
+      { type: "ExpressionStatement",
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "aa" } } }
+    );
+
   });
 });

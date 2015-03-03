@@ -14,11 +14,27 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var testParse = require("../assertions").testParse;
+var expr = require("../helpers").expr;
 
 suite("Parser", function () {
   suite("computed member expression", function () {
-    testEsprimaEquiv("a[b, c]");
-    testEsprimaEquiv("a[b]");
+
+    testParse("a[b, c]", expr,
+      { type: "ComputedMemberExpression",
+        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        expression:
+          { type: "BinaryExpression",
+            operator: ",",
+            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } } }
+    );
+
+    testParse("a[b]", expr,
+      { type: "ComputedMemberExpression",
+        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } }
+    );
+
   });
 });

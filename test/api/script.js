@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-var testEsprimaEquiv = require('../assertions').testEsprimaEquiv;
+var Shift = require("shift-ast");
+
+var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
+
+function id(x) {
+  return x;
+}
 
 suite("Parser", function () {
   suite("script", function () {
-    testEsprimaEquiv("");
-    testEsprimaEquiv(" ");
+    testParse("", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse(" ", id, new Shift.Script(new Shift.FunctionBody([], [])));
     testParseFailure("/*", "Unexpected token ILLEGAL");
   });
 });

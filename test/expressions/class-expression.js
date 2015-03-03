@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-var ShiftParser = require('../../dist/index.js');
+var ShiftParser = require("../../dist/index.js");
 var Shift = require("shift-ast");
-var testParse = require('../assertions').testParse;
-var testParseFailure = require('../assertions').testParseFailure;
+var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
-var locationSanityCheck = require('../helpers').locationSanityCheck;
+var locationSanityCheck = require("../helpers").locationSanityCheck;
 
 suite("Parser", function () {
   suite("class expression", function () {
 
+    // TODO: move this into the testParse assertion
     function locationSanityTest(source) {
       test(source, function() {
         var tree = ShiftParser.default(source, {loc: true});

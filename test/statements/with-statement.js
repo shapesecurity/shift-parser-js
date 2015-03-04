@@ -28,30 +28,30 @@ suite("Parser", function () {
 
     testParse("with (x) foo", stmt,
       { type: "WithStatement",
-        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        object: { type: "IdentifierExpression", name: "x" },
         body:
           { type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } } } }
+            expression: { type: "IdentifierExpression", name: "foo" } } }
     );
 
     testParse("with (x) foo;", stmt,
       { type: "WithStatement",
-        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        object: { type: "IdentifierExpression", name: "x" },
         body:
           { type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } } } }
+            expression: { type: "IdentifierExpression", name: "foo" } } }
     );
 
     testParse("with (x) { foo }", stmt,
       { type: "WithStatement",
-        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        object: { type: "IdentifierExpression", name: "x" },
         body:
           { type: "BlockStatement",
             block:
               { type: "Block",
                 statements:
                   [ { type: "ExpressionStatement",
-                      expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } } } ] } } }
+                      expression: { type: "IdentifierExpression", name: "foo" } } ] } } }
     );
 
   });

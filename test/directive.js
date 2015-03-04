@@ -49,17 +49,17 @@ suite("Parser", function () {
 
     testParse("(function () { 'use\\x20strict'; with (i); })", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([new Shift.Directive("use\\x20strict")], [
-        new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),
+        new Shift.WithStatement({ type: "IdentifierExpression", name: "i" }, new Shift.EmptyStatement),
       ]))
     );
     testParse("(function () { 'use\\nstrict'; with (i); })", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([new Shift.Directive("use\\nstrict")], [
-        new Shift.WithStatement(new Shift.IdentifierExpression(new Shift.Identifier("i")), new Shift.EmptyStatement),
+        new Shift.WithStatement({ type: "IdentifierExpression", name: "i" }, new Shift.EmptyStatement),
       ]))
     );
 
     testParse("function a() {'use strict';return 0;};", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))
     );
@@ -69,7 +69,7 @@ suite("Parser", function () {
       ]))
     );
     testParse("(function a() {'use strict';return 0;});", expr,
-      new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
+      new Shift.FunctionExpression(false, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
         new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
       ]))
     );

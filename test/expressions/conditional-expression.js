@@ -24,14 +24,14 @@ suite("Parser", function () {
 
     testParse("a?b:c", expr,
       { type: "ConditionalExpression",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
-        consequent: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
-        alternate: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+        test: { type: "IdentifierExpression", name: "a" },
+        consequent: { type: "IdentifierExpression", name: "b" },
+        alternate: { type: "IdentifierExpression", name: "c" } }
     );
 
     testParse("y ? 1 : 2", expr,
       { type: "ConditionalExpression",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+        test: { type: "IdentifierExpression", name: "y" },
         consequent: { type: "LiteralNumericExpression", value: 1 },
         alternate: { type: "LiteralNumericExpression", value: 2 } }
     );
@@ -41,8 +41,8 @@ suite("Parser", function () {
         test:
           { type: "BinaryExpression",
             operator: "&&",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
         consequent: { type: "LiteralNumericExpression", value: 1 },
         alternate: { type: "LiteralNumericExpression", value: 2 } }
     );
@@ -50,7 +50,7 @@ suite("Parser", function () {
     testParse("x = (0) ? 1 : 2", expr,
       new Shift.AssignmentExpression(
         "=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.ConditionalExpression(
           new Shift.LiteralNumericExpression(0),
           new Shift.LiteralNumericExpression(1),

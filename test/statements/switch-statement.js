@@ -22,13 +22,13 @@ suite("Parser", function () {
 
     testParse("switch (x) {}", stmt,
       { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        discriminant: { type: "IdentifierExpression", name: "x" },
         cases: [] }
     );
 
     testParse("switch(a){case 1:}", stmt,
       { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        discriminant: { type: "IdentifierExpression", name: "a" },
         cases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 1 },
@@ -37,7 +37,7 @@ suite("Parser", function () {
 
     testParse("switch (answer) { case 0: hi(); break; }", stmt,
       { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        discriminant: { type: "IdentifierExpression", name: "answer" },
         cases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 0 },
@@ -45,14 +45,14 @@ suite("Parser", function () {
                 [ { type: "ExpressionStatement",
                     expression:
                       { type: "CallExpression",
-                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "hi" } },
+                        callee: { type: "IdentifierExpression", name: "hi" },
                         arguments: [] } },
                   { type: "BreakStatement", label: null } ] } ] }
     );
 
     testParse("switch (answer) { case 0: let a; }", stmt,
       { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        discriminant: { type: "IdentifierExpression", name: "answer" },
         cases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 0 },
@@ -64,7 +64,7 @@ suite("Parser", function () {
                       declarators: [
                         { type: "VariableDeclarator",
                           binding:
-                          { type: "BindingIdentifier", identifier: { type: "Identifier", name: "a" } },
+                          { type: "BindingIdentifier", name: "a" },
                           init: null
                         } ]
                     }

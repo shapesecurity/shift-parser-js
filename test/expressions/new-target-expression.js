@@ -24,31 +24,31 @@ suite("Parser", function () {
   suite("new.target expression", function () {
 
     testParse("function f() { new.target; }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "f" }, [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.NewTargetExpression),
       ]))
     );
 
     testParse("function f() { new.\\u0074arget; }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "f" }, [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.NewTargetExpression),
       ]))
     );
 
     testParse("function f() { new new.target; }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "f" }, [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.NewExpression(new Shift.NewTargetExpression, [])),
       ]))
     );
 
     testParse("function f() { new.target(); }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "f" }, [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.NewTargetExpression, [])),
       ]))
     );
 
     testParse("function f() { new[\"target\"]; }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "f" }, [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.NewExpression(new Shift.ArrayExpression([
           new Shift.LiteralStringExpression("target"),
         ]), [])),

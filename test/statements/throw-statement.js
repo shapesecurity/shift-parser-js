@@ -24,7 +24,7 @@ suite("Parser", function () {
 
     testParse( "throw x;", stmt,
       { type: "ThrowStatement",
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } }
+        expression: { type: "IdentifierExpression", name: "x" } }
     );
 
     testParse("throw x * y", stmt,
@@ -32,8 +32,8 @@ suite("Parser", function () {
         expression:
           { type: "BinaryExpression",
             operator: "*",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } } }
     );
 
     testParse("throw {}", stmt, { type: "ThrowStatement", expression: { type: "ObjectExpression", properties: [] } });

@@ -41,7 +41,7 @@ suite("Parser", function () {
     );
     testParse("({set c(x) {}})", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("c"), new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.StaticPropertyName("c"), { type: "BindingIdentifier", name: "x" }, new Shift.FunctionBody([], [])),
       ])
     );
 
@@ -59,14 +59,14 @@ suite("Parser", function () {
 
     testParse("({set __proto__(x) {}})", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("__proto__"), new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.StaticPropertyName("__proto__"), { type: "BindingIdentifier", name: "x" }, new Shift.FunctionBody([], [])),
       ])
     );
 
     testParse("({get __proto__() {}, set __proto__(x) {}})", expr,
       new Shift.ObjectExpression([
         new Shift.Getter(new Shift.StaticPropertyName("__proto__"), new Shift.FunctionBody([], [])),
-        new Shift.Setter(new Shift.StaticPropertyName("__proto__"), new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.FunctionBody([], [])),
+        new Shift.Setter(new Shift.StaticPropertyName("__proto__"), { type: "BindingIdentifier", name: "x" }, new Shift.FunctionBody([], [])),
       ])
     );
 
@@ -93,7 +93,7 @@ suite("Parser", function () {
         ), new Shift.FunctionBody([], [])),
         new Shift.Setter(new Shift.ComputedPropertyName(
           new Shift.BinaryExpression("/", new Shift.LiteralNumericExpression(5), new Shift.LiteralNumericExpression(4))
-        ), new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.FunctionBody([], [])),
+        ), { type: "BindingIdentifier", name: "x" }, new Shift.FunctionBody([], [])),
       ])
     );
 
@@ -131,9 +131,9 @@ suite("Parser", function () {
         new Shift.Method(
           false,
           new Shift.StaticPropertyName("oink"),
-          [new Shift.BindingIdentifier(new Shift.Identifier("that")),
-            new Shift.BindingIdentifier(new Shift.Identifier("little")),
-            new Shift.BindingIdentifier(new Shift.Identifier("piggy"))],
+          [{ type: "BindingIdentifier", name: "that" },
+            { type: "BindingIdentifier", name: "little" },
+            { type: "BindingIdentifier", name: "piggy" }],
           null, new Shift.FunctionBody([], []))
       ])
     );

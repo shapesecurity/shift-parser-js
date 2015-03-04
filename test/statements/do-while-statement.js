@@ -28,7 +28,7 @@ suite("Parser", function () {
           { type: "ExpressionStatement",
             expression:
               { type: "CallExpression",
-                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "keep" } },
+                callee: { type: "IdentifierExpression", name: "keep" },
                 arguments: [] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );

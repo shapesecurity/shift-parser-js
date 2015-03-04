@@ -22,55 +22,55 @@ suite("Parser", function () {
 
     testParse("!a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "!" }
     );
 
     testParse("typeof a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "typeof" }
     );
 
     testParse("void a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "void" }
     );
 
     testParse("delete a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "delete" }
     );
 
     testParse("+a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "+" }
     );
 
     testParse("~a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "~" }
     );
 
     testParse("++a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "++" }
     );
 
     testParse("-a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "-" }
     );
 
     testParse("--a", expr,
       { type: "PrefixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        operand: { type: "IdentifierExpression", name: "a" },
         operator: "--" }
     );
 

@@ -45,7 +45,7 @@ suite("Parser", function () {
       "import * as a from 'a'",
             new Shift.ImportNamespace(
         null,
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        { type: "BindingIdentifier", name: "a" },
         "a"));
 
     testImportDecl(
@@ -64,56 +64,56 @@ suite("Parser", function () {
       "import a, * as b from 'a'",
             new Shift.ImportNamespace(
         "a",
-        new Shift.BindingIdentifier(new Shift.Identifier("b")),
+        { type: "BindingIdentifier", name: "b" },
         "a"));
 
     testImportDecl(
       "import a, {b} from 'c'",
             new Shift.Import(
         "a",
-        [new Shift.ImportSpecifier(null, new Shift.BindingIdentifier(new Shift.Identifier("b")))],
+        [new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" })],
         "c"));
 
     testImportDecl(
       "import a, {b as c} from 'c'",
             new Shift.Import(
         "a",
-        [new Shift.ImportSpecifier(new Shift.Identifier("b"), new Shift.BindingIdentifier(new Shift.Identifier("c")))],
+        [new Shift.ImportSpecifier("b", { type: "BindingIdentifier", name: "c" })],
         "c"));
 
     testImportDecl(
       "import a, {function as c} from 'c'",
             new Shift.Import(
         "a",
-        [new Shift.ImportSpecifier(new Shift.Identifier("function"), new Shift.BindingIdentifier(new Shift.Identifier("c")))],
+        [new Shift.ImportSpecifier("function", { type: "BindingIdentifier", name: "c" })],
         "c"));
 
     testImportDecl(
       "import a, {as} from 'c'",
             new Shift.Import(
         "a",
-        [new Shift.ImportSpecifier(null, new Shift.BindingIdentifier(new Shift.Identifier("as")))],
+        [new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "as" })],
         "c"));
 
     testImportDecl(
       "import a, {as as c} from 'c'",
             new Shift.Import(
         "a",
-        [new Shift.ImportSpecifier(new Shift.Identifier("as"), new Shift.BindingIdentifier(new Shift.Identifier("c")))],
+        [new Shift.ImportSpecifier("as", { type: "BindingIdentifier", name: "c" })],
         "c"));
 
     testImportDecl(
       "import {as as as} from 'as'",
             new Shift.Import(
         null,
-        [new Shift.ImportSpecifier(new Shift.Identifier("as"), new Shift.BindingIdentifier(new Shift.Identifier("as")))],
+        [new Shift.ImportSpecifier("as", { type: "BindingIdentifier", name: "as" })],
         "as"));
 
     testImportDecl(
       "import a, {b,} from 'c'",
             new Shift.Import(
         "a",
-        [new Shift.ImportSpecifier(null, new Shift.BindingIdentifier(new Shift.Identifier("b")))],
+        [new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" })],
         "c"));
 
     testImportDecl(
@@ -121,8 +121,8 @@ suite("Parser", function () {
             new Shift.Import(
         "a",
         [
-          new Shift.ImportSpecifier(null, new Shift.BindingIdentifier(new Shift.Identifier("b"))),
-          new Shift.ImportSpecifier(null, new Shift.BindingIdentifier(new Shift.Identifier("c")))
+          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" }),
+          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "c" })
         ],
         "d"));
 
@@ -131,8 +131,8 @@ suite("Parser", function () {
             new Shift.Import(
         "a",
         [
-          new Shift.ImportSpecifier(null, new Shift.BindingIdentifier(new Shift.Identifier("b"))),
-          new Shift.ImportSpecifier(null, new Shift.BindingIdentifier(new Shift.Identifier("c")))
+          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" }),
+          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "c" })
         ],
         "d"));
 

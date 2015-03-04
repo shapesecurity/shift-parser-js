@@ -27,10 +27,9 @@ suite("Parser", function () {
         new Shift.AssignmentExpression(
           "=",
           new Shift.ObjectBinding([
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("x")),
-              null
-            ),
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: null }
           ]),
           new Shift.LiteralNumericExpression(0)
         )
@@ -40,10 +39,9 @@ suite("Parser", function () {
         new Shift.AssignmentExpression(
           "=",
           new Shift.ObjectBinding([
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("x")),
-              null
-            ),
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: null }
           ]),
           new Shift.LiteralNumericExpression(0)
         )
@@ -53,14 +51,12 @@ suite("Parser", function () {
         new Shift.AssignmentExpression(
           "=",
           new Shift.ObjectBinding([
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("x")),
-              null
-            ),
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("y")),
-              null
-            ),
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: null },
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "y" },
+              init: null },
           ]),
           new Shift.LiteralNumericExpression(0)
         )
@@ -70,14 +66,12 @@ suite("Parser", function () {
         new Shift.AssignmentExpression(
           "=",
           new Shift.ObjectBinding([
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("x")),
-              null
-            ),
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("y")),
-              null
-            ),
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: null },
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "y" },
+              init: null },
           ]),
           new Shift.LiteralNumericExpression(0)
         )
@@ -88,8 +82,8 @@ suite("Parser", function () {
           "=",
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
-              new Shift.ComputedPropertyName(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
-              new Shift.BindingIdentifier(new Shift.Identifier("a"))
+              new Shift.ComputedPropertyName({ type: "IdentifierExpression", name: "a" }),
+              { type: "BindingIdentifier", name: "a" }
             ),
           ]),
           new Shift.LiteralNumericExpression(1)
@@ -100,10 +94,9 @@ suite("Parser", function () {
         new Shift.AssignmentExpression(
           "=",
           new Shift.ObjectBinding([
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("x")),
-              new Shift.LiteralNumericExpression(0)
-            ),
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: new Shift.LiteralNumericExpression(0) }
           ]),
           new Shift.LiteralNumericExpression(1)
         )
@@ -113,10 +106,9 @@ suite("Parser", function () {
         new Shift.AssignmentExpression(
           "=",
           new Shift.ObjectBinding([
-            new Shift.BindingPropertyIdentifier(
-              new Shift.BindingIdentifier(new Shift.Identifier("x")),
-              new Shift.LiteralNumericExpression(0)
-            ),
+            { type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: new Shift.LiteralNumericExpression(0) }
           ]),
           new Shift.LiteralNumericExpression(1)
         )
@@ -129,7 +121,7 @@ suite("Parser", function () {
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("x"),
-              new Shift.BindingIdentifier(new Shift.Identifier("y"))
+              { type: "BindingIdentifier", name: "y" }
             ),
           ]),
           new Shift.LiteralNumericExpression(0)
@@ -142,7 +134,7 @@ suite("Parser", function () {
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("x"),
-              new Shift.BindingIdentifier(new Shift.Identifier("y"))
+              { type: "BindingIdentifier", name: "y" }
             ),
           ]),
           new Shift.LiteralNumericExpression(0)
@@ -155,7 +147,7 @@ suite("Parser", function () {
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("var"),
-              new Shift.BindingIdentifier(new Shift.Identifier("x"))
+              { type: "BindingIdentifier", name: "x" }
             ),
           ]),
           new Shift.LiteralNumericExpression(0)
@@ -168,7 +160,7 @@ suite("Parser", function () {
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("x"),
-              new Shift.BindingIdentifier(new Shift.Identifier("y"))
+              { type: "BindingIdentifier", name: "y" }
             ),
           ]),
           new Shift.LiteralNumericExpression(0)
@@ -181,7 +173,7 @@ suite("Parser", function () {
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("x"),
-              new Shift.BindingIdentifier(new Shift.Identifier("y"))
+              { type: "BindingIdentifier", name: "y" }
             ),
           ]),
           new Shift.LiteralNumericExpression(0)
@@ -194,7 +186,7 @@ suite("Parser", function () {
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("0"),
-              new Shift.BindingIdentifier(new Shift.Identifier("y"))
+              { type: "BindingIdentifier", name: "y" }
             ),
           ]),
           new Shift.LiteralNumericExpression(0)
@@ -207,11 +199,11 @@ suite("Parser", function () {
           new Shift.ObjectBinding([
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("0"),
-              new Shift.BindingIdentifier(new Shift.Identifier("x"))
+              { type: "BindingIdentifier", name: "x" }
             ),
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("1"),
-              new Shift.BindingIdentifier(new Shift.Identifier("x"))
+              { type: "BindingIdentifier", name: "x" }
             ),
           ]),
           new Shift.LiteralNumericExpression(0)
@@ -225,7 +217,7 @@ suite("Parser", function () {
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("x"),
               new Shift.BindingWithDefault(
-                new Shift.BindingIdentifier(new Shift.Identifier("y")),
+                { type: "BindingIdentifier", name: "y" },
                 new Shift.LiteralNumericExpression(0)
               )
             ),
@@ -241,10 +233,10 @@ suite("Parser", function () {
             new Shift.BindingPropertyProperty(
               new Shift.StaticPropertyName("x"),
               new Shift.BindingWithDefault(
-                new Shift.BindingIdentifier(new Shift.Identifier("y")),
+                { type: "BindingIdentifier", name: "y" },
                 new Shift.AssignmentExpression(
                   "=",
-                  new Shift.BindingIdentifier(new Shift.Identifier("z")),
+                  { type: "BindingIdentifier", name: "z" },
                   new Shift.LiteralNumericExpression(0)
                 )
               )
@@ -262,7 +254,7 @@ suite("Parser", function () {
               new Shift.StaticPropertyName("x"),
               new Shift.BindingWithDefault(
                 new Shift.ArrayBinding(
-                  [new Shift.BindingIdentifier(new Shift.Identifier("y"))],
+                  [{ type: "BindingIdentifier", name: "y" }],
                   null
                 ),
                 new Shift.LiteralNumericExpression(0)

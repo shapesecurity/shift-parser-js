@@ -26,7 +26,7 @@ suite("Parser", function () {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("a")),
+          { type: "BindingIdentifier", name: "a" },
           new Shift.Block([])
         )
       )
@@ -35,7 +35,7 @@ suite("Parser", function () {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          { type: "BindingIdentifier", name: "e" },
           new Shift.Block([])
         )
       )
@@ -45,16 +45,14 @@ suite("Parser", function () {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          { type: "BindingIdentifier", name: "e" },
           new Shift.Block([
             new Shift.VariableDeclarationStatement(
               new Shift.VariableDeclaration(
                 "let",
                 [
                   new Shift.VariableDeclarator(
-                    new Shift.BindingIdentifier(
-                      new Shift.Identifier("a")
-                    ),
+                    { type: "BindingIdentifier", name: "a" },
                     null
                   )
                 ]
@@ -69,7 +67,7 @@ suite("Parser", function () {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("eval")),
+          { type: "BindingIdentifier", name: "eval" },
           new Shift.Block([])
         )
       )
@@ -78,7 +76,7 @@ suite("Parser", function () {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("arguments")),
+          { type: "BindingIdentifier", name: "arguments" },
           new Shift.Block([])
         )
       )
@@ -87,10 +85,10 @@ suite("Parser", function () {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          { type: "BindingIdentifier", name: "e" },
           new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-            new Shift.IdentifierExpression(new Shift.Identifier("say")),
-            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+            { type: "IdentifierExpression", name: "say" },
+            [{ type: "IdentifierExpression", name: "e" }]
           ))])
         )
       )
@@ -98,13 +96,13 @@ suite("Parser", function () {
     testParse("try { doThat(); } catch (e) { say(e) }", stmt,
       new Shift.TryCatchStatement(
         new Shift.Block([
-          new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("doThat")), []))
+          new Shift.ExpressionStatement(new Shift.CallExpression({ type: "IdentifierExpression", name: "doThat" }, []))
         ]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          { type: "BindingIdentifier", name: "e" },
           new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-            new Shift.IdentifierExpression(new Shift.Identifier("say")),
-            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+            { type: "IdentifierExpression", name: "say" },
+            [{ type: "IdentifierExpression", name: "e" }]
           ))])
         )
       )

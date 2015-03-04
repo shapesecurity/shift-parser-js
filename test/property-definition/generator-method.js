@@ -31,7 +31,7 @@ suite("Parser", function () {
     ]));
     testParse("({*[yield](){}})", expr, new Shift.ObjectExpression([
       new Shift.Method(true, new Shift.ComputedPropertyName(
-        new Shift.IdentifierExpression(new Shift.Identifier("yield"))), [], null, new Shift.FunctionBody([], []))
+        { type: "IdentifierExpression", name: "yield" }), [], null, new Shift.FunctionBody([], []))
     ]));
 
   });

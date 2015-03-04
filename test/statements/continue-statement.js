@@ -42,7 +42,7 @@ suite("Parser", function () {
 
     testParse("done: while (true) { continue done }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "done" },
+        label: "done",
         body:
           { type: "WhileStatement",
             body:
@@ -50,13 +50,13 @@ suite("Parser", function () {
                 block:
                   { type: "Block",
                     statements:
-                      [ { type: "ContinueStatement", label: { type: "Identifier", name: "done" } } ] } },
+                      [ { type: "ContinueStatement", label: "done" } ] } },
         test: { type: "LiteralBooleanExpression", value: true } } }
     );
 
     testParse("done: while (true) { continue done; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "done" },
+        label: "done",
         body:
           { type: "WhileStatement",
             body:
@@ -64,13 +64,13 @@ suite("Parser", function () {
                 block:
                   { type: "Block",
                     statements:
-                      [ { type: "ContinueStatement", label: { type: "Identifier", name: "done" } } ] } },
+                      [ { type: "ContinueStatement", label: "done" } ] } },
         test: { type: "LiteralBooleanExpression", value: true } } }
     );
 
     testParse("__proto__: while (true) { continue __proto__; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "__proto__" },
+        label: "__proto__",
         body:
           { type: "WhileStatement",
             body:
@@ -78,22 +78,22 @@ suite("Parser", function () {
                 block:
                   { type: "Block",
                     statements:
-                      [ { type: "ContinueStatement", label: { type: "Identifier", name: "__proto__" } } ] } },
+                      [ { type: "ContinueStatement", label: "__proto__" } ] } },
         test: { type: "LiteralBooleanExpression", value: true } } }
     );
 
     testParse("a: do continue a; while(1);", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "DoWhileStatement",
-            body: { type: "ContinueStatement", label: { type: "Identifier", name: "a" } },
+            body: { type: "ContinueStatement", label: "a" },
         test: { type: "LiteralNumericExpression", value: 1 } } }
     );
 
     testParse("a: while (0) { continue \n b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -103,13 +103,13 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("a: while (0) { continue \r b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -119,13 +119,13 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("a: while (0) { continue \r\n b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -135,13 +135,13 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("a: while (0) { continue /*\r*/ b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -151,13 +151,13 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("a: while (0) { continue /*\n*/ b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -167,13 +167,13 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("a: while (0) { continue /*\r\n*/ b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -183,13 +183,13 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("a: while (0) { continue /*\u2028*/ b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -199,13 +199,13 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("a: while (0) { continue /*\u2029*/ b; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "WhileStatement",
             body:
@@ -215,7 +215,7 @@ suite("Parser", function () {
                     statements:
                       [ { type: "ContinueStatement", label: null },
                         { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } } ] } },
+                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
         test: { type: "LiteralNumericExpression", value: 0 } } }
     );
 

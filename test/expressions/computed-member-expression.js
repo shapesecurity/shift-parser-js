@@ -22,18 +22,18 @@ suite("Parser", function () {
 
     testParse("a[b, c]", expr,
       { type: "ComputedMemberExpression",
-        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        object: { type: "IdentifierExpression", name: "a" },
         expression:
           { type: "BinaryExpression",
             operator: ",",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } } }
+            left: { type: "IdentifierExpression", name: "b" },
+            right: { type: "IdentifierExpression", name: "c" } } }
     );
 
     testParse("a[b]", expr,
       { type: "ComputedMemberExpression",
-        object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } }
+        object: { type: "IdentifierExpression", name: "a" },
+        expression: { type: "IdentifierExpression", name: "b" } }
     );
 
   });

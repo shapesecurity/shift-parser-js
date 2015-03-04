@@ -26,8 +26,8 @@ suite("Parser", function () {
         new Shift.Block([]),
         null,
         new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("cleanup")),
-          [new Shift.IdentifierExpression(new Shift.Identifier("stuff"))]
+          { type: "IdentifierExpression", name: "cleanup" },
+          [{ type: "IdentifierExpression", name: "stuff" }]
         ))])
       )
     );
@@ -35,7 +35,7 @@ suite("Parser", function () {
       new Shift.TryFinallyStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("a")),
+          { type: "BindingIdentifier", name: "a" },
           new Shift.Block([])
         ),
         new Shift.Block([])
@@ -44,19 +44,19 @@ suite("Parser", function () {
     testParse("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }", stmt,
       new Shift.TryFinallyStatement(
         new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("doThat")),
+          { type: "IdentifierExpression", name: "doThat" },
           []
         ))]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          { type: "BindingIdentifier", name: "e" },
           new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-            new Shift.IdentifierExpression(new Shift.Identifier("say")),
-            [new Shift.IdentifierExpression(new Shift.Identifier("e"))]
+            { type: "IdentifierExpression", name: "say" },
+            [{ type: "IdentifierExpression", name: "e" }]
           ))])
         ),
         new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("cleanup")),
-          [new Shift.IdentifierExpression(new Shift.Identifier("stuff"))]
+          { type: "IdentifierExpression", name: "cleanup" },
+          [{ type: "IdentifierExpression", name: "stuff" }]
         ))])
       )
     );

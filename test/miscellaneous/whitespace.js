@@ -30,11 +30,11 @@ suite("Parser", function () {
           { type: "Block",
             statements:
               [ { type: "ExpressionStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } },
+                  expression: { type: "IdentifierExpression", name: "x" } },
                 { type: "ExpressionStatement",
                   expression:
                     { type: "PrefixExpression",
-                      operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+                      operand: { type: "IdentifierExpression", name: "y" },
                       operator: "++" } } ] } }
     );
 
@@ -44,11 +44,11 @@ suite("Parser", function () {
           { type: "Block",
             statements:
               [ { type: "ExpressionStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } },
+                  expression: { type: "IdentifierExpression", name: "x" } },
                 { type: "ExpressionStatement",
                   expression:
                     { type: "PrefixExpression",
-                      operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+                      operand: { type: "IdentifierExpression", name: "y" },
                       operator: "--" } } ] } }
     );
 
@@ -56,15 +56,15 @@ suite("Parser", function () {
       new Shift.BlockStatement(new Shift.Block([
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
-            new Shift.BindingIdentifier(new Shift.Identifier("x")),
+            { type: "BindingIdentifier", name: "x" },
             new Shift.LiteralNumericExpression(14)
           ),
           new Shift.VariableDeclarator(
-            new Shift.BindingIdentifier(new Shift.Identifier("y")),
+            { type: "BindingIdentifier", name: "y" },
             new Shift.LiteralNumericExpression(3)
           ),
         ])),
-        new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("z"))),
+        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "z" }),
       ]))
     );
 
@@ -78,7 +78,7 @@ suite("Parser", function () {
                   [ { type: "ContinueStatement", label: null },
                     { type: "ExpressionStatement",
                       expression:
-                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+                        { type: "IdentifierExpression", name: "there" } } ] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );
 
@@ -92,7 +92,7 @@ suite("Parser", function () {
                   [ { type: "ContinueStatement", label: null },
                     { type: "ExpressionStatement",
                       expression:
-                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+                        { type: "IdentifierExpression", name: "there" } } ] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );
 
@@ -106,7 +106,7 @@ suite("Parser", function () {
                   [ { type: "ContinueStatement", label: null },
                     { type: "ExpressionStatement",
                       expression:
-                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+                        { type: "IdentifierExpression", name: "there" } } ] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );
 
@@ -120,8 +120,7 @@ suite("Parser", function () {
                 statements:
                   [ { type: "BreakStatement", label: null },
                     { type: "ExpressionStatement",
-                      expression:
-                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+                      expression: { type: "IdentifierExpression", name: "there" } } ] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );
 
@@ -135,7 +134,7 @@ suite("Parser", function () {
                   [ { type: "BreakStatement", label: null },
                     { type: "ExpressionStatement",
                       expression:
-                        { type: "IdentifierExpression", identifier: { type: "Identifier", name: "there" } } } ] } },
+                        { type: "IdentifierExpression", name: "there" } } ] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );
 
@@ -148,9 +147,7 @@ suite("Parser", function () {
                 statements:
                   [ { type: "BreakStatement", label: null },
                     { type: "ExpressionStatement",
-                      expression:
-                        { type: "IdentifierExpression",
-                          identifier: { type: "Identifier", name: "there" } } } ] } },
+                      expression: { type: "IdentifierExpression", name: "there" } } ] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );
 
@@ -160,19 +157,19 @@ suite("Parser", function () {
     testParse("(function(){ return\nx; })", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
-        new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
+        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
       ]))
     );
     testParse("(function(){ return // Comment\nx; })", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
-        new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
+        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
       ]))
     );
     testParse("(function(){ return/* Multiline\nComment */x; })", expr,
       new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
         new Shift.ReturnStatement(null),
-        new Shift.ExpressionStatement(new Shift.IdentifierExpression(new Shift.Identifier("x"))),
+        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
       ]))
     );
 
@@ -182,9 +179,9 @@ suite("Parser", function () {
           { type: "Block",
             statements:
               [ { type: "ThrowStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } },
+                  expression: { type: "IdentifierExpression", name: "error" } },
                 { type: "ExpressionStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } } ] } }
+                  expression: { type: "IdentifierExpression", name: "error" } } ] } }
     );
 
     testParse("{ throw error// Comment\nerror; }", stmt,
@@ -193,9 +190,9 @@ suite("Parser", function () {
           { type: "Block",
             statements:
               [ { type: "ThrowStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } },
+                  expression: { type: "IdentifierExpression", name: "error" } },
                 { type: "ExpressionStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } } ] } }
+                  expression: { type: "IdentifierExpression", name: "error" } } ] } }
     );
 
     testParse("{ throw error/* Multiline\nComment */error; }", stmt,
@@ -204,9 +201,9 @@ suite("Parser", function () {
           { type: "Block",
             statements:
               [ { type: "ThrowStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } },
+                  expression: { type: "IdentifierExpression", name: "error" } },
                 { type: "ExpressionStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "error" } } } ] } }
+                  expression: { type: "IdentifierExpression", name: "error" } } ] } }
     );
 
     testParseFailure("throw /* \n */ e", "Illegal newline after throw");
@@ -215,7 +212,7 @@ suite("Parser", function () {
 
     testParse("throw /* \u202a */ e", stmt,
       { type: "ThrowStatement",
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "e" } } }
+        expression: { type: "IdentifierExpression", name: "e" } }
     );
 
   });
@@ -224,7 +221,7 @@ suite("Parser", function () {
 
     testParse("new\u0020\u0009\u000B\u000C\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFFa", expr,
       { type: "NewExpression",
-        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        callee: { type: "IdentifierExpression", name: "a" },
         arguments: [] }
     );
 

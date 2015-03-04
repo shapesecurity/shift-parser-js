@@ -30,22 +30,22 @@ suite("Parser", function () {
     testParse("x & y", expr,
       { type: "BinaryExpression",
         operator: "&",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x ^ y", expr,
       { type: "BinaryExpression",
         operator: "^",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x | y", expr,
       { type: "BinaryExpression",
         operator: "|",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     // Binary Expressions
@@ -55,9 +55,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "+",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x - y + z", expr,
@@ -66,9 +66,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "-",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x + y - z", expr,
@@ -77,9 +77,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "+",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x - y - z", expr,
@@ -88,42 +88,42 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "-",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
      );
 
     testParse("x + y * z", expr,
       { type: "BinaryExpression",
         operator: "+",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        left: { type: "IdentifierExpression", name: "x" },
         right:
           { type: "BinaryExpression",
             operator: "*",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } } }
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
     );
 
     testParse("x + y / z", expr,
       { type: "BinaryExpression",
         operator: "+",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        left: { type: "IdentifierExpression", name: "x" },
         right:
           { type: "BinaryExpression",
             operator: "/",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } } }
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
     );
 
     testParse("x - y % z", expr,
       { type: "BinaryExpression",
         operator: "-",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        left: { type: "IdentifierExpression", name: "x" },
         right:
           { type: "BinaryExpression",
             operator: "%",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } } }
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
     );
 
     testParse("x * y * z", expr,
@@ -132,9 +132,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "*",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x * y / z", expr,
@@ -143,10 +143,10 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "*",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
         right:
-          { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+          { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x * y % z", expr,
@@ -155,9 +155,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "*",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x % y * z", expr,
@@ -166,9 +166,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "%",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x << y << z", expr,
@@ -177,9 +177,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "<<",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x | y | z", expr,
@@ -188,9 +188,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "|",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x & y & z", expr,
@@ -199,9 +199,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "&",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x ^ y ^ z", expr,
@@ -210,9 +210,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "^",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x & y | z", expr,
@@ -221,31 +221,31 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "&",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x | y ^ z", expr,
       { type: "BinaryExpression",
         operator: "|",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        left: { type: "IdentifierExpression", name: "x" },
         right:
           { type: "BinaryExpression",
             operator: "^",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } } }
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
     );
 
     testParse("x | y & z", expr,
       { type: "BinaryExpression",
         operator: "|",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        left: { type: "IdentifierExpression", name: "x" },
         right:
           { type: "BinaryExpression",
             operator: "&",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } } }
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
     );
 
 
@@ -253,15 +253,15 @@ suite("Parser", function () {
     testParse("x || y", expr,
       { type: "BinaryExpression",
         operator: "||",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x && y", expr,
       { type: "BinaryExpression",
         operator: "&&",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x || y || z", expr,
@@ -270,9 +270,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "||",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x && y && z", expr,
@@ -281,31 +281,31 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "&&",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
     testParse("x || y && z", expr,
       { type: "BinaryExpression",
         operator: "||",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        left: { type: "IdentifierExpression", name: "x" },
         right:
           { type: "BinaryExpression",
             operator: "&&",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } } }
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
     );
 
     testParse("x || y ^ z", expr,
       { type: "BinaryExpression",
         operator: "||",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        left: { type: "IdentifierExpression", name: "x" },
         right:
           { type: "BinaryExpression",
             operator: "^",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } } }
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
     );
 
 
@@ -313,22 +313,22 @@ suite("Parser", function () {
     testParse("x * y", expr,
       { type: "BinaryExpression",
         operator: "*",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x / y", expr,
       { type: "BinaryExpression",
         operator: "/",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x % y", expr,
       { type: "BinaryExpression",
         operator: "%",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
 
@@ -336,37 +336,37 @@ suite("Parser", function () {
     testParse("x + y", expr,
       { type: "BinaryExpression",
         operator: "+",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x - y", expr,
       { type: "BinaryExpression",
         operator: "-",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     // Bitwise Shift Operator
     testParse("x << y", expr,
       { type: "BinaryExpression",
         operator: "<<",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x >> y", expr,
       { type: "BinaryExpression",
         operator: ">>",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x >>> y", expr,
       { type: "BinaryExpression",
         operator: ">>>",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
 
@@ -374,43 +374,43 @@ suite("Parser", function () {
     testParse("x < y", expr,
       { type: "BinaryExpression",
         operator: "<",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x > y", expr,
       { type: "BinaryExpression",
         operator: ">",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x <= y", expr,
       { type: "BinaryExpression",
         operator: "<=",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x >= y", expr,
       { type: "BinaryExpression",
         operator: ">=",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x in y", expr,
       { type: "BinaryExpression",
         operator: "in",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x instanceof y", expr,
       { type: "BinaryExpression",
         operator: "instanceof",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x < y < z", expr,
@@ -419,9 +419,9 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "<",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "z" } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
+        right: { type: "IdentifierExpression", name: "z" } }
     );
 
 
@@ -429,29 +429,29 @@ suite("Parser", function () {
     testParse("x == y", expr,
       { type: "BinaryExpression",
         operator: "==",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x != y", expr,
       { type: "BinaryExpression",
         operator: "!=",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x === y", expr,
       { type: "BinaryExpression",
         operator: "===",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
     testParse("x !== y", expr,
       { type: "BinaryExpression",
         operator: "!==",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } }
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
     );
 
   });

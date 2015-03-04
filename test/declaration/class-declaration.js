@@ -21,7 +21,7 @@ var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("class declaration", function () {
-    testParse("class A{}", stmt, new Shift.ClassDeclaration(new Shift.BindingIdentifier(new Shift.Identifier("A")), null, []));
+    testParse("class A{}", stmt, new Shift.ClassDeclaration({ type: "BindingIdentifier", name: "A" }, null, []));
     testParseFailure("class {}", "Unexpected token {");
     testParseFailure("class extends A{}", "Unexpected token extends");
   });

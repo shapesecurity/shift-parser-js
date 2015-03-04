@@ -46,23 +46,23 @@ suite("Parser", function() {
     testParse("let[a] = b;", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
         new Shift.VariableDeclarator(
-          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
-          new Shift.IdentifierExpression(new Shift.Identifier("b"))
+          new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "a" }], null),
+          { type: "IdentifierExpression", name: "b" }
         ),
       ]))
     );
     testParse("const[a] = b;", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
         new Shift.VariableDeclarator(
-          new Shift.ArrayBinding([new Shift.BindingIdentifier(new Shift.Identifier("a"))], null),
-          new Shift.IdentifierExpression(new Shift.Identifier("b"))
+          new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "a" }], null),
+          { type: "IdentifierExpression", name: "b" }
         ),
       ]))
     );
 
     testParse("var let", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("let")), null)
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "let" }, null)
       ])));
 
     testParseFailure("'use strict'; var let", "Unexpected token let");
@@ -72,7 +72,7 @@ suite("Parser", function() {
     // ES6: function declaration within a block
     testParse("{ function f(){} }", stmt,
       new Shift.BlockStatement(new Shift.Block([
-        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], []))
+        new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "f" }, [], null, new Shift.FunctionBody([], []))
       ]))
     );
   });
@@ -84,8 +84,8 @@ suite("Parser", function() {
     testParse("var yield = function yield(){};", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
         new Shift.VariableDeclarator(
-          new Shift.BindingIdentifier(new Shift.Identifier("yield")),
-          new Shift.FunctionExpression(false, new Shift.BindingIdentifier(new Shift.Identifier("yield")), [], null, new Shift.FunctionBody([], []))
+          { type: "BindingIdentifier", name: "yield" },
+          new Shift.FunctionExpression(false, { type: "BindingIdentifier", name: "yield" }, [], null, new Shift.FunctionBody([], []))
         )
       ]))
     );
@@ -96,10 +96,10 @@ suite("Parser", function() {
       new Shift.TryCatchStatement(
         new Shift.Block([]),
         new Shift.CatchClause(
-          new Shift.BindingIdentifier(new Shift.Identifier("e")),
+          { type: "BindingIdentifier", name: "e" },
           new Shift.Block([
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("e")), new Shift.LiteralNumericExpression(0))
+              new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "e" }, new Shift.LiteralNumericExpression(0))
             ]))
           ])
         )
@@ -123,19 +123,19 @@ suite("Parser", function() {
     testParseFailure("for(let x=1 of [1,2,3]) 0", "Invalid variable declaration in for-of statement");
 
     testParse("for(var x in [1,2]) 0", stmt, new Shift.ForInStatement(
-      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
       new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
       new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
     testParse("for(let x in [1,2]) 0", stmt, new Shift.ForInStatement(
-      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
       new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
       new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
     testParse("for(var x of [1,2]) 0", stmt, new Shift.ForOfStatement(
-      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
       new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
       new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
     testParse("for(let x of [1,2]) 0", stmt, new Shift.ForOfStatement(
-      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)]),
+      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
       new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
       new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
 
@@ -152,17 +152,17 @@ suite("Parser", function() {
     testParseFailure(";/**/-->", "Unexpected token >");
     testParse("\n  -->", stmt, undefined);
     testParse("/*\n*/-->", stmt, undefined);
-    testParse("a<!--b", expr, new Shift.IdentifierExpression(new Shift.Identifier("a")));
+    testParse("a<!--b", expr, { type: "IdentifierExpression", name: "a" });
 
     testParseModuleFailure("<!--", "Unexpected token <");
     testParseModuleFailure("-->", "Unexpected token >");
 
     testParseModule("a<!--b", moduleExpr,
       new Shift.BinaryExpression("<",
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
+        { type: "IdentifierExpression", name: "a" },
         new Shift.PrefixExpression("!",
           new Shift.PrefixExpression("--",
-            new Shift.IdentifierExpression(new Shift.Identifier("b"))
+            { type: "IdentifierExpression", name: "b" }
           )
         )
       )

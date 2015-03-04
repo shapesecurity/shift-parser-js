@@ -28,8 +28,8 @@ suite("Parser", function () {
         init:
           { type: "BinaryExpression",
             operator: ",",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } },
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } },
         test: null,
         update: null }
     );
@@ -38,7 +38,7 @@ suite("Parser", function () {
       new Shift.ForStatement(
         new Shift.AssignmentExpression(
           "=",
-          new Shift.BindingIdentifier(new Shift.Identifier("x")),
+          { type: "BindingIdentifier", name: "x" },
           new Shift.LiteralNumericExpression(0)
         ),
         null,
@@ -50,7 +50,7 @@ suite("Parser", function () {
     testParse("for(var x = 0;;);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0))
         ]),
         null,
         null,
@@ -61,7 +61,7 @@ suite("Parser", function () {
     testParse("for(let x = 0;;);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("let", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0))
         ]),
         null,
         null,
@@ -72,8 +72,8 @@ suite("Parser", function () {
     testParse("for(var x = 0, y = 1;;);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0)),
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("y")), new Shift.LiteralNumericExpression(1)),
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "y" }, new Shift.LiteralNumericExpression(1)),
         ]),
         null,
         null,
@@ -84,11 +84,11 @@ suite("Parser", function () {
     testParse("for(x; x < 0;);", stmt,
       { type: "ForStatement",
         body: { type: "EmptyStatement" },
-        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        init: { type: "IdentifierExpression", name: "x" },
         test:
           { type: "BinaryExpression",
             operator: "<",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            left: { type: "IdentifierExpression", name: "x" },
             right: { type: "LiteralNumericExpression", value: 0 } },
         update: null }
     );
@@ -96,15 +96,15 @@ suite("Parser", function () {
     testParse("for(x; x < 0; x++);", stmt,
       { type: "ForStatement",
         body: { type: "EmptyStatement" },
-        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        init: { type: "IdentifierExpression", name: "x" },
         test:
           { type: "BinaryExpression",
             operator: "<",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            left: { type: "IdentifierExpression", name: "x" },
             right: { type: "LiteralNumericExpression", value: 0 } },
         update:
           { type: "PostfixExpression",
-            operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            operand: { type: "IdentifierExpression", name: "x" },
             operator: "++" } }
     );
 
@@ -114,35 +114,35 @@ suite("Parser", function () {
           { type: "ExpressionStatement",
             expression:
               { type: "CallExpression",
-                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "process" } },
-                arguments: [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } ] } },
-        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+                callee: { type: "IdentifierExpression", name: "process" },
+                arguments: [ { type: "IdentifierExpression", name: "x" } ] } },
+        init: { type: "IdentifierExpression", name: "x" },
         test:
           { type: "BinaryExpression",
             operator: "<",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            left: { type: "IdentifierExpression", name: "x" },
             right: { type: "LiteralNumericExpression", value: 0 } },
         update:
           { type: "PostfixExpression",
-            operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            operand: { type: "IdentifierExpression", name: "x" },
             operator: "++" } }
     );
 
     testParse("for(a;b;c);", stmt,
       { type: "ForStatement",
         body: { type: "EmptyStatement" },
-        init: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
-        update: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+        init: { type: "IdentifierExpression", name: "a" },
+        test: { type: "IdentifierExpression", name: "b" },
+        update: { type: "IdentifierExpression", name: "c" } }
     );
 
     testParse("for(var a;b;c);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
         ]),
-        new Shift.IdentifierExpression(new Shift.Identifier("b")),
-        new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        { type: "IdentifierExpression", name: "b" },
+        { type: "IdentifierExpression", name: "c" },
         new Shift.EmptyStatement
       )
     );
@@ -150,10 +150,10 @@ suite("Parser", function () {
     testParse("for(var a = 0;b;c);", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.LiteralNumericExpression(0))
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, new Shift.LiteralNumericExpression(0))
         ]),
-        new Shift.IdentifierExpression(new Shift.Identifier("b")),
-        new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        { type: "IdentifierExpression", name: "b" },
+        { type: "IdentifierExpression", name: "c" },
         new Shift.EmptyStatement
       )
     );
@@ -161,14 +161,14 @@ suite("Parser", function () {
     testParse("for(var a = 0;;) { let a; }", stmt,
       new Shift.ForStatement(
         new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.LiteralNumericExpression(0))
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, new Shift.LiteralNumericExpression(0))
         ]),
         null,
         null,
         new Shift.BlockStatement(new Shift.Block([
           new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let",
           [
-            new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+            new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
           ]))
         ]))
       )
@@ -178,8 +178,8 @@ suite("Parser", function () {
       { type: "ForStatement",
         body: { type: "EmptyStatement" },
         init: null,
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
-        update: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+        test: { type: "IdentifierExpression", name: "b" },
+        update: { type: "IdentifierExpression", name: "c" } }
     );
 
   });

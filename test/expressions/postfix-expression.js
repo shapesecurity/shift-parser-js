@@ -22,38 +22,38 @@ suite("Parser", function () {
 
     testParse("x++", expr,
       { type: "PostfixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        operand: { type: "IdentifierExpression", name: "x" },
         operator: "++" }
     );
 
     testParse("x--", expr,
       { type: "PostfixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        operand: { type: "IdentifierExpression", name: "x" },
         operator: "--" }
     );
 
     testParse("eval++", expr,
       { type: "PostfixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "eval" } },
+        operand: { type: "IdentifierExpression", name: "eval" },
         operator: "++" }
     );
 
     testParse("eval--", expr,
       { type: "PostfixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "eval" } },
+        operand: { type: "IdentifierExpression", name: "eval" },
         operator: "--" }
     );
 
     testParse("arguments++",
       expr,
       { type: "PostfixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "arguments" } },
+        operand: { type: "IdentifierExpression", name: "arguments" },
         operator: "++" }
     );
 
     testParse("arguments--", expr,
       { type: "PostfixExpression",
-        operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "arguments" } },
+        operand: { type: "IdentifierExpression", name: "arguments" },
         operator: "--" }
     );
 

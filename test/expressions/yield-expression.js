@@ -34,14 +34,14 @@ suite("Parser", function () {
       return p.body.statements[0].body.statements[0].expression.expression;
     }
 
-    testParse("function*a(){yield\na}", yd, [new Shift.YieldExpression(null), new Shift.IdentifierExpression(new Shift.Identifier("a"))]);
+    testParse("function*a(){yield\na}", yd, [new Shift.YieldExpression(null), { type: "IdentifierExpression", name: "a" }]);
 
     // yield as an Identifier cannot show up in body of a generator or in strict mode.
     testParse("({set a(yield){}})", expr,
       new Shift.ObjectExpression([
         new Shift.Setter(
           new Shift.StaticPropertyName("a"),
-          new Shift.BindingIdentifier(new Shift.Identifier("yield")),
+          { type: "BindingIdentifier", name: "yield" },
           emptyBody)
       ]));
     testParse("function *a(){yield 0}", yde, new Shift.LiteralNumericExpression(0));
@@ -49,7 +49,7 @@ suite("Parser", function () {
     testParse("function *a(){yield true}", yde, new Shift.LiteralBooleanExpression(true));
     testParse("function *a(){yield false}", yde, new Shift.LiteralBooleanExpression(false));
     testParse("function *a(){yield \"a\"}", yde, new Shift.LiteralStringExpression("a"));
-    testParse("function *a(){yield a}", yde, new Shift.IdentifierExpression(new Shift.Identifier("a")));
+    testParse("function *a(){yield a}", yde, { type: "IdentifierExpression", name: "a" });
     testParse("function *a(){yield+0}", yde, new Shift.PrefixExpression("+", new Shift.LiteralNumericExpression(0)));
     testParse("function *a(){yield-0}", yde, new Shift.PrefixExpression("-", new Shift.LiteralNumericExpression(0)));
     testParse("function *a(){yield 2e308}", yde, new Shift.LiteralInfinityExpression());

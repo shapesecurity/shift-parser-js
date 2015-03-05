@@ -22,10 +22,10 @@ suite("Parser", function () {
 
     testParse("start: for (;;) break start", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "start" },
+        label: "start",
         body:
           { type: "ForStatement",
-            body: { type: "BreakStatement", label: { type: "Identifier", name: "start" } },
+            body: { type: "BreakStatement", label: "start" },
             init: null,
             test: null,
             update: null } }
@@ -33,30 +33,30 @@ suite("Parser", function () {
 
     testParse("start: while (true) break start", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "start" },
+        label: "start",
         body:
           { type: "WhileStatement",
-            body: { type: "BreakStatement", label: { type: "Identifier", name: "start" } },
+            body: { type: "BreakStatement", label: "start" },
             test: { type: "LiteralBooleanExpression", value: true } } }
     );
 
     testParse("__proto__: test", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "__proto__" },
+        label: "__proto__",
         body:
           { type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "test" } } } }
+            expression: { type: "IdentifierExpression", name: "test" } } }
     );
 
     testParse("a:{break a;}", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "a" },
+        label: "a",
         body:
           { type: "BlockStatement",
             block:
               { type: "Block",
                 statements:
-                  [ { type: "BreakStatement", label: { type: "Identifier", name: "a" } } ] } } }
+                  [ { type: "BreakStatement", label: "a" } ] } } }
     );
 
   });

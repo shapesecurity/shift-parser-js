@@ -24,19 +24,19 @@ suite("Parser", function () {
 
     testParse("if (morning) goodMorning()", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "morning" } },
+        test: { type: "IdentifierExpression", name: "morning" },
         consequent:
           { type: "ExpressionStatement",
             expression:
               { type: "CallExpression",
-                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "goodMorning" } },
+                callee: { type: "IdentifierExpression", name: "goodMorning" },
                 arguments: [] } },
         alternate: null }
     );
 
     testParse("if (morning) (function(){})", stmt,
       new Shift.IfStatement(
-        new Shift.IdentifierExpression(new Shift.Identifier("morning")),
+        { type: "IdentifierExpression", name: "morning" },
         new Shift.ExpressionStatement(new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))),
         null
       )
@@ -44,9 +44,9 @@ suite("Parser", function () {
 
     testParse("if (morning) var x = 0;", stmt,
       new Shift.IfStatement(
-        new Shift.IdentifierExpression(new Shift.Identifier("morning")),
+        { type: "IdentifierExpression", name: "morning" },
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(0))
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0))
         ])),
         null
       )
@@ -54,39 +54,39 @@ suite("Parser", function () {
 
     testParse("if (morning) goodMorning(); else goodDay()", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "morning" } },
+        test: { type: "IdentifierExpression", name: "morning" },
         consequent:
           { type: "ExpressionStatement",
             expression:
               { type: "CallExpression",
-                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "goodMorning" } },
+                callee: { type: "IdentifierExpression", name: "goodMorning" },
                 arguments: [] } },
         alternate:
           { type: "ExpressionStatement",
             expression:
               { type: "CallExpression",
-                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "goodDay" } },
+                callee: { type: "IdentifierExpression", name: "goodDay" },
                 arguments: [] } } }
     );
 
     testParse("if(a)b;", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        test: { type: "IdentifierExpression", name: "a" },
         consequent:
           { type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
+            expression: { type: "IdentifierExpression", name: "b" } },
         alternate: null }
     );
 
     testParse("if(a)b;else c;", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        test: { type: "IdentifierExpression", name: "a" },
         consequent:
           { type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
+            expression: { type: "IdentifierExpression", name: "b" } },
         alternate:
           { type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } } }
+            expression: { type: "IdentifierExpression", name: "c" } } }
     );
 
   });

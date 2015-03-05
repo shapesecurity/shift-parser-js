@@ -24,44 +24,44 @@ suite("Parser", function () {
   suite("call expression", function () {
     testParse("a(b,c)", expr,
       { type: "CallExpression",
-        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        callee: { type: "IdentifierExpression", name: "a" },
         arguments:
-          [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
-            { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } ] }
+          [ { type: "IdentifierExpression", name: "b" },
+            { type: "IdentifierExpression", name: "c" } ] }
     );
 
     testParse("foo(bar, baz)", expr,
       { type: "CallExpression",
-        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
+        callee: { type: "IdentifierExpression", name: "foo" },
         arguments:
-          [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bar" } },
-            { type: "IdentifierExpression", identifier: { type: "Identifier", name: "baz" } } ] }
+          [ { type: "IdentifierExpression", name: "bar" },
+            { type: "IdentifierExpression", name: "baz" } ] }
     );
 
     testParse("(    foo  )()", expr,
       { type: "CallExpression",
-        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
+        callee: { type: "IdentifierExpression", name: "foo" },
         arguments: [] }
     );
 
 
     testParse("f(...a)", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        { type: "IdentifierExpression", name: "f" },
         [
-          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
+          new Shift.SpreadElement({ type: "IdentifierExpression", name: "a" }),
         ]
       )
     );
     testParse("f(...a = b)", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        { type: "IdentifierExpression", name: "f" },
         [
           new Shift.SpreadElement(
             new Shift.AssignmentExpression(
               "=",
-              new Shift.BindingIdentifier(new Shift.Identifier("a")),
-              new Shift.IdentifierExpression(new Shift.Identifier("b"))
+              { type: "BindingIdentifier", name: "a" },
+              { type: "IdentifierExpression", name: "b" }
             )
           ),
         ]
@@ -69,36 +69,36 @@ suite("Parser", function () {
     );
     testParse("f(...a, ...b)", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        { type: "IdentifierExpression", name: "f" },
         [
-          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
-          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+          new Shift.SpreadElement({ type: "IdentifierExpression", name: "a" }),
+          new Shift.SpreadElement({ type: "IdentifierExpression", name: "b" }),
         ]
       )
     );
     testParse("f(a, ...b, c)", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        { type: "IdentifierExpression", name: "f" },
         [
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("b"))),
-          new Shift.IdentifierExpression(new Shift.Identifier("c")),
+          { type: "IdentifierExpression", name: "a" },
+          new Shift.SpreadElement({ type: "IdentifierExpression", name: "b" }),
+          { type: "IdentifierExpression", name: "c" },
         ]
       )
     );
     testParse("f(...a, b, ...c)", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        { type: "IdentifierExpression", name: "f" },
         [
-          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("a"))),
-          new Shift.IdentifierExpression(new Shift.Identifier("b")),
-          new Shift.SpreadElement(new Shift.IdentifierExpression(new Shift.Identifier("c"))),
+          new Shift.SpreadElement({ type: "IdentifierExpression", name: "a" }),
+          { type: "IdentifierExpression", name: "b" },
+          new Shift.SpreadElement({ type: "IdentifierExpression", name: "c" }),
         ]
       )
     );
     testParse("f(....0)", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        { type: "IdentifierExpression", name: "f" },
         [
           new Shift.SpreadElement(new Shift.LiteralNumericExpression(0)),
         ]
@@ -106,7 +106,7 @@ suite("Parser", function () {
     );
     testParse("f(.0)", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("f")),
+        { type: "IdentifierExpression", name: "f" },
         [
           new Shift.LiteralNumericExpression(0),
         ]

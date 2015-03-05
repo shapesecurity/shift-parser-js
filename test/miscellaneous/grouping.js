@@ -63,78 +63,78 @@ suite("Parser", function () {
     testParse("(a) + (b)", expr,
       new Shift.BinaryExpression(
         "+",
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
-        new Shift.IdentifierExpression(new Shift.Identifier("b"))
+        { type: "IdentifierExpression", name: "a" },
+        { type: "IdentifierExpression", name: "b" }
       )
     );
 
     testParse("(a)", expr,
-      new Shift.IdentifierExpression(new Shift.Identifier("a"))
+      { type: "IdentifierExpression", name: "a" }
     );
 
     testParse("((a))", expr,
-      new Shift.IdentifierExpression(new Shift.Identifier("a"))
+      { type: "IdentifierExpression", name: "a" }
     );
 
     testParse("((a))()", expr,
-      new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), [])
+      new Shift.CallExpression({ type: "IdentifierExpression", name: "a" }, [])
     );
 
     testParse("((a))((a))", expr,
       new Shift.CallExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
-        [new Shift.IdentifierExpression(new Shift.Identifier("a"))]
+        { type: "IdentifierExpression", name: "a" },
+        [{ type: "IdentifierExpression", name: "a" }]
       )
     );
 
     testParse("(a) = 0", expr,
       new Shift.AssignmentExpression("=",
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        { type: "BindingIdentifier", name: "a" },
         new Shift.LiteralNumericExpression(0)
       )
     );
 
     testParse("((a)) = 0", expr,
       new Shift.AssignmentExpression("=",
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        { type: "BindingIdentifier", name: "a" },
         new Shift.LiteralNumericExpression(0)
       )
     );
 
     testParse("void (a)", expr,
-      new Shift.PrefixExpression("void", new Shift.IdentifierExpression(new Shift.Identifier("a")))
+      new Shift.PrefixExpression("void", { type: "IdentifierExpression", name: "a" })
     );
 
     testParse("(void a)", expr,
-      new Shift.PrefixExpression("void", new Shift.IdentifierExpression(new Shift.Identifier("a")))
+      new Shift.PrefixExpression("void", { type: "IdentifierExpression", name: "a" })
     );
 
     testParse("(a++)", expr,
       new Shift.PostfixExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
+        { type: "IdentifierExpression", name: "a" },
         "++"
       )
     );
 
     testParse("(a)++", expr,
       new Shift.PostfixExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
+        { type: "IdentifierExpression", name: "a" },
         "++"
       )
     );
 
     testParse("(a)--", expr,
       new Shift.PostfixExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
+        { type: "IdentifierExpression", name: "a" },
         "--"
       )
     );
 
     testParse("(a) ? (b) : (c)", expr,
       new Shift.ConditionalExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
-        new Shift.IdentifierExpression(new Shift.Identifier("b")),
-        new Shift.IdentifierExpression(new Shift.Identifier("c"))
+        { type: "IdentifierExpression", name: "a" },
+        { type: "IdentifierExpression", name: "b" },
+        { type: "IdentifierExpression", name: "c" }
       )
     );
   });

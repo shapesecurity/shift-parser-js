@@ -21,11 +21,11 @@ suite("Parser", function () {
   suite("identifier expression", function () {
 
     testParse("x", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } }
+      { type: "IdentifierExpression", name: "x" }
     );
 
     testParse("x;", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } }
+      { type: "IdentifierExpression", name: "x" }
     );
 
   });
@@ -33,27 +33,27 @@ suite("Parser", function () {
   suite("unicode identifier", function () {
     // Unicode
     testParse("日本語", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "日本語" } }
+      { type: "IdentifierExpression", name: "日本語" }
     );
 
     testParse("T\u203F", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "T\u203F" } }
+      { type: "IdentifierExpression", name: "T\u203F" }
     );
 
     testParse("T\u200C", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "T\u200C" } }
+      { type: "IdentifierExpression", name: "T\u200C" }
     );
 
     testParse("T\u200D", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "T\u200D" } }
+      { type: "IdentifierExpression", name: "T\u200D" }
     );
 
     testParse("\u2163\u2161", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "\u2163\u2161" } }
+      { type: "IdentifierExpression", name: "\u2163\u2161" }
     );
 
     testParse("\u2163\u2161\u200A", expr,
-      { type: "IdentifierExpression", identifier: { type: "Identifier", name: "\u2163\u2161" } }
+      { type: "IdentifierExpression", name: "\u2163\u2161" }
     );
 
   });

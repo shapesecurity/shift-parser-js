@@ -52,12 +52,12 @@ suite("Parser", function () {
     testParse("a.b(b, c)", expr,
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          { type: "IdentifierExpression", name: "a" },
           "b"
         ),
         [
-          new Shift.IdentifierExpression(new Shift.Identifier("b")),
-          new Shift.IdentifierExpression(new Shift.Identifier("c")),
+          { type: "IdentifierExpression", name: "b" },
+          { type: "IdentifierExpression", name: "c" },
         ]
       )
     );
@@ -66,18 +66,18 @@ suite("Parser", function () {
       { type: "CallExpression",
         callee:
          { type: "ComputedMemberExpression",
-           object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
-           expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
+           object: { type: "IdentifierExpression", name: "a" },
+           expression: { type: "IdentifierExpression", name: "b" } },
         arguments:
-         [ { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
-           { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } ] }
+         [ { type: "IdentifierExpression", name: "b" },
+           { type: "IdentifierExpression", name: "c" } ] }
     );
 
 
     testParse("new foo().bar()", expr,
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(
-          new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("foo")), []),
+          new Shift.NewExpression({ type: "IdentifierExpression", name: "foo" }, []),
           "bar"
         ),
         []
@@ -88,8 +88,8 @@ suite("Parser", function () {
       { type: "NewExpression",
         callee:
           { type: "ComputedMemberExpression",
-            object: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } },
-            expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bar" } } },
+            object: { type: "IdentifierExpression", name: "foo" },
+            expression: { type: "IdentifierExpression", name: "bar" } },
         arguments: [] }
     );
 
@@ -97,7 +97,7 @@ suite("Parser", function () {
     testParse("new foo.bar()", expr,
       new Shift.NewExpression(
         new Shift.StaticMemberExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("foo")),
+          { type: "IdentifierExpression", name: "foo" },
           "bar"
         ),
         []
@@ -107,7 +107,7 @@ suite("Parser", function () {
     testParse("(new foo).bar()", expr,
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(
-          new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("foo")), []),
+          new Shift.NewExpression({ type: "IdentifierExpression", name: "foo" }, []),
           "bar"
         ),
         []
@@ -117,7 +117,7 @@ suite("Parser", function () {
     testParse("a[0].b", expr,
       new Shift.StaticMemberExpression(
         new Shift.ComputedMemberExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          { type: "IdentifierExpression", name: "a" },
           new Shift.LiteralNumericExpression(0)
         ),
         "b"
@@ -127,7 +127,7 @@ suite("Parser", function () {
     testParse("a(0).b", expr,
       new Shift.StaticMemberExpression(
         new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
+          { type: "IdentifierExpression", name: "a" },
           [new Shift.LiteralNumericExpression(0)]
         ),
         "b"
@@ -139,7 +139,7 @@ suite("Parser", function () {
         new Shift.CallExpression(
           new Shift.StaticMemberExpression(
             new Shift.CallExpression(
-              new Shift.IdentifierExpression(new Shift.Identifier("a")),
+              { type: "IdentifierExpression", name: "a" },
               [new Shift.LiteralNumericExpression(0)]
             ),
             "b"
@@ -157,7 +157,7 @@ suite("Parser", function () {
     testParse("a.b.c(2014)", expr,
       new Shift.CallExpression(
         new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("a")), "b"), "c"),
+          { type: "IdentifierExpression", name: "a" }, "b"), "c"),
         [new Shift.LiteralNumericExpression(2014)]
       )
     );
@@ -166,44 +166,44 @@ suite("Parser", function () {
     testParse("a || b && c | d ^ e & f == g < h >>> i + j * k", expr,
       { type: "BinaryExpression",
         operator: "||",
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        left: { type: "IdentifierExpression", name: "a" },
         right:
           { type: "BinaryExpression",
             operator: "&&",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } },
+            left: { type: "IdentifierExpression", name: "b" },
             right:
               { type: "BinaryExpression",
                 operator: "|",
-                left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } },
+                left: { type: "IdentifierExpression", name: "c" },
                 right:
                   { type: "BinaryExpression",
                     operator: "^",
-                    left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "d" } },
+                    left: { type: "IdentifierExpression", name: "d" },
                     right:
                       { type: "BinaryExpression",
                         operator: "&",
-                        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "e" } },
+                        left: { type: "IdentifierExpression", name: "e" },
                         right:
                           { type: "BinaryExpression",
                             operator: "==",
-                            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "f" } },
+                            left: { type: "IdentifierExpression", name: "f" },
                             right:
                               { type: "BinaryExpression",
                                 operator: "<",
-                                left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "g" } },
+                                left: { type: "IdentifierExpression", name: "g" },
                                 right:
                                   { type: "BinaryExpression",
                                     operator: ">>>",
-                                    left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "h" } },
+                                    left: { type: "IdentifierExpression", name: "h" },
                                     right:
                                       { type: "BinaryExpression",
                                         operator: "+",
-                                        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "i" } },
+                                        left: { type: "IdentifierExpression", name: "i" },
                                         right:
                                           { type: "BinaryExpression",
                                             operator: "*",
-                                            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "j" } },
-                                            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "k" } } } } } } } } } } } }
+                                            left: { type: "IdentifierExpression", name: "j" },
+                                            right: { type: "IdentifierExpression", name: "k" } } } } } } } } } } }
     );
 
 
@@ -216,7 +216,7 @@ suite("Parser", function () {
             statements:
               [ { type: "EmptyStatement" },
                 { type: "ExpressionStatement",
-                  expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } } } ] } }
+                  expression: { type: "IdentifierExpression", name: "a" } } ] } }
     );
 
     testParse("/* block comment */ 0", expr,
@@ -238,16 +238,16 @@ suite("Parser", function () {
         left:
           { type: "BinaryExpression",
             operator: "+",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "c" } } }
+            left: { type: "IdentifierExpression", name: "a" },
+            right: { type: "IdentifierExpression", name: "b" } },
+        right: { type: "IdentifierExpression", name: "c" } }
     );
 
     testParse("/* assignment */\n a = b", expr,
       new Shift.AssignmentExpression(
         "=",
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
-        new Shift.IdentifierExpression(new Shift.Identifier("b"))
+        { type: "BindingIdentifier", name: "a" },
+        { type: "IdentifierExpression", name: "b" }
       )
     );
 
@@ -292,7 +292,7 @@ suite("Parser", function () {
 
     testParse("if (x) { doThat() // Some comment\n }", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        test: { type: "IdentifierExpression", name: "x" },
         consequent:
           { type: "BlockStatement",
             block:
@@ -301,14 +301,14 @@ suite("Parser", function () {
                   [ { type: "ExpressionStatement",
                       expression:
                         { type: "CallExpression",
-                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          callee: { type: "IdentifierExpression", name: "doThat" },
                           arguments: [] } } ] } },
         alternate: null }
     );
 
     testParse("if (x) { // Some comment\ndoThat(); }", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        test: { type: "IdentifierExpression", name: "x" },
         consequent:
           { type: "BlockStatement",
             block:
@@ -317,14 +317,14 @@ suite("Parser", function () {
                   [ { type: "ExpressionStatement",
                       expression:
                         { type: "CallExpression",
-                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          callee: { type: "IdentifierExpression", name: "doThat" },
                           arguments: [] } } ] } },
         alternate: null }
     );
 
     testParse("if (x) { /* Some comment */ doThat() }", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        test: { type: "IdentifierExpression", name: "x" },
         consequent:
           { type: "BlockStatement",
             block:
@@ -333,14 +333,14 @@ suite("Parser", function () {
                   [ { type: "ExpressionStatement",
                       expression:
                         { type: "CallExpression",
-                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          callee: { type: "IdentifierExpression", name: "doThat" },
                           arguments: [] } } ] } },
         alternate: null }
     );
 
     testParse("if (x) { doThat() /* Some comment */ }", stmt,
       { type: "IfStatement",
-        test: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+        test: { type: "IdentifierExpression", name: "x" },
         consequent:
           { type: "BlockStatement",
             block:
@@ -349,14 +349,14 @@ suite("Parser", function () {
                   [ { type: "ExpressionStatement",
                       expression:
                         { type: "CallExpression",
-                          callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                          callee: { type: "IdentifierExpression", name: "doThat" },
                           arguments: [] } } ] } },
         alternate: null }
     );
 
     testParse("switch (answer) { case 0: /* perfect */ bingo() }", stmt,
       { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        discriminant: { type: "IdentifierExpression", name: "answer" },
         cases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 0 },
@@ -364,13 +364,13 @@ suite("Parser", function () {
                 [ { type: "ExpressionStatement",
                     expression:
                       { type: "CallExpression",
-                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bingo" } },
+                        callee: { type: "IdentifierExpression", name: "bingo" },
                         arguments: [] } } ] } ] }
     );
 
     testParse("switch (answer) { case 0: bingo() /* perfect */ }", stmt,
       { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        discriminant: { type: "IdentifierExpression", name: "answer" },
         cases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 0 },
@@ -378,7 +378,7 @@ suite("Parser", function () {
                 [ { type: "ExpressionStatement",
                     expression:
                       { type: "CallExpression",
-                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "bingo" } },
+                        callee: { type: "IdentifierExpression", name: "bingo" },
                         arguments: [] } } ] } ] }
     );
 
@@ -387,7 +387,7 @@ suite("Parser", function () {
         new Shift.StaticMemberExpression(
           new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("version")), new Shift.LiteralNumericExpression(1)),
+              new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "version" }, new Shift.LiteralNumericExpression(1)),
             ])),
           ])),
           "call"
@@ -399,7 +399,7 @@ suite("Parser", function () {
         new Shift.StaticMemberExpression(
           new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
             new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("version")), new Shift.LiteralNumericExpression(1)),
+              new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "version" }, new Shift.LiteralNumericExpression(1)),
             ])),
           ])),
           "call"
@@ -407,10 +407,10 @@ suite("Parser", function () {
       )
     );
     testParse("function f() { /* infinite */ while (true) { } /* bar */ var each; }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("f")), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "f" }, [], null, new Shift.FunctionBody([], [
         new Shift.WhileStatement(new Shift.LiteralBooleanExpression(true), new Shift.BlockStatement(new Shift.Block([]))),
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("each")), null)
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "each" }, null)
         ])),
       ]))
     );
@@ -423,14 +423,14 @@ suite("Parser", function () {
            operator: ">",
            left:
             { type: "PostfixExpression",
-              operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "i" } },
+              operand: { type: "IdentifierExpression", name: "i" },
               operator: "--" },
            right: { type: "LiteralNumericExpression", value: 0 } } }
     );
 
     testParse("var x = 1<!--foo", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.LiteralNumericExpression(1)),
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(1)),
       ]))
     );
 
@@ -447,7 +447,7 @@ suite("Parser", function () {
                       operator: ">",
                       left:
                         { type: "PostfixExpression",
-                          operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "i" } },
+                          operand: { type: "IdentifierExpression", name: "i" },
                           operator: "--" },
                       right: { type: "LiteralNumericExpression", value: 0 } } } ] } }
     );

@@ -22,7 +22,7 @@ suite("Parser", function () {
 
     testParse("x", stmt,
       { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } } }
+        expression: { type: "IdentifierExpression", name: "x" } }
     );
 
     testParse("x, y", stmt,
@@ -30,28 +30,28 @@ suite("Parser", function () {
         expression:
           { type: "BinaryExpression",
             operator: ",",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-            right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } } } }
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } } }
     );
 
     testParse("\\u0061", stmt,
       { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } } }
+        expression: { type: "IdentifierExpression", name: "a" } }
     );
 
     testParse("a\\u0061", stmt,
       { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "aa" } } }
+        expression: { type: "IdentifierExpression", name: "aa" } }
     );
 
     testParse("\\u0061a", stmt,
       { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "aa" } } }
+        expression: { type: "IdentifierExpression", name: "aa" } }
     );
 
     testParse("\\u0061a ", stmt,
       { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "aa" } } }
+        expression: { type: "IdentifierExpression", name: "aa" } }
     );
 
   });

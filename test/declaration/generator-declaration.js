@@ -27,34 +27,34 @@ function id(x) {
 suite("Parser", function () {
   var emptyBody = new Shift.FunctionBody([], []);
   suite("generator declaration", function () {
-    testParse("function* a(){}", stmt, new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, emptyBody));
+    testParse("function* a(){}", stmt, new Shift.FunctionDeclaration(true, { type: "BindingIdentifier", name: "a" }, [], null, emptyBody));
     testParse("function* a(){yield}", stmt,
-      new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [
+      new Shift.FunctionDeclaration(true, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([], [
         new Shift.ExpressionStatement(new Shift.YieldExpression(null))
       ])));
     testParse("function* a(){yield a}", stmt,
-      new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [
-        new Shift.ExpressionStatement(new Shift.YieldExpression(new Shift.IdentifierExpression(new Shift.Identifier("a"))))
+      new Shift.FunctionDeclaration(true, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([], [
+        new Shift.ExpressionStatement(new Shift.YieldExpression({ type: "IdentifierExpression", name: "a" }))
       ])));
     testParse("function* yield(){}", stmt,
-      new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("yield")), [], null, emptyBody));
+      new Shift.FunctionDeclaration(true, { type: "BindingIdentifier", name: "yield" }, [], null, emptyBody));
 
     testParse("function* a(a=yield){}", stmt,
       new Shift.FunctionDeclaration(
         true,
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
-        [new Shift.BindingWithDefault(new Shift.BindingIdentifier(new Shift.Identifier("a")), new Shift.IdentifierExpression(new Shift.Identifier("yield")))],
+        { type: "BindingIdentifier", name: "a" },
+        [new Shift.BindingWithDefault({ type: "BindingIdentifier", name: "a" }, { type: "IdentifierExpression", name: "yield" })],
         null,
         emptyBody));
 
     testParse("function* a({[yield]:a}){}", stmt,
       new Shift.FunctionDeclaration(
         true,
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        { type: "BindingIdentifier", name: "a" },
         [new Shift.ObjectBinding([
           new Shift.BindingPropertyProperty(
-            new Shift.ComputedPropertyName(new Shift.IdentifierExpression(new Shift.Identifier("yield"))),
-            new Shift.BindingIdentifier(new Shift.Identifier("a"))
+            new Shift.ComputedPropertyName({ type: "IdentifierExpression", name: "yield" }),
+            { type: "BindingIdentifier", name: "a" }
           )
         ])],
         null,
@@ -67,30 +67,30 @@ suite("Parser", function () {
         new Shift.ObjectBinding([
           new Shift.BindingPropertyProperty(
             new Shift.ComputedPropertyName(new Shift.YieldExpression(null)),
-            new Shift.BindingIdentifier(new Shift.Identifier("a"))
+            { type: "BindingIdentifier", name: "a" }
           )
         ]),
         new Shift.LiteralNumericExpression(0)));
 
     testParse("function *a(a=class extends yield{}){}", function (p) {
       return p.body.statements[0].parameters[0].init.super;
-    }, new Shift.IdentifierExpression(new Shift.Identifier("yield")));
+    }, { type: "IdentifierExpression", name: "yield" });
     testParse("function *a({[class extends yield{}]:a}){}", function (p) {
       return p.body.statements[0].parameters[0].properties[0].name.expression.super;
-    }, new Shift.IdentifierExpression(new Shift.Identifier("yield")));
+    }, { type: "IdentifierExpression", name: "yield" });
 
 
     testParse("function* a() {} function a() {}", id,
       new Shift.Script(new Shift.FunctionBody([], [
-        new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [])),
-        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], []))
+        new Shift.FunctionDeclaration(true, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([], []))
       ]))
     );
 
     testParse("function a() { function* a() {} function a() {} }", stmt,
-      new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [
-        new Shift.FunctionDeclaration(true, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], [])),
-        new Shift.FunctionDeclaration(false, new Shift.BindingIdentifier(new Shift.Identifier("a")), [], null, new Shift.FunctionBody([], []))
+      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([], [
+        new Shift.FunctionDeclaration(true, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([], [])),
+        new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([], []))
       ]))
     );
 

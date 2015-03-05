@@ -33,9 +33,9 @@ suite("Parser", function () {
     }
 
     testParse("(class {})", expr, new Shift.ClassExpression(null, null, []));
-    testParse("(class A{})", expr, new Shift.ClassExpression(new Shift.BindingIdentifier(new Shift.Identifier("A")), null, []));
-    testParse("(class extends A {})", expr, new Shift.ClassExpression(null, new Shift.IdentifierExpression(new Shift.Identifier("A")), []));
-    testParse("(class A extends A {})", expr, new Shift.ClassExpression(new Shift.BindingIdentifier(new Shift.Identifier("A")), new Shift.IdentifierExpression(new Shift.Identifier("A")), []));
+    testParse("(class A{})", expr, new Shift.ClassExpression({ type: "BindingIdentifier", name: "A" }, null, []));
+    testParse("(class extends A {})", expr, new Shift.ClassExpression(null, { type: "IdentifierExpression", name: "A" }, []));
+    testParse("(class A extends A {})", expr, new Shift.ClassExpression({ type: "BindingIdentifier", name: "A" }, { type: "IdentifierExpression", name: "A" }, []));
 
     testParse("(class {;;;\n;\n})", expr, new Shift.ClassExpression(null, null, []));
     testParse("(class {;;;\n;a(){}})", expr,
@@ -81,7 +81,7 @@ suite("Parser", function () {
         [
           new Shift.ClassElement(false, new Shift.Setter(
             new Shift.StaticPropertyName("a"),
-            new Shift.BindingIdentifier(new Shift.Identifier("b")),
+            { type: "BindingIdentifier", name: "b" },
             new Shift.FunctionBody([], [])
           ))
         ]
@@ -108,7 +108,7 @@ suite("Parser", function () {
         [
           new Shift.ClassElement(false, new Shift.Setter(
             new Shift.StaticPropertyName("a"),
-            new Shift.BindingIdentifier(new Shift.Identifier("b")),
+            { type: "BindingIdentifier", name: "b" },
             new Shift.FunctionBody([new Shift.Directive("use strict")], [])
           ))
         ]
@@ -123,7 +123,7 @@ suite("Parser", function () {
           new Shift.ClassElement(false, new Shift.Method(
             false,
             new Shift.StaticPropertyName("a"),
-            [new Shift.BindingIdentifier(new Shift.Identifier("b"))],
+            [{ type: "BindingIdentifier", name: "b" }],
             null,
             new Shift.FunctionBody([new Shift.Directive("use strict")], [])
           ))
@@ -205,8 +205,8 @@ suite("Parser", function () {
       new Shift.ClassExpression(
         null,
         new Shift.BinaryExpression(",",
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+          { type: "IdentifierExpression", name: "a" },
+          { type: "IdentifierExpression", name: "b" }),
         []
       )
     );
@@ -217,8 +217,8 @@ suite("Parser", function () {
       new Shift.ClassExpression(
         null,
         new Shift.BinaryExpression(",",
-          new Shift.IdentifierExpression(new Shift.Identifier("a")),
-          new Shift.IdentifierExpression(new Shift.Identifier("b"))),
+          { type: "IdentifierExpression", name: "a" },
+          { type: "IdentifierExpression", name: "b" }),
         []
       )
     );

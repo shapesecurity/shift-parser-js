@@ -28,23 +28,22 @@ suite("Parser", function () {
           { type: "ExpressionStatement",
             expression:
               { type: "CallExpression",
-                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "process" } },
+                callee: { type: "IdentifierExpression", name: "process" },
                 arguments:
-                  [ { type: "IdentifierExpression",
-                    identifier: { type: "Identifier", name: "x" } } ] } },
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "list" } } }
+                  [ { type: "IdentifierExpression", name: "x" } ] } },
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "list" } }
     );
 
     testParse("for (var x in list) process(x);", stmt,
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)
         ]),
-        new Shift.IdentifierExpression(new Shift.Identifier("list")),
+        { type: "IdentifierExpression", name: "list" },
         new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("process")),
-          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+          { type: "IdentifierExpression", name: "process" },
+          [{ type: "IdentifierExpression", name: "x" }]
         ))
       )
     );
@@ -52,12 +51,12 @@ suite("Parser", function () {
     testParse("for (let x in list) process(x);", stmt,
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("let", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("x")), null)
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)
         ]),
-        new Shift.IdentifierExpression(new Shift.Identifier("list")),
+        { type: "IdentifierExpression", name: "list" },
         new Shift.ExpressionStatement(new Shift.CallExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("process")),
-          [new Shift.IdentifierExpression(new Shift.Identifier("x"))]
+          { type: "IdentifierExpression", name: "process" },
+          [{ type: "IdentifierExpression", name: "x" }]
         ))
       )
     );
@@ -65,9 +64,9 @@ suite("Parser", function () {
     testParse("for(var a in b);", stmt,
       new Shift.ForInStatement(
         new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
         ]),
-        new Shift.IdentifierExpression(new Shift.Identifier("b")),
+        { type: "IdentifierExpression", name: "b" },
         new Shift.EmptyStatement
       )
     );
@@ -75,23 +74,23 @@ suite("Parser", function () {
     testParse("for(a in b);", stmt,
       { type: "ForInStatement",
         body: { type: "EmptyStatement" },
-        left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
-        right: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "b" } } }
+        left: { type: "IdentifierExpression", name: "a" },
+        right: { type: "IdentifierExpression", name: "b" } }
     );
 
     // TODO: a should be a BindingIdentifier, not an IdentifierExpression
     testParse("for(a in b);", stmt,
       new Shift.ForInStatement(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")),
-        new Shift.IdentifierExpression(new Shift.Identifier("b")),
+        { type: "IdentifierExpression", name: "a" },
+        { type: "IdentifierExpression", name: "b" },
         new Shift.EmptyStatement
       )
     );
 
     testParse("for(a.b in c);", stmt,
       new Shift.ForInStatement(
-        new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "b"),
-        new Shift.IdentifierExpression(new Shift.Identifier("c")),
+        new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "b"),
+        { type: "IdentifierExpression", name: "c" },
         new Shift.EmptyStatement
       )
     );

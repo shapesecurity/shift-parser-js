@@ -32,7 +32,7 @@ suite("Parser", function () {
 
     testParse("done: while (true) { break done }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "done" },
+        label: "done",
         body:
           { type: "WhileStatement",
             body:
@@ -41,13 +41,13 @@ suite("Parser", function () {
                   { type: "Block",
                     statements:
                       [ { type: "BreakStatement",
-                          label: { type: "Identifier", name: "done" } } ] } },
+                          label: "done" } ] } },
         test: { type: "LiteralBooleanExpression", value: true } } }
     );
 
     testParse("done: while (true) { break done; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "done" },
+        label: "done",
         body:
           { type: "WhileStatement",
             body:
@@ -56,13 +56,13 @@ suite("Parser", function () {
                   { type: "Block",
                     statements:
                       [ { type: "BreakStatement",
-                          label: { type: "Identifier", name: "done" } } ] } },
+                          label: "done" } ] } },
         test: { type: "LiteralBooleanExpression", value: true } } }
     );
 
     testParse("__proto__: while (true) { break __proto__; }", stmt,
       { type: "LabeledStatement",
-        label: { type: "Identifier", name: "__proto__" },
+        label: "__proto__",
         body:
           { type: "WhileStatement",
             body:
@@ -71,7 +71,7 @@ suite("Parser", function () {
                   { type: "Block",
                     statements:
                       [ { type: "BreakStatement",
-                          label: { type: "Identifier", name: "__proto__" } } ] } },
+                          label: "__proto__" } ] } },
         test: { type: "LiteralBooleanExpression", value: true } } }
     );
 

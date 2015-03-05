@@ -29,31 +29,30 @@ suite("Parser", function () {
 
     testParse("(...a) => 0", expr,
       new Shift.ArrowExpression([],
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        { type: "BindingIdentifier", name: "a" },
         new Shift.LiteralNumericExpression(0)));
 
     testParse("() => {}", expr, new Shift.ArrowExpression([], null, new Shift.FunctionBody([], [])));
 
     testParse("(a) => 0", expr, new Shift.ArrowExpression([
-      new Shift.BindingIdentifier(new Shift.Identifier("a"))
+      { type: "BindingIdentifier", name: "a" }
     ], null, new Shift.LiteralNumericExpression(0)));
 
     testParse("([a]) => 0", expr, new Shift.ArrowExpression([
       new Shift.ArrayBinding(
-        [new Shift.BindingIdentifier(new Shift.Identifier("a"))],
+        [{ type: "BindingIdentifier", name: "a" }],
         null)
     ], null, new Shift.LiteralNumericExpression(0)));
 
     testParse("a => 0", expr, new Shift.ArrowExpression([
-      new Shift.BindingIdentifier(new Shift.Identifier("a"))
+      { type: "BindingIdentifier", name: "a" }
     ], null, new Shift.LiteralNumericExpression(0)));
 
     testParse("({a}) => 0", expr,
       new Shift.ArrowExpression([new Shift.ObjectBinding([
-        new Shift.BindingPropertyIdentifier(
-          new Shift.BindingIdentifier(new Shift.Identifier("a")),
-          null
-        )
+        { type: "BindingPropertyIdentifier",
+          binding: { type: "BindingIdentifier", name: "a" },
+          init: null }
       ])], null, new Shift.LiteralNumericExpression(0)));
 
     testParse("() => () => 0", expr,
@@ -72,17 +71,17 @@ suite("Parser", function () {
 
     testParse("(a,b) => 0 + 1", expr,
       new Shift.ArrowExpression([
-          new Shift.BindingIdentifier(new Shift.Identifier("a")),
-          new Shift.BindingIdentifier(new Shift.Identifier("b"))
+          { type: "BindingIdentifier", name: "a" },
+          { type: "BindingIdentifier", name: "b" }
         ], null,
         new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(0), new Shift.LiteralNumericExpression(1))
       ));
 
     testParse("(a,b,...c) => 0 + 1", expr,
       new Shift.ArrowExpression([
-          new Shift.BindingIdentifier(new Shift.Identifier("a")),
-          new Shift.BindingIdentifier(new Shift.Identifier("b"))
-        ], new Shift.BindingIdentifier(new Shift.Identifier("c")),
+          { type: "BindingIdentifier", name: "a" },
+          { type: "BindingIdentifier", name: "b" }
+        ], { type: "BindingIdentifier", name: "c" },
         new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(0), new Shift.LiteralNumericExpression(1))
       ));
 
@@ -90,29 +89,29 @@ suite("Parser", function () {
       new Shift.ArrowExpression([], null,
         new Shift.AssignmentExpression(
           "=",
-          new Shift.BindingIdentifier(new Shift.Identifier("a")),
+          { type: "BindingIdentifier", name: "a" },
           new Shift.LiteralNumericExpression(0))));
 
     testParse("a => b => c => 0", expr,
       new Shift.ArrowExpression(
-        [new Shift.BindingIdentifier(new Shift.Identifier("a"))],
+        [{ type: "BindingIdentifier", name: "a" }],
         null,
         new Shift.ArrowExpression(
-          [new Shift.BindingIdentifier(new Shift.Identifier("b"))],
+          [{ type: "BindingIdentifier", name: "b" }],
           null,
           new Shift.ArrowExpression(
-            [new Shift.BindingIdentifier(new Shift.Identifier("c"))],
+            [{ type: "BindingIdentifier", name: "c" }],
             null,
             new Shift.LiteralNumericExpression(0)))));
 
     testParse("(x)=>{'use strict';}", expr, new Shift.ArrowExpression([
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
       ], null,
       new Shift.FunctionBody([new Shift.Directive("use strict")], [])
     ));
 
     testParse("'use strict';(x)=>0", expr, new Shift.ArrowExpression([
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
       ], null,
       new Shift.LiteralNumericExpression(0)
     ));

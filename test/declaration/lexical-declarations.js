@@ -25,7 +25,7 @@ suite("Parser", function () {
     testParse("let a", stmt,
       new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let",
         [
-          new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)
+          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
         ]))
     );
 
@@ -35,7 +35,7 @@ suite("Parser", function () {
           new Shift.VariableDeclarationStatement(
             new Shift.VariableDeclaration(
               "let",
-              [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)]))])));
+              [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)]))])));
 
     // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token let");
     testParse("while(true) var a", stmt,
@@ -44,7 +44,7 @@ suite("Parser", function () {
         new Shift.VariableDeclarationStatement(
           new Shift.VariableDeclaration(
             "var",
-            [new Shift.VariableDeclarator(new Shift.BindingIdentifier(new Shift.Identifier("a")), null)]))));
+            [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)]))));
 
     testParseFailure("while(true) let a", "Unexpected identifier");
     testParseFailure("while(true) const a", "Unexpected token const");

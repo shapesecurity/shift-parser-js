@@ -32,7 +32,7 @@ suite("Parser", function () {
           { type: "ExpressionStatement",
             expression:
               { type: "CallExpression",
-                callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doSomething" } },
+                callee: { type: "IdentifierExpression", name: "doSomething" },
                 arguments: [] } },
         test: { type: "LiteralBooleanExpression", value: true } }
     );
@@ -47,17 +47,17 @@ suite("Parser", function () {
                   [ { type: "ExpressionStatement",
                       expression:
                         { type: "PostfixExpression",
-                          operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+                          operand: { type: "IdentifierExpression", name: "x" },
                           operator: "++" } },
                     { type: "ExpressionStatement",
                       expression:
                         { type: "PostfixExpression",
-                          operand: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "y" } },
+                          operand: { type: "IdentifierExpression", name: "y" },
                           operator: "--" } } ] } },
         test:
           { type: "BinaryExpression",
             operator: "<",
-            left: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "x" } },
+            left: { type: "IdentifierExpression", name: "x" },
             right: { type: "LiteralNumericExpression", value: 10 } } }
     );
 

@@ -29,14 +29,14 @@ suite("Parser", function () {
     testParse("`\r\n\t\n`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement("\r\n\t\n")]));
     testParse("`\\``", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement("\\`")]));
     testParse("`$$$`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement("$$$")]));
-    testParse("`$$$${a}`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement("$$$"), new Shift.IdentifierExpression(new Shift.Identifier("a")), new Shift.TemplateElement("")]));
-    testParse("`${a}`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement(""), new Shift.IdentifierExpression(new Shift.Identifier("a")), new Shift.TemplateElement("")]));
-    testParse("`${a}$`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement(""), new Shift.IdentifierExpression(new Shift.Identifier("a")), new Shift.TemplateElement("$")]));
+    testParse("`$$$${a}`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement("$$$"), { type: "IdentifierExpression", name: "a" }, new Shift.TemplateElement("")]));
+    testParse("`${a}`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement(""), { type: "IdentifierExpression", name: "a" }, new Shift.TemplateElement("")]));
+    testParse("`${a}$`", expr, new Shift.TemplateExpression(null, [new Shift.TemplateElement(""), { type: "IdentifierExpression", name: "a" }, new Shift.TemplateElement("$")]));
     testParse("`${a}${b}`", expr, new Shift.TemplateExpression(null, [
       new Shift.TemplateElement(""),
-      new Shift.IdentifierExpression(new Shift.Identifier("a")),
+      { type: "IdentifierExpression", name: "a" },
       new Shift.TemplateElement(""),
-      new Shift.IdentifierExpression(new Shift.Identifier("b")),
+      { type: "IdentifierExpression", name: "b" },
       new Shift.TemplateElement(""),
     ]));
     testParse("````", expr, new Shift.TemplateExpression(new Shift.TemplateExpression(null, [new Shift.TemplateElement("")]), [new Shift.TemplateElement("")]));
@@ -49,9 +49,9 @@ suite("Parser", function () {
   });
 
   suite("tagged template expressions", function () {
-    testParse("a``", expr, new Shift.TemplateExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), [new Shift.TemplateElement("")]));
-    testParse("a()``", expr, new Shift.TemplateExpression(new Shift.CallExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), []), [new Shift.TemplateElement("")]));
-    testParse("new a``", expr, new Shift.NewExpression(new Shift.TemplateExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), [new Shift.TemplateElement("")]), []));
-    testParse("new a()``", expr, new Shift.TemplateExpression(new Shift.NewExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), []), [new Shift.TemplateElement("")]));
+    testParse("a``", expr, new Shift.TemplateExpression({ type: "IdentifierExpression", name: "a" }, [new Shift.TemplateElement("")]));
+    testParse("a()``", expr, new Shift.TemplateExpression(new Shift.CallExpression({ type: "IdentifierExpression", name: "a" }, []), [new Shift.TemplateElement("")]));
+    testParse("new a``", expr, new Shift.NewExpression(new Shift.TemplateExpression({ type: "IdentifierExpression", name: "a" }, [new Shift.TemplateElement("")]), []));
+    testParse("new a()``", expr, new Shift.TemplateExpression(new Shift.NewExpression({ type: "IdentifierExpression", name: "a" }, []), [new Shift.TemplateElement("")]));
   });
 });

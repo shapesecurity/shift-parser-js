@@ -27,7 +27,7 @@ suite("Parser", function () {
             statements:
               [ { type: "ExpressionStatement",
                   expression:
-                    { type: "IdentifierExpression", identifier: { type: "Identifier", name: "foo" } } } ] } }
+                    { type: "IdentifierExpression", name: "foo" } } ] } }
     );
 
     testParse("{ doThis(); doThat(); }", stmt,
@@ -38,12 +38,12 @@ suite("Parser", function () {
               [ { type: "ExpressionStatement",
                   expression:
                     { type: "CallExpression",
-                      callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThis" } },
+                      callee: { type: "IdentifierExpression", name: "doThis" },
                       arguments: [] } },
                 { type: "ExpressionStatement",
                   expression:
                     { type: "CallExpression",
-                      callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "doThat" } },
+                      callee: { type: "IdentifierExpression", name: "doThat" },
                       arguments: [] } } ] } }
     );
 

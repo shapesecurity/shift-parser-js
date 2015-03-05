@@ -24,42 +24,42 @@ suite("Parser", function () {
     testParse("a=0;", expr,
       new Shift.AssignmentExpression(
         "=",
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        { type: "BindingIdentifier", name: "a" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("(a)=(0);", expr,
       new Shift.AssignmentExpression(
         "=",
-        new Shift.BindingIdentifier(new Shift.Identifier("a")),
+        { type: "BindingIdentifier", name: "a" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x = 0", expr,
       new Shift.AssignmentExpression(
         "=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("eval = 0", expr,
       new Shift.AssignmentExpression(
         "=",
-        new Shift.BindingIdentifier(new Shift.Identifier("eval")),
+        { type: "BindingIdentifier", name: "eval" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("arguments = 0", expr,
       new Shift.AssignmentExpression(
         "=",
-        new Shift.BindingIdentifier(new Shift.Identifier("arguments")),
+        { type: "BindingIdentifier", name: "arguments" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x *= 0", expr,
       new Shift.AssignmentExpression(
         "*=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
@@ -67,7 +67,7 @@ suite("Parser", function () {
       new Shift.AssignmentExpression(
         "*=",
         new Shift.StaticMemberExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("x")),
+          { type: "IdentifierExpression", name: "x" },
           "x"
         ),
         new Shift.LiteralNumericExpression(0)
@@ -76,70 +76,70 @@ suite("Parser", function () {
     testParse("x /= 0", expr,
       new Shift.AssignmentExpression(
         "/=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x %= 0", expr,
       new Shift.AssignmentExpression(
         "%=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x += 0", expr,
       new Shift.AssignmentExpression(
         "+=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x -= 0", expr,
       new Shift.AssignmentExpression(
         "-=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x <<= 0", expr,
       new Shift.AssignmentExpression(
         "<<=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x >>= 0", expr,
       new Shift.AssignmentExpression(
         ">>=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x >>>= 0", expr,
       new Shift.AssignmentExpression(
         ">>>=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x &= 0", expr,
       new Shift.AssignmentExpression(
         "&=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x ^= 0", expr,
       new Shift.AssignmentExpression(
         "^=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
     testParse("x |= 0", expr,
       new Shift.AssignmentExpression(
         "|=",
-        new Shift.BindingIdentifier(new Shift.Identifier("x")),
+        { type: "BindingIdentifier", name: "x" },
         new Shift.LiteralNumericExpression(0)
       )
     );
@@ -148,7 +148,7 @@ suite("Parser", function () {
       new Shift.AssignmentExpression(
         "=",
         new Shift.ComputedMemberExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("eval")),
+          { type: "IdentifierExpression", name: "eval" },
           new Shift.LiteralNumericExpression(0)
         ),
         new Shift.LiteralNumericExpression(0)
@@ -159,7 +159,7 @@ suite("Parser", function () {
       new Shift.AssignmentExpression(
         "=",
         new Shift.ComputedMemberExpression(
-          new Shift.IdentifierExpression(new Shift.Identifier("arguments")),
+          { type: "IdentifierExpression", name: "arguments" },
           new Shift.LiteralNumericExpression(0)
         ),
         new Shift.LiteralNumericExpression(0)

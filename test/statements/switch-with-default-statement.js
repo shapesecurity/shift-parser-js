@@ -22,7 +22,7 @@ suite("Parser", function () {
 
     testParse("switch(a){case 1:default:case 2:}", stmt,
       { type: "SwitchStatementWithDefault",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        discriminant: { type: "IdentifierExpression", name: "a" },
         preDefaultCases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 1 },
@@ -36,7 +36,7 @@ suite("Parser", function () {
 
     testParse("switch(a){case 1:default:}", stmt,
       { type: "SwitchStatementWithDefault",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        discriminant: { type: "IdentifierExpression", name: "a" },
         preDefaultCases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 1 },
@@ -47,7 +47,7 @@ suite("Parser", function () {
 
     testParse("switch(a){default:case 2:}", stmt,
       { type: "SwitchStatementWithDefault",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "a" } },
+        discriminant: { type: "IdentifierExpression", name: "a" },
         preDefaultCases: [],
         defaultCase: { type: "SwitchDefault", consequent: [] },
         postDefaultCases:
@@ -58,7 +58,7 @@ suite("Parser", function () {
 
     testParse("switch (answer) { case 0: hi(); break; default: break }", stmt,
       { type: "SwitchStatementWithDefault",
-        discriminant: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "answer" } },
+        discriminant: { type: "IdentifierExpression", name: "answer" },
         preDefaultCases:
           [ { type: "SwitchCase",
               test: { type: "LiteralNumericExpression", value: 0 },
@@ -66,7 +66,7 @@ suite("Parser", function () {
                 [ { type: "ExpressionStatement",
                     expression:
                       { type: "CallExpression",
-                        callee: { type: "IdentifierExpression", identifier: { type: "Identifier", name: "hi" } },
+                        callee: { type: "IdentifierExpression", name: "hi" },
                         arguments: [] } },
                   { type: "BreakStatement", label: null } ] } ],
         defaultCase: { type: "SwitchDefault", consequent: [ { type: "BreakStatement", label: null } ] },

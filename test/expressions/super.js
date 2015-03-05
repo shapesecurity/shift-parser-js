@@ -28,7 +28,7 @@ suite("Parser", function () {
     testParse("(class extends B { constructor() { super() } });", expr,
       new Shift.ClassExpression(
         null,
-        new Shift.IdentifierExpression(new Shift.Identifier("B")),
+        { type: "IdentifierExpression", name: "B" },
         [
           new Shift.ClassElement(false,
             new Shift.Method(false, new Shift.StaticPropertyName("constructor"), [], null, new Shift.FunctionBody([], [
@@ -41,8 +41,8 @@ suite("Parser", function () {
 
     testParse("class A extends B { constructor() { super() } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
-        new Shift.IdentifierExpression(new Shift.Identifier("B")),
+        { type: "BindingIdentifier", name: "A" },
+        { type: "IdentifierExpression", name: "B" },
         [
           new Shift.ClassElement(false,
             new Shift.Method(false, new Shift.StaticPropertyName("constructor"), [], null, new Shift.FunctionBody([], [
@@ -55,8 +55,8 @@ suite("Parser", function () {
 
     testParse("class A extends B { \"constructor\"() { super() } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
-        new Shift.IdentifierExpression(new Shift.Identifier("B")),
+        { type: "BindingIdentifier", name: "A" },
+        { type: "IdentifierExpression", name: "B" },
         [
           new Shift.ClassElement(false,
             new Shift.Method(false, new Shift.StaticPropertyName("constructor"), [], null, new Shift.FunctionBody([], [
@@ -69,8 +69,8 @@ suite("Parser", function () {
 
     testParse("class A extends B { constructor() { ({a: super()}); } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
-        new Shift.IdentifierExpression(new Shift.Identifier("B")),
+        { type: "BindingIdentifier", name: "A" },
+        { type: "IdentifierExpression", name: "B" },
         [
           new Shift.ClassElement(false,
             new Shift.Method(false, new Shift.StaticPropertyName("constructor"), [], null, new Shift.FunctionBody([], [
@@ -85,8 +85,8 @@ suite("Parser", function () {
 
     testParse("class A extends B { constructor() { () => super(); } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
-        new Shift.IdentifierExpression(new Shift.Identifier("B")),
+        { type: "BindingIdentifier", name: "A" },
+        { type: "IdentifierExpression", name: "B" },
         [
           new Shift.ClassElement(false,
             new Shift.Method(false, new Shift.StaticPropertyName("constructor"), [], null, new Shift.FunctionBody([], [
@@ -101,8 +101,8 @@ suite("Parser", function () {
 
     testParse("class A extends B { constructor() { () => { super(); } } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
-        new Shift.IdentifierExpression(new Shift.Identifier("B")),
+        { type: "BindingIdentifier", name: "A" },
+        { type: "IdentifierExpression", name: "B" },
         [
           new Shift.ClassElement(false,
             new Shift.Method(false, new Shift.StaticPropertyName("constructor"), [], null, new Shift.FunctionBody([], [
@@ -156,7 +156,7 @@ suite("Parser", function () {
 
     testParse("({ set a(x) { super.b[0] = 1; } });", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(new Shift.StaticPropertyName("a"), new Shift.BindingIdentifier(new Shift.Identifier("x")), new Shift.FunctionBody([], [
+        new Shift.Setter(new Shift.StaticPropertyName("a"), { type: "BindingIdentifier", name: "x" }, new Shift.FunctionBody([], [
           new Shift.ExpressionStatement(new Shift.AssignmentExpression("=",
             new Shift.ComputedMemberExpression(new Shift.StaticMemberExpression(new Shift.Super, "b"), new Shift.LiteralNumericExpression(0)),
             new Shift.LiteralNumericExpression(1)
@@ -177,8 +177,8 @@ suite("Parser", function () {
 
     testParse("class A extends B { constructor() { super.x } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
-        new Shift.IdentifierExpression(new Shift.Identifier("B")),
+        { type: "BindingIdentifier", name: "A" },
+        { type: "IdentifierExpression", name: "B" },
         [
           new Shift.ClassElement(false,
             new Shift.Method(false, new Shift.StaticPropertyName("constructor"), [], null, new Shift.FunctionBody([], [
@@ -191,7 +191,7 @@ suite("Parser", function () {
 
     testParse("class A { a() { () => super.b; } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
+        { type: "BindingIdentifier", name: "A" },
         null,
         [
           new Shift.ClassElement(false,
@@ -207,7 +207,7 @@ suite("Parser", function () {
 
     testParse("class A { a() { new super.b; } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
+        { type: "BindingIdentifier", name: "A" },
         null,
         [
           new Shift.ClassElement(false,
@@ -222,7 +222,7 @@ suite("Parser", function () {
 
     testParse("class A { a() { new super.b(); } }", stmt,
       new Shift.ClassDeclaration(
-        new Shift.BindingIdentifier(new Shift.Identifier("A")),
+        { type: "BindingIdentifier", name: "A" },
         null,
         [
           new Shift.ClassElement(false,

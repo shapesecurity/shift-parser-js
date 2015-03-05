@@ -22,29 +22,29 @@ var testParse = require("../assertions").testParse;
 suite("Parser", function () {
   suite("static member expression", function () {
     testParse("a.b", expr,
-      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "b")
+      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "b")
     );
     testParse("a.b.c", expr,
       new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")), "b"), "c"
+        { type: "IdentifierExpression", name: "a" }, "b"), "c"
       )
     );
     testParse("a.$._.B0", expr,
       new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
-        new Shift.IdentifierExpression(new Shift.Identifier("a")), "$"), "_"), "B0"
+        { type: "IdentifierExpression", name: "a" }, "$"), "_"), "B0"
       )
     );
     testParse("a.if", expr,
-      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "if")
+      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "if")
     );
     testParse("a.true", expr,
-      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "true")
+      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "true")
     );
     testParse("a.false", expr,
-      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "false")
+      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "false")
     );
     testParse("a.null", expr,
-      new Shift.StaticMemberExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")), "null")
+      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "null")
     );
   });
 });

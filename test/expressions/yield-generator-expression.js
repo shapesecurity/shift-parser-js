@@ -28,8 +28,8 @@ suite("Parser", function () {
       });
     }
 
-    testParse("function*a(){yield*a}", yd, [new Shift.YieldGeneratorExpression(new Shift.IdentifierExpression(new Shift.Identifier("a")))]);
-    testParse("function a(){yield*a}", yd, [new Shift.BinaryExpression("*", new Shift.IdentifierExpression(new Shift.Identifier("yield")), new Shift.IdentifierExpression(new Shift.Identifier("a")))]);
+    testParse("function*a(){yield*a}", yd, [new Shift.YieldGeneratorExpression({ type: "IdentifierExpression", name: "a" })]);
+    testParse("function a(){yield*a}", yd, [new Shift.BinaryExpression("*", { type: "IdentifierExpression", name: "yield" }, { type: "IdentifierExpression", name: "a" })]);
 
     testParseFailure("function *a(){yield\n*a}", "Unexpected token *");
     testParseFailure("function *a(){yield*}", "Unexpected token }");

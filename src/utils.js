@@ -28,7 +28,7 @@ const Regex = {
 };
 
 export function isRestrictedWord(name) {
-  return "eval" === name || "arguments" === name;
+  return name === "eval" || name === "arguments";
 }
 
 export function isStrictModeReservedWordES5(name) {
@@ -41,30 +41,30 @@ export function isDecimalDigit(ch) {
 
 // 7.3 Line Terminators
 export function isLineTerminator(ch) {
-  return (ch === 0x0D) || (ch === 0x0A) || (ch === 0x2028) || (ch === 0x2029);
+  return ch === 0x0D || ch === 0x0A || ch === 0x2028 || ch === 0x2029;
 }
 
 export function isWhitespace(ch) {
-  return (ch === 0x20) || (ch === 0x09) || (ch === 0x0B) || (ch === 0x0C) || (ch === 0xA0) ||
-      (ch >= 0x1680 && [0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009,
-        0x200A, 0x202F, 0x205F, 0x3000, 0xFEFF].indexOf(ch) >= 0);
+  return ch === 0x20 || ch === 0x09 || ch === 0x0B || ch === 0x0C || ch === 0xA0 ||
+      ch >= 0x1680 && [0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009,
+        0x200A, 0x202F, 0x205F, 0x3000, 0xFEFF].indexOf(ch) >= 0;
 }
 
 export function isIdentifierStart(ch) {
-  return (ch === 0x24) || (ch === 0x5F) ||  // $ (dollar) and _ (underscore)
-      (ch >= 0x41 && ch <= 0x5A) ||         // A..Z
-      (ch >= 0x61 && ch <= 0x7A) ||         // a..z
-      (ch === 0x5C) ||                      // \ (backslash)
-      ((ch >= 0x80) && Regex.NonAsciiIdentifierStart.test(String.fromCharCode(ch)));
+  return ch === 0x24 || ch === 0x5F ||  // $ (dollar) and _ (underscore)
+      ch >= 0x41 && ch <= 0x5A ||         // A..Z
+      ch >= 0x61 && ch <= 0x7A ||         // a..z
+      ch === 0x5C ||                      // \ (backslash)
+      ch >= 0x80 && Regex.NonAsciiIdentifierStart.test(String.fromCharCode(ch));
 }
 
 export function isIdentifierPart(ch) {
-  return (ch === 0x24) || (ch === 0x5F) ||  // $ (dollar) and _ (underscore)
-      (ch >= 0x41 && ch <= 0x5A) ||         // A..Z
-      (ch >= 0x61 && ch <= 0x7A) ||         // a..z
-      (ch >= 0x30 && ch <= 0x39) ||         // 0..9
-      (ch === 0x5C) ||                      // \ (backslash)
-      ((ch >= 0x80) && Regex.NonAsciiIdentifierPart.test(String.fromCharCode(ch)));
+  return ch === 0x24 || ch === 0x5F ||  // $ (dollar) and _ (underscore)
+      ch >= 0x41 && ch <= 0x5A ||         // A..Z
+      ch >= 0x61 && ch <= 0x7A ||         // a..z
+      ch >= 0x30 && ch <= 0x39 ||         // 0..9
+      ch === 0x5C ||                      // \ (backslash)
+      ch >= 0x80 && Regex.NonAsciiIdentifierPart.test(String.fromCharCode(ch));
 }
 
 export function getHexValue(rune) {
@@ -79,4 +79,3 @@ export function getHexValue(rune) {
   }
   return -1;
 }
-

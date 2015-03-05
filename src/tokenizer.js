@@ -283,10 +283,10 @@ export default class Tokenizer {
       case TokenClass.Ident:
         return this.createError(ErrorMessages.UNEXPECTED_IDENTIFIER);
       case TokenClass.Keyword:
-        if ((token.type === TokenType.FUTURE_RESERVED_WORD)) {
+        if (token.type === TokenType.FUTURE_RESERVED_WORD) {
           return this.createError(ErrorMessages.UNEXPECTED_RESERVED_WORD);
         }
-        if ((token.type === TokenType.FUTURE_STRICT_RESERVED_WORD)) {
+        if (token.type === TokenType.FUTURE_STRICT_RESERVED_WORD) {
           return this.createError(ErrorMessages.STRICT_RESERVED_WORD);
         }
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
@@ -548,7 +548,7 @@ export default class Tokenizer {
           case "p":
             if (strict) {
               let s = id;
-              if ("private" === s || "package" === s) {
+              if (s === "private" || s === "package") {
                 return TokenType.FUTURE_STRICT_RESERVED_WORD;
               }
             }
@@ -581,7 +581,7 @@ export default class Tokenizer {
       case 9:
         if (strict && (id.charAt(0) === "p" || id.charAt(0) === "i")) {
           let s = id;
-          if ("protected" === s || "interface" === s) {
+          if (s === "protected" || s === "interface") {
             return TokenType.FUTURE_STRICT_RESERVED_WORD;
           }
         }
@@ -589,9 +589,9 @@ export default class Tokenizer {
       case 10:
       {
         let s = id;
-        if ("instanceof" === s) {
+        if (s === "instanceof") {
           return TokenType.INSTANCEOF;
-        } else if (strict && "implements" === s) {
+        } else if (strict && s === "implements") {
           return TokenType.FUTURE_STRICT_RESERVED_WORD;
         }
       }
@@ -709,7 +709,7 @@ export default class Tokenizer {
           break;
         }
         // U+003E is ">"
-        if ((this.source.charAt(this.index + 1) === "-") && (this.source.charAt(this.index + 2) === ">")) {
+        if (this.source.charAt(this.index + 1) === "-" && this.source.charAt(this.index + 2) === ">") {
           // "-->" is a single-line comment
           this.skipSingleLineComment(3);
         } else {
@@ -878,7 +878,7 @@ export default class Tokenizer {
     let slice = this.getSlice(start, startLocation);
     slice.text = id;
 
-    if ((id.length === 1)) {
+    if (id.length === 1) {
       return new IdentifierToken(slice);
     }
 
@@ -1097,7 +1097,7 @@ export default class Tokenizer {
         this.index++;
       } else if (ch === "8" || ch === "9") {
         isOctal = false;
-        this.index++
+        this.index++;
       } else if (isIdentifierPart(ch.charCodeAt(0))) {
         throw this.createILLEGAL();
       } else {
@@ -1311,7 +1311,7 @@ export default class Tokenizer {
         this.index++;
         return new StringLiteralToken(this.getSlice(start, startLocation), str, octal);
       } else if (ch === "\\") {
-        ([str, octal] = this.scanStringEscape(str, octal));
+        [str, octal] = this.scanStringEscape(str, octal);
       } else if (isLineTerminator(ch.charCodeAt(0))) {
         throw this.createILLEGAL();
       } else {

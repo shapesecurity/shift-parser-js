@@ -96,8 +96,7 @@ function copyLocation(from, to) {
  * @returns {string?}
  */
 function firstDuplicate(strings) {
-  if (strings.length < 2)
-    return null;
+  if (strings.length < 2) return null;
   let map = {};
   for (let cursor = 0; cursor < strings.length; cursor++) {
     let id = "$" + strings[cursor];
@@ -193,7 +192,7 @@ export class Parser extends Tokenizer {
     let originalVDN = this.VDN;
     this.VDN = Object.create(null);
     let result = f.call(this);
-    post && post.call(this);
+    if (post) post.call(this);
 
     for (let key in this.VDN) {
       originalVDN[key] = this.VDN[key];
@@ -510,14 +509,14 @@ export class Parser extends Tokenizer {
         if ({}.hasOwnProperty.call(exportedNames, "$default")) {
           throw this.createError(ErrorMessages.DUPLICATE_EXPORTED_NAME, "default");
         }
-        exportedNames["$default"] = true;
+        exportedNames.$default = true;
         this.lex();
         switch (this.lookahead.type) {
           case TokenType.FUNCTION:
             // export default HoistableDeclaration[Default]
             decl = new Shift.ExportDefault(this.parseFunction({isExpr: false, inDefault: true, isTopLevel: true}));
             key = decl.body.name.name;
-            if (key != "*default*") {
+            if (key !== "*default*") {
               exportedBindings["$" + key] = true;
               oldLDN.push(key);
             }
@@ -526,7 +525,7 @@ export class Parser extends Tokenizer {
             // export default ClassDeclaration[Default]
             decl = new Shift.ExportDefault(this.parseClass({isExpr: false, inDefault: true}));
             key = decl.body.name.name;
-            if (key != "*default*") {
+            if (key !== "*default*") {
               exportedBindings["$" + key] = true;
               oldLDN.push(key);
             }
@@ -541,7 +540,7 @@ export class Parser extends Tokenizer {
         break;
       case TokenType.VAR:
         isVar = true;
-      // fallthrough
+        // falls through
       case TokenType.LET:
       case TokenType.CONST:
         // export LexicalDeclaration
@@ -728,7 +727,7 @@ export class Parser extends Tokenizer {
     }
 
     let label = null;
-    if (this.lookahead.type == TokenType.IDENTIFIER) {
+    if (this.lookahead.type === TokenType.IDENTIFIER) {
       label = this.parseIdentifier();
 
       let key = "$" + label;
@@ -768,7 +767,7 @@ export class Parser extends Tokenizer {
     }
 
     let label = null;
-    if (this.lookahead.type == TokenType.IDENTIFIER) {
+    if (this.lookahead.type === TokenType.IDENTIFIER) {
       label = this.parseIdentifier();
 
       let key = "$" + label;
@@ -858,10 +857,8 @@ export class Parser extends Tokenizer {
             Parser.isDestructuringAssignmentTargetWithDefault(p.expression)
         );
       case "ArrayExpression":
-        if (node.elements.length === 0)
-          return false;
-        if (!node.elements.slice(0, -1).filter(e => e != null).every(Parser.isDestructuringAssignmentTargetWithDefault))
-          return false;
+        if (node.elements.length === 0) return false;
+        if (!node.elements.slice(0, -1).filter(e => e != null).every(Parser.isDestructuringAssignmentTargetWithDefault)) return false;
         let last = node.elements[node.elements.length - 1];
         return last == null ||
           last.type === "SpreadElement" && Parser.isDestructuringAssignmentTarget(last.expression) ||
@@ -895,7 +892,7 @@ export class Parser extends Tokenizer {
   }
 
   static boundNames(node) {
-    switch(node.type) {
+    switch (node.type) {
       case "BindingIdentifier":
         return [node.name];
       case "BindingWithDefault":
@@ -962,20 +959,20 @@ export class Parser extends Tokenizer {
         this.allowIn = previousAllowIn;
 
         if (initDecl.declarators.length === 1 && (this.match(TokenType.IN) || this.match(TokenType.OF))) {
-          let type;
+          let Ctor;
 
           if (this.match(TokenType.IN)) {
             if (initDecl.declarators[0].init != null) {
               throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN);
             }
-            type = Shift.ForInStatement;
+            Ctor = Shift.ForInStatement;
             this.lex();
             right = this.parseExpression();
           } else {
             if (initDecl.declarators[0].init != null) {
               throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_OF);
             }
-            type = Shift.ForOfStatement;
+            Ctor = Shift.ForOfStatement;
             for (let key in this.VDN) {
               this.VDN[key] = FOR_OF_VAR;
             }
@@ -986,7 +983,7 @@ export class Parser extends Tokenizer {
 
           let epilogue = this.wrapVDN(this.getIteratorStatementEpilogue, isForDecl && this.checkBlockScope);
 
-          return new type(initDecl, right, epilogue);
+          return new Ctor(initDecl, right, epilogue);
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
@@ -1009,13 +1006,12 @@ export class Parser extends Tokenizer {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
           }
 
-          let type = this.match(TokenType.IN) ?
-            Shift.ForInStatement : Shift.ForOfStatement;
+          let Ctor = this.match(TokenType.IN) ? Shift.ForInStatement : Shift.ForOfStatement;
 
           this.lex();
           right = this.parseExpression();
 
-          return new type(init, right, this.getIteratorStatementEpilogue());
+          return new Ctor(init, right, this.getIteratorStatementEpilogue());
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
@@ -1232,12 +1228,12 @@ export class Parser extends Tokenizer {
     let body = this.wrapVDN(this.parseBlock, this.checkBlockScope);
 
     this.LDN.forEach(name => {
-      if (bound.indexOf(name) != -1) {
+      if (bound.indexOf(name) >= 0) {
         throw this.createErrorWithLocation(token, ErrorMessages.DUPLICATE_BINDING, name);
       }
     });
     for (let key in this.VDN) {
-      if (this.VDN[key] === FOR_OF_VAR && bound.indexOf(key.slice(1)) != -1) {
+      if (this.VDN[key] === FOR_OF_VAR && bound.indexOf(key.slice(1)) >= 0) {
         throw this.createError(ErrorMessages.DUPLICATE_CATCH_BINDING, key.slice(1));
       }
     }
@@ -1261,7 +1257,7 @@ export class Parser extends Tokenizer {
     let token = this.lex();
 
     // Preceded by this.match(TokenSubType.VAR) || this.match(TokenSubType.LET);
-    let kind = token.type == TokenType.VAR ? "var" : token.type === TokenType.CONST ? "const" : "let";
+    let kind = token.type === TokenType.VAR ? "var" : token.type === TokenType.CONST ? "const" : "let";
     let declarators = this.parseVariableDeclaratorList(kind, {inFor, boundNames});
     return this.markLocation(new Shift.VariableDeclaration(kind, declarators), startLocation);
   }
@@ -1396,7 +1392,7 @@ export class Parser extends Tokenizer {
     let node = this.parseConditionalExpression();
 
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
-      return this.parseArrowExpressionTail(node, startLocation)
+      return this.parseArrowExpressionTail(node, startLocation);
     }
 
     let isAssignmentOperator = false;
@@ -1493,8 +1489,8 @@ export class Parser extends Tokenizer {
       expr = this.parseAssignmentExpression();
     }
     this.allowYieldExpression = previousYield;
-    let cons = isGenerator ? Shift.YieldGeneratorExpression : Shift.YieldExpression;
-    return this.markLocation(new cons(expr), startLocation);
+    let Ctor = isGenerator ? Shift.YieldGeneratorExpression : Shift.YieldExpression;
+    return this.markLocation(new Ctor(expr), startLocation);
   }
 
   parseConditionalExpression() {
@@ -1566,7 +1562,7 @@ export class Parser extends Tokenizer {
     while (isBinaryOperator) {
       let precedence = BinaryPrecedence[operator.name];
       // Reduce: make a binary expression from the three topmost entries.
-      while (stack.length && (precedence <= stack[stack.length - 1].precedence)) {
+      while (stack.length && precedence <= stack[stack.length - 1].precedence) {
         let stackItem = stack[stack.length - 1];
         let stackOperator = stackItem.operator;
         left = stackItem.left;
@@ -1608,7 +1604,7 @@ export class Parser extends Tokenizer {
   }
 
   parseUnaryExpression() {
-    if (this.lookahead.type.klass != TokenClass.Punctuator && this.lookahead.type.klass != TokenClass.Keyword) {
+    if (this.lookahead.type.klass !== TokenClass.Punctuator && this.lookahead.type.klass !== TokenClass.Keyword) {
       return this.parsePostfixExpression();
     }
     let startLocation = this.getLocation();
@@ -1654,7 +1650,7 @@ export class Parser extends Tokenizer {
     }
 
     let operator = this.lookahead;
-    if ((operator.type !== TokenType.INC) && (operator.type !== TokenType.DEC)) {
+    if (operator.type !== TokenType.INC && operator.type !== TokenType.DEC) {
       return expr;
     }
     this.lex();
@@ -1998,24 +1994,23 @@ export class Parser extends Tokenizer {
         if (dup) {
           throw this.createError(ErrorMessages.DUPLICATE_BINDING, dup);
         }
-        allBoundNames = allBoundNames.concat(boundNames)
+        allBoundNames = allBoundNames.concat(boundNames);
       });
       if (rest) {
         allBoundNames.push(rest.name);
       }
 
-      let dup = firstDuplicate(allBoundNames);
-      if (dup) {
+      if (firstDuplicate(allBoundNames) != null) {
         throw this.createError(ErrorMessages.STRICT_PARAM_DUPE);
       }
 
-      let strict_restricted_word = allBoundNames.some(isRestrictedWord);
-      if (strict_restricted_word) {
+      let strictRestrictedWord = allBoundNames.some(isRestrictedWord);
+      if (strictRestrictedWord) {
         throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
       }
 
-      let strict_reserved_word = hasStrictModeReservedWord(allBoundNames);
-      if (strict_reserved_word) {
+      let strictReservedWord = hasStrictModeReservedWord(allBoundNames);
+      if (strictReservedWord) {
         throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
       }
 
@@ -2208,7 +2203,7 @@ export class Parser extends Tokenizer {
       let name = token.value;
       if (name.length === 3) {
         // Property Assignment: Getter and Setter.
-        if ("get" === name && this.lookaheadPropertyName()) {
+        if (name === "get" && this.lookaheadPropertyName()) {
           key = this.parsePropertyName();
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
@@ -2223,7 +2218,7 @@ export class Parser extends Tokenizer {
             methodOrKey: this.markLocation(new Shift.Getter(key, body), startLocation),
             kind: "method"
           };
-        } else if ("set" === name && this.lookaheadPropertyName()) {
+        } else if (name === "set" && this.lookaheadPropertyName()) {
           key = this.parsePropertyName();
           this.expect(TokenType.LPAREN);
           let param = this.parseParam();
@@ -2447,7 +2442,7 @@ export class Parser extends Tokenizer {
       }
     }
     this.strict = previousStrict;
-    let cons = isExpr ? Shift.FunctionExpression : Shift.FunctionDeclaration;
+    let Ctor = isExpr ? Shift.FunctionExpression : Shift.FunctionDeclaration;
     if (!isExpr) {
       if (isTopLevel) {
         this.VDN["$" + id.name] = true;
@@ -2457,7 +2452,7 @@ export class Parser extends Tokenizer {
 
     }
     return this.markLocation(
-      new cons(isGenerator, id, info.params, info.rest, body),
+      new Ctor(isGenerator, id, info.params, info.rest, body),
       startLocation
     );
   }

@@ -260,9 +260,43 @@ export default class Tokenizer {
     this.lastLineStart = 0;
     this.strict = false;
     this.hasLineTerminatorBeforeNext = false;
-    this.prevToken = null;
     this.tokenIndex = 0;
-    this.lineStarts = [0];
+  }
+
+  saveLexerState() {
+    return {
+      source: this.source,
+      index: this.index,
+      line: this.line,
+      lineStart: this.lineStart,
+      startIndex: this.startIndex,
+      startLine: this.startLine,
+      startLineStart: this.startLineStart,
+      lastIndex: this.lastIndex,
+      lastLine: this.lastLine,
+      lastLineStart: this.lastLineStart,
+      lookahead: this.lookahead,
+      strict: this.strict,
+      hasLineTerminatorBeforeNext: this.hasLineTerminatorBeforeNext,
+      tokenIndex: this.tokenIndex
+    };
+  }
+
+  restoreLexerState(state) {
+    this.source = state.source;
+    this.index = state.index;
+    this.line = state.line;
+    this.lineStart = state.lineStart;
+    this.startIndex = state.startIndex;
+    this.startLine = state.startLine;
+    this.startLineStart = state.startLineStart;
+    this.lastIndex = state.lastIndex;
+    this.lastLine = state.lastLine;
+    this.lastLineStart = state.lastLineStart;
+    this.lookahead = state.lookahead;
+    this.strict = state.strict;
+    this.hasLineTerminatorBeforeNext = state.hasLineTerminatorBeforeNext;
+    this.tokenIndex = state.tokenIndex;
   }
 
   createILLEGAL() {
@@ -1479,9 +1513,9 @@ export default class Tokenizer {
   }
 
   lex() {
-    this.prevToken = this.lookahead;
+    let prevToken = this.lookahead;
     this.lookahead = this.advance();
     this.tokenIndex++;
-    return this.prevToken;
+    return prevToken;
   }
 }

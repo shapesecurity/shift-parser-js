@@ -15,7 +15,9 @@
  */
 
 var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("identifier expression", function () {
@@ -28,6 +30,77 @@ suite("Parser", function () {
       { type: "IdentifierExpression", name: "x" }
     );
 
+  });
+
+  suite("let used as identifier expression", function () {
+
+    testParse("let", expr,
+      { type: "IdentifierExpression", name: "let" }
+    );
+
+    testParse("let()", expr,
+      { type: "CallExpression", callee: { type: "IdentifierExpression", name: "let" }, arguments: [] }
+    );
+
+    testParse("(let[let])", expr,
+      { type: "ComputedMemberExpression", object: { type: "IdentifierExpression", name: "let" }, expression: { type: "IdentifierExpression", name: "let" } }
+    );
+
+    testParse("(let.let)", expr,
+      { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" }
+    );
+
+    testParse("for(let;;);", stmt,
+      { type: "ForStatement",
+        init: { type: "IdentifierExpression", name: "let" },
+        test: null,
+        update: null,
+        body: { type: "EmptyStatement"}
+      }
+    );
+
+    testParse("for(let();;);", stmt,
+      { type: "ForStatement",
+        init: { type: "CallExpression", callee: { type: "IdentifierExpression", name: "let" }, arguments: [] },
+        test: null,
+        update: null,
+        body: { type: "EmptyStatement"}
+      }
+    );
+
+    testParse("for(let in 0);", stmt,
+      { type: "ForInStatement",
+        left: { type: "IdentifierExpression", name: "let" },
+        right: { type: "LiteralNumericExpression", value: 0},
+        body: { type: "EmptyStatement"}
+      }
+    );
+
+    testParse("for(let yield in 0);", stmt,
+      { type: "ForInStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [ {
+            type: "VariableDeclarator",
+            binding: { name: "yield", type: "BindingIdentifier" },
+            init: null
+          } ] },
+        right: { type: "LiteralNumericExpression", value: 0},
+        body: { type: "EmptyStatement"}
+      }
+    );
+
+    testParse("for(let.let in 0);", stmt,
+      { type: "ForInStatement",
+        left: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" },
+        right: { type: "LiteralNumericExpression", value: 0},
+        body: { type: "EmptyStatement"}
+      }
+    );
+
+    testParseFailure("for(let of 0);", "Unexpected token of");
+    testParseFailure("for(let.let of 0);", "Unexpected token of");
   });
 
   suite("unicode identifier", function () {

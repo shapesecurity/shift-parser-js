@@ -582,6 +582,24 @@ export class Parser extends Tokenizer {
     }
   }
 
+  lookaheadLexicalDeclaration() {
+    if (this.match(TokenType.LET) || this.match(TokenType.CONST)) {
+      return true;
+    }
+    if (this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let") {
+      let lexerState = this.saveLexerState();
+      this.lex();
+      if (this.match(TokenType.YIELD) || this.match(TokenType.IDENTIFIER) ||
+        this.match(TokenType.LBRACE) || this.match(TokenType.LBRACK)) {
+        this.restoreLexerState(lexerState);
+        return true;
+      } else {
+        this.restoreLexerState(lexerState);
+      }
+    }
+    return false;
+  }
+
   parseStatementListItem({isTopLevel = false} = {}) {
     let startLocation = this.getLocation();
     if (this.eof()) {
@@ -592,13 +610,10 @@ export class Parser extends Tokenizer {
       switch (this.lookahead.type) {
         case TokenType.FUNCTION:
           return this.parseFunction({isExpr: false, isTopLevel});
-        case TokenType.CONST:
-          return this.parseVariableDeclarationStatement();
         case TokenType.CLASS:
           return this.parseClass({isExpr: false});
         default:
-          // TODO: lookahead `let [` instead.
-          if (this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let") {
+          if (this.lookaheadLexicalDeclaration()) {
             return this.parseVariableDeclarationStatement();
           }
           return this.parseStatement({allowLabeledFunction: true, isTopLevel});
@@ -654,12 +669,14 @@ export class Parser extends Tokenizer {
         return this.parseWhileStatement();
       case TokenType.WITH:
         return this.parseWithStatement();
-      case TokenType.CONST:
       case TokenType.FUNCTION:
       case TokenType.CLASS:
         throw this.createUnexpected(this.lookahead);
 
       default: {
+        if (this.lookaheadLexicalDeclaration()) {
+          throw this.createUnexpected(this.lookahead);
+        }
         let expr = this.parseExpression();
         // 12.12 Labelled Statements;
         if (expr.type === "IdentifierExpression" && this.eat(TokenType.COLON)) {
@@ -950,8 +967,8 @@ export class Parser extends Tokenizer {
           this.getIteratorStatementEpilogue()
       );
     } else {
-      // TODO (bzhang): lookahead `let [`.
-      let isForDecl = this.match(TokenType.CONST) || this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let";
+      let startsWithLet = this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let";
+      let isForDecl = this.lookaheadLexicalDeclaration();
       if (this.match(TokenType.VAR) || isForDecl) {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
@@ -1001,7 +1018,7 @@ export class Parser extends Tokenizer {
         let init = this.parseExpression();
         this.allowIn = previousAllowIn;
 
-        if (this.match(TokenType.IN) || this.match(TokenType.OF)) {
+        if (this.match(TokenType.IN) || !startsWithLet && this.match(TokenType.OF)) {
           if (!Parser.isValidSimpleAssignmentTarget(init)) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
           }

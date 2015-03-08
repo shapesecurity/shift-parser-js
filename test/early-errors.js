@@ -41,8 +41,6 @@ suite("Parser", function () {
 
     // 12.1.1
     // It is a Syntax Error if the code matched by this production is contained in strict code and the StringValue of Identifier is "arguments" or "eval".
-
-    //   In 2.1.3, arguments and eval are not IsValidSimpleAssignmentTarget
     testParseFailure("'use strict'; arguments = 0", "Assignment to eval or arguments is not allowed in strict mode");
     testParseFailure("'use strict'; arguments *= 0", "Assignment to eval or arguments is not allowed in strict mode");
 

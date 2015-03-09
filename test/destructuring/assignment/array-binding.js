@@ -171,6 +171,97 @@ suite("Parser", function () {
         )
       );
 
+      testParse("[x.a=a] = b", expr, {
+        "type": "AssignmentExpression",
+        "binding": {
+          "elements": [
+            {
+              "type": "BindingWithDefault",
+              "binding": {
+                "type": "StaticMemberExpression",
+                "object": {
+                  "type": "IdentifierExpression",
+                  "name": "x",
+                },
+                "property": "a",
+              },
+              "init": {
+                "type": "IdentifierExpression",
+                "name": "a",
+              }
+            }
+          ],
+          "restElement": null,
+          "type": "ArrayBinding",
+        },
+        "operator": "=",
+        "expression": {
+          "type": "IdentifierExpression",
+          "name": "b",
+        }
+      });
+
+      testParse("[x[a]=a] = b", expr, {
+        type: "AssignmentExpression",
+        binding: {
+          elements: [
+            {
+              type: "BindingWithDefault",
+              binding: {
+                type: "ComputedMemberExpression",
+                object: {
+                  type: "IdentifierExpression",
+                  name: "x",
+                },
+                expression: {
+                  type: "IdentifierExpression",
+                  name: "a",
+                },
+              },
+              init: {
+                type: "IdentifierExpression",
+                name: "a",
+              }
+            }
+          ],
+          restElement: null,
+          type: "ArrayBinding",
+        },
+        operator: "=",
+        expression: {
+          type: "IdentifierExpression",
+          name: "b",
+        }
+      });
+
+      testParse("[...[...a[x]]] = b", expr, {
+        type: "AssignmentExpression",
+        binding: {
+          type: "ArrayBinding",
+          elements: [],
+          restElement: {
+            type: "ArrayBinding",
+            elements: [],
+            restElement: {
+              type: "ComputedMemberExpression",
+              object: {
+                type: "IdentifierExpression",
+                name: "a"
+              },
+              expression: {
+                type: "IdentifierExpression",
+                name: "x"
+              }
+            },
+          },
+        },
+        operator: "=",
+        expression: {
+          type: "IdentifierExpression",
+          name: "b",
+        },
+      });
+
       testParseFailure("[] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment"); // TODO(bzhang): Unexpected token ,
       testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment");

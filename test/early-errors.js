@@ -156,12 +156,10 @@ suite("Parser", function () {
     // 12.14.1
     // It is a Syntax Error if LeftHandSideExpression is either an ObjectLiteral or an ArrayLiteral and the lexical token sequence matched by LeftHandSideExpression cannot be parsed with no tokens left over using AssignmentPattern as the goal symbol.
     testParseFailure("({a: 0} = 0);", "Invalid left-hand side in assignment");
-    testParseFailure("({a: b.c} = 0)", "Invalid left-hand side in assignment");
     testParseFailure("({get a(){}} = 0)", "Invalid left-hand side in assignment");
     testParseFailure("({set a(b){}} = 0)", "Invalid left-hand side in assignment");
     testParseFailure("({a(b){}} = 0)", "Invalid left-hand side in assignment");
     testParseFailure("[0] = 0;", "Invalid left-hand side in assignment");
-    testParseFailure("[a.b] = 0;", "Invalid left-hand side in assignment");
     // It is an early Reference Error if LeftHandSideExpression is neither an ObjectLiteral nor an ArrayLiteral and IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.
     testParseFailure("0 = 0;", "Invalid left-hand side in assignment");
     // It is an early Reference Error if IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.

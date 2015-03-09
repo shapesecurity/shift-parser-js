@@ -860,47 +860,56 @@ export class Parser extends Tokenizer {
         ));
       case "IdentifierExpression":
         return copyLocation(node, { type: "BindingIdentifier", name: node.name });
+      case "ComputedMemberExpression":
+      case "StaticMemberExpression":
+        return node;
+      case "ArrayBinding":
+      case "BindingIdentifier":
+      case "BindingPropertyIdentifier":
+      case "BindingPropertyProperty":
+      case "BindingWithDefault":
+      case "ObjectBinding":
+        return node;
     }
-    return node;
   }
 
-  static isDestructuringTarget(node, {isAssignment}) {
+  static isDestructuringTarget(node, isLeafNode) {
     switch (node.type) {
       case "ObjectExpression":
         return node.properties.every(p =>
           p.type === "BindingPropertyIdentifier" ||
           p.type === "ShorthandProperty" ||
           p.type === "DataProperty" &&
-          Parser.isDestructuringTargetWithDefault(p.expression, {isAssignment})
+          Parser.isDestructuringTargetWithDefault(p.expression, isLeafNode)
         );
       case "ArrayExpression":
         if (node.elements.length === 0) return false;
         if (!node.elements.slice(0, -1)
             .filter(e => e != null)
-            .every(e => Parser.isDestructuringTargetWithDefault(e, {isAssignment}))) return false;
+            .every(e => Parser.isDestructuringTargetWithDefault(e, isLeafNode))) return false;
         let last = node.elements[node.elements.length - 1];
         return last == null ||
-          last.type === "SpreadElement" && Parser.isDestructuringTarget(last.expression, {isAssignment}) ||
-          Parser.isDestructuringTargetWithDefault(last, {isAssignment});
+          last.type === "SpreadElement" && Parser.isDestructuringTarget(last.expression, isLeafNode) ||
+          Parser.isDestructuringTargetWithDefault(last, isLeafNode);
       case "ArrayBinding":
       case "BindingIdentifier":
       case "BindingPropertyIdentifier":
       case "BindingPropertyProperty":
       case "BindingWithDefault":
-      case "IdentifierExpression":
       case "ObjectBinding":
         return true;
-      case "ComputedMemberExpression":
-      case "StaticMemberExpression":
-        return isAssignment;
     }
-    return false;
+    return isLeafNode(node);
   }
 
-  static isDestructuringTargetWithDefault(node, {isAssignment}) {
+  static isDestructuringTargetWithDefault(node, isLeafNode) {
     return node.type === "AssignmentExpression" && node.operator === "=" ?
-      Parser.isDestructuringTarget(node.binding, {isAssignment}) :
-      Parser.isDestructuringTarget(node, {isAssignment});
+      Parser.isDestructuringTarget(node.binding, isLeafNode) :
+      Parser.isDestructuringTarget(node, isLeafNode);
+  }
+
+  static isValidSimpleBindingTarget(node) {
+    return node.type === "IdentifierExpression";
   }
 
   static isValidSimpleAssignmentTarget(node) {
@@ -1231,7 +1240,7 @@ export class Parser extends Tokenizer {
 
     let param = this.parseLeftHandSideExpression({allowCall: false});
 
-    if (!Parser.isDestructuringTarget(param, {isAssignment: false})) {
+    if (!Parser.isDestructuringTarget(param, Parser.isValidSimpleBindingTarget)) {
       throw this.createUnexpected(token);
     }
     param = Parser.transformDestructuring(param);
@@ -1323,7 +1332,7 @@ export class Parser extends Tokenizer {
     }
     let id = this.parseLeftHandSideExpression({allowCall: false});
 
-    if (!Parser.isDestructuringTarget(id, {isAssignment: false})) {
+    if (!Parser.isDestructuringTarget(id, Parser.isValidSimpleBindingTarget)) {
       throw this.createUnexpected(token);
     }
     id = Parser.transformDestructuring(id);
@@ -1445,7 +1454,7 @@ export class Parser extends Tokenizer {
         node = Parser.transformDestructuring(node);
       }
     } else if (operator.type === TokenType.ASSIGN) {
-      if (!Parser.isDestructuringTarget(node, {isAssignment: true})) {
+      if (!Parser.isDestructuringTarget(node, Parser.isValidSimpleAssignmentTarget)) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
       node = Parser.transformDestructuring(node);
@@ -1999,7 +2008,7 @@ export class Parser extends Tokenizer {
 
     if (possibleBindings) {
       possibleBindings = params.every(e =>
-        Parser.isDestructuringTargetWithDefault(e, {isAssignment: false}));
+        Parser.isDestructuringTargetWithDefault(e, Parser.isValidSimpleBindingTarget));
     }
 
     this.expect(TokenType.RPAREN);
@@ -2499,7 +2508,7 @@ export class Parser extends Tokenizer {
       this.inGeneratorParameter = previousInGeneratorParameter;
       this.allowYieldExpression = previousYieldExpression;
     }
-    if (!Parser.isDestructuringTargetWithDefault(param, {isAssignment: false})) {
+    if (!Parser.isDestructuringTargetWithDefault(param, Parser.isValidSimpleBindingTarget)) {
       throw this.createUnexpected(token);
     }
     this.inParameter = originalInParameter;

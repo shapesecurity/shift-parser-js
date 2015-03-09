@@ -307,7 +307,6 @@ suite("Parser", function () {
     testParseFailure("({\'__proto__\':1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");
     testParseFailure("{ \"use strict\"; ({__proto__:1,__proto__:2}) }", "Duplicate __proto__ property in object literal not allowed");
     testParseFailure("var", "Unexpected end of input");
-    testParseFailure("let", "Unexpected end of input");
     testParseFailure("const", "Unexpected end of input");
     testParseFailure("{ ;  ;  ", "Unexpected end of input");
     testParseFailure("({get +:3})", "Unexpected token +");

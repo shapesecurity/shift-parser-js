@@ -824,16 +824,16 @@ export class Parser extends Tokenizer {
     return new Shift.DoWhileStatement(body, test);
   }
 
-  static transformDestructuringAssignment(node) {
+  static transformDestructuring(node) {
     switch (node.type) {
       case "ObjectExpression":
         return copyLocation(node, new Shift.ObjectBinding(
-          node.properties.map(Parser.transformDestructuringAssignment)
+          node.properties.map(Parser.transformDestructuring)
         ));
       case "DataProperty":
         return copyLocation(node, new Shift.BindingPropertyProperty(
           node.name,
-          Parser.transformDestructuringAssignment(node.expression)
+          Parser.transformDestructuring(node.expression)
         ));
       case "ShorthandProperty":
         return copyLocation(node, { type: "BindingPropertyIdentifier",
@@ -844,18 +844,18 @@ export class Parser extends Tokenizer {
         let last = node.elements[node.elements.length - 1];
         if (last != null && last.type === "SpreadElement") {
           return copyLocation(node, new Shift.ArrayBinding(
-            node.elements.slice(0, -1).map(e => e && Parser.transformDestructuringAssignment(e)),
-            copyLocation(last.expression, Parser.transformDestructuringAssignment(last.expression))
+            node.elements.slice(0, -1).map(e => e && Parser.transformDestructuring(e)),
+            copyLocation(last.expression, Parser.transformDestructuring(last.expression))
           ));
         } else {
           return copyLocation(node, new Shift.ArrayBinding(
-            node.elements.map(e => e && Parser.transformDestructuringAssignment(e)),
+            node.elements.map(e => e && Parser.transformDestructuring(e)),
             null
           ));
         }
       case "AssignmentExpression":
         return copyLocation(node, new Shift.BindingWithDefault(
-          Parser.transformDestructuringAssignment(node.binding),
+          Parser.transformDestructuring(node.binding),
           node.expression
         ));
       case "IdentifierExpression":
@@ -864,22 +864,24 @@ export class Parser extends Tokenizer {
     return node;
   }
 
-  static isDestructuringAssignmentTarget(node) {
+  static isDestructuringTarget(node, {isAssignment}) {
     switch (node.type) {
       case "ObjectExpression":
         return node.properties.every(p =>
           p.type === "BindingPropertyIdentifier" ||
           p.type === "ShorthandProperty" ||
           p.type === "DataProperty" &&
-            Parser.isDestructuringAssignmentTargetWithDefault(p.expression)
+          Parser.isDestructuringTargetWithDefault(p.expression, {isAssignment})
         );
       case "ArrayExpression":
         if (node.elements.length === 0) return false;
-        if (!node.elements.slice(0, -1).filter(e => e != null).every(Parser.isDestructuringAssignmentTargetWithDefault)) return false;
+        if (!node.elements.slice(0, -1)
+            .filter(e => e != null)
+            .every(e => Parser.isDestructuringTargetWithDefault(e, {isAssignment}))) return false;
         let last = node.elements[node.elements.length - 1];
         return last == null ||
-          last.type === "SpreadElement" && Parser.isDestructuringAssignmentTarget(last.expression) ||
-          Parser.isDestructuringAssignmentTargetWithDefault(last);
+          last.type === "SpreadElement" && Parser.isDestructuringTarget(last.expression, {isAssignment}) ||
+          Parser.isDestructuringTargetWithDefault(last, {isAssignment});
       case "ArrayBinding":
       case "BindingIdentifier":
       case "BindingPropertyIdentifier":
@@ -888,14 +890,17 @@ export class Parser extends Tokenizer {
       case "IdentifierExpression":
       case "ObjectBinding":
         return true;
+      case "ComputedMemberExpression":
+      case "StaticMemberExpression":
+        return isAssignment;
     }
     return false;
   }
 
-  static isDestructuringAssignmentTargetWithDefault(node) {
-    return Parser.isDestructuringAssignmentTarget(node) ||
-      node.type === "AssignmentExpression" && node.operator === "=" &&
-      Parser.isDestructuringAssignmentTarget(node.binding);
+  static isDestructuringTargetWithDefault(node, {isAssignment}) {
+    return node.type === "AssignmentExpression" && node.operator === "=" ?
+      Parser.isDestructuringTarget(node.binding, {isAssignment}) :
+      Parser.isDestructuringTarget(node, {isAssignment});
   }
 
   static isValidSimpleAssignmentTarget(node) {
@@ -1224,12 +1229,12 @@ export class Parser extends Tokenizer {
       throw this.createUnexpected(token);
     }
 
-    let param = this.parseLeftHandSideExpression();
+    let param = this.parseLeftHandSideExpression({allowCall: false});
 
-    if (!Parser.isDestructuringAssignmentTarget(param)) {
+    if (!Parser.isDestructuringTarget(param, {isAssignment: false})) {
       throw this.createUnexpected(token);
     }
-    param = Parser.transformDestructuringAssignment(param);
+    param = Parser.transformDestructuring(param);
 
     let bound = Parser.boundNames(param);
     if (firstDuplicate(bound) != null) {
@@ -1316,12 +1321,12 @@ export class Parser extends Tokenizer {
     if (this.match(TokenType.LPAREN)) {
       throw this.createUnexpected(this.lookahead);
     }
-    let id = this.parseLeftHandSideExpression();
+    let id = this.parseLeftHandSideExpression({allowCall: false});
 
-    if (!Parser.isDestructuringAssignmentTarget(id)) {
+    if (!Parser.isDestructuringTarget(id, {isAssignment: false})) {
       throw this.createUnexpected(token);
     }
-    id = Parser.transformDestructuringAssignment(id);
+    id = Parser.transformDestructuring(id);
 
     let bound = Parser.boundNames(id);
 
@@ -1378,7 +1383,7 @@ export class Parser extends Tokenizer {
         if (isRestrictedWord(name)) {
           throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
         }
-        head = Parser.transformDestructuringAssignment(head);
+        head = Parser.transformDestructuring(head);
         params = [head];
       } else {
         throw this.createUnexpected(arrow);
@@ -1437,13 +1442,13 @@ export class Parser extends Tokenizer {
         if (this.strict && isRestrictedWord(node.name)) {
           throw this.createErrorWithLocation(token, ErrorMessages.STRICT_LHS_ASSIGNMENT);
         }
-        node = Parser.transformDestructuringAssignment(node);
+        node = Parser.transformDestructuring(node);
       }
     } else if (operator.type === TokenType.ASSIGN) {
-      if (!Parser.isDestructuringAssignmentTarget(node) && node.type !== "ComputedMemberExpression" && node.type !== "StaticMemberExpression") {
+      if (!Parser.isDestructuringTarget(node, {isAssignment: true})) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
-      node = Parser.transformDestructuringAssignment(node);
+      node = Parser.transformDestructuring(node);
 
       let bound = Parser.boundNames(node);
       if (this.strict && bound.some(isRestrictedWord)) {
@@ -1660,7 +1665,7 @@ export class Parser extends Tokenizer {
   parsePostfixExpression() {
     let startLocation = this.getLocation();
 
-    let expr = this.parseLeftHandSideExpression(true);
+    let expr = this.parseLeftHandSideExpression({allowCall: true});
 
     if (this.hasLineTerminatorBeforeNext) {
       return expr;
@@ -1683,7 +1688,7 @@ export class Parser extends Tokenizer {
     return this.markLocation(new Shift.PostfixExpression(expr, operator.value), startLocation);
   }
 
-  parseLeftHandSideExpression(allowCall) {
+  parseLeftHandSideExpression({allowCall}) {
     let startLocation = this.getLocation();
     let previousAllowIn = this.allowIn;
     this.allowIn = allowCall;
@@ -1798,7 +1803,7 @@ export class Parser extends Tokenizer {
       }
       return this.markLocation(new Shift.NewTargetExpression, startLocation);
     }
-    let callee = this.parseLeftHandSideExpression();
+    let callee = this.parseLeftHandSideExpression({allowCall: false});
     return this.markLocation(new Shift.NewExpression(
       callee,
       this.match(TokenType.LPAREN) ? this.parseArgumentList() : []
@@ -1993,7 +1998,8 @@ export class Parser extends Tokenizer {
     }
 
     if (possibleBindings) {
-      possibleBindings = params.every(Parser.isDestructuringAssignmentTargetWithDefault);
+      possibleBindings = params.every(e =>
+        Parser.isDestructuringTargetWithDefault(e, {isAssignment: false}));
     }
 
     this.expect(TokenType.RPAREN);
@@ -2003,7 +2009,7 @@ export class Parser extends Tokenizer {
         throw this.createErrorWithLocation(start, ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
       }
       // check dup params
-      params = params.map(Parser.transformDestructuringAssignment);
+      params = params.map(Parser.transformDestructuring);
       let allBoundNames = [];
       params.forEach(expr => {
         let boundNames = Parser.boundNames(expr);
@@ -2334,7 +2340,7 @@ export class Parser extends Tokenizer {
       this.allowYieldExpression = false;
     }
     if (this.eat(TokenType.EXTENDS)) {
-      heritage = this.parseLeftHandSideExpression(true);
+      heritage = this.parseLeftHandSideExpression({allowCall: true});
     }
 
     this.expect(TokenType.LBRACE);
@@ -2481,7 +2487,7 @@ export class Parser extends Tokenizer {
     if (this.match(TokenType.LPAREN)) {
       throw this.createUnexpected(this.lookahead);
     }
-    let param = this.parseLeftHandSideExpression();
+    let param = this.parseLeftHandSideExpression({allowCall: false});
     if (this.eat(TokenType.ASSIGN)) {
       let previousInGeneratorParameter = this.inGeneratorParameter;
       let previousYieldExpression = this.allowYieldExpression;
@@ -2493,11 +2499,11 @@ export class Parser extends Tokenizer {
       this.inGeneratorParameter = previousInGeneratorParameter;
       this.allowYieldExpression = previousYieldExpression;
     }
-    if (!Parser.isDestructuringAssignmentTargetWithDefault(param)) {
+    if (!Parser.isDestructuringTargetWithDefault(param, {isAssignment: false})) {
       throw this.createUnexpected(token);
     }
     this.inParameter = originalInParameter;
-    return Parser.transformDestructuringAssignment(param);
+    return Parser.transformDestructuring(param);
   }
 
   checkParam(param, token, bound, info) {

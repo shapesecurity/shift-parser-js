@@ -82,6 +82,17 @@ suite("Parser", function () {
       testParseFailure("var {a: b.c};", "Unexpected token {");
     });
 
+    suite("formal parameter", function () {
+      // passing cases are tested in other function test cases.
+      testParseFailure("({e: a.b}) => 0", "Illegal arrow function parameter list");
+      testParseFailure("function a({e: a.b}) {}", "Unexpected token {");
+      testParseFailure("function* a({e: a.b}) {}", "Unexpected token {");
+      testParseFailure("(function ({e: a.b}) {})", "Unexpected token {");
+      testParseFailure("(function* ({e: a.b}) {})", "Unexpected token {");
+      testParseFailure("({a({e: a.b}){}})", "Unexpected token {");
+      testParseFailure("({*a({e: a.b}){}})", "Unexpected token {");
+      testParseFailure("({set a({e: a.b}){}})", "Unexpected token {");
+    });
     suite("catch clause", function () {
       testParse("try {} catch ({e}) {}", stmt,
         new Shift.TryCatchStatement(
@@ -111,6 +122,7 @@ suite("Parser", function () {
         )
       );
 
+      testParseFailure("try {} catch ({e: x.a}) {}", "Unexpected token {");
     });
 
   });

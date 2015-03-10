@@ -132,6 +132,7 @@ export class Parser extends Tokenizer {
     this.allowLabeledFunction = true;
     this.module = false;
     this.strict = false;
+    this.allowBindingPattern = false;
   }
 
   eat(tokenType) {
@@ -1330,7 +1331,13 @@ export class Parser extends Tokenizer {
     if (this.match(TokenType.LPAREN)) {
       throw this.createUnexpected(this.lookahead);
     }
+
+    let previousAllowBindingPattern = this.allowBindingPattern;
+    this.allowBindingPattern = true;
+
     let id = this.parseLeftHandSideExpression({allowCall: false});
+
+    this.allowBindingPattern = previousAllowBindingPattern;
 
     if (!Parser.isDestructuringTarget(id, Parser.isValidSimpleBindingTarget)) {
       throw this.createUnexpected(token);
@@ -1412,6 +1419,75 @@ export class Parser extends Tokenizer {
     }
   }
 
+  // TODO: this is gross and we shouldn't actually do this
+  static containsBindingPropertyIdentifier(node) {
+    switch(node.type) {
+      case "BindingPropertyIdentifier":
+        return true;
+      case "ObjectExpression":
+      case "ObjectBinding":
+        return node.properties.some(Parser.containsBindingPropertyIdentifier);
+      case "ArrayExpression":
+      case "ArrayBinding":
+        return node.elements.some(e => e != null && Parser.containsBindingPropertyIdentifier(e));
+      case "BindingPropertyProperty":
+      case "BindingWithDefault":
+        return Parser.containsBindingPropertyIdentifier(node.binding);
+      case "BindingIdentifier":
+      case "ShorthandProperty":
+      case "Method":
+      case "Getter":
+      case "Setter":
+        return false;
+      case "SpreadElement":
+        return Parser.containsBindingPropertyIdentifier(node.expression);
+
+      case "ArrowExpression":
+      case "FunctionExpression":
+      case "IdentifierExpression":
+      case "LiteralBooleanExpression":
+      case "LiteralInfinityExpression":
+      case "LiteralNullExpression":
+      case "LiteralNumericExpression":
+      case "LiteralRegExpExpression":
+      case "LiteralStringExpression":
+      case "NewTargetExpression":
+      case "Super":
+      case "ThisExpression":
+        return false;
+      case "AssignmentExpression":
+        return Parser.containsBindingPropertyIdentifier(node.expression);
+      case "BinaryExpression":
+        return Parser.containsBindingPropertyIdentifier(node.left)
+          || Parser.containsBindingPropertyIdentifier(node.right);
+      case "CallExpression":
+      case "NewExpression":
+        return Parser.containsBindingPropertyIdentifier(node.callee)
+          || node.arguments.some(Parser.containsBindingPropertyIdentifier);
+      case "ClassExpression":
+        return node.super != null && Parser.containsBindingPropertyIdentifier(node.super);
+      case "ComputedMemberExpression":
+        return Parser.containsBindingPropertyIdentifier(node.object)
+          || Parser.containsBindingPropertyIdentifier(node.expression);
+      case "ConditionalExpression":
+        return Parser.containsBindingPropertyIdentifier(node.test)
+          || Parser.containsBindingPropertyIdentifier(node.consequent)
+          || Parser.containsBindingPropertyIdentifier(node.alternate);
+      case "PrefixExpression":
+      case "PostfixExpression":
+        return Parser.containsBindingPropertyIdentifier(node.operand);
+      case "StaticMemberExpression":
+        return Parser.containsBindingPropertyIdentifier(node.object);
+      case "TemplateExpression":
+        return node.elements.some(e => e.type !== "TemplateElement" && Parser.containsBindingPropertyIdentifier(e));
+      case "YieldExpression":
+        return node.expression != null && Parser.containsBindingPropertyIdentifier(node.expression);
+      case "YieldGeneratorExpression":
+      case "DataProperty":
+        return Parser.containsBindingPropertyIdentifier(node.expression);
+    }
+  }
+
   parseAssignmentExpression() {
     let token = this.lookahead;
     let startLocation = this.getLocation();
@@ -1420,7 +1496,12 @@ export class Parser extends Tokenizer {
       return this.parseYieldExpression();
     }
 
+    let previousAllowBindingPattern = this.allowBindingPattern;
+    this.allowBindingPattern = true;
+
     let node = this.parseConditionalExpression();
+
+    this.allowBindingPattern = previousAllowBindingPattern;
 
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
       return this.parseArrowExpressionTail(node, startLocation);
@@ -1464,7 +1545,7 @@ export class Parser extends Tokenizer {
         throw this.createErrorWithLocation(token, ErrorMessages.STRICT_LHS_ASSIGNMENT);
       }
     } else {
-      if (node.type === "ObjectExpression" && node.properties.some(p => p.type === "BindingPropertyIdentifier")) {
+      if (!this.allowBindingPattern && Parser.containsBindingPropertyIdentifier(node)) {
         throw this.createUnexpected(operator);
       }
       return node;

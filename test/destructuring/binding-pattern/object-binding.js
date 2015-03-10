@@ -34,6 +34,18 @@ suite("Parser", function () {
         ]))
       );
 
+      testParse("var [{a = 0}];", stmt,
+        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
+          new Shift.VariableDeclarator(
+            new Shift.ArrayBinding([
+              new Shift.ObjectBinding([
+                { type: "BindingPropertyIdentifier", binding: { type: "BindingIdentifier", name: "a" }, init: new Shift.LiteralNumericExpression(0) },
+              ]),
+            ], null)
+          , null),
+        ]))
+      );
+
       testParse("var {a, x: {y: a}};", stmt,
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
@@ -93,6 +105,7 @@ suite("Parser", function () {
       testParseFailure("({*a({e: a.b}){}})", "Unexpected token {");
       testParseFailure("({set a({e: a.b}){}})", "Unexpected token {");
     });
+
     suite("catch clause", function () {
       testParse("try {} catch ({e}) {}", stmt,
         new Shift.TryCatchStatement(

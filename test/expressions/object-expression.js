@@ -362,5 +362,18 @@ suite("Parser", function () {
         new Shift.FunctionBody([], [])
       )
     ]));
+
+    testParse("({ set a([{b = 0}]){}, })", expr, new Shift.ObjectExpression([
+      new Shift.Setter(
+        new Shift.StaticPropertyName("a"),
+        new Shift.ArrayBinding([
+          new Shift.ObjectBinding([
+          { type: "BindingPropertyIdentifier", binding: { type: "BindingIdentifier", name: "b" }, init: new Shift.LiteralNumericExpression(0) },
+          ]),
+        ], null),
+        new Shift.FunctionBody([], [])
+      )
+    ]));
+
   });
 });

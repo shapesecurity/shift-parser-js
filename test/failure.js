@@ -314,7 +314,9 @@ suite("Parser", function () {
     testParseFailure("function t() { ;  ;  ", "Unexpected end of input");
     testParseFailure("#=", "Unexpected token ILLEGAL");
     testParseFailure("**", "Unexpected token *");
-    testParseFailure("({a = 0})", "Unexpected token )");
+    testParseFailure("({a = 0});", "Unexpected token ;");
+    testParseFailure("[{a = 0}];", "Unexpected token ;");
+    testParseFailure("[+{a = 0}];", "Unexpected token ;");
     testParseFailure("1 / %", "Unexpected token %");
 
   });

@@ -119,7 +119,7 @@ suite("Parser", function () {
     testParseFailure("class A extends B { constructor() { !{get constructor() { super(); }}; } }", "Unexpected super call");
     testParseFailure("class A extends B { constructor() { !{set constructor(a) { super(); }}; } }", "Unexpected super call");
     // Always throw a Syntax Error if code matches this production.
-    testParseFailure("({ a = 0 });", "Unexpected token )");
+    testParseFailure("({ a = 0 });", "Unexpected token ;");
 
     // 12.2.7.1
     // It is a Syntax Error if BodyText of RegularExpressionLiteral cannot be recognized using the goal symbol Pattern of the ECMAScript RegExp grammar specified in 21.2.1.

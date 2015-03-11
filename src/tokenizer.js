@@ -1100,7 +1100,7 @@ export default class Tokenizer {
       throw this.createILLEGAL();
     }
 
-    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(offset), 2), true);
+    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(offset), 2), false);
   }
 
   scanOctalLiteral(start, startLocation) {

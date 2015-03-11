@@ -60,6 +60,7 @@ suite("Parser", function () {
     testParse("0b1", expr, new Shift.LiteralNumericExpression(1));
     testParse("0b10", expr, new Shift.LiteralNumericExpression(2));
     testParse("0B0", expr, new Shift.LiteralNumericExpression(0));
+    testParse("'use strict'; 0b0", expr, new Shift.LiteralNumericExpression(0));
 
     testParseFailure("0b", "Unexpected token ILLEGAL");
     testParseFailure("0b1a", "Unexpected token ILLEGAL");
@@ -80,6 +81,7 @@ suite("Parser", function () {
     testParse("0O0", expr, new Shift.LiteralNumericExpression(0));
     testParse("09", expr, new Shift.LiteralNumericExpression(9));
     testParse("018", expr, new Shift.LiteralNumericExpression(18));
+    testParse("'use strict'; 0o0", expr, new Shift.LiteralNumericExpression(0));
 
     testParseFailure("0o", "Unexpected token ILLEGAL");
     testParseFailure("0o1a", "Unexpected token ILLEGAL");

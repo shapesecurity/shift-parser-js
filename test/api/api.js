@@ -63,26 +63,30 @@ suite("API", function () {
         span(0, 1, 0, 1, 1, 1)));
   });
 
-
-  test("location sanity test", function () {
-    // TODO: everything.js once the ES6 version is ready
-    var source = require("fs").readFileSync(require.resolve("../../src/parser"), "utf-8");
+  function parseModule(name) {
+    var source = require("fs").readFileSync(require.resolve(name), "utf-8");
     var tree = ShiftParser.parseModule(source, {loc: true});
     locationSanityCheck(tree);
+  }
+
+  function parseScript(name) {
+    var source = require("fs").readFileSync(require.resolve(name), "utf-8");
+    var tree = ShiftParser.parseScript(source, {loc: true});
+    locationSanityCheck(tree);
+  }
+
+  test("location sanity test", function () {
+    parseModule("everything.js/es2015-module");
+    parseScript("everything.js/es2015-script");
   });
 
   test("self parsing", function () {
-    function parseFile(name) {
-      var source = require("fs").readFileSync(require.resolve("../../src/" + name), "utf-8");
-      var tree = ShiftParser.parseModule(source, {loc: true});
-      locationSanityCheck(tree);
-    }
-
-    parseFile("utils");
-    parseFile("errors");
-    parseFile("parser");
-    parseFile("tokenizer");
-    parseFile("index");
+    parseScript(__filename);
+    parseModule("../../src/utils");
+    parseModule("../../src/errors");
+    parseModule("../../src/parser");
+    parseModule("../../src/tokenizer");
+    parseModule("../../src/index");
   });
 
 });

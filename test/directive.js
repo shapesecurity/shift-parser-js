@@ -31,8 +31,6 @@ suite("Parser", function () {
     testParse("\"\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0\"", directives, [new Shift.Directive("\\n\\r\\t\\v\\b\\f\\\\\\'\\\"\\0")]);
     testParse("\"\\u0061\"", directives, [new Shift.Directive("\\u0061")]);
     testParse("\"\\x61\"", directives, [new Shift.Directive("\\x61")]);
-    testParse("\"\\u00\"", directives, [new Shift.Directive("\\u00")]);
-    testParse("\"\\xt\"", directives, [new Shift.Directive("\\xt")]);
     testParse("\"Hello\\nworld\"", directives, [new Shift.Directive("Hello\\nworld")]);
     testParse("\"Hello\\\nworld\"", directives, [new Shift.Directive("Hello\\\nworld")]);
     testParse("\"Hello\\02World\"", directives, [new Shift.Directive("Hello\\02World")]);
@@ -41,7 +39,6 @@ suite("Parser", function () {
     testParse("\"Hello\\0122World\"", directives, [new Shift.Directive("Hello\\0122World")]);
     testParse("\"Hello\\312World\"", directives, [new Shift.Directive("Hello\\312World")]);
     testParse("\"Hello\\412World\"", directives, [new Shift.Directive("Hello\\412World")]);
-    testParse("\"Hello\\812World\"", directives, [new Shift.Directive("Hello\\812World")]);
     testParse("\"Hello\\712World\"", directives, [new Shift.Directive("Hello\\712World")]);
     testParse("\"Hello\\0World\"", directives, [new Shift.Directive("Hello\\0World")]);
     testParse("\"Hello\\\r\nworld\"", directives, [new Shift.Directive("Hello\\\r\nworld")]);

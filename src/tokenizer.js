@@ -336,6 +336,9 @@ export default class Tokenizer {
 
   createErrorWithLocation(location, message, arg) {
     let msg = message.replace(/{(\d+)}/g, () => arg);
+    if (location instanceof Token) {
+      location = location.slice.startLocation;
+    }
     return new JsError(location.offset, location.line, location.column + 1, msg);
   }
 
@@ -352,18 +355,15 @@ export default class Tokenizer {
   }
 
   static cse5(id, ch1, ch2, ch3, ch4, ch5) {
-    return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5)
-        === ch5;
+    return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5) === ch5;
   }
 
   static cse6(id, ch1, ch2, ch3, ch4, ch5, ch6) {
-    return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5)
-        === ch5 && id.charAt(6) === ch6;
+    return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5) === ch5 && id.charAt(6) === ch6;
   }
 
   static cse7(id, ch1, ch2, ch3, ch4, ch5, ch6, ch7) {
-    return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5)
-        === ch5 && id.charAt(6) === ch6 && id.charAt(7) === ch7;
+    return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5) === ch5 && id.charAt(6) === ch6 && id.charAt(7) === ch7;
   }
 
   static getKeyword(id, strict) {

@@ -33,16 +33,19 @@ suite("Parser", function () {
     testParse("('\\\u2029')", expr, new Shift.LiteralStringExpression(""));
     testParse("('\u202a')", expr, new Shift.LiteralStringExpression("\u202a"));
     testParse("('\\0')", expr, new Shift.LiteralStringExpression("\u0000"));
+    testParse("'use strict'; ('\\0')", expr, new Shift.LiteralStringExpression("\u0000"));
+    testParse("'use strict'; ('\\0x')", expr, new Shift.LiteralStringExpression("\u0000x"));
     testParse("('\\01')", expr, new Shift.LiteralStringExpression("\u0001"));
     testParse("('\\1')", expr, new Shift.LiteralStringExpression("\u0001"));
     testParse("('\\11')", expr, new Shift.LiteralStringExpression("\u0009"));
     testParse("('\\111')", expr, new Shift.LiteralStringExpression("\u0049"));
-    testParse("('\\1111')", expr, new Shift.LiteralStringExpression("\u00491")); // 73/16
-    testParse("('\\2111')", expr, new Shift.LiteralStringExpression("\u00891")); // 73/16
-    testParse("('\\5111')", expr, new Shift.LiteralStringExpression("\u002911")); // 73/16
-    testParse("('\\5a')", expr, new Shift.LiteralStringExpression("\u0005a")); // 73/16
-    testParse("('\\7a')", expr, new Shift.LiteralStringExpression("\u0007a")); // 73/16
-    testParse("('\\9a')", expr, new Shift.LiteralStringExpression("9a")); // 73/16
+    testParse("('\\1111')", expr, new Shift.LiteralStringExpression("\u00491"));
+    testParse("('\\2111')", expr, new Shift.LiteralStringExpression("\u00891"));
+    testParse("('\\5111')", expr, new Shift.LiteralStringExpression("\u002911"));
+    testParse("('\\5a')", expr, new Shift.LiteralStringExpression("\u0005a"));
+    testParse("('\\7a')", expr, new Shift.LiteralStringExpression("\u0007a"));
+    testParse("('\\a')", expr, new Shift.LiteralStringExpression("a"));
+    testParse("('\\`')", expr, new Shift.LiteralStringExpression("`"));
     testParse("('\\u{00F8}')", expr, new Shift.LiteralStringExpression("\u00F8"));
     testParse("('\\u{0}')", expr, new Shift.LiteralStringExpression("\u0000"));
     testParse("('\\u{10FFFF}')", expr, new Shift.LiteralStringExpression(String.fromCharCode(0x10FFFF)));
@@ -50,10 +53,17 @@ suite("Parser", function () {
 
     testParseFailure("(')", "Unexpected token ILLEGAL");
     testParseFailure("('\n')", "Unexpected token ILLEGAL");
+    testParseFailure("('\\x')", "Unexpected token ILLEGAL");
+    testParseFailure("('\\u')", "Unexpected token ILLEGAL");
+    testParseFailure("('\\8')", "Unexpected token ILLEGAL");
+    testParseFailure("('\\9')", "Unexpected token ILLEGAL");
+    testParseFailure("('\\x0')", "Unexpected token ILLEGAL");
     testParseFailure("('\u2028')", "Unexpected token ILLEGAL");
     testParseFailure("('\u2029')", "Unexpected token ILLEGAL");
     testParseFailure("('\\u{2028')", "Unexpected token ILLEGAL");
     testParseFailure("'use strict'; ('\\1')", "Octal literals are not allowed in strict mode.");
+    testParseFailure("'use strict'; ('\\01')", "Octal literals are not allowed in strict mode.");
+    testParseFailure("'use strict'; ('\\000')", "Octal literals are not allowed in strict mode.");
 
   });
 });

@@ -1271,13 +1271,10 @@ export default class Tokenizer {
             throw this.createILLEGAL();
           }
           unescaped = ch === "u" ? this.scanUnicode() : this.scanHexEscape2();
-          if (unescaped >= 0) {
-            str += String.fromCharCode(unescaped);
-          } else {
-            this.index = restore;
-            str += ch;
-            this.index++;
+          if (unescaped < 0) {
+            throw this.createILLEGAL();
           }
+          str += String.fromCharCode(unescaped);
           break;
         case "b":
           str += "\b";
@@ -1293,7 +1290,6 @@ export default class Tokenizer {
           break;
         default:
           if ("0" <= ch && ch <= "7") {
-            octal = true;
             let octLen = 1;
             // 3 digits are only allowed when string starts
             // with 0, 1, 2, 3
@@ -1302,6 +1298,9 @@ export default class Tokenizer {
             }
             let code = 0;
             while (octLen < 3 && "0" <= ch && ch <= "7") {
+              if (octLen > 0 || ch !== "0") {
+                octal = true;
+              }
               code *= 8;
               octLen++;
               code += ch - "0";
@@ -1312,6 +1311,8 @@ export default class Tokenizer {
               ch = this.source.charAt(this.index);
             }
             str += String.fromCharCode(code);
+          } else if (ch === "8" || ch === "9") {
+            throw this.createILLEGAL();
           } else {
             str += ch;
             this.index++;

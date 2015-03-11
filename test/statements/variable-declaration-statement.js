@@ -108,6 +108,38 @@ suite("Parser", function () {
       ]))
     );
 
+    // exotic unicode characters
+    testParse("let x, x\\u{E01D5}", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5"}, null),
+      ]))
+    );
+    testParse("let x, x\\uDB40\\uDDD5;", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
+      ]))
+    );
+    testParse("let x, x\uDB40\uDDD5;", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
+      ]))
+    );
+    testParse("let xǕ, x\\u{E01D5}", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "xǕ" }, null),
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
+      ]))
+    );
+    testParse("let x\u01D5, x\\u{E01D5}", stmt,
+      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "xǕ" }, null),
+        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
+      ]))
+    );
+
     // Const Statement
     testParseFailure("const x", "Unexpected end of input");
     testParseFailure("{ const x }", "Unexpected token }");

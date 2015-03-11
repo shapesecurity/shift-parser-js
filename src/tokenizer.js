@@ -15,7 +15,7 @@
  */
 
 
-import {getHexValue, isLineTerminator, isWhitespace, isIdentifierStart, isIdentifierPart, isDecimalDigit} from "./utils";
+import {getHexValue, isLineTerminator, isWhiteSpace, isIdentifierStart, isIdentifierPart, isDecimalDigit} from "./utils";
 import {ErrorMessages} from "./errors";
 import * as Shift from "shift-ast";
 
@@ -244,6 +244,17 @@ export class JsError extends Error {
     this.description = msg;
     this.message = `[${line}:${column}]: ${msg}`;
   }
+}
+
+function fromCodePoint(cp) {
+  if (cp <= 0xFFFF) return String.fromCharCode(cp);
+  let cu1 = String.fromCharCode(Math.floor((cp - 0x10000) / 0x400) + 0xD800);
+  let cu2 = String.fromCharCode(((cp - 0x10000) % 0x400) + 0xDC00);
+  return cu1 + cu2;
+}
+
+function decodeUtf16(lead, trail) {
+  return (lead - 0xD800) * 0x400 + (trail - 0xDC00) + 0x10000;
 }
 
 export default class Tokenizer {
@@ -714,7 +725,7 @@ export default class Tokenizer {
 
     while (this.index < length) {
       let chCode = this.source.charCodeAt(this.index);
-      if (isWhitespace(chCode)) {
+      if (isWhiteSpace(chCode)) {
         this.index++;
       } else if (isLineTerminator(chCode)) {
         this.hasLineTerminatorBeforeNext = true;
@@ -826,78 +837,105 @@ export default class Tokenizer {
   }
 
   getEscapedIdentifier() {
-    let ch = this.source.charAt(this.index);
-    this.index++;
-    if (this.index >= this.source.length) {
-      throw this.createILLEGAL();
-    }
-
     let id = "";
-
-    if (ch === "\\") {
-      if (this.source.charAt(this.index) !== "u") {
-        throw this.createILLEGAL();
-      }
-      this.index++;
-      if (this.index >= this.source.length) {
-        throw this.createILLEGAL();
-      }
-      let ich = this.scanUnicode();
-      if (ich < 0 || ich === 0x5C /* "\\" */ || !isIdentifierStart(ich)) {
-        throw this.createILLEGAL();
-      }
-      ch = String.fromCharCode(ich);
-    }
-    id += ch;
+    let check = isIdentifierStart;
 
     while (this.index < this.source.length) {
-      ch = this.source.charAt(this.index);
-      if (!isIdentifierPart(ch.charCodeAt(0)) && ch !== "\\") {
-        break;
-      }
-      this.index++;
+      let ch = this.source.charAt(this.index);
+      let code = ch.charCodeAt(0);
+      let start = this.index;
       if (ch === "\\") {
+        ++this.index;
         if (this.index >= this.source.length) {
           throw this.createILLEGAL();
         }
         if (this.source.charAt(this.index) !== "u") {
           throw this.createILLEGAL();
         }
-        this.index++;
+        ++this.index;
         if (this.index >= this.source.length) {
           throw this.createILLEGAL();
         }
-        let ich = this.scanUnicode();
-        if (ich < 0 || ich === 0x5C /* "\\" */ || !isIdentifierPart(ich)) {
+        code = this.scanUnicode();
+        if (code < 0) {
           throw this.createILLEGAL();
         }
-        ch = String.fromCharCode(ich);
+        if (0xD800 <= code && code <= 0xDBFF) {
+          if (this.source.charAt(this.index) !== "\\") {
+            throw this.createILLEGAL();
+          }
+          ++this.index;
+          if (this.index >= this.source.length) {
+            throw this.createILLEGAL();
+          }
+          if (this.source.charAt(this.index) !== "u") {
+            throw this.createILLEGAL();
+          }
+          ++this.index;
+          if (this.index >= this.source.length) {
+            throw this.createILLEGAL();
+          }
+          let lowSurrogateCode = this.scanUnicode();
+          if (!(0xDC00 <= lowSurrogateCode && lowSurrogateCode <= 0xDFFF)) {
+            throw this.createILLEGAL();
+          }
+          code = decodeUtf16(code, lowSurrogateCode);
+        }
+        ch = fromCodePoint(code);
+      } else if (0xD800 <= code && code <= 0xDBFF) {
+        ++this.index;
+        if (this.index >= this.source.length) {
+          throw this.createILLEGAL();
+        }
+        let highSurrogate = this.source.charAt(this.index);
+        let lowSurrogateCode = highSurrogate.charCodeAt(0);
+        if (!(0xDC00 <= lowSurrogateCode && lowSurrogateCode <= 0xDFFF)) {
+          throw this.createILLEGAL();
+        }
+        code = decodeUtf16(code, lowSurrogateCode);
+        ch = fromCodePoint(code);
+        ++this.index;
+      } else {
+        ++this.index;
       }
+      if (code === 0x5C /* "\\" */ || !check(code)) {
+        if (id.length < 1) {
+          throw this.createILLEGAL();
+        }
+        this.index = start;
+        return id;
+      }
+      check = isIdentifierPart;
       id += ch;
     }
-
     return id;
   }
 
   getIdentifier() {
     let start = this.index;
-    this.index++;
     let l = this.source.length;
     let i = this.index;
+    let check = isIdentifierStart;
     while (i < l) {
       let ch = this.source.charAt(i);
-      if (ch === "\\") {
+      let code = ch.charCodeAt(0);
+      if (ch === "\\" || 0xD800 <= code && code <= 0xDBFF) {
         // Go back and try the hard one.
         this.index = start;
         return this.getEscapedIdentifier();
-      } else if (isIdentifierPart(ch.charCodeAt(0))) {
-        i++;
-      } else {
-        break;
       }
+      if (!check(code)) {
+        this.index = i;
+        return this.source.slice(start, i);
+      }
+      ++i;
+      check = isIdentifierPart;
     }
     this.index = i;
-    return this.source.slice(start, this.index);
+    if (i - start < 1) {
+      throw this.createILLEGAL();
+    }
+    return this.source.slice(start, i);
   }
 
   scanIdentifier() {
@@ -1096,7 +1134,7 @@ export default class Tokenizer {
     }
 
     if (this.index < this.source.length && (isIdentifierStart(this.source.charCodeAt(this.index))
-        || isDecimalDigit(this.source.charAt(this.index)))) {
+        || isDecimalDigit(this.source.charCodeAt(this.index)))) {
       throw this.createILLEGAL();
     }
 
@@ -1274,7 +1312,7 @@ export default class Tokenizer {
           if (unescaped < 0) {
             throw this.createILLEGAL();
           }
-          str += String.fromCharCode(unescaped);
+          str += fromCodePoint(unescaped);
           break;
         case "b":
           str += "\b";
@@ -1478,7 +1516,7 @@ export default class Tokenizer {
       // Dot (.) U+002E can also start a floating-polet number, hence the need
       // to check the next character.
       if (charCode === 0x2E) {
-        if (this.index + 1 < this.source.length && isDecimalDigit(this.source.charAt(this.index + 1))) {
+        if (this.index + 1 < this.source.length && isDecimalDigit(this.source.charCodeAt(this.index + 1))) {
           return this.scanNumericLiteral();
         }
         return this.scanPunctuator();

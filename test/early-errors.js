@@ -203,16 +203,19 @@ suite("Parser", function () {
     testParseFailure("let a, let;", "Invalid lexical binding name 'let'");
     testParseFailure("let a, let = 0;", "Invalid lexical binding name 'let'");
     // It is a Syntax Error if the BoundNames of BindingList contains any duplicate entries.
-
     testParseFailure("let a, a;", "Duplicate binding 'a'");
     testParseFailure("let a, b, a;", "Duplicate binding 'a'");
     testParseFailure("let a = 0, a = 1;", "Duplicate binding 'a'");
     testParseFailure("const a = 0, a = 1;", "Duplicate binding 'a'");
     testParseFailure("const a = 0, b = 1, a = 2;", "Duplicate binding 'a'");
-
     testParseFailure("let a, [a];", "Duplicate binding 'a'");
     testParseFailure("let [a, a];", "Duplicate binding 'a'");
     testParseFailure("let [a, ...a];", "Duplicate binding 'a'");
+    testParseFailure("let \\u{61}, \\u{0061};", "Duplicate binding 'a'");
+    testParseFailure("let \\u0061, \\u{0061};", "Duplicate binding 'a'");
+    testParseFailure("let x\\u{61}, x\\u{0061};", "Duplicate binding 'xa'");
+    testParseFailure("let x\\u{E01D5}, x\uDB40\uDDD5;", "Duplicate binding 'x\uDB40\uDDD5'");
+    testParseFailure("let x\\u{E01D5}, x\\uDB40\\uDDD5;", "Duplicate binding 'x\uDB40\uDDD5'");
 
     // It is a Syntax Error if Initializer is not present and IsConstantDeclaration of the LexicalDeclaration containing this production is true.
     testParseFailure("const a;", "Unexpected token ;");

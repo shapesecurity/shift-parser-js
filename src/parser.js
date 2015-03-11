@@ -16,7 +16,7 @@
 
 import * as Shift from "shift-ast";
 
-import {isRestrictedWord, isStrictModeReservedWordES5} from "./utils";
+import {isRestrictedWord, isStrictModeReservedWord} from "./utils";
 
 import {ErrorMessages} from "./errors";
 
@@ -2510,7 +2510,7 @@ export class Parser extends Tokenizer {
         if (isRestrictedWord(id)) {
           firstRestricted = token;
           message = ErrorMessages.STRICT_FUNCTION_NAME;
-        } else if (isStrictModeReservedWordES5(id)) {
+        } else if (isStrictModeReservedWord(id)) {
           firstRestricted = token;
           message = ErrorMessages.STRICT_RESERVED_WORD;
         }

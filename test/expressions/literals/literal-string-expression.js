@@ -48,7 +48,7 @@ suite("Parser", function () {
     testParse("('\\`')", expr, new Shift.LiteralStringExpression("`"));
     testParse("('\\u{00F8}')", expr, new Shift.LiteralStringExpression("\u00F8"));
     testParse("('\\u{0}')", expr, new Shift.LiteralStringExpression("\u0000"));
-    testParse("('\\u{10FFFF}')", expr, new Shift.LiteralStringExpression(String.fromCharCode(0x10FFFF)));
+    testParse("('\\u{10FFFF}')", expr, new Shift.LiteralStringExpression("\uDBFF\uDFFF"));
     testParse("('\\u{0000000000F8}')", expr, new Shift.LiteralStringExpression("\u00F8"));
 
     testParseFailure("(')", "Unexpected token ILLEGAL");

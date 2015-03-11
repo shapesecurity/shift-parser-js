@@ -2388,7 +2388,7 @@ export class Parser extends Tokenizer {
               throw this.createErrorWithLocation(methodToken, "Static class methods cannot be named 'prototype'");
             }
           }
-          methods.push(new Shift.ClassElement(isStatic, methodOrKey));
+          methods.push(copyLocation(methodOrKey, new Shift.ClassElement(isStatic, methodOrKey)));
           break;
         default:
           throw this.createError("Only methods are allowed in classes");
@@ -2490,6 +2490,7 @@ export class Parser extends Tokenizer {
   }
 
   parseParam() {
+    let startLocation = this.getLocation();
     let token = this.lookahead;
     let originalInParameter = this.inParameter;
     this.inParameter = true;
@@ -2504,7 +2505,7 @@ export class Parser extends Tokenizer {
         this.allowYieldExpression = false;
       }
       this.inGeneratorParameter = false;
-      param = this.markLocation(new Shift.AssignmentExpression("=", param, this.parseAssignmentExpression()));
+      param = this.markLocation(new Shift.AssignmentExpression("=", param, this.parseAssignmentExpression()), startLocation);
       this.inGeneratorParameter = previousInGeneratorParameter;
       this.allowYieldExpression = previousYieldExpression;
     }

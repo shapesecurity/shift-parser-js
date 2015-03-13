@@ -1430,10 +1430,6 @@ export class Parser extends Tokenizer {
       case "ArrayExpression":
       case "ArrayBinding":
         return node.elements.some(e => e != null && Parser.containsBindingPropertyIdentifier(e));
-      case "BindingPropertyProperty":
-      case "BindingWithDefault":
-        return Parser.containsBindingPropertyIdentifier(node.binding);
-      case "BindingIdentifier":
       case "ShorthandProperty":
       case "Method":
       case "Getter":

@@ -151,12 +151,6 @@ const PUNCTUATOR_START = [
   F, F, F, F, F, F, F, F, F, F, F, F, F, T, F, T, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
   F, F, F, F, F, F, T, T, T, T, F];
 
-const IDENTIFIER_START = [
-  F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, T, F, F,
-  F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, T, T, T, T, T, T, T, T, T, T, T, T, T,
-  T, T, T, T, T, T, T, T, T, T, T, T, T, F, T, F, F, T, F, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T,
-  T, T, T, T, T, T, F, F, F, F, F];
-
 export class Token {
   constructor(type, slice, octal) {
     this.type = type;
@@ -844,8 +838,8 @@ export default class Tokenizer {
       let ch = this.source.charAt(this.index);
       let code = ch.charCodeAt(0);
       let start = this.index;
+      ++this.index;
       if (ch === "\\") {
-        ++this.index;
         if (this.index >= this.source.length) {
           throw this.createILLEGAL();
         }
@@ -853,9 +847,6 @@ export default class Tokenizer {
           throw this.createILLEGAL();
         }
         ++this.index;
-        if (this.index >= this.source.length) {
-          throw this.createILLEGAL();
-        }
         code = this.scanUnicode();
         if (code < 0) {
           throw this.createILLEGAL();
@@ -872,9 +863,6 @@ export default class Tokenizer {
             throw this.createILLEGAL();
           }
           ++this.index;
-          if (this.index >= this.source.length) {
-            throw this.createILLEGAL();
-          }
           let lowSurrogateCode = this.scanUnicode();
           if (!(0xDC00 <= lowSurrogateCode && lowSurrogateCode <= 0xDFFF)) {
             throw this.createILLEGAL();
@@ -883,22 +871,18 @@ export default class Tokenizer {
         }
         ch = fromCodePoint(code);
       } else if (0xD800 <= code && code <= 0xDBFF) {
-        ++this.index;
         if (this.index >= this.source.length) {
           throw this.createILLEGAL();
         }
-        let highSurrogate = this.source.charAt(this.index);
-        let lowSurrogateCode = highSurrogate.charCodeAt(0);
+        let lowSurrogateCode = this.source.charCodeAt(this.index);
+        ++this.index;
         if (!(0xDC00 <= lowSurrogateCode && lowSurrogateCode <= 0xDFFF)) {
           throw this.createILLEGAL();
         }
         code = decodeUtf16(code, lowSurrogateCode);
         ch = fromCodePoint(code);
-        ++this.index;
-      } else {
-        ++this.index;
       }
-      if (code === 0x5C /* "\\" */ || !check(code)) {
+      if (!check(code)) {
         if (id.length < 1) {
           throw this.createILLEGAL();
         }
@@ -932,9 +916,6 @@ export default class Tokenizer {
       check = isIdentifierPart;
     }
     this.index = i;
-    if (i - start < 1) {
-      throw this.createILLEGAL();
-    }
     return this.source.slice(start, i);
   }
 
@@ -1509,7 +1490,7 @@ export default class Tokenizer {
         return this.scanPunctuator();
       }
 
-      if (IDENTIFIER_START[charCode]) {
+      if (isIdentifierStart(charCode) || charCode === 0x5C /* backslash (\) */) {
         return this.scanIdentifier();
       }
 
@@ -1539,7 +1520,7 @@ export default class Tokenizer {
       // Slash (/) U+002F can also start a regex.
       throw this.createILLEGAL();
     } else {
-      if (isIdentifierStart(charCode)) {
+      if (isIdentifierStart(charCode) || 0xD800 <= charCode && charCode <= 0xDBFF) {
         return this.scanIdentifier();
       }
 

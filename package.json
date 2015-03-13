@@ -21,11 +21,13 @@
     "cjsify": "cjsify --export ShiftParser dist/index.js > shift-parser.js"
   },
   "dependencies": {
+    "esutils": "^2.0.0",
     "shift-ast": "git://github.com/shapesecurity/shift-ast-js.git#53ad28ca8b3c2023ecdd575d0ba4bc4c0b9ea624"
   },
   "devDependencies": {
     "babel": "4.3.0",
     "commonjs-everywhere": "0.9.7",
+    "everything.js": "^1.0.0",
     "expect.js": "0.3.1",
     "istanbul": "0.3.5",
     "mocha": "2.0.1"

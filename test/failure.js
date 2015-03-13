@@ -44,6 +44,16 @@ suite("Parser", function () {
     testParseFailure("a\\u1", "Unexpected token ILLEGAL");
     testParseFailure("a\\u12", "Unexpected token ILLEGAL");
     testParseFailure("a\\u113", "Unexpected token ILLEGAL");
+    testParseFailure("\\uD800", "Unexpected token ILLEGAL");
+    testParseFailure("\\uD800x", "Unexpected token ILLEGAL");
+    testParseFailure("\\uD800\\", "Unexpected token ILLEGAL");
+    testParseFailure("\\uD800\\u", "Unexpected token ILLEGAL");
+    testParseFailure("\\uD800\\x62", "Unexpected token ILLEGAL");
+    testParseFailure("\uD800", "Unexpected token ILLEGAL");
+    testParseFailure("\uD800x", "Unexpected token ILLEGAL");
+    testParseFailure("\uD800\\", "Unexpected token ILLEGAL");
+    testParseFailure("\uD800\\u", "Unexpected token ILLEGAL");
+    testParseFailure("\uD800\\x62", "Unexpected token ILLEGAL");
     testParseFailure("'\\03", "Unexpected token ILLEGAL");
     testParseFailure("'\\x", "Unexpected token ILLEGAL");
     testParseFailure("'\\x1", "Unexpected token ILLEGAL");
@@ -314,7 +324,13 @@ suite("Parser", function () {
     testParseFailure("function t() { ;  ;  ", "Unexpected end of input");
     testParseFailure("#=", "Unexpected token ILLEGAL");
     testParseFailure("**", "Unexpected token *");
-    testParseFailure("({a = 0})", "Unexpected token )");
+    testParseFailure("({a = 0});", "Unexpected token ;");
+    testParseFailure("({a: 0, b = 0});", "Unexpected token ;");
+    testParseFailure("({a: b = 0, c = 0});", "Unexpected token ;");
+    testParseFailure("[{a = 0}];", "Unexpected token ;");
+    testParseFailure("[+{a = 0}];", "Unexpected token ;");
+    testParseFailure("function* f() { [yield {a = 0}]; }", "Unexpected token ;");
+    testParseFailure("function* f() { [yield* {a = 0}]; }", "Unexpected token ;");
     testParseFailure("1 / %", "Unexpected token %");
 
   });

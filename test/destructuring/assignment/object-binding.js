@@ -265,7 +265,7 @@ suite("Parser", function () {
         )
       );
 
-      testParseFailure("({a = 0})", "Unexpected token )");
+      testParseFailure("({a = 0});", "Unexpected token ;");
       testParseFailure("({a,,} = 0)", "Unexpected token ,");
       testParseFailure("({,a,} = 0)", "Unexpected token ,");
       testParseFailure("({a,,a} = 0)", "Unexpected token ,");

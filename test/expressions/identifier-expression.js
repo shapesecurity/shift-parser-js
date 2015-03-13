@@ -109,6 +109,14 @@ suite("Parser", function () {
       { type: "IdentifierExpression", name: "日本語" }
     );
 
+    testParse("\uD800\uDC00", expr,
+      { type: "IdentifierExpression", name: "\uD800\uDC00" }
+    );
+
+    testParse("\\uD800\\uDC00", expr,
+      { type: "IdentifierExpression", name: "\uD800\uDC00" }
+    );
+
     testParse("T\u203F", expr,
       { type: "IdentifierExpression", name: "T\u203F" }
     );

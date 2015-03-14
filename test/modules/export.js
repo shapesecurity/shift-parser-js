@@ -135,22 +135,26 @@ suite("Parser", function () {
     testExportDecl(
       "export function A(){} /* no semi */ false",
       new Shift.Export(
-        new Shift.FunctionDeclaration(
-          false,
-          { type: "BindingIdentifier", name: "A" },
-          [],
-          null,
-          new Shift.FunctionBody([], []))));
+        { type: "FunctionDeclaration",
+          isGenerator: false,
+          name: { type: "BindingIdentifier", name: "A" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: new Shift.FunctionBody([], [])
+        }
+      )
+    );
 
     testExportDecl(
       "export default function (){} /* no semi */ false",
       new Shift.ExportDefault(
-        new Shift.FunctionDeclaration(
-          false,
-          { type: "BindingIdentifier", name: "*default*" },
-          [],
-          null,
-          new Shift.FunctionBody([], []))));
+        { type: "FunctionDeclaration",
+          isGenerator: false,
+          name: { type: "BindingIdentifier", name: "*default*" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: new Shift.FunctionBody([], [])
+        }
+      )
+    );
 
     testExportDecl(
       "export default class {} /* no semi */ false",
@@ -174,24 +178,29 @@ suite("Parser", function () {
       ));
 
     testExportDecl("export default function a(){}", new Shift.ExportDefault(
-      new Shift.FunctionDeclaration(
-        false,
-        { type: "BindingIdentifier", name: "a" },
-        [],
-        null,
-        new Shift.FunctionBody([], []))));
+      { type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      }
+    ));
+
     testExportDecl("export default class a{}", new Shift.ExportDefault(
       new Shift.ClassDeclaration(
         { type: "BindingIdentifier", name: "a" },
         null,
         []
       )));
-    testExportDecl("export default function* a(){}", new Shift.ExportDefault(new Shift.FunctionDeclaration(
-      true,
-      { type: "BindingIdentifier", name: "a" },
-      [],
-      null,
-      new Shift.FunctionBody([], []))));
+
+    testExportDecl("export default function* a(){}", new Shift.ExportDefault(
+      { type: "FunctionDeclaration",
+        isGenerator: true,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      }
+    ));
 
     testParseFailure("export * from \"a\"", "Unexpected token export");
     testParseModuleFailure("{export default 3}", "Unexpected token export");

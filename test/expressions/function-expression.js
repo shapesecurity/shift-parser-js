@@ -25,138 +25,202 @@ suite("Parser", function () {
   suite("function expression", function () {
 
     testParse("(function(){})", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function x() { y; z() });", expr,
-      new Shift.FunctionExpression(false, { type: "BindingIdentifier", name: "x" }, [], null, new Shift.FunctionBody([], [
-        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "y" }),
-        new Shift.ExpressionStatement(new Shift.CallExpression({ type: "IdentifierExpression", name: "z" }, [])),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "x" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [
+          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "y" }),
+          new Shift.ExpressionStatement(new Shift.CallExpression({ type: "IdentifierExpression", name: "z" }, [])),
+        ])
+      }
     );
 
     testParse("(function eval() { });", expr,
-      new Shift.FunctionExpression(false, { type: "BindingIdentifier", name: "eval" }, [], null, new Shift.FunctionBody([], []))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "eval" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function arguments() { });", expr,
-      new Shift.FunctionExpression(false, { type: "BindingIdentifier", name: "arguments" }, [], null, new Shift.FunctionBody([], []))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "arguments" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function x(y, z) { })", expr,
-      new Shift.FunctionExpression(
-        false,
-        { type: "BindingIdentifier", name: "x" },
-        [
-          { type: "BindingIdentifier", name: "y" },
-          { type: "BindingIdentifier", name: "z" }
-        ],
-        null,
-        new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "x" },
+        params:
+          { type: "FormalParameters",
+            items:
+              [
+                { type: "BindingIdentifier", name: "y" },
+                { type: "BindingIdentifier", name: "z" }
+              ],
+            rest: null
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function(a = b){})", expr,
-      new Shift.FunctionExpression(
-        false,
-        null,
-        [
-          new Shift.BindingWithDefault(
-            { type: "BindingIdentifier", name: "a" },
-            { type: "IdentifierExpression", name: "b" }
-          )
-        ],
-        null, new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params:
+          { type: "FormalParameters",
+            items:
+              [
+                new Shift.BindingWithDefault(
+                  { type: "BindingIdentifier", name: "a" },
+                  { type: "IdentifierExpression", name: "b" }
+                )
+              ],
+            rest: null,
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function(...a){})", expr,
-      new Shift.FunctionExpression(
-        false, null, [], { type: "BindingIdentifier", name: "a" }, new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params:
+          { type: "FormalParameters",
+            items: [],
+            rest: { type: "BindingIdentifier", name: "a" }
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function(a, ...b){})", expr,
-      new Shift.FunctionExpression(
-        false, null, [{ type: "BindingIdentifier", name: "a" }], { type: "BindingIdentifier", name: "b" }, new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params:
+          { type: "FormalParameters",
+            items: [{ type: "BindingIdentifier", name: "a" }],
+            rest: { type: "BindingIdentifier", name: "b" }
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function({a}){})", expr,
-      new Shift.FunctionExpression(
-        false,
-        null,
-        [
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "a" },
-              init: null }
-          ])
-        ],
-        null,
-        new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params:
+          { type: "FormalParameters",
+            items:
+              [
+                new Shift.ObjectBinding([
+                  { type: "BindingPropertyIdentifier",
+                    binding: { type: "BindingIdentifier", name: "a" },
+                    init: null }
+                ])
+              ],
+            rest: null,
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function({a: x, a: y}){})", expr,
-      new Shift.FunctionExpression(
-        false,
-        null,
-        [
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("a"),
-              { type: "BindingIdentifier", name: "x" }
-            ),
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("a"),
-              { type: "BindingIdentifier", name: "y" }
-            )
-          ])
-        ],
-        null,
-        new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params:
+          { type: "FormalParameters",
+            items:
+              [
+                new Shift.ObjectBinding([
+                  new Shift.BindingPropertyProperty(
+                    new Shift.StaticPropertyName("a"),
+                    { type: "BindingIdentifier", name: "x" }
+                  ),
+                  new Shift.BindingPropertyProperty(
+                    new Shift.StaticPropertyName("a"),
+                    { type: "BindingIdentifier", name: "y" }
+                  )
+                ])
+              ],
+            rest: null
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function([a]){})", expr,
-      new Shift.FunctionExpression(
-        false,
-        null,
-        [
-          new Shift.ArrayBinding(
-            [{ type: "BindingIdentifier", name: "a" }],
-            null
-          )
-        ],
-        null,
-        new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params:
+          { type: "FormalParameters",
+            items:
+              [
+                new Shift.ArrayBinding(
+                  [{ type: "BindingIdentifier", name: "a" }],
+                  null
+                )
+              ],
+            rest: null
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("(function({a = 0}){})", expr,
-      new Shift.FunctionExpression(
-        false,
-        null,
-        [
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "a" },
-              init: new Shift.LiteralNumericExpression(0) }
-          ])
-        ],
-        null,
-        new Shift.FunctionBody([], [])
-      )
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params:
+          { type: "FormalParameters",
+            items:
+              [
+                new Shift.ObjectBinding([
+                  { type: "BindingPropertyIdentifier",
+                    binding: { type: "BindingIdentifier", name: "a" },
+                    init: new Shift.LiteralNumericExpression(0) }
+                ])
+              ],
+            rest: null
+          },
+        body: new Shift.FunctionBody([], [])
+      }
     );
 
     testParse("label: !function(){ label:; };", stmt,
       new Shift.LabeledStatement(
         "label",
         new Shift.ExpressionStatement(new Shift.PrefixExpression("!",
-          new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-            new Shift.LabeledStatement("label", new Shift.EmptyStatement),
-          ]))
+          { type: "FunctionExpression",
+            isGenerator: false,
+            name: null,
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: new Shift.FunctionBody([], [
+              new Shift.LabeledStatement("label", new Shift.EmptyStatement),
+            ])
+          }
         ))
       )
     );

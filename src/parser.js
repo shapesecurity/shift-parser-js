@@ -1406,16 +1406,18 @@ export class Parser extends Tokenizer {
       }
     }
 
+    let paramsNode = this.markLocation({ type: "FormalParameters", items: params, rest }, startLocation);
+
     if (this.match(TokenType.LBRACE)) {
       let previousYield = this.allowYieldExpression;
       this.allowYieldExpression = false;
       let boundParams = [].concat.apply([], params.map(Parser.boundNames));
       let [body] = this.parseFunctionBody(boundParams);
       this.allowYieldExpression = previousYield;
-      return this.markLocation(new Shift.ArrowExpression(params, rest, body), startLocation);
+      return this.markLocation({ type: "ArrowExpression", params: paramsNode, body }, startLocation);
     } else {
       let body = this.parseAssignmentExpression();
-      return this.markLocation(new Shift.ArrowExpression(params, rest, body), startLocation);
+      return this.markLocation({ type: "ArrowExpression", params: paramsNode, body }, startLocation);
     }
   }
 
@@ -2351,7 +2353,7 @@ export class Parser extends Tokenizer {
             }
           }
           return {
-            methodOrKey: this.markLocation(new Shift.Setter(key, param, body), startLocation),
+            methodOrKey: this.markLocation({ type: "Setter", name: key, param, body }, startLocation),
             kind: "method"
           };
         }
@@ -2363,6 +2365,7 @@ export class Parser extends Tokenizer {
       let previousInGeneratorParameter = this.inGeneratorParameter;
       this.inGeneratorParameter = isGenerator;
       this.allowYieldExpression = isGenerator;
+      let paramsLocation = this.getLocation();
       let paramInfo = this.parseParams(null);
       this.inGeneratorParameter = previousInGeneratorParameter;
       this.allowYieldExpression = previousYield;
@@ -2379,6 +2382,9 @@ export class Parser extends Tokenizer {
         this.inGeneratorBody = true;
       }
       let boundParams = [].concat.apply([], paramInfo.params.map(Parser.boundNames));
+
+      let params = this.markLocation({ type: "FormalParameters", items: paramInfo.params, rest: paramInfo.rest }, paramsLocation);
+
       let [body] = this.parseFunctionBody(boundParams);
       this.allowYieldExpression = previousYield;
       this.inGeneratorBody = previousInGeneratorBody;
@@ -2388,9 +2394,10 @@ export class Parser extends Tokenizer {
       if (paramInfo.firstRestricted) {
         throw this.createErrorWithLocation(paramInfo.firstRestricted, paramInfo.message);
       }
+
       return {
         methodOrKey: this.markLocation(
-          new Shift.Method(isGenerator, key, paramInfo.params, paramInfo.rest, body), startLocation),
+          { type: "Method", isGenerator, name: key, params, body }, startLocation),
         kind: "method"
       };
     }
@@ -2486,7 +2493,7 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.FUNCTION);
 
-    let id = null;
+    let name = null;
     let message = null;
     let firstRestricted = null;
     let isGenerator = allowGenerator && !!this.eat(TokenType.MUL);
@@ -2497,28 +2504,31 @@ export class Parser extends Tokenizer {
     if (!this.match(TokenType.LPAREN)) {
       let token = this.lookahead;
       let identifierLocation = this.getLocation();
-      id = this.parseIdentifier();
+      name = this.parseIdentifier();
       if (this.strict || isGenerator) {
-        if (isRestrictedWord(id)) {
+        if (isRestrictedWord(name)) {
           throw this.createErrorWithLocation(token, ErrorMessages.STRICT_FUNCTION_NAME);
         }
       } else {
-        if (isRestrictedWord(id)) {
+        if (isRestrictedWord(name)) {
           firstRestricted = token;
           message = ErrorMessages.STRICT_FUNCTION_NAME;
-        } else if (isStrictModeReservedWord(id)) {
+        } else if (isStrictModeReservedWord(name)) {
           firstRestricted = token;
           message = ErrorMessages.STRICT_RESERVED_WORD;
         }
       }
-      id = this.markLocation({ type: "BindingIdentifier", name: id }, identifierLocation);
+      name = this.markLocation({ type: "BindingIdentifier", name: name }, identifierLocation);
     } else if (!isExpr) {
       if (inDefault) {
-        id = this.markLocation({type: "BindingIdentifier", name: "*default*" }, startLocation);
+        name = this.markLocation({type: "BindingIdentifier", name: "*default*" }, startLocation);
       } else {
         throw this.createUnexpected(this.lookahead);
       }
     }
+
+    let paramsLocation = this.getLocation();
+
     this.inGeneratorParameter = isGenerator;
     this.allowYieldExpression = isGenerator;
     let info = this.parseParams(firstRestricted);
@@ -2539,6 +2549,9 @@ export class Parser extends Tokenizer {
     let previousInMethod = this.inMethod;
     this.inMethod = false;
     let boundParams = [].concat.apply([], info.params.map(Parser.boundNames));
+
+    let params = this.markLocation({ type: "FormalParameters", items: info.params, rest: info.rest }, paramsLocation);
+
     let [body, isStrict] = this.parseFunctionBody(boundParams);
     this.inGeneratorBody = previousInGeneratorBody;
     this.inConstructor = previousInConstructor;
@@ -2551,17 +2564,17 @@ export class Parser extends Tokenizer {
       }
     }
     this.strict = previousStrict;
-    let Ctor = isExpr ? Shift.FunctionExpression : Shift.FunctionDeclaration;
     if (!isExpr) {
       if (isTopLevel) {
-        this.VDN["$" + id.name] = true;
+        this.VDN["$" + name.name] = true;
       } else {
-        this.LDN.push(id.name);
+        this.LDN.push(name.name);
       }
 
     }
+
     return this.markLocation(
-      new Ctor(isGenerator, id, info.params, info.rest, body),
+      { type: isExpr ? "FunctionExpression" : "FunctionDeclaration", isGenerator, name, params, body },
       startLocation
     );
   }

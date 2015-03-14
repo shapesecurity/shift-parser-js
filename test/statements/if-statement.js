@@ -37,7 +37,14 @@ suite("Parser", function () {
     testParse("if (morning) (function(){})", stmt,
       new Shift.IfStatement(
         { type: "IdentifierExpression", name: "morning" },
-        new Shift.ExpressionStatement(new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], []))),
+        { type: "ExpressionStatement", expression:
+          { type: "FunctionExpression",
+            isGenerator: false,
+            name: null,
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+            }
+        },
         null
       )
     );

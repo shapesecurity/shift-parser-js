@@ -155,22 +155,38 @@ suite("Parser", function () {
 
 
     testParse("(function(){ return\nx; })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-        new Shift.ReturnStatement(null),
-        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [
+          new Shift.ReturnStatement(null),
+          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
+        ])
+      }
     );
+
     testParse("(function(){ return // Comment\nx; })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-        new Shift.ReturnStatement(null),
-        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [
+          new Shift.ReturnStatement(null),
+          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
+        ])
+      }
     );
     testParse("(function(){ return/* Multiline\nComment */x; })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-        new Shift.ReturnStatement(null),
-        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [
+          new Shift.ReturnStatement(null),
+          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
+        ])
+      }
     );
 
     testParse("{ throw error\nerror; }", stmt,

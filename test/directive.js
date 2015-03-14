@@ -45,30 +45,60 @@ suite("Parser", function () {
     testParse("\"Hello\\1World\"", directives, [new Shift.Directive("Hello\\1World")]);
 
     testParse("(function () { 'use\\x20strict'; with (i); })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([new Shift.Directive("use\\x20strict")], [
-        new Shift.WithStatement({ type: "IdentifierExpression", name: "i" }, new Shift.EmptyStatement),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody(
+          [new Shift.Directive("use\\x20strict")],
+          [new Shift.WithStatement({ type: "IdentifierExpression", name: "i" }, new Shift.EmptyStatement)]
+        )
+      }
     );
     testParse("(function () { 'use\\nstrict'; with (i); })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([new Shift.Directive("use\\nstrict")], [
-        new Shift.WithStatement({ type: "IdentifierExpression", name: "i" }, new Shift.EmptyStatement),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody(
+          [new Shift.Directive("use\\nstrict")],
+          [new Shift.WithStatement({ type: "IdentifierExpression", name: "i" }, new Shift.EmptyStatement)]
+        )
+      }
     );
 
     testParse("function a() {'use strict';return 0;};", stmt,
-      new Shift.FunctionDeclaration(false, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
-        new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
-      ]))
+      { type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody(
+          [new Shift.Directive("use strict")],
+          [new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0))]
+        )
+      }
     );
     testParse("(function() {'use strict';return 0;});", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
-        new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody(
+          [new Shift.Directive("use strict")],
+          [new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0))]
+        )
+      }
     );
     testParse("(function a() {'use strict';return 0;});", expr,
-      new Shift.FunctionExpression(false, { type: "BindingIdentifier", name: "a" }, [], null, new Shift.FunctionBody([new Shift.Directive("use strict")], [
-        new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0)),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody(
+          [new Shift.Directive("use strict")],
+          [new Shift.ReturnStatement(new Shift.LiteralNumericExpression(0))]
+        )
+      }
     );
 
     testParse("\"use strict\" + 0", expr,

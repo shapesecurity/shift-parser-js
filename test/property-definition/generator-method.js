@@ -23,15 +23,32 @@ var expr = require("../helpers").expr;
 suite("Parser", function () {
 
   suite("generator method", function () {
+
     testParse("({*a(){}})", expr, new Shift.ObjectExpression([
-      new Shift.Method(true, new Shift.StaticPropertyName("a"), [], null, new Shift.FunctionBody([], []))
+      { type: "Method",
+        isGenerator: true,
+        name: new Shift.StaticPropertyName("a"),
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      },
     ]));
+
     testParse("({*yield(){}})", expr, new Shift.ObjectExpression([
-      new Shift.Method(true, new Shift.StaticPropertyName("yield"), [], null, new Shift.FunctionBody([], []))
+      { type: "Method",
+        isGenerator: true,
+        name: new Shift.StaticPropertyName("yield"),
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      },
     ]));
+
     testParse("({*[yield](){}})", expr, new Shift.ObjectExpression([
-      new Shift.Method(true, new Shift.ComputedPropertyName(
-        { type: "IdentifierExpression", name: "yield" }), [], null, new Shift.FunctionBody([], []))
+      { type: "Method",
+        isGenerator: true,
+        name: new Shift.ComputedPropertyName({ type: "IdentifierExpression", name: "yield" }),
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: new Shift.FunctionBody([], [])
+      },
     ]));
 
   });

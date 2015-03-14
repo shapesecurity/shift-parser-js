@@ -45,12 +45,16 @@ suite("Parser", function () {
         [
           new Shift.ClassElement(
             false,
-            new Shift.Method(
-              false,
-              new Shift.StaticPropertyName("a"),
-              [],
-              null,
-              new Shift.FunctionBody([], [])))]));
+            { type: "Method",
+              isGenerator: false,
+              name: new Shift.StaticPropertyName("a"),
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: new Shift.FunctionBody([], [])
+            }
+          ),
+        ]
+      )
+    );
 
     testParse("(class {;;;\n;a(){}b(){}})", expr,
       new Shift.ClassExpression(
@@ -59,31 +63,39 @@ suite("Parser", function () {
         [
           new Shift.ClassElement(
             false,
-            new Shift.Method(
-              false,
-              new Shift.StaticPropertyName("a"),
-              [],
-              null,
-              new Shift.FunctionBody([], []))),
+            { type: "Method",
+              isGenerator: false,
+              name: new Shift.StaticPropertyName("a"),
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: new Shift.FunctionBody([], [])
+            }
+          ),
           new Shift.ClassElement(
             false,
-            new Shift.Method(
-              false,
-              new Shift.StaticPropertyName("b"),
-              [],
-              null,
-              new Shift.FunctionBody([], [])))]));
+            { type: "Method",
+              isGenerator: false,
+              name: new Shift.StaticPropertyName("b"),
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: new Shift.FunctionBody([], [])
+            }
+          ),
+        ]
+      )
+    );
 
     testParse("(class {set a(b) {}})", expr,
       new Shift.ClassExpression(
         null,
         null,
         [
-          new Shift.ClassElement(false, new Shift.Setter(
-            new Shift.StaticPropertyName("a"),
-            { type: "BindingIdentifier", name: "b" },
-            new Shift.FunctionBody([], [])
-          ))
+          new Shift.ClassElement(
+            false,
+            { type: "Setter",
+              name: new Shift.StaticPropertyName("a"),
+              param: { type: "BindingIdentifier", name: "b" },
+              body: new Shift.FunctionBody([], [])
+            }
+          )
         ]
       )
     );
@@ -106,11 +118,14 @@ suite("Parser", function () {
         null,
         null,
         [
-          new Shift.ClassElement(false, new Shift.Setter(
-            new Shift.StaticPropertyName("a"),
-            { type: "BindingIdentifier", name: "b" },
-            new Shift.FunctionBody([new Shift.Directive("use strict")], [])
-          ))
+          new Shift.ClassElement(
+            false,
+            { type: "Setter",
+              name: new Shift.StaticPropertyName("a"),
+              param: { type: "BindingIdentifier", name: "b" },
+              body: new Shift.FunctionBody([new Shift.Directive("use strict")], [])
+            }
+          )
         ]
       )
     );
@@ -120,13 +135,19 @@ suite("Parser", function () {
         null,
         null,
         [
-          new Shift.ClassElement(false, new Shift.Method(
+          new Shift.ClassElement(
             false,
-            new Shift.StaticPropertyName("a"),
-            [{ type: "BindingIdentifier", name: "b" }],
-            null,
-            new Shift.FunctionBody([new Shift.Directive("use strict")], [])
-          ))
+            { type: "Method",
+              isGenerator: false,
+              name: new Shift.StaticPropertyName("a"),
+              params:
+                { type: "FormalParameters",
+                  items: [{ type: "BindingIdentifier", name: "b" }],
+                  rest: null,
+                },
+              body: new Shift.FunctionBody([new Shift.Directive("use strict")], [])
+            }
+          ),
         ]
       )
     );
@@ -136,13 +157,15 @@ suite("Parser", function () {
         null,
         null,
         [
-          new Shift.ClassElement(false, new Shift.Method(
+          new Shift.ClassElement(
             false,
-            new Shift.StaticPropertyName("prototype"),
-            [],
-            null,
-            new Shift.FunctionBody([], [])
-          ))
+            { type: "Method",
+              isGenerator: false,
+              name: new Shift.StaticPropertyName("prototype"),
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: new Shift.FunctionBody([], [])
+            }
+          ),
         ]
       )
     );
@@ -152,13 +175,15 @@ suite("Parser", function () {
         null,
         null,
         [
-          new Shift.ClassElement(false, new Shift.Method(
+          new Shift.ClassElement(
             false,
-            new Shift.StaticPropertyName("a"),
-            [],
-            null,
-            new Shift.FunctionBody([], [])
-          ))
+            { type: "Method",
+              isGenerator: false,
+              name: new Shift.StaticPropertyName("a"),
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: new Shift.FunctionBody([], [])
+            }
+          ),
         ]
       )
     );
@@ -168,13 +193,15 @@ suite("Parser", function () {
         null,
         null,
         [
-          new Shift.ClassElement(false, new Shift.Method(
+          new Shift.ClassElement(
             false,
-            new Shift.StaticPropertyName("3"),
-            [],
-            null,
-            new Shift.FunctionBody([], [])
-          ))
+            { type: "Method",
+              isGenerator: false,
+              name: new Shift.StaticPropertyName("3"),
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: new Shift.FunctionBody([], [])
+            }
+          ),
         ]
       )
     );
@@ -184,19 +211,22 @@ suite("Parser", function () {
         null,
         null,
         [
-          new Shift.ClassElement(false, new Shift.Method(
+          new Shift.ClassElement(
             false,
-            new Shift.ComputedPropertyName(
-              new Shift.BinaryExpression(
-                "+",
-                new Shift.LiteralNumericExpression(3),
-                new Shift.LiteralNumericExpression(5)
-              )
-            ),
-            [],
-            null,
-            new Shift.FunctionBody([], [])
-          ))
+            { type: "Method",
+              isGenerator: false,
+              name:
+                new Shift.ComputedPropertyName(
+                  new Shift.BinaryExpression(
+                    "+",
+                    new Shift.LiteralNumericExpression(3),
+                    new Shift.LiteralNumericExpression(5)
+                  )
+                ),
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: new Shift.FunctionBody([], [])
+            }
+          ),
         ]
       )
     );
@@ -226,12 +256,13 @@ suite("Parser", function () {
     testParse("(class {static(){}})", expr, new Shift.ClassExpression(null, null, [
       new Shift.ClassElement(
         false,
-        new Shift.Method(
-          false,
-          new Shift.StaticPropertyName("static"),
-          [],
-          null,
-          new Shift.FunctionBody([], [])))
+        { type: "Method",
+          isGenerator: false,
+          name: new Shift.StaticPropertyName("static"),
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: new Shift.FunctionBody([], [])
+        }
+      ),
     ]));
 
     testParse("(class {static constructor(){}})", expr, new Shift.ClassExpression(
@@ -240,13 +271,15 @@ suite("Parser", function () {
       [
         new Shift.ClassElement(
           true,
-          new Shift.Method(
-            false,
-            new Shift.StaticPropertyName("constructor"),
-            [],
-            null,
-            new Shift.FunctionBody([], [])
-          ))]));
+          { type: "Method",
+            isGenerator: false,
+            name: new Shift.StaticPropertyName("constructor"),
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: new Shift.FunctionBody([], [])
+          }
+        ),
+      ]
+    ));
 
     testParseFailure("(class {a:0})", "Only methods are allowed in classes");
     testParseFailure("(class {a=0})", "Only methods are allowed in classes");

@@ -22,24 +22,44 @@ var expr = require("../helpers").expr;
 suite("Parser", function () {
   suite("return statement", function () {
     testParse("(function(){ return })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-        new Shift.ReturnStatement(null),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [
+          new Shift.ReturnStatement(null),
+        ] }
+      }
     );
     testParse("(function(){ return; })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-        new Shift.ReturnStatement(null),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [
+          new Shift.ReturnStatement(null),
+        ] }
+      }
     );
     testParse("(function(){ return x; })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-        new Shift.ReturnStatement({ type: "IdentifierExpression", name: "x" }),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [
+          new Shift.ReturnStatement({ type: "IdentifierExpression", name: "x" }),
+        ] }
+      }
     );
     testParse("(function(){ return x * y })", expr,
-      new Shift.FunctionExpression(false, null, [], null, new Shift.FunctionBody([], [
-        new Shift.ReturnStatement(new Shift.BinaryExpression("*", { type: "IdentifierExpression", name: "x" }, { type: "IdentifierExpression", name: "y" })),
-      ]))
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [
+          new Shift.ReturnStatement(new Shift.BinaryExpression("*", { type: "IdentifierExpression", name: "x" }, { type: "IdentifierExpression", name: "y" })),
+        ] }
+      }
     );
   });
 });

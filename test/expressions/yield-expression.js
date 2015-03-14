@@ -39,11 +39,13 @@ suite("Parser", function () {
     // yield as an Identifier cannot show up in body of a generator or in strict mode.
     testParse("({set a(yield){}})", expr,
       new Shift.ObjectExpression([
-        new Shift.Setter(
-          new Shift.StaticPropertyName("a"),
-          { type: "BindingIdentifier", name: "yield" },
-          emptyBody)
+        { type: "Setter",
+          name: new Shift.StaticPropertyName("a"),
+          param: { type: "BindingIdentifier", name: "yield" },
+          body: emptyBody
+        }
       ]));
+
     testParse("function *a(){yield 0}", yde, new Shift.LiteralNumericExpression(0));
     testParse("function *a(){yield null}", yde, new Shift.LiteralNullExpression());
     testParse("function *a(){yield true}", yde, new Shift.LiteralBooleanExpression(true));

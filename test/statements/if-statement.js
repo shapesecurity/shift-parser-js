@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var stmt = require("../helpers").stmt;
 
@@ -35,28 +33,41 @@ suite("Parser", function () {
     );
 
     testParse("if (morning) (function(){})", stmt,
-      new Shift.IfStatement(
-        { type: "IdentifierExpression", name: "morning" },
-        { type: "ExpressionStatement", expression:
-          { type: "FunctionExpression",
+      {
+        type: "IfStatement",
+        test: { type: "IdentifierExpression", name: "morning" },
+        consequent: {
+          type: "ExpressionStatement",
+          expression: {
+            type: "FunctionExpression",
             isGenerator: false,
             name: null,
             params: { type: "FormalParameters", items: [], rest: null },
             body: { type: "FunctionBody", directives: [], statements: [] }
-            }
+          }
         },
-        null
-      )
+        alternate: null
+      }
     );
 
     testParse("if (morning) var x = 0;", stmt,
-      new Shift.IfStatement(
-        { type: "IdentifierExpression", name: "morning" },
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0))
-        ])),
-        null
-      )
+      {
+        type: "IfStatement",
+        test: { type: "IdentifierExpression", name: "morning" },
+        consequent: {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }
+        },
+        alternate: null
+      }
     );
 
     testParse("if (morning) goodMorning(); else goodDay()", stmt,

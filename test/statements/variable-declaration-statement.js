@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../helpers").stmt;
 var expr = require("../helpers").expr;
 var testParse = require("../assertions").testParse;
@@ -25,151 +23,368 @@ suite("Parser", function () {
   suite("variable declaration statement", function () {
     // Variable Statement
     testParse("var x", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+        }
+      }
     );
     testParse("var a;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+        }
+      }
     );
     testParse("var x, y;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "y" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "y" }, init: null }]
+        }
+      }
     );
     testParse("var x = 0", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        }
+      }
     );
     testParse("var eval = 0, arguments = 1", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "eval" }, new Shift.LiteralNumericExpression(0)),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "arguments" }, new Shift.LiteralNumericExpression(1)),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "eval" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "arguments" },
+            init: { type: "LiteralNumericExpression", value: 1 }
+          }]
+        }
+      }
     );
     testParse("var x = 0, y = 1, z = 2", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "y" }, new Shift.LiteralNumericExpression(1)),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "z" }, new Shift.LiteralNumericExpression(2)),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "y" },
+            init: { type: "LiteralNumericExpression", value: 1 }
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "z" },
+            init: { type: "LiteralNumericExpression", value: 2 }
+          }]
+        }
+      }
     );
     testParse("var implements, interface, package", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "implements" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "interface" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "package" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "implements" },
+            init: null
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "interface" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "package" }, init: null }]
+        }
+      }
     );
     testParse("var private, protected, public", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "private" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "protected" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "public" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "private" },
+            init: null
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "protected" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "public" }, init: null }]
+        }
+      }
     );
     testParse("var yield;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "yield" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "yield" },
+            init: null
+          }]
+        }
+      }
     );
 
     // Let Statement
     testParse("let x", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+        }
+      }
     );
     testParse("{ let x }", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
-        ])),
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "let",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: null
+              }]
+            }
+          }]
+        }
+      }
     );
     testParse("{ let x = 0 }", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
-        ])),
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "let",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }]
+            }
+          }]
+        }
+      }
     );
     testParse("{ let x = 0, y = 1, z = 2 }", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "y" }, new Shift.LiteralNumericExpression(1)),
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "z" }, new Shift.LiteralNumericExpression(2)),
-        ])),
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "let",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }, {
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "y" },
+                init: { type: "LiteralNumericExpression", value: 1 }
+              }, {
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "z" },
+                init: { type: "LiteralNumericExpression", value: 2 }
+              }]
+            }
+          }]
+        }
+      }
     );
 
     // exotic unicode characters
     testParse("let x, x\\u{E01D5}", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5"}, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, init: null }]
+        }
+      }
     );
     testParse("let x, x\\uDB40\\uDDD5;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, init: null }]
+        }
+      }
     );
     testParse("let x, x\uDB40\uDDD5;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, init: null }]
+        }
+      }
     );
     testParse("let xǕ, x\\u{E01D5}", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "xǕ" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x\u01D5" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, init: null }]
+        }
+      }
     );
     testParse("let x\u01D5, x\\u{E01D5}", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "xǕ" }, null),
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x\u01D5" },
+            init: null
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, init: null }]
+        }
+      }
     );
 
     // Const Statement
     testParseFailure("const x", "Unexpected end of input");
     testParseFailure("{ const x }", "Unexpected token }");
     testParse("{ const x = 0 }", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
-        ])),
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "const",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }]
+            }
+          }]
+        }
+      }
     );
     testParse("{ const x = 0, y = 1, z = 2 }", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "y" }, new Shift.LiteralNumericExpression(1)),
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "z" }, new Shift.LiteralNumericExpression(2)),
-        ])),
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "const",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }, {
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "y" },
+                init: { type: "LiteralNumericExpression", value: 1 }
+              }, {
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "z" },
+                init: { type: "LiteralNumericExpression", value: 2 }
+              }]
+            }
+          }]
+        }
+      }
     );
     testParse("var static;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "static" }, null),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "static" },
+            init: null
+          }]
+        }
+      }
     );
 
     testParse("(let[a])", expr,
-      new Shift.ComputedMemberExpression(
-        { type: "IdentifierExpression", name: "let" },
-        { type: "IdentifierExpression", name: "a" }
-      )
+      {
+        type: "ComputedMemberExpression",
+        object: { type: "IdentifierExpression", name: "let" },
+        expression: { type: "IdentifierExpression", name: "a" }
+      }
     );
 
     // FIXME(bzhang): testParseFailure("var a[0]=0;", "Unexpected token 'a'");

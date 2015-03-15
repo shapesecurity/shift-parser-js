@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../../helpers").expr;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("literal string expression", function () {
-    testParse("('x')", expr, new Shift.LiteralStringExpression("x") );
-    testParse("('\\\\\\'')", expr, new Shift.LiteralStringExpression("\\'"));
-    testParse("(\"x\")", expr, new Shift.LiteralStringExpression("x"));
-    testParse("(\"\\\\\\\"\")", expr, new Shift.LiteralStringExpression("\\\""));
-    testParse("('\\\r')", expr, new Shift.LiteralStringExpression(""));
-    testParse("('\\\r\n')", expr, new Shift.LiteralStringExpression(""));
-    testParse("('\\\n')", expr, new Shift.LiteralStringExpression(""));
-    testParse("('\\\u2028')", expr, new Shift.LiteralStringExpression(""));
-    testParse("('\\\u2029')", expr, new Shift.LiteralStringExpression(""));
-    testParse("('\u202a')", expr, new Shift.LiteralStringExpression("\u202a"));
-    testParse("('\\0')", expr, new Shift.LiteralStringExpression("\u0000"));
-    testParse("'use strict'; ('\\0')", expr, new Shift.LiteralStringExpression("\u0000"));
-    testParse("'use strict'; ('\\0x')", expr, new Shift.LiteralStringExpression("\u0000x"));
-    testParse("('\\01')", expr, new Shift.LiteralStringExpression("\u0001"));
-    testParse("('\\1')", expr, new Shift.LiteralStringExpression("\u0001"));
-    testParse("('\\11')", expr, new Shift.LiteralStringExpression("\u0009"));
-    testParse("('\\111')", expr, new Shift.LiteralStringExpression("\u0049"));
-    testParse("('\\1111')", expr, new Shift.LiteralStringExpression("\u00491"));
-    testParse("('\\2111')", expr, new Shift.LiteralStringExpression("\u00891"));
-    testParse("('\\5111')", expr, new Shift.LiteralStringExpression("\u002911"));
-    testParse("('\\5a')", expr, new Shift.LiteralStringExpression("\u0005a"));
-    testParse("('\\7a')", expr, new Shift.LiteralStringExpression("\u0007a"));
-    testParse("('\\a')", expr, new Shift.LiteralStringExpression("a"));
-    testParse("('\\`')", expr, new Shift.LiteralStringExpression("`"));
-    testParse("('\\u{00F8}')", expr, new Shift.LiteralStringExpression("\u00F8"));
-    testParse("('\\u{0}')", expr, new Shift.LiteralStringExpression("\u0000"));
-    testParse("('\\u{10FFFF}')", expr, new Shift.LiteralStringExpression("\uDBFF\uDFFF"));
-    testParse("('\\u{0000000000F8}')", expr, new Shift.LiteralStringExpression("\u00F8"));
+    testParse("('x')", expr, { type: "LiteralStringExpression", value: "x" });
+    testParse("('\\\\\\'')", expr, { type: "LiteralStringExpression", value: "\\'" });
+    testParse("(\"x\")", expr, { type: "LiteralStringExpression", value: "x" });
+    testParse("(\"\\\\\\\"\")", expr, { type: "LiteralStringExpression", value: "\\\"" });
+    testParse("('\\\r')", expr, { type: "LiteralStringExpression", value: "" });
+    testParse("('\\\r\n')", expr, { type: "LiteralStringExpression", value: "" });
+    testParse("('\\\n')", expr, { type: "LiteralStringExpression", value: "" });
+    testParse("('\\\u2028')", expr, { type: "LiteralStringExpression", value: "" });
+    testParse("('\\\u2029')", expr, { type: "LiteralStringExpression", value: "" });
+    testParse("('\u202a')", expr, { type: "LiteralStringExpression", value: "\u202A" });
+    testParse("('\\0')", expr, { type: "LiteralStringExpression", value: "\0" });
+    testParse("'use strict'; ('\\0')", expr, { type: "LiteralStringExpression", value: "\0" });
+    testParse("'use strict'; ('\\0x')", expr, { type: "LiteralStringExpression", value: "\0x" });
+    testParse("('\\01')", expr, { type: "LiteralStringExpression", value: "\x01" });
+    testParse("('\\1')", expr, { type: "LiteralStringExpression", value: "\x01" });
+    testParse("('\\11')", expr, { type: "LiteralStringExpression", value: "\t" });
+    testParse("('\\111')", expr, { type: "LiteralStringExpression", value: "I" });
+    testParse("('\\1111')", expr, { type: "LiteralStringExpression", value: "I1" });
+    testParse("('\\2111')", expr, { type: "LiteralStringExpression", value: "\x891" });
+    testParse("('\\5111')", expr, { type: "LiteralStringExpression", value: ")11" });
+    testParse("('\\5a')", expr, { type: "LiteralStringExpression", value: "\x05a" });
+    testParse("('\\7a')", expr, { type: "LiteralStringExpression", value: "\x07a" });
+    testParse("('\\a')", expr, { type: "LiteralStringExpression", value: "a" });
+    testParse("('\\`')", expr, { type: "LiteralStringExpression", value: "`" });
+    testParse("('\\u{00F8}')", expr, { type: "LiteralStringExpression", value: "\xF8" });
+    testParse("('\\u{0}')", expr, { type: "LiteralStringExpression", value: "\0" });
+    testParse("('\\u{10FFFF}')", expr, { type: "LiteralStringExpression", value: "\uDBFF\uDFFF" });
+    testParse("('\\u{0000000000F8}')", expr, { type: "LiteralStringExpression", value: "\xF8" });
 
     testParseFailure("(')", "Unexpected token ILLEGAL");
     testParseFailure("('\n')", "Unexpected token ILLEGAL");

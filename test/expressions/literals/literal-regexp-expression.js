@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../../helpers").expr;
 var testParse = require("../../assertions").testParse;
 
 suite("Parser", function () {
   suite("literal regexp expression", function () {
     // Regular Expression Literals
-    testParse("/a/", expr, new Shift.LiteralRegExpExpression("a", ""));
-    testParse("/a/;", expr, new Shift.LiteralRegExpExpression("a", ""));
-    testParse("/a/i", expr, new Shift.LiteralRegExpExpression("a", "i"));
-    testParse("/a/i;", expr, new Shift.LiteralRegExpExpression("a", "i"));
-    testParse("/[a-z]/i", expr, new Shift.LiteralRegExpExpression("[a-z]", "i"));
-    testParse("/[x-z]/i", expr, new Shift.LiteralRegExpExpression("[x-z]", "i"));
-    testParse("/[a-c]/i", expr, new Shift.LiteralRegExpExpression("[a-c]", "i"));
-    testParse("/[P QR]/i", expr, new Shift.LiteralRegExpExpression("[P QR]", "i"));
-    testParse("/[\\]/]/", expr, new Shift.LiteralRegExpExpression("[\\]/]", ""));
-    testParse("/foo\\/bar/", expr, new Shift.LiteralRegExpExpression("foo/bar", ""));
-    testParse("/=([^=\\s])+/g", expr, new Shift.LiteralRegExpExpression("=([^=\\s])+", "g"));
-    testParse("/0/g.test", expr, new Shift.StaticMemberExpression(new Shift.LiteralRegExpExpression("0", "g"), "test"));
+    testParse("/a/", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "" });
+    testParse("/a/;", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "" });
+    testParse("/a/i", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "i" });
+    testParse("/a/i;", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "i" });
+    testParse("/[a-z]/i", expr, { type: "LiteralRegExpExpression", pattern: "[a-z]", flags: "i" });
+    testParse("/[x-z]/i", expr, { type: "LiteralRegExpExpression", pattern: "[x-z]", flags: "i" });
+    testParse("/[a-c]/i", expr, { type: "LiteralRegExpExpression", pattern: "[a-c]", flags: "i" });
+    testParse("/[P QR]/i", expr, { type: "LiteralRegExpExpression", pattern: "[P QR]", flags: "i" });
+    testParse("/[\\]/]/", expr, { type: "LiteralRegExpExpression", pattern: "[\\]/]", flags: "" });
+    testParse("/foo\\/bar/", expr, { type: "LiteralRegExpExpression", pattern: "foo/bar", flags: "" });
+    testParse("/=([^=\\s])+/g", expr, { type: "LiteralRegExpExpression", pattern: "=([^=\\s])+", flags: "g" });
+    testParse("/0/g.test", expr, {
+      type: "StaticMemberExpression",
+      object: { type: "LiteralRegExpExpression", pattern: "0", flags: "g" },
+      property: "test"
+    });
   });
 });

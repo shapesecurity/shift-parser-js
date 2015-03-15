@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
 
@@ -35,50 +33,76 @@ suite("Parser", function () {
     );
 
     testParse("for(x = 0;;);", stmt,
-      new Shift.ForStatement(
-        new Shift.AssignmentExpression(
-          "=",
-          { type: "BindingIdentifier", name: "x" },
-          new Shift.LiteralNumericExpression(0)
-        ),
-        null,
-        null,
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForStatement",
+        init: {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: { type: "BindingIdentifier", name: "x" },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        },
+        test: null,
+        update: null,
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(var x = 0;;);", stmt,
-      new Shift.ForStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0))
-        ]),
-        null,
-        null,
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForStatement",
+        init: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        },
+        test: null,
+        update: null,
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(let x = 0;;);", stmt,
-      new Shift.ForStatement(
-        new Shift.VariableDeclaration("let", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0))
-        ]),
-        null,
-        null,
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForStatement",
+        init: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        },
+        test: null,
+        update: null,
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(var x = 0, y = 1;;);", stmt,
-      new Shift.ForStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(0)),
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "y" }, new Shift.LiteralNumericExpression(1)),
-        ]),
-        null,
-        null,
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForStatement",
+        init: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "y" },
+            init: { type: "LiteralNumericExpression", value: 1 }
+          }]
+        },
+        test: null,
+        update: null,
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(x; x < 0;);", stmt,
@@ -137,41 +161,70 @@ suite("Parser", function () {
     );
 
     testParse("for(var a;b;c);", stmt,
-      new Shift.ForStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
-        ]),
-        { type: "IdentifierExpression", name: "b" },
-        { type: "IdentifierExpression", name: "c" },
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForStatement",
+        init: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+        },
+        test: { type: "IdentifierExpression", name: "b" },
+        update: { type: "IdentifierExpression", name: "c" },
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(var a = 0;b;c);", stmt,
-      new Shift.ForStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, new Shift.LiteralNumericExpression(0))
-        ]),
-        { type: "IdentifierExpression", name: "b" },
-        { type: "IdentifierExpression", name: "c" },
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForStatement",
+        init: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        },
+        test: { type: "IdentifierExpression", name: "b" },
+        update: { type: "IdentifierExpression", name: "c" },
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(var a = 0;;) { let a; }", stmt,
-      new Shift.ForStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, new Shift.LiteralNumericExpression(0))
-        ]),
-        null,
-        null,
-        new Shift.BlockStatement(new Shift.Block([
-          new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let",
-          [
-            new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
-          ]))
-        ]))
-      )
+      {
+        type: "ForStatement",
+        init: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        },
+        test: null,
+        update: null,
+        body: {
+          type: "BlockStatement",
+          block: {
+            type: "Block",
+            statements: [{
+              type: "VariableDeclarationStatement",
+              declaration: {
+                type: "VariableDeclaration",
+                kind: "let",
+                declarators: [{
+                  type: "VariableDeclarator",
+                  binding: { type: "BindingIdentifier", name: "a" },
+                  init: null
+                }]
+              }
+            }]
+          }
+        }
+      }
     );
 
     testParse("for(;b;c);", stmt,

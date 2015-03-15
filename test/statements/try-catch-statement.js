@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
@@ -23,89 +21,127 @@ var testParseFailure = require("../assertions").testParseFailure;
 suite("Parser", function () {
   suite("try-catch statement", function () {
     testParse("try{}catch(a){}", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "a" },
-          new Shift.Block([])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "a" },
+          body: { type: "Block", statements: [] }
+        }
+      }
     );
     testParse("try { } catch (e) { }", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "e" },
-          new Shift.Block([])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "e" },
+          body: { type: "Block", statements: [] }
+        }
+      }
     );
 
     testParse("try { } catch (e) { let a; }", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "e" },
-          new Shift.Block([
-            new Shift.VariableDeclarationStatement(
-              new Shift.VariableDeclaration(
-                "let",
-                [
-                  new Shift.VariableDeclarator(
-                    { type: "BindingIdentifier", name: "a" },
-                    null
-                  )
-                ]
-              )
-            )
-          ])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "e" },
+          body: {
+            type: "Block",
+            statements: [{
+              type: "VariableDeclarationStatement",
+              declaration: {
+                type: "VariableDeclaration",
+                kind: "let",
+                declarators: [{
+                  type: "VariableDeclarator",
+                  binding: { type: "BindingIdentifier", name: "a" },
+                  init: null
+                }]
+              }
+            }]
+          }
+        }
+      }
     );
 
     testParse("try { } catch (eval) { }", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "eval" },
-          new Shift.Block([])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "eval" },
+          body: { type: "Block", statements: [] }
+        }
+      }
     );
     testParse("try { } catch (arguments) { }", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "arguments" },
-          new Shift.Block([])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "arguments" },
+          body: { type: "Block", statements: [] }
+        }
+      }
     );
     testParse("try { } catch (e) { say(e) }", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "e" },
-          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-            { type: "IdentifierExpression", name: "say" },
-            [{ type: "IdentifierExpression", name: "e" }]
-          ))])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "e" },
+          body: {
+            type: "Block",
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "CallExpression",
+                callee: { type: "IdentifierExpression", name: "say" },
+                arguments: [{ type: "IdentifierExpression", name: "e" }]
+              }
+            }]
+          }
+        }
+      }
     );
     testParse("try { doThat(); } catch (e) { say(e) }", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([
-          new Shift.ExpressionStatement(new Shift.CallExpression({ type: "IdentifierExpression", name: "doThat" }, []))
-        ]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "e" },
-          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-            { type: "IdentifierExpression", name: "say" },
-            [{ type: "IdentifierExpression", name: "e" }]
-          ))])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: {
+          type: "Block",
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "CallExpression",
+              callee: { type: "IdentifierExpression", name: "doThat" },
+              arguments: []
+            }
+          }]
+        },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "e" },
+          body: {
+            type: "Block",
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "CallExpression",
+                callee: { type: "IdentifierExpression", name: "say" },
+                arguments: [{ type: "IdentifierExpression", name: "e" }]
+              }
+            }]
+          }
+        }
+      }
     );
 
     testParseFailure("try {} catch ((e)) {}", "Unexpected token (");

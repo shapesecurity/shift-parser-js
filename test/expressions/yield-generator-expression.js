@@ -15,8 +15,6 @@
  */
 
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 
@@ -28,8 +26,16 @@ suite("Parser", function () {
       });
     }
 
-    testParse("function*a(){yield*a}", yd, [new Shift.YieldGeneratorExpression({ type: "IdentifierExpression", name: "a" })]);
-    testParse("function a(){yield*a}", yd, [new Shift.BinaryExpression("*", { type: "IdentifierExpression", name: "yield" }, { type: "IdentifierExpression", name: "a" })]);
+    testParse("function*a(){yield*a}", yd, [{
+      type: "YieldGeneratorExpression",
+      expression: { type: "IdentifierExpression", name: "a" }
+    }]);
+    testParse("function a(){yield*a}", yd, [{
+      type: "BinaryExpression",
+      operator: "*",
+      left: { type: "IdentifierExpression", name: "yield" },
+      right: { type: "IdentifierExpression", name: "a" }
+    }]);
 
     testParseFailure("function *a(){yield\n*a}", "Unexpected token *");
     testParseFailure("function *a(){yield*}", "Unexpected token }");

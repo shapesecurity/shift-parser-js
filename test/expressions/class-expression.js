@@ -15,7 +15,6 @@
  */
 
 var ShiftParser = require("../../dist/index.js");
-var Shift = require("shift-ast");
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
@@ -32,254 +31,294 @@ suite("Parser", function () {
       });
     }
 
-    testParse("(class {})", expr, new Shift.ClassExpression(null, null, []));
-    testParse("(class A{})", expr, new Shift.ClassExpression({ type: "BindingIdentifier", name: "A" }, null, []));
-    testParse("(class extends A {})", expr, new Shift.ClassExpression(null, { type: "IdentifierExpression", name: "A" }, []));
-    testParse("(class A extends A {})", expr, new Shift.ClassExpression({ type: "BindingIdentifier", name: "A" }, { type: "IdentifierExpression", name: "A" }, []));
+    testParse("(class {})", expr, { type: "ClassExpression", name: null, super: null, elements: [] });
+    testParse("(class A{})", expr, {
+      type: "ClassExpression",
+      name: { type: "BindingIdentifier", name: "A" },
+      super: null,
+      elements: []
+    });
+    testParse("(class extends A {})", expr, {
+      type: "ClassExpression",
+      name: null,
+      super: { type: "IdentifierExpression", name: "A" },
+      elements: []
+    });
+    testParse("(class A extends A {})", expr, {
+      type: "ClassExpression",
+      name: { type: "BindingIdentifier", name: "A" },
+      super: { type: "IdentifierExpression", name: "A" },
+      elements: []
+    });
 
-    testParse("(class {;;;\n;\n})", expr, new Shift.ClassExpression(null, null, []));
+    testParse("(class {;;;\n;\n})", expr, { type: "ClassExpression", name: null, super: null, elements: [] });
     testParse("(class {;;;\n;a(){}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("a"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [])
-            }
-          ),
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "a" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {;;;\n;a(){}b(){}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("a"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [])
-            }
-          ),
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("b"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [])
-            }
-          ),
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "a" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }, {
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "b" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {set a(b) {}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Setter",
-              name: new Shift.StaticPropertyName("a"),
-              param: { type: "BindingIdentifier", name: "b" },
-              body: new Shift.FunctionBody([], [])
-            }
-          )
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Setter",
+            name: { type: "StaticPropertyName", value: "a" },
+            param: { type: "BindingIdentifier", name: "b" },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {get a() {}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(false, new Shift.Getter(
-            new Shift.StaticPropertyName("a"),
-            new Shift.FunctionBody([], [])
-          ))
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Getter",
+            name: { type: "StaticPropertyName", value: "a" },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {set a(b) {'use strict';}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Setter",
-              name: new Shift.StaticPropertyName("a"),
-              param: { type: "BindingIdentifier", name: "b" },
-              body: new Shift.FunctionBody([new Shift.Directive("use strict")], [])
-            }
-          )
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Setter",
+            name: { type: "StaticPropertyName", value: "a" },
+            param: { type: "BindingIdentifier", name: "b" },
+            body: { type: "FunctionBody", directives: [{ type: "Directive", rawValue: "use strict" }], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {a(b) {'use strict';}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("a"),
-              params:
-                { type: "FormalParameters",
-                  items: [{ type: "BindingIdentifier", name: "b" }],
-                  rest: null,
-                },
-              body: new Shift.FunctionBody([new Shift.Directive("use strict")], [])
-            }
-          ),
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "a" },
+            params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "b" }], rest: null },
+            body: { type: "FunctionBody", directives: [{ type: "Directive", rawValue: "use strict" }], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {prototype() {}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("prototype"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [])
-            }
-          ),
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "prototype" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {a() {}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("a"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [])
-            }
-          ),
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "a" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class {3() {}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("3"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [])
-            }
-          ),
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "3" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class{[3+5](){}})", expr,
-      new Shift.ClassExpression(
-        null,
-        null,
-        [
-          new Shift.ClassElement(
-            false,
-            { type: "Method",
-              isGenerator: false,
-              name:
-                new Shift.ComputedPropertyName(
-                  new Shift.BinaryExpression(
-                    "+",
-                    new Shift.LiteralNumericExpression(3),
-                    new Shift.LiteralNumericExpression(5)
-                  )
-                ),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [])
-            }
-          ),
-        ]
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: {
+              type: "ComputedPropertyName",
+              expression: {
+                type: "BinaryExpression",
+                operator: "+",
+                left: { type: "LiteralNumericExpression", value: 3 },
+                right: { type: "LiteralNumericExpression", value: 5 }
+              }
+            },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }
+        }]
+      }
     );
 
     testParse("(class extends (a,b) {})", expr,
-      new Shift.ClassExpression(
-        null,
-        new Shift.BinaryExpression(",",
-          { type: "IdentifierExpression", name: "a" },
-          { type: "IdentifierExpression", name: "b" }),
-        []
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: {
+          type: "BinaryExpression",
+          operator: ",",
+          left: { type: "IdentifierExpression", name: "a" },
+          right: { type: "IdentifierExpression", name: "b" }
+        },
+        elements: []
+      }
     );
 
     testParse("var x = class extends (a,b) {};", function stmt(program) {
         return program.body.statements[0].declaration.declarators[0].init;
       },
-      new Shift.ClassExpression(
-        null,
-        new Shift.BinaryExpression(",",
-          { type: "IdentifierExpression", name: "a" },
-          { type: "IdentifierExpression", name: "b" }),
-        []
-      )
+      {
+        type: "ClassExpression",
+        name: null,
+        super: {
+          type: "BinaryExpression",
+          operator: ",",
+          left: { type: "IdentifierExpression", name: "a" },
+          right: { type: "IdentifierExpression", name: "b" }
+        },
+        elements: []
+      }
     );
 
-    testParse("(class {static(){}})", expr, new Shift.ClassExpression(null, null, [
-      new Shift.ClassElement(
-        false,
-        { type: "Method",
+    testParse("(class {static(){}})", expr, {
+      type: "ClassExpression",
+      name: null,
+      super: null,
+      elements: [{
+        type: "ClassElement",
+        isStatic: false,
+        method: {
+          type: "Method",
           isGenerator: false,
-          name: new Shift.StaticPropertyName("static"),
+          name: { type: "StaticPropertyName", value: "static" },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [])
+          body: { type: "FunctionBody", directives: [], statements: [] }
         }
-      ),
-    ]));
+      }]
+    });
 
-    testParse("(class {static constructor(){}})", expr, new Shift.ClassExpression(
-      null,
-      null,
-      [
-        new Shift.ClassElement(
-          true,
-          { type: "Method",
-            isGenerator: false,
-            name: new Shift.StaticPropertyName("constructor"),
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: new Shift.FunctionBody([], [])
-          }
-        ),
-      ]
-    ));
+    testParse("(class {static constructor(){}})", expr, {
+      type: "ClassExpression",
+      name: null,
+      super: null,
+      elements: [{
+        type: "ClassElement",
+        isStatic: true,
+        method: {
+          type: "Method",
+          isGenerator: false,
+          name: { type: "StaticPropertyName", value: "constructor" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }
+      }]
+    });
 
     testParseFailure("(class {a:0})", "Only methods are allowed in classes");
     testParseFailure("(class {a=0})", "Only methods are allowed in classes");

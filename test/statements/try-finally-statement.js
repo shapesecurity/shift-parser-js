@@ -14,51 +14,82 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("try-finally statement", function () {
     testParse("try { } finally { cleanup(stuff) }", stmt,
-      new Shift.TryFinallyStatement(
-        new Shift.Block([]),
-        null,
-        new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-          { type: "IdentifierExpression", name: "cleanup" },
-          [{ type: "IdentifierExpression", name: "stuff" }]
-        ))])
-      )
+      {
+        type: "TryFinallyStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: null,
+        finalizer: {
+          type: "Block",
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "CallExpression",
+              callee: { type: "IdentifierExpression", name: "cleanup" },
+              arguments: [{ type: "IdentifierExpression", name: "stuff" }]
+            }
+          }]
+        }
+      }
     );
     testParse("try{}catch(a){}finally{}", stmt,
-      new Shift.TryFinallyStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "a" },
-          new Shift.Block([])
-        ),
-        new Shift.Block([])
-      )
+      {
+        type: "TryFinallyStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "a" },
+          body: { type: "Block", statements: [] }
+        },
+        finalizer: { type: "Block", statements: [] }
+      }
     );
     testParse("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }", stmt,
-      new Shift.TryFinallyStatement(
-        new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-          { type: "IdentifierExpression", name: "doThat" },
-          []
-        ))]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "e" },
-          new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-            { type: "IdentifierExpression", name: "say" },
-            [{ type: "IdentifierExpression", name: "e" }]
-          ))])
-        ),
-        new Shift.Block([new Shift.ExpressionStatement(new Shift.CallExpression(
-          { type: "IdentifierExpression", name: "cleanup" },
-          [{ type: "IdentifierExpression", name: "stuff" }]
-        ))])
-      )
+      {
+        type: "TryFinallyStatement",
+        body: {
+          type: "Block",
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "CallExpression",
+              callee: { type: "IdentifierExpression", name: "doThat" },
+              arguments: []
+            }
+          }]
+        },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "e" },
+          body: {
+            type: "Block",
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "CallExpression",
+                callee: { type: "IdentifierExpression", name: "say" },
+                arguments: [{ type: "IdentifierExpression", name: "e" }]
+              }
+            }]
+          }
+        },
+        finalizer: {
+          type: "Block",
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "CallExpression",
+              callee: { type: "IdentifierExpression", name: "cleanup" },
+              arguments: [{ type: "IdentifierExpression", name: "stuff" }]
+            }
+          }]
+        }
+      }
     );
   });
 });

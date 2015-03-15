@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../../helpers").expr;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
@@ -24,245 +22,301 @@ suite("Parser", function () {
   suite("object binding", function () {
     suite("assignment", function () {
       testParse("({x} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyIdentifier",
               binding: { type: "BindingIdentifier", name: "x" },
-              init: null }
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+              init: null
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({x,} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyIdentifier",
               binding: { type: "BindingIdentifier", name: "x" },
-              init: null }
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+              init: null
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({x,y} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyIdentifier",
               binding: { type: "BindingIdentifier", name: "x" },
-              init: null },
-            { type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "y" },
-              init: null },
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+              init: null
+            }, { type: "BindingPropertyIdentifier", binding: { type: "BindingIdentifier", name: "y" }, init: null }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({x,y,} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyIdentifier",
               binding: { type: "BindingIdentifier", name: "x" },
-              init: null },
-            { type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "y" },
-              init: null },
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+              init: null
+            }, { type: "BindingPropertyIdentifier", binding: { type: "BindingIdentifier", name: "y" }, init: null }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({[a]: a} = 1)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.ComputedPropertyName({ type: "IdentifierExpression", name: "a" }),
-              { type: "BindingIdentifier", name: "a" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(1)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "ComputedPropertyName", expression: { type: "IdentifierExpression", name: "a" } },
+              binding: { type: "BindingIdentifier", name: "a" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 1 }
+        }
       );
 
       testParse("({x = 0} = 1)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyIdentifier",
               binding: { type: "BindingIdentifier", name: "x" },
-              init: new Shift.LiteralNumericExpression(0) }
-          ]),
-          new Shift.LiteralNumericExpression(1)
-        )
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 1 }
+        }
       );
 
       testParse("({x = 0,} = 1)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            { type: "BindingPropertyIdentifier",
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyIdentifier",
               binding: { type: "BindingIdentifier", name: "x" },
-              init: new Shift.LiteralNumericExpression(0) }
-          ]),
-          new Shift.LiteralNumericExpression(1)
-        )
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 1 }
+        }
       );
 
 
       testParse("({x: y} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("x"),
-              { type: "BindingIdentifier", name: "y" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "x" },
+              binding: { type: "BindingIdentifier", name: "y" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({x: y,} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("x"),
-              { type: "BindingIdentifier", name: "y" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "x" },
+              binding: { type: "BindingIdentifier", name: "y" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({var: x} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("var"),
-              { type: "BindingIdentifier", name: "x" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "var" },
+              binding: { type: "BindingIdentifier", name: "x" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({\"x\": y} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("x"),
-              { type: "BindingIdentifier", name: "y" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "x" },
+              binding: { type: "BindingIdentifier", name: "y" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({'x': y} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("x"),
-              { type: "BindingIdentifier", name: "y" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "x" },
+              binding: { type: "BindingIdentifier", name: "y" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({0: y} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("0"),
-              { type: "BindingIdentifier", name: "y" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "0" },
+              binding: { type: "BindingIdentifier", name: "y" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({0: x, 1: x} = 0)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("0"),
-              { type: "BindingIdentifier", name: "x" }
-            ),
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("1"),
-              { type: "BindingIdentifier", name: "x" }
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "0" },
+              binding: { type: "BindingIdentifier", name: "x" }
+            }, {
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "1" },
+              binding: { type: "BindingIdentifier", name: "x" }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("({x: y = 0} = 1)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("x"),
-              new Shift.BindingWithDefault(
-                { type: "BindingIdentifier", name: "y" },
-                new Shift.LiteralNumericExpression(0)
-              )
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(1)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "x" },
+              binding: {
+                type: "BindingWithDefault",
+                binding: { type: "BindingIdentifier", name: "y" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 1 }
+        }
       );
 
       testParse("({x: y = z = 0} = 1)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("x"),
-              new Shift.BindingWithDefault(
-                { type: "BindingIdentifier", name: "y" },
-                new Shift.AssignmentExpression(
-                  "=",
-                  { type: "BindingIdentifier", name: "z" },
-                  new Shift.LiteralNumericExpression(0)
-                )
-              )
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(1)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "x" },
+              binding: {
+                type: "BindingWithDefault",
+                binding: { type: "BindingIdentifier", name: "y" },
+                init: {
+                  type: "AssignmentExpression",
+                  operator: "=",
+                  binding: { type: "BindingIdentifier", name: "z" },
+                  expression: { type: "LiteralNumericExpression", value: 0 }
+                }
+              }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 1 }
+        }
       );
 
       testParse("({x: [y] = 0} = 1)", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ObjectBinding([
-            new Shift.BindingPropertyProperty(
-              new Shift.StaticPropertyName("x"),
-              new Shift.BindingWithDefault(
-                new Shift.ArrayBinding(
-                  [{ type: "BindingIdentifier", name: "y" }],
-                  null
-                ),
-                new Shift.LiteralNumericExpression(0)
-              )
-            ),
-          ]),
-          new Shift.LiteralNumericExpression(1)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ObjectBinding",
+            properties: [{
+              type: "BindingPropertyProperty",
+              name: { type: "StaticPropertyName", value: "x" },
+              binding: {
+                type: "BindingWithDefault",
+                binding: {
+                  type: "ArrayBinding",
+                  elements: [{ type: "BindingIdentifier", name: "y" }],
+                  restElement: null
+                },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }
+            }]
+          },
+          expression: { type: "LiteralNumericExpression", value: 1 }
+        }
       );
 
       testParse("({a:yield} = 0);", expr,

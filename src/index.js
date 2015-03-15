@@ -16,8 +16,6 @@
 
 import {Parser} from "./parser";
 
-import * as Shift from "shift-ast";
-
 function markLocation(node, location) {
   node.loc = {
     start: location,

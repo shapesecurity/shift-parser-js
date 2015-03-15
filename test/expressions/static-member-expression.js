@@ -14,37 +14,47 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("static member expression", function () {
     testParse("a.b", expr,
-      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "b")
+      { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "b" }
     );
     testParse("a.b.c", expr,
-      new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
-        { type: "IdentifierExpression", name: "a" }, "b"), "c"
-      )
+      {
+        type: "StaticMemberExpression",
+        object: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "b" },
+        property: "c"
+      }
     );
     testParse("a.$._.B0", expr,
-      new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
-        { type: "IdentifierExpression", name: "a" }, "$"), "_"), "B0"
-      )
+      {
+        type: "StaticMemberExpression",
+        object: {
+          type: "StaticMemberExpression",
+          object: {
+            type: "StaticMemberExpression",
+            object: { type: "IdentifierExpression", name: "a" },
+            property: "$"
+          },
+          property: "_"
+        },
+        property: "B0"
+      }
     );
     testParse("a.if", expr,
-      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "if")
+      { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "if" }
     );
     testParse("a.true", expr,
-      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "true")
+      { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "true" }
     );
     testParse("a.false", expr,
-      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "false")
+      { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "false" }
     );
     testParse("a.null", expr,
-      new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "null")
+      { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "null" }
     );
   });
 });

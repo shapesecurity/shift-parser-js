@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
@@ -53,19 +51,28 @@ suite("Parser", function () {
     );
 
     testParse("{ var x = 14, y = 3\nz; }", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            { type: "BindingIdentifier", name: "x" },
-            new Shift.LiteralNumericExpression(14)
-          ),
-          new Shift.VariableDeclarator(
-            { type: "BindingIdentifier", name: "y" },
-            new Shift.LiteralNumericExpression(3)
-          ),
-        ])),
-        new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "z" }),
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "var",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: { type: "LiteralNumericExpression", value: 14 }
+              }, {
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "y" },
+                init: { type: "LiteralNumericExpression", value: 3 }
+              }]
+            }
+          }, { type: "ExpressionStatement", expression: { type: "IdentifierExpression", name: "z" } }]
+        }
+      }
     );
 
     testParse("while (true) { continue\nthere; }", stmt,
@@ -159,10 +166,14 @@ suite("Parser", function () {
         isGenerator: false,
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [
-          new Shift.ReturnStatement(null),
-          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
-        ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{ type: "ReturnStatement", expression: null }, {
+            type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", name: "x" }
+          }]
+        }
       }
     );
 
@@ -171,10 +182,14 @@ suite("Parser", function () {
         isGenerator: false,
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [
-          new Shift.ReturnStatement(null),
-          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
-        ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{ type: "ReturnStatement", expression: null }, {
+            type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", name: "x" }
+          }]
+        }
       }
     );
     testParse("(function(){ return/* Multiline\nComment */x; })", expr,
@@ -182,10 +197,14 @@ suite("Parser", function () {
         isGenerator: false,
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [
-          new Shift.ReturnStatement(null),
-          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "x" }),
-        ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{ type: "ReturnStatement", expression: null }, {
+            type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", name: "x" }
+          }]
+        }
       }
     );
 

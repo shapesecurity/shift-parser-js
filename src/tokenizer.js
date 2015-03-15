@@ -17,7 +17,6 @@
 
 import {getHexValue, isLineTerminator, isWhiteSpace, isIdentifierStart, isIdentifierPart, isDecimalDigit} from "./utils";
 import {ErrorMessages} from "./errors";
-import * as Shift from "shift-ast";
 
 export const TokenClass = {
   Eof: {name: "<End>"},

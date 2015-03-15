@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var stmt = require("../helpers").stmt;
 
@@ -36,39 +34,56 @@ suite("Parser", function () {
     );
 
     testParse("for (var x in list) process(x);", stmt,
-      new Shift.ForInStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)
-        ]),
-        { type: "IdentifierExpression", name: "list" },
-        new Shift.ExpressionStatement(new Shift.CallExpression(
-          { type: "IdentifierExpression", name: "process" },
-          [{ type: "IdentifierExpression", name: "x" }]
-        ))
-      )
+      {
+        type: "ForInStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+        },
+        right: { type: "IdentifierExpression", name: "list" },
+        body: {
+          type: "ExpressionStatement",
+          expression: {
+            type: "CallExpression",
+            callee: { type: "IdentifierExpression", name: "process" },
+            arguments: [{ type: "IdentifierExpression", name: "x" }]
+          }
+        }
+      }
     );
 
     testParse("for (let x in list) process(x);", stmt,
-      new Shift.ForInStatement(
-        new Shift.VariableDeclaration("let", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)
-        ]),
-        { type: "IdentifierExpression", name: "list" },
-        new Shift.ExpressionStatement(new Shift.CallExpression(
-          { type: "IdentifierExpression", name: "process" },
-          [{ type: "IdentifierExpression", name: "x" }]
-        ))
-      )
+      {
+        type: "ForInStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+        },
+        right: { type: "IdentifierExpression", name: "list" },
+        body: {
+          type: "ExpressionStatement",
+          expression: {
+            type: "CallExpression",
+            callee: { type: "IdentifierExpression", name: "process" },
+            arguments: [{ type: "IdentifierExpression", name: "x" }]
+          }
+        }
+      }
     );
 
     testParse("for(var a in b);", stmt,
-      new Shift.ForInStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
-        ]),
-        { type: "IdentifierExpression", name: "b" },
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForInStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+        },
+        right: { type: "IdentifierExpression", name: "b" },
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(a in b);", stmt,
@@ -80,19 +95,21 @@ suite("Parser", function () {
 
     // TODO: a should be a BindingIdentifier, not an IdentifierExpression
     testParse("for(a in b);", stmt,
-      new Shift.ForInStatement(
-        { type: "IdentifierExpression", name: "a" },
-        { type: "IdentifierExpression", name: "b" },
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForInStatement",
+        left: { type: "IdentifierExpression", name: "a" },
+        right: { type: "IdentifierExpression", name: "b" },
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(a.b in c);", stmt,
-      new Shift.ForInStatement(
-        new Shift.StaticMemberExpression({ type: "IdentifierExpression", name: "a" }, "b"),
-        { type: "IdentifierExpression", name: "c" },
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForInStatement",
+        left: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "b" },
+        right: { type: "IdentifierExpression", name: "c" },
+        body: { type: "EmptyStatement" }
+      }
     );
   });
 });

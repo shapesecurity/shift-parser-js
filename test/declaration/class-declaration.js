@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("class declaration", function () {
-    testParse("class A{}", stmt, new Shift.ClassDeclaration({ type: "BindingIdentifier", name: "A" }, null, []));
+    testParse("class A{}", stmt, {
+      type: "ClassDeclaration",
+      name: { type: "BindingIdentifier", name: "A" },
+      super: null,
+      elements: []
+    });
     testParseFailure("class {}", "Unexpected token {");
     testParseFailure("class extends A{}", "Unexpected token extends");
   });

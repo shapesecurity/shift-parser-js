@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
@@ -46,71 +44,73 @@ suite("Parser", function () {
 
 
     testParse("f(...a)", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "f" },
-        [
-          new Shift.SpreadElement({ type: "IdentifierExpression", name: "a" }),
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "f" },
+        arguments: [{ type: "SpreadElement", expression: { type: "IdentifierExpression", name: "a" } }]
+      }
     );
     testParse("f(...a = b)", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "f" },
-        [
-          new Shift.SpreadElement(
-            new Shift.AssignmentExpression(
-              "=",
-              { type: "BindingIdentifier", name: "a" },
-              { type: "IdentifierExpression", name: "b" }
-            )
-          ),
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "f" },
+        arguments: [{
+          type: "SpreadElement",
+          expression: {
+            type: "AssignmentExpression",
+            operator: "=",
+            binding: { type: "BindingIdentifier", name: "a" },
+            expression: { type: "IdentifierExpression", name: "b" }
+          }
+        }]
+      }
     );
     testParse("f(...a, ...b)", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "f" },
-        [
-          new Shift.SpreadElement({ type: "IdentifierExpression", name: "a" }),
-          new Shift.SpreadElement({ type: "IdentifierExpression", name: "b" }),
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "f" },
+        arguments: [{
+          type: "SpreadElement",
+          expression: { type: "IdentifierExpression", name: "a" }
+        }, { type: "SpreadElement", expression: { type: "IdentifierExpression", name: "b" } }]
+      }
     );
     testParse("f(a, ...b, c)", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "f" },
-        [
-          { type: "IdentifierExpression", name: "a" },
-          new Shift.SpreadElement({ type: "IdentifierExpression", name: "b" }),
-          { type: "IdentifierExpression", name: "c" },
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "f" },
+        arguments: [{ type: "IdentifierExpression", name: "a" }, {
+          type: "SpreadElement",
+          expression: { type: "IdentifierExpression", name: "b" }
+        }, { type: "IdentifierExpression", name: "c" }]
+      }
     );
     testParse("f(...a, b, ...c)", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "f" },
-        [
-          new Shift.SpreadElement({ type: "IdentifierExpression", name: "a" }),
-          { type: "IdentifierExpression", name: "b" },
-          new Shift.SpreadElement({ type: "IdentifierExpression", name: "c" }),
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "f" },
+        arguments: [{
+          type: "SpreadElement",
+          expression: { type: "IdentifierExpression", name: "a" }
+        }, { type: "IdentifierExpression", name: "b" }, {
+          type: "SpreadElement",
+          expression: { type: "IdentifierExpression", name: "c" }
+        }]
+      }
     );
     testParse("f(....0)", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "f" },
-        [
-          new Shift.SpreadElement(new Shift.LiteralNumericExpression(0)),
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "f" },
+        arguments: [{ type: "SpreadElement", expression: { type: "LiteralNumericExpression", value: 0 } }]
+      }
     );
     testParse("f(.0)", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "f" },
-        [
-          new Shift.LiteralNumericExpression(0),
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "f" },
+        arguments: [{ type: "LiteralNumericExpression", value: 0 }]
+      }
     );
 
     testParseFailure("f(..a)", "Unexpected token .");

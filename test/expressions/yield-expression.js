@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
-  var emptyBody = new Shift.FunctionBody([], []);
+  var emptyBody = { type: "FunctionBody", directives: [], statements: [] };
 
   suite("yield", function () {
     function yd(p) {
@@ -34,31 +32,44 @@ suite("Parser", function () {
       return p.body.statements[0].body.statements[0].expression.expression;
     }
 
-    testParse("function*a(){yield\na}", yd, [new Shift.YieldExpression(null), { type: "IdentifierExpression", name: "a" }]);
+    testParse("function*a(){yield\na}", yd, [{
+      type: "YieldExpression",
+      expression: null
+    }, { type: "IdentifierExpression", name: "a" }]);
 
     // yield as an Identifier cannot show up in body of a generator or in strict mode.
     testParse("({set a(yield){}})", expr,
-      new Shift.ObjectExpression([
-        { type: "Setter",
-          name: new Shift.StaticPropertyName("a"),
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Setter",
+          name: { type: "StaticPropertyName", value: "a" },
           param: { type: "BindingIdentifier", name: "yield" },
           body: emptyBody
-        }
-      ]));
+        }]
+      });
 
-    testParse("function *a(){yield 0}", yde, new Shift.LiteralNumericExpression(0));
-    testParse("function *a(){yield null}", yde, new Shift.LiteralNullExpression());
-    testParse("function *a(){yield true}", yde, new Shift.LiteralBooleanExpression(true));
-    testParse("function *a(){yield false}", yde, new Shift.LiteralBooleanExpression(false));
-    testParse("function *a(){yield \"a\"}", yde, new Shift.LiteralStringExpression("a"));
+    testParse("function *a(){yield 0}", yde, { type: "LiteralNumericExpression", value: 0 });
+    testParse("function *a(){yield null}", yde, { type: "LiteralNullExpression" });
+    testParse("function *a(){yield true}", yde, { type: "LiteralBooleanExpression", value: true });
+    testParse("function *a(){yield false}", yde, { type: "LiteralBooleanExpression", value: false });
+    testParse("function *a(){yield \"a\"}", yde, { type: "LiteralStringExpression", value: "a" });
     testParse("function *a(){yield a}", yde, { type: "IdentifierExpression", name: "a" });
-    testParse("function *a(){yield+0}", yde, new Shift.PrefixExpression("+", new Shift.LiteralNumericExpression(0)));
-    testParse("function *a(){yield-0}", yde, new Shift.PrefixExpression("-", new Shift.LiteralNumericExpression(0)));
-    testParse("function *a(){yield 2e308}", yde, new Shift.LiteralInfinityExpression());
-    testParse("function *a(){yield(0)}", yde, new Shift.LiteralNumericExpression(0));
-    testParse("function *a(){yield/a/}", yde, new Shift.LiteralRegExpExpression("a", ""));
-    testParse("function *a(){yield/=3/}", yde, new Shift.LiteralRegExpExpression("=3", ""));
-    testParse("function *a(){yield class{}}", yde, new Shift.ClassExpression(null, null, []));
+    testParse("function *a(){yield+0}", yde, {
+      type: "PrefixExpression",
+      operator: "+",
+      operand: { type: "LiteralNumericExpression", value: 0 }
+    });
+    testParse("function *a(){yield-0}", yde, {
+      type: "PrefixExpression",
+      operator: "-",
+      operand: { type: "LiteralNumericExpression", value: 0 }
+    });
+    testParse("function *a(){yield 2e308}", yde, { type: "LiteralInfinityExpression" });
+    testParse("function *a(){yield(0)}", yde, { type: "LiteralNumericExpression", value: 0 });
+    testParse("function *a(){yield/a/}", yde, { type: "LiteralRegExpExpression", pattern: "a", flags: "" });
+    testParse("function *a(){yield/=3/}", yde, { type: "LiteralRegExpExpression", pattern: "=3", flags: "" });
+    testParse("function *a(){yield class{}}", yde, { type: "ClassExpression", name: null, super: null, elements: [] });
 
     testParseFailure("function *a(){ return ({set a(yield){}}); }", "Unexpected token yield");
   });

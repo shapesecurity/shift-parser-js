@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
@@ -23,136 +21,234 @@ var testParseFailure = require("../assertions").testParseFailure;
 suite("Parser", function () {
   suite("property name", function () {
     testParse("({0x0:0})", expr,
-      new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("0"), new Shift.LiteralNumericExpression(0)),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "DataProperty",
+          name: { type: "StaticPropertyName", value: "0" },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }]
+      }
     );
 
     testParse("({2e308:0})", expr,
-      new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("" + 1 / 0), new Shift.LiteralNumericExpression(0)),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "DataProperty",
+          name: { type: "StaticPropertyName", value: "" + 1 / 0 },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }]
+      }
     );
 
     testParse("({get b() {}})", expr,
-      new Shift.ObjectExpression([
-        new Shift.Getter(new Shift.StaticPropertyName("b"), new Shift.FunctionBody([], [])),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Getter",
+          name: { type: "StaticPropertyName", value: "b" },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
     testParse("({set c(x) {}})", expr,
-      new Shift.ObjectExpression([
-        { type: "Setter", name: new Shift.StaticPropertyName("c"), param: { type: "BindingIdentifier", name: "x" }, body: new Shift.FunctionBody([], []) },
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Setter",
+          name: { type: "StaticPropertyName", value: "c" },
+          param: { type: "BindingIdentifier", name: "x" },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({__proto__:0})", expr,
-      new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.StaticPropertyName("__proto__"), new Shift.LiteralNumericExpression(0)),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "DataProperty",
+          name: { type: "StaticPropertyName", value: "__proto__" },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }]
+      }
     );
 
     testParse("({get __proto__() {}})", expr,
-      new Shift.ObjectExpression([
-        new Shift.Getter(new Shift.StaticPropertyName("__proto__"), new Shift.FunctionBody([], [])),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Getter",
+          name: { type: "StaticPropertyName", value: "__proto__" },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({set __proto__(x) {}})", expr,
-      new Shift.ObjectExpression([
-        { type: "Setter", name: new Shift.StaticPropertyName("__proto__"), param: { type: "BindingIdentifier", name: "x" }, body: new Shift.FunctionBody([], []) },
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Setter",
+          name: { type: "StaticPropertyName", value: "__proto__" },
+          param: { type: "BindingIdentifier", name: "x" },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({get __proto__() {}, set __proto__(x) {}})", expr,
-      new Shift.ObjectExpression([
-        new Shift.Getter(new Shift.StaticPropertyName("__proto__"), new Shift.FunctionBody([], [])),
-        { type: "Setter", name: new Shift.StaticPropertyName("__proto__"), param: { type: "BindingIdentifier", name: "x" }, body: new Shift.FunctionBody([], []) },
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Getter",
+          name: { type: "StaticPropertyName", value: "__proto__" },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }, {
+          type: "Setter",
+          name: { type: "StaticPropertyName", value: "__proto__" },
+          param: { type: "BindingIdentifier", name: "x" },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({[\"nUmBeR\"+9]:\"nein\"})", expr,
-      new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.ComputedPropertyName(
-          new Shift.BinaryExpression("+", new Shift.LiteralStringExpression("nUmBeR"), new Shift.LiteralNumericExpression(9))
-        ), new Shift.LiteralStringExpression("nein")),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "DataProperty",
+          name: {
+            type: "ComputedPropertyName",
+            expression: {
+              type: "BinaryExpression",
+              operator: "+",
+              left: { type: "LiteralStringExpression", value: "nUmBeR" },
+              right: { type: "LiteralNumericExpression", value: 9 }
+            }
+          },
+          expression: { type: "LiteralStringExpression", value: "nein" }
+        }]
+      }
     );
 
     testParse("({[2*308]:0})", expr,
-      new Shift.ObjectExpression([
-        new Shift.DataProperty(new Shift.ComputedPropertyName(
-          new Shift.BinaryExpression("*", new Shift.LiteralNumericExpression(2), new Shift.LiteralNumericExpression(308))
-        ), new Shift.LiteralNumericExpression(0)),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "DataProperty",
+          name: {
+            type: "ComputedPropertyName",
+            expression: {
+              type: "BinaryExpression",
+              operator: "*",
+              left: { type: "LiteralNumericExpression", value: 2 },
+              right: { type: "LiteralNumericExpression", value: 308 }
+            }
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }]
+      }
     );
 
     testParse("({get [6+3]() {}, set [5/4](x) {}})", expr,
-      new Shift.ObjectExpression([
-        new Shift.Getter(new Shift.ComputedPropertyName(
-          new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(6), new Shift.LiteralNumericExpression(3))
-        ), new Shift.FunctionBody([], [])),
-        { type: "Setter",
-          name:
-            new Shift.ComputedPropertyName(
-              new Shift.BinaryExpression("/", new Shift.LiteralNumericExpression(5), new Shift.LiteralNumericExpression(4))
-            ),
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Getter",
+          name: {
+            type: "ComputedPropertyName",
+            expression: {
+              type: "BinaryExpression",
+              operator: "+",
+              left: { type: "LiteralNumericExpression", value: 6 },
+              right: { type: "LiteralNumericExpression", value: 3 }
+            }
+          },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }, {
+          type: "Setter",
+          name: {
+            type: "ComputedPropertyName",
+            expression: {
+              type: "BinaryExpression",
+              operator: "/",
+              left: { type: "LiteralNumericExpression", value: 5 },
+              right: { type: "LiteralNumericExpression", value: 4 }
+            }
+          },
           param: { type: "BindingIdentifier", name: "x" },
-          body: new Shift.FunctionBody([], [])
-        },
-      ])
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({[6+3]() {}})", expr,
-      new Shift.ObjectExpression([
-        { type: "Method",
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Method",
           isGenerator: false,
-          name: new Shift.ComputedPropertyName(
-              new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(6), new Shift.LiteralNumericExpression(3))
-            ),
+          name: {
+            type: "ComputedPropertyName",
+            expression: {
+              type: "BinaryExpression",
+              operator: "+",
+              left: { type: "LiteralNumericExpression", value: 6 },
+              right: { type: "LiteralNumericExpression", value: 3 }
+            }
+          },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [])
-        }
-      ])
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({3() {}})", expr,
-      new Shift.ObjectExpression([
-        { type: "Method",
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Method",
           isGenerator: false,
-          name: new Shift.StaticPropertyName("3"),
+          name: { type: "StaticPropertyName", value: "3" },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [])
-        }
-      ])
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({\"moo\"() {}})", expr,
-      new Shift.ObjectExpression([
-        { type: "Method",
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Method",
           isGenerator: false,
-          name: new Shift.StaticPropertyName("moo"),
+          name: { type: "StaticPropertyName", value: "moo" },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [])
-        }
-      ])
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParse("({\"oink\"(that, little, piggy) {}})", expr,
-      new Shift.ObjectExpression([
-        { type: "Method",
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Method",
           isGenerator: false,
-          name: new Shift.StaticPropertyName("oink"),
-          params:
-            { type: "FormalParameters",
-              items:
-                [{ type: "BindingIdentifier", name: "that" },
-                { type: "BindingIdentifier", name: "little" },
-                { type: "BindingIdentifier", name: "piggy" }],
-              rest: null
-            },
-          body: new Shift.FunctionBody([], [])
-        }
-      ])
+          name: { type: "StaticPropertyName", value: "oink" },
+          params: {
+            type: "FormalParameters",
+            items: [{ type: "BindingIdentifier", name: "that" }, {
+              type: "BindingIdentifier",
+              name: "little"
+            }, { type: "BindingIdentifier", name: "piggy" }],
+            rest: null
+          },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
     );
 
     testParseFailure("({[1,2]:3})", "Unexpected token ,");

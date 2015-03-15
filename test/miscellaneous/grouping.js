@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var expr = require("../helpers").expr;
 
@@ -61,11 +59,12 @@ suite("Parser", function () {
 
 
     testParse("(a) + (b)", expr,
-      new Shift.BinaryExpression(
-        "+",
-        { type: "IdentifierExpression", name: "a" },
-        { type: "IdentifierExpression", name: "b" }
-      )
+      {
+        type: "BinaryExpression",
+        operator: "+",
+        left: { type: "IdentifierExpression", name: "a" },
+        right: { type: "IdentifierExpression", name: "b" }
+      }
     );
 
     testParse("(a)", expr,
@@ -77,65 +76,62 @@ suite("Parser", function () {
     );
 
     testParse("((a))()", expr,
-      new Shift.CallExpression({ type: "IdentifierExpression", name: "a" }, [])
+      { type: "CallExpression", callee: { type: "IdentifierExpression", name: "a" }, arguments: [] }
     );
 
     testParse("((a))((a))", expr,
-      new Shift.CallExpression(
-        { type: "IdentifierExpression", name: "a" },
-        [{ type: "IdentifierExpression", name: "a" }]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "IdentifierExpression", name: "a" },
+        arguments: [{ type: "IdentifierExpression", name: "a" }]
+      }
     );
 
     testParse("(a) = 0", expr,
-      new Shift.AssignmentExpression("=",
-        { type: "BindingIdentifier", name: "a" },
-        new Shift.LiteralNumericExpression(0)
-      )
+      {
+        type: "AssignmentExpression",
+        operator: "=",
+        binding: { type: "BindingIdentifier", name: "a" },
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      }
     );
 
     testParse("((a)) = 0", expr,
-      new Shift.AssignmentExpression("=",
-        { type: "BindingIdentifier", name: "a" },
-        new Shift.LiteralNumericExpression(0)
-      )
+      {
+        type: "AssignmentExpression",
+        operator: "=",
+        binding: { type: "BindingIdentifier", name: "a" },
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      }
     );
 
     testParse("void (a)", expr,
-      new Shift.PrefixExpression("void", { type: "IdentifierExpression", name: "a" })
+      { type: "PrefixExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
     );
 
     testParse("(void a)", expr,
-      new Shift.PrefixExpression("void", { type: "IdentifierExpression", name: "a" })
+      { type: "PrefixExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
     );
 
     testParse("(a++)", expr,
-      new Shift.PostfixExpression(
-        { type: "IdentifierExpression", name: "a" },
-        "++"
-      )
+      { type: "PostfixExpression", operand: { type: "IdentifierExpression", name: "a" }, operator: "++" }
     );
 
     testParse("(a)++", expr,
-      new Shift.PostfixExpression(
-        { type: "IdentifierExpression", name: "a" },
-        "++"
-      )
+      { type: "PostfixExpression", operand: { type: "IdentifierExpression", name: "a" }, operator: "++" }
     );
 
     testParse("(a)--", expr,
-      new Shift.PostfixExpression(
-        { type: "IdentifierExpression", name: "a" },
-        "--"
-      )
+      { type: "PostfixExpression", operand: { type: "IdentifierExpression", name: "a" }, operator: "--" }
     );
 
     testParse("(a) ? (b) : (c)", expr,
-      new Shift.ConditionalExpression(
-        { type: "IdentifierExpression", name: "a" },
-        { type: "IdentifierExpression", name: "b" },
-        { type: "IdentifierExpression", name: "c" }
-      )
+      {
+        type: "ConditionalExpression",
+        test: { type: "IdentifierExpression", name: "a" },
+        consequent: { type: "IdentifierExpression", name: "b" },
+        alternate: { type: "IdentifierExpression", name: "c" }
+      }
     );
   });
 });

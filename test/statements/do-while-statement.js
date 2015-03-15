@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
 
@@ -54,17 +52,31 @@ suite("Parser", function () {
     );
 
     testParse("{do ; while(false); false}", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(false)),
-        new Shift.ExpressionStatement(new Shift.LiteralBooleanExpression(false))
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "DoWhileStatement",
+            body: { type: "EmptyStatement" },
+            test: { type: "LiteralBooleanExpression", value: false }
+          }, { type: "ExpressionStatement", expression: { type: "LiteralBooleanExpression", value: false } }]
+        }
+      }
     );
 
     testParse("{do ; while(false) false}", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        new Shift.DoWhileStatement(new Shift.EmptyStatement(), new Shift.LiteralBooleanExpression(false)),
-        new Shift.ExpressionStatement(new Shift.LiteralBooleanExpression(false))
-      ]))
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "DoWhileStatement",
+            body: { type: "EmptyStatement" },
+            test: { type: "LiteralBooleanExpression", value: false }
+          }, { type: "ExpressionStatement", expression: { type: "LiteralBooleanExpression", value: false } }]
+        }
+      }
     );
   });
 });

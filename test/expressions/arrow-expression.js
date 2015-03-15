@@ -241,6 +241,71 @@ suite("Parser", function () {
       }
     );
 
+    testParse("({x=0}, {})=>0", expr,
+      {
+        type: "ArrowExpression",
+        params: {
+          type: "FormalParameters", items: [{
+            type: "ObjectBinding",
+            properties: [{
+                type: "BindingPropertyIdentifier",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }, {
+            type: "ObjectBinding",
+            properties: []
+          }],
+          rest: null
+        },
+        body: new Shift.LiteralNumericExpression(0)
+      });
+
+    testParse("([x=0], [])=>0", expr,
+      {
+        type: "ArrowExpression",
+        params: {
+          type: "FormalParameters",
+          items: [{
+            type: "ArrayBinding",
+            elements: [{
+                type: "BindingWithDefault",
+                binding: { type: "BindingIdentifier", name: "x" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+            }],
+            restElement: null
+          }, {
+            type: "ArrayBinding",
+            elements: [],
+            restElement: null
+          }],
+          rest: null
+        },
+        body: new Shift.LiteralNumericExpression(0)
+      });
+
+    testParse("(a, {x = 0})=>0", expr,
+      {
+        type: "ArrowExpression",
+        params: {
+          type: "FormalParameters", items: [
+            { type: "BindingIdentifier", name: "a" },
+            {
+              type: "ObjectBinding",
+              properties: [
+                {
+                  type: "BindingPropertyIdentifier",
+                  binding: { type: "BindingIdentifier", name: "x" },
+                  init: { type: "LiteralNumericExpression", value: 0 }
+                }
+              ]
+            },
+          ],
+          rest: null
+        },
+        body: new Shift.LiteralNumericExpression(0)
+      });
+
     testParseFailure("[]=>0", "Unexpected token =>");
     testParseFailure("() + 1", "Unexpected token +");
     testParseFailure("1 + ()", "Unexpected end of input");

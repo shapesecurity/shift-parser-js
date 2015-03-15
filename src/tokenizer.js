@@ -944,7 +944,11 @@ export default class Tokenizer {
   }
 
   getLocation() {
-    return new Shift.SourceLocation(this.startIndex, this.startLine + 1, this.startIndex - this.startLineStart);
+    return {
+      line: this.startLine + 1,
+      column: this.startIndex - this.startLineStart,
+      offset: this.startIndex
+    };
   }
 
   getSlice(start, startLocation) {

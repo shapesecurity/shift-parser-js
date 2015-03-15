@@ -61,5 +61,6 @@ export const ErrorMessages = {
   UNEXPECTED_NEW_TARGET: "Unexpected new . target",
   DUPLICATE_EXPORTED_NAME: "Duplicate export of '{0}'",
   MODULE_EXPORT_UNDEFINED: "Export '{0}' is not defined in module",
+  ILLEGAL_PROPERTY: "Illegal property initializer",
   DUPLICATE_CATCH_BINDING: "Catch parameter '{0}' redeclared as var in for-of loop",
 };

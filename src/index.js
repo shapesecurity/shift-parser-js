@@ -19,7 +19,15 @@ import {Parser} from "./parser";
 import * as Shift from "shift-ast";
 
 function markLocation(node, location) {
-  node.loc = new Shift.SourceSpan(location, new Shift.SourceLocation(this.lastIndex, this.lastLine + 1, this.lastIndex - this.lastLineStart));
+  node.loc = {
+    start: location,
+    end: {
+      line: this.lastLine + 1,
+      column: this.lastIndex - this.lastLineStart,
+      offset: this.lastIndex,
+    },
+    source: null
+  };
   return node;
 }
 

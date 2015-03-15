@@ -265,7 +265,58 @@ suite("Parser", function () {
         )
       );
 
-      testParseFailure("({a = 0});", "Unexpected token ;");
+      testParse("({a:yield} = 0);", expr,
+        {
+          type: "AssignmentExpression",
+          binding: {
+            type: "ObjectBinding",
+            properties: [
+              {
+                type: "BindingPropertyProperty",
+                name: { type: "StaticPropertyName", value: "a" },
+                binding: { type: "BindingIdentifier", name: "yield" }
+              }
+            ]
+          },
+          operator: "=",
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        });
+
+      testParse("({yield} = 0);", expr,
+        {
+          type: "AssignmentExpression",
+          binding: {
+            type: "ObjectBinding",
+            properties: [
+              {
+                type: "BindingPropertyIdentifier",
+                binding: { type: "BindingIdentifier", name: "yield" },
+                init: null
+              }
+            ]
+          },
+          operator: "=",
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        });
+
+      testParse("({yield = 0} = 0);", expr,
+        {
+          type: "AssignmentExpression",
+          binding: {
+            type: "ObjectBinding",
+            properties: [
+              {
+                type: "BindingPropertyIdentifier",
+                binding: { type: "BindingIdentifier", name: "yield" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }
+            ]
+          },
+          operator: "=",
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        });
+
+      testParseFailure("({a = 0});", "Illegal property initializer");
       testParseFailure("({a,,} = 0)", "Unexpected token ,");
       testParseFailure("({,a,} = 0)", "Unexpected token ,");
       testParseFailure("({a,,a} = 0)", "Unexpected token ,");
@@ -276,6 +327,9 @@ suite("Parser", function () {
       testParseFailure("({var} = 0)", "Unexpected token var");
       testParseFailure("({a.b} = 0)", "Unexpected token .");
       testParseFailure("({0} = 0)", "Unexpected token }");
+      testParseFailure("'use strict'; ({yield} = 0);", "Unexpected token yield");
+      testParseFailure("'use strict'; ({yield = 0} = 0);", "Unexpected token yield");
+      testParseFailure("'use strict'; ({a: yield = 0} = 0);", "Unexpected token yield");
     });
   });
 });

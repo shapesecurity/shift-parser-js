@@ -30,7 +30,7 @@ suite("API", function () {
   }
 
   function span(si, sl, sc, ei, el, ec) {
-    return new Shift.SourceSpan(new Shift.SourceLocation(si, sl, sc), new Shift.SourceLocation(ei, el, ec));
+    return new Shift.SourceSpan(new Shift.SourceLocation(si, sl, sc), new Shift.SourceLocation(ei, el, ec), null);
   }
 
   test("for location information", function () {

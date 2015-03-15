@@ -26,6 +26,20 @@ suite("Parser", function () {
         operator: "!" }
     );
 
+    testParse("!(a=b)", expr,
+      {
+        type: "PrefixExpression",
+        operand: {
+          type: "AssignmentExpression",
+          binding: { type: "BindingIdentifier", name: "a" },
+          operator: "=",
+          expression: { type: "IdentifierExpression", name: "b" }
+        },
+        operator: "!"
+      }
+    );
+
+
     testParse("typeof a", expr,
       { type: "PrefixExpression",
         operand: { type: "IdentifierExpression", name: "a" },

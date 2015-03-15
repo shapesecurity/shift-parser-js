@@ -177,7 +177,10 @@ suite("Parser", function () {
     testParseFailure("var new A = 0;", "Unexpected token new");
     testParseFailure("var (x)", "Unexpected token (");
     testParseFailure("var this", "Unexpected token this");
-    testParseFailure("var a.b;", "Unexpected identifier");
+    testParseFailure("var a.b;", "Unexpected token .");
+    testParseFailure("var [a];", "Unexpected token ;");
+    testParseFailure("var {a};", "Unexpected token ;");
+    testParseFailure("var {a:a};", "Unexpected token ;");
     testParseFailure("'use strict'; var enum;", "Unexpected reserved word");
   });
 });

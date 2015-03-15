@@ -1482,6 +1482,12 @@ export default class Tokenizer {
     this.startLine = this.line;
     this.startLineStart = this.lineStart;
 
+    if (this.lastIndex == 0) {
+      this.lastIndex = this.index;
+      this.lastLine = this.line;
+      this.lastLineStart = this.lineStart;
+    }
+
     if (this.index >= this.source.length) {
       return new EOFToken(this.getSlice(this.index, startLocation));
     }

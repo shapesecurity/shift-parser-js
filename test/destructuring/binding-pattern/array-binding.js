@@ -23,11 +23,11 @@ var testParseFailure = require("../../assertions").testParseFailure;
 suite("Parser", function () {
   suite("array binding", function () {
     suite("variable declarator", function () {
-      testParse("var [,a];", stmt,
+      testParse("var [,a] = 0;", stmt,
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
             new Shift.ArrayBinding([null, { type: "BindingIdentifier", name: "a" }], null),
-            null
+            { type: "LiteralNumericExpression", value: 0 }
           ),
         ]))
       );
@@ -52,7 +52,7 @@ suite("Parser", function () {
         ]))
       );
 
-      testParse("var a, [a];", stmt,
+      testParse("var a, [a] = 0;", stmt,
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
             { type: "BindingIdentifier", name: "a" },
@@ -62,24 +62,24 @@ suite("Parser", function () {
             new Shift.ArrayBinding([
               { type: "BindingIdentifier", name: "a" },
             ], null),
-            null
+            { type: "LiteralNumericExpression", value: 0 }
           ),
         ]))
       );
 
-      testParse("var [a, a];", stmt,
+      testParse("var [a, a] = 0;", stmt,
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
             new Shift.ArrayBinding([
               { type: "BindingIdentifier", name: "a" },
               { type: "BindingIdentifier", name: "a" },
             ], null),
-            null
+            { type: "LiteralNumericExpression", value: 0 }
           ),
         ]))
       );
 
-      testParse("var [a, ...a];", stmt,
+      testParse("var [a, ...a] = 0;", stmt,
         new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
           new Shift.VariableDeclarator(
             new Shift.ArrayBinding(
@@ -88,25 +88,25 @@ suite("Parser", function () {
               ],
               { type: "BindingIdentifier", name: "a" }
             ),
-            null
+            { type: "LiteralNumericExpression", value: 0 }
           ),
         ]))
       );
 
-      testParseFailure("var [a.b]", "Unexpected token [");
-      testParseFailure("var ([x])", "Unexpected token (");
+      testParseFailure("var [a.b] = 0", "Unexpected token .");
+      testParseFailure("var ([x]) = 0", "Unexpected token (");
     });
 
     suite("formal parameter", function () {
       // passing cases are tested in other function test cases.
       testParseFailure("([a.b]) => 0", "Illegal arrow function parameter list");
-      testParseFailure("function a([a.b]) {}", "Unexpected token [");
-      testParseFailure("function* a([a.b]) {}", "Unexpected token [");
-      testParseFailure("(function ([a.b]) {})", "Unexpected token [");
-      testParseFailure("(function* ([a.b]) {})", "Unexpected token [");
-      testParseFailure("({a([a.b]){}})", "Unexpected token [");
-      testParseFailure("({*a([a.b]){}})", "Unexpected token [");
-      testParseFailure("({set a([a.b]){}})", "Unexpected token [");
+      testParseFailure("function a([a.b]) {}", "Unexpected token .");
+      testParseFailure("function* a([a.b]) {}", "Unexpected token .");
+      testParseFailure("(function ([a.b]) {})", "Unexpected token .");
+      testParseFailure("(function* ([a.b]) {})", "Unexpected token .");
+      testParseFailure("({a([a.b]){}})", "Unexpected token .");
+      testParseFailure("({*a([a.b]){}})", "Unexpected token .");
+      testParseFailure("({set a([a.b]){}})", "Unexpected token .");
     });
 
     suite("catch clause", function () {

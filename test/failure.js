@@ -324,13 +324,13 @@ suite("Parser", function () {
     testParseFailure("function t() { ;  ;  ", "Unexpected end of input");
     testParseFailure("#=", "Unexpected token ILLEGAL");
     testParseFailure("**", "Unexpected token *");
-    testParseFailure("({a = 0});", "Unexpected token ;");
-    testParseFailure("({a: 0, b = 0});", "Unexpected token ;");
-    testParseFailure("({a: b = 0, c = 0});", "Unexpected token ;");
-    testParseFailure("[{a = 0}];", "Unexpected token ;");
-    testParseFailure("[+{a = 0}];", "Unexpected token ;");
-    testParseFailure("function* f() { [yield {a = 0}]; }", "Unexpected token ;");
-    testParseFailure("function* f() { [yield* {a = 0}]; }", "Unexpected token ;");
+    testParseFailure("({a = 0});", "Illegal property initializer");
+    testParseFailure("({a: 0, b = 0});", "Illegal property initializer");
+    testParseFailure("({a: b = 0, c = 0});", "Illegal property initializer");
+    testParseFailure("[{a = 0}];", "Illegal property initializer");
+    testParseFailure("[+{a = 0}];", "Illegal property initializer");
+    testParseFailure("function* f() { [yield {a = 0}]; }", "Illegal property initializer");
+    testParseFailure("function* f() { [yield* {a = 0}]; }", "Illegal property initializer");
     testParseFailure("1 / %", "Unexpected token %");
 
   });

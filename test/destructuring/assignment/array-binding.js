@@ -86,21 +86,6 @@ suite("Parser", function () {
         )
       );
 
-      // TODO(bzhang): should fail
-      testParse("[, x, ...y,] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [
-              null,
-              { type: "BindingIdentifier", name: "x" },
-            ],
-            { type: "BindingIdentifier", name: "y" }
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
-      );
-
       testParse("[, x,,] = 0", expr,
         new Shift.AssignmentExpression(
           "=",
@@ -262,10 +247,60 @@ suite("Parser", function () {
         },
       });
 
-      testParseFailure("[] = 0", "Invalid left-hand side in assignment");
+      testParse("[] = 0", expr, {
+        type: "AssignmentExpression",
+        binding: {
+          type: "ArrayBinding",
+          elements: [],
+          restElement: null
+        },
+        operator: "=",
+        expression: {
+          type: "LiteralNumericExpression",
+          value: 0
+        }
+      });
+
+      testParse("[{a=0},{a=0}] = 0", expr, {
+        type: "AssignmentExpression",
+        binding: {
+          type: "ArrayBinding",
+          elements: [
+            {
+              type: "ObjectBinding",
+              properties: [{
+                type: "BindingPropertyIdentifier",
+                binding: { type: "BindingIdentifier", name: "a" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }]
+            },
+            {
+              type: "ObjectBinding",
+              properties: [{
+                type: "BindingPropertyIdentifier",
+                binding: { type: "BindingIdentifier", name: "a" },
+                init: { type: "LiteralNumericExpression", value: 0 }
+              }]
+            },
+          ],
+          restElement: null,
+        },
+        operator: "=",
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      });
+
+      testParseFailure("[, x, ...y,] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment"); // TODO(bzhang): Unexpected token ,
       testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...x,,] = 0", "Invalid left-hand side in assignment");
+      testParseFailure("[0,{a=0}] = 0", "Illegal property initializer");
+      testParseFailure("[{a=0},{b=0},0] = 0", "Illegal property initializer");
+      testParseFailure("[{a=0},...0]", "Illegal property initializer");
+      testParseFailure("[...0,a]=0", "Invalid left-hand side in assignment");
+      testParseFailure("[...0,{a=0}]=0", "Illegal property initializer");
+      testParseFailure("[...0,...{a=0}]=0", "Illegal property initializer");
+      testParseFailure("[...{a=0},]", "Illegal property initializer");
+      testParseFailure("[...{a=0},]=0", "Invalid left-hand side in assignment");
     });
   });
 });

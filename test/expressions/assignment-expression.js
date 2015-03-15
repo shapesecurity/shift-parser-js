@@ -166,6 +166,56 @@ suite("Parser", function () {
       )
     );
 
+    testParse("((((((((((((((((((((((((((((((((((((((((a)))))))))))))))))))))))))))))))))))))))) = 0", expr,
+      {
+        type: "AssignmentExpression",
+        binding: { type: "BindingIdentifier", name: "a" },
+        operator: "=",
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      });
+
+    testParse("((((((((((((((((((((((((((((((((((((((((a.a)))))))))))))))))))))))))))))))))))))))) = 0", expr,
+      {
+        type: "AssignmentExpression",
+        binding: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "a" },
+        operator: "=",
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      });
+
+    testParse("[0].length = 0", expr,
+      {
+        type: "AssignmentExpression",
+        binding: {
+          type: "StaticMemberExpression",
+          object: {
+            type: "ArrayExpression",
+            elements: [
+              { type: "LiteralNumericExpression", value: 0 }
+            ]
+          },
+          property: "length"
+        },
+        operator: "=",
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      });
+
+    testParse("([0].length) = 0", expr,
+      {
+        type: "AssignmentExpression",
+        binding: {
+          type: "StaticMemberExpression",
+          object: {
+            type: "ArrayExpression",
+            elements: [
+              { type: "LiteralNumericExpression", value: 0 }
+            ]
+          },
+          property: "length"
+        },
+        operator: "=",
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      });
+
     // TODO: add some assignment failure tests
   });
 });

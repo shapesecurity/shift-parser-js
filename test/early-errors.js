@@ -56,7 +56,7 @@ suite("Parser", function () {
 
     testParseFailure("\"use strict\"; var eval;", "Variable name may not be eval or arguments in strict mode");
     testParseFailure("\"use strict\"; var arguments;", "Variable name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; let [eval];", "Variable name may not be eval or arguments in strict mode");
+    testParseFailure("\"use strict\"; let [eval] = 0;", "Variable name may not be eval or arguments in strict mode");
     testParseFailure("\"use strict\"; const {a: eval} = 0;", "Variable name may not be eval or arguments in strict mode");
     testParseModuleFailure("var eval;", "Variable name may not be eval or arguments in strict mode");
 
@@ -119,7 +119,7 @@ suite("Parser", function () {
     testParseFailure("class A extends B { constructor() { !{get constructor() { super(); }}; } }", "Unexpected super call");
     testParseFailure("class A extends B { constructor() { !{set constructor(a) { super(); }}; } }", "Unexpected super call");
     // Always throw a Syntax Error if code matches this production.
-    testParseFailure("({ a = 0 });", "Unexpected token ;");
+    testParseFailure("({ a = 0 });", "Illegal property initializer");
 
     // 12.2.7.1
     // It is a Syntax Error if BodyText of RegularExpressionLiteral cannot be recognized using the goal symbol Pattern of the ECMAScript RegExp grammar specified in 21.2.1.
@@ -208,9 +208,9 @@ suite("Parser", function () {
     testParseFailure("let a = 0, a = 1;", "Duplicate binding 'a'");
     testParseFailure("const a = 0, a = 1;", "Duplicate binding 'a'");
     testParseFailure("const a = 0, b = 1, a = 2;", "Duplicate binding 'a'");
-    testParseFailure("let a, [a];", "Duplicate binding 'a'");
-    testParseFailure("let [a, a];", "Duplicate binding 'a'");
-    testParseFailure("let [a, ...a];", "Duplicate binding 'a'");
+    testParseFailure("let a, [a] = 0;", "Duplicate binding 'a'");
+    testParseFailure("let [a, a] = 0;", "Duplicate binding 'a'");
+    testParseFailure("let [a, ...a] = 0;", "Duplicate binding 'a'");
     testParseFailure("let \\u{61}, \\u{0061};", "Duplicate binding 'a'");
     testParseFailure("let \\u0061, \\u{0061};", "Duplicate binding 'a'");
     testParseFailure("let x\\u{61}, x\\u{0061};", "Duplicate binding 'xa'");
@@ -412,8 +412,8 @@ suite("Parser", function () {
     testParseFailure("class A { static f([a, a]){} }", "Duplicate binding 'a'");
     testParseFailure("class A { static f({a, a}){} }", "Duplicate binding 'a'");
     testParseFailure("(a, a) => 0;", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("([a, a]) => 0;", "Duplicate binding 'a'");
-    testParseFailure("({a, a}) => 0;", "Duplicate binding 'a'");
+    testParseFailure("([a, a]) => 0;", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("({a, a}) => 0;", "Strict mode function may not have duplicate parameter names");
     testParseFailure("([a],...a)=>0", "Strict mode function may not have duplicate parameter names");
     testParseFailure("(a,...a)=>0", "Strict mode function may not have duplicate parameter names");
     testParseFailure("([a],...a)=>0", "Strict mode function may not have duplicate parameter names");

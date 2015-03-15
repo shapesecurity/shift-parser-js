@@ -225,7 +225,19 @@ suite("Parser", function () {
       )
     );
 
-    testParseFailure("(function([]){})", "Unexpected token [");
+    testParse("(function([]){})", expr,
+      {
+        type: "FunctionExpression",
+        isGenerator: false,
+        name: null,
+        params: {
+          type: "FormalParameters",
+          items: [{ type: "ArrayBinding", elements: [], restElement: null }],
+          rest: null
+        },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      });
+
     testParseFailure("(function(...a, b){})", "Unexpected token ,");
     testParseFailure("(function((a)){})", "Unexpected token (");
     testParseFailure("(function(package){'use strict';})", "Use of future reserved word in strict mode");

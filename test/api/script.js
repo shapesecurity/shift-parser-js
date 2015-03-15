@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 
@@ -25,8 +23,8 @@ function id(x) {
 
 suite("Parser", function () {
   suite("script", function () {
-    testParse("", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse(" ", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse("", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse(" ", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
     testParseFailure("/*", "Unexpected token ILLEGAL");
   });
 });

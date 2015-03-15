@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 var testParseFailure = require("../assertions").testParseFailure;
@@ -30,19 +28,19 @@ suite("Parser", function () {
     // LiteralNumericExpression and StaticMemberExpression
 
     testParse("0 .toString", expr,
-      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(0), "toString")
+      { type: "StaticMemberExpression", object: { type: "LiteralNumericExpression", value: 0 }, property: "toString" }
     );
 
     testParse("0.0.toString", expr,
-      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(0), "toString")
+      { type: "StaticMemberExpression", object: { type: "LiteralNumericExpression", value: 0 }, property: "toString" }
     );
 
     testParse("0..toString", expr,
-      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(0), "toString")
+      { type: "StaticMemberExpression", object: { type: "LiteralNumericExpression", value: 0 }, property: "toString" }
     );
 
     testParse("01.toString", expr,
-      new Shift.StaticMemberExpression(new Shift.LiteralNumericExpression(1), "toString")
+      { type: "StaticMemberExpression", object: { type: "LiteralNumericExpression", value: 1 }, property: "toString" }
     );
 
     testParseFailure("0.toString", "Unexpected token ILLEGAL");
@@ -50,16 +48,11 @@ suite("Parser", function () {
     // LeftHandSideExpressions
 
     testParse("a.b(b, c)", expr,
-      new Shift.CallExpression(
-        new Shift.StaticMemberExpression(
-          { type: "IdentifierExpression", name: "a" },
-          "b"
-        ),
-        [
-          { type: "IdentifierExpression", name: "b" },
-          { type: "IdentifierExpression", name: "c" },
-        ]
-      )
+      {
+        type: "CallExpression",
+        callee: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "b" },
+        arguments: [{ type: "IdentifierExpression", name: "b" }, { type: "IdentifierExpression", name: "c" }]
+      }
     );
 
     testParse("a[b](b,c)", expr,
@@ -75,13 +68,15 @@ suite("Parser", function () {
 
 
     testParse("new foo().bar()", expr,
-      new Shift.CallExpression(
-        new Shift.StaticMemberExpression(
-          new Shift.NewExpression({ type: "IdentifierExpression", name: "foo" }, []),
-          "bar"
-        ),
-        []
-      )
+      {
+        type: "CallExpression",
+        callee: {
+          type: "StaticMemberExpression",
+          object: { type: "NewExpression", callee: { type: "IdentifierExpression", name: "foo" }, arguments: [] },
+          property: "bar"
+        },
+        arguments: []
+      }
     );
 
     testParse("new foo[bar]", expr,
@@ -95,71 +90,90 @@ suite("Parser", function () {
 
 
     testParse("new foo.bar()", expr,
-      new Shift.NewExpression(
-        new Shift.StaticMemberExpression(
-          { type: "IdentifierExpression", name: "foo" },
-          "bar"
-        ),
-        []
-      )
+      {
+        type: "NewExpression",
+        callee: {
+          type: "StaticMemberExpression",
+          object: { type: "IdentifierExpression", name: "foo" },
+          property: "bar"
+        },
+        arguments: []
+      }
     );
 
     testParse("(new foo).bar()", expr,
-      new Shift.CallExpression(
-        new Shift.StaticMemberExpression(
-          new Shift.NewExpression({ type: "IdentifierExpression", name: "foo" }, []),
-          "bar"
-        ),
-        []
-      )
+      {
+        type: "CallExpression",
+        callee: {
+          type: "StaticMemberExpression",
+          object: { type: "NewExpression", callee: { type: "IdentifierExpression", name: "foo" }, arguments: [] },
+          property: "bar"
+        },
+        arguments: []
+      }
     );
 
     testParse("a[0].b", expr,
-      new Shift.StaticMemberExpression(
-        new Shift.ComputedMemberExpression(
-          { type: "IdentifierExpression", name: "a" },
-          new Shift.LiteralNumericExpression(0)
-        ),
-        "b"
-      )
+      {
+        type: "StaticMemberExpression",
+        object: {
+          type: "ComputedMemberExpression",
+          object: { type: "IdentifierExpression", name: "a" },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        },
+        property: "b"
+      }
     );
 
     testParse("a(0).b", expr,
-      new Shift.StaticMemberExpression(
-        new Shift.CallExpression(
-          { type: "IdentifierExpression", name: "a" },
-          [new Shift.LiteralNumericExpression(0)]
-        ),
-        "b"
-      )
+      {
+        type: "StaticMemberExpression",
+        object: {
+          type: "CallExpression",
+          callee: { type: "IdentifierExpression", name: "a" },
+          arguments: [{ type: "LiteralNumericExpression", value: 0 }]
+        },
+        property: "b"
+      }
     );
 
     testParse("a(0).b(14, 3, 77).c", expr,
-      new Shift.StaticMemberExpression(
-        new Shift.CallExpression(
-          new Shift.StaticMemberExpression(
-            new Shift.CallExpression(
-              { type: "IdentifierExpression", name: "a" },
-              [new Shift.LiteralNumericExpression(0)]
-            ),
-            "b"
-          ),
-          [
-            new Shift.LiteralNumericExpression(14),
-            new Shift.LiteralNumericExpression(3),
-            new Shift.LiteralNumericExpression(77),
-          ]
-        ),
-        "c"
-      )
+      {
+        type: "StaticMemberExpression",
+        object: {
+          type: "CallExpression",
+          callee: {
+            type: "StaticMemberExpression",
+            object: {
+              type: "CallExpression",
+              callee: { type: "IdentifierExpression", name: "a" },
+              arguments: [{ type: "LiteralNumericExpression", value: 0 }]
+            },
+            property: "b"
+          },
+          arguments: [{ type: "LiteralNumericExpression", value: 14 }, {
+            type: "LiteralNumericExpression",
+            value: 3
+          }, { type: "LiteralNumericExpression", value: 77 }]
+        },
+        property: "c"
+      }
     );
 
     testParse("a.b.c(2014)", expr,
-      new Shift.CallExpression(
-        new Shift.StaticMemberExpression(new Shift.StaticMemberExpression(
-          { type: "IdentifierExpression", name: "a" }, "b"), "c"),
-        [new Shift.LiteralNumericExpression(2014)]
-      )
+      {
+        type: "CallExpression",
+        callee: {
+          type: "StaticMemberExpression",
+          object: {
+            type: "StaticMemberExpression",
+            object: { type: "IdentifierExpression", name: "a" },
+            property: "b"
+          },
+          property: "c"
+        },
+        arguments: [{ type: "LiteralNumericExpression", value: 2014 }]
+      }
     );
 
     // BinaryExpressions
@@ -244,11 +258,12 @@ suite("Parser", function () {
     );
 
     testParse("/* assignment */\n a = b", expr,
-      new Shift.AssignmentExpression(
-        "=",
-        { type: "BindingIdentifier", name: "a" },
-        { type: "IdentifierExpression", name: "b" }
-      )
+      {
+        type: "AssignmentExpression",
+        operator: "=",
+        binding: { type: "BindingIdentifier", name: "a" },
+        expression: { type: "IdentifierExpression", name: "b" }
+      }
     );
 
     testParse("0 /*The*/ /*Answer*/", expr, { type: "LiteralNumericExpression", value: 0 });
@@ -383,50 +398,94 @@ suite("Parser", function () {
     );
 
     testParse("/* header */ (function(){ var version = 1; }).call(this)", expr,
-      new Shift.CallExpression(
-        new Shift.StaticMemberExpression(
-          { type: "FunctionExpression",
+      {
+        type: "CallExpression",
+        callee: {
+          type: "StaticMemberExpression",
+          object: {
+            type: "FunctionExpression",
             isGenerator: false,
             name: null,
             params: { type: "FormalParameters", items: [], rest: null },
-            body: new Shift.FunctionBody([], [
-              new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-                new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "version" }, new Shift.LiteralNumericExpression(1)),
-              ])),
-            ])
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "VariableDeclarationStatement",
+                declaration: {
+                  type: "VariableDeclaration",
+                  kind: "var",
+                  declarators: [{
+                    type: "VariableDeclarator",
+                    binding: { type: "BindingIdentifier", name: "version" },
+                    init: { type: "LiteralNumericExpression", value: 1 }
+                  }]
+                }
+              }]
+            }
           },
-          "call"
-        ), [new Shift.ThisExpression]
-      )
+          property: "call"
+        },
+        arguments: [{ type: "ThisExpression" }]
+      }
     );
     testParse("(function(){ var version = 1; /* sync */ }).call(this)", expr,
-      new Shift.CallExpression(
-        new Shift.StaticMemberExpression(
-          { type: "FunctionExpression",
+      {
+        type: "CallExpression",
+        callee: {
+          type: "StaticMemberExpression",
+          object: {
+            type: "FunctionExpression",
             isGenerator: false,
             name: null,
             params: { type: "FormalParameters", items: [], rest: null },
-            body: new Shift.FunctionBody([], [
-              new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-                new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "version" }, new Shift.LiteralNumericExpression(1)),
-              ])),
-            ])
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "VariableDeclarationStatement",
+                declaration: {
+                  type: "VariableDeclaration",
+                  kind: "var",
+                  declarators: [{
+                    type: "VariableDeclarator",
+                    binding: { type: "BindingIdentifier", name: "version" },
+                    init: { type: "LiteralNumericExpression", value: 1 }
+                  }]
+                }
+              }]
+            }
           },
-          "call"
-        ), [new Shift.ThisExpression]
-      )
+          property: "call"
+        },
+        arguments: [{ type: "ThisExpression" }]
+      }
     );
     testParse("function f() { /* infinite */ while (true) { } /* bar */ var each; }", stmt,
       { type: "FunctionDeclaration",
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "f" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [
-          new Shift.WhileStatement(new Shift.LiteralBooleanExpression(true), new Shift.BlockStatement(new Shift.Block([]))),
-          new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-            new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "each" }, null)
-          ])),
-        ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "WhileStatement",
+            test: { type: "LiteralBooleanExpression", value: true },
+            body: { type: "BlockStatement", block: { type: "Block", statements: [] } }
+          }, {
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "var",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "each" },
+                init: null
+              }]
+            }
+          }]
+        }
       }
     );
 
@@ -444,9 +503,18 @@ suite("Parser", function () {
     );
 
     testParse("var x = 1<!--foo", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, new Shift.LiteralNumericExpression(1)),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "x" },
+            init: { type: "LiteralNumericExpression", value: 1 }
+          }]
+        }
+      }
     );
 
     testParse("/* not comment*/; i-->0", id,

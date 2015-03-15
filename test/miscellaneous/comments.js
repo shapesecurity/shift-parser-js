@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 
 function id(x) {
@@ -24,15 +22,27 @@ function id(x) {
 
 suite("Parser", function () {
   suite("Comments", function () {
-    testParse(" /**/", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse(" /****/", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse(" /**\n\r\r\n**/", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse(" //\n", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse("<!-- foo", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse("--> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse("<!-- comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse(" \t --> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse(" \t /* block comment */  --> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
-    testParse("/* block comment */--> comment", id, new Shift.Script(new Shift.FunctionBody([], [])));
+    testParse(" /**/", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse(" /****/", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse(" /**\n\r\r\n**/", id, {
+      type: "Script",
+      body: { type: "FunctionBody", directives: [], statements: [] }
+    });
+    testParse(" //\n", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse("<!-- foo", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse("--> comment", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse("<!-- comment", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse(" \t --> comment", id, {
+      type: "Script",
+      body: { type: "FunctionBody", directives: [], statements: [] }
+    });
+    testParse(" \t /* block comment */  --> comment", id, {
+      type: "Script",
+      body: { type: "FunctionBody", directives: [], statements: [] }
+    });
+    testParse("/* block comment */--> comment", id, {
+      type: "Script",
+      body: { type: "FunctionBody", directives: [], statements: [] }
+    });
   });
 });

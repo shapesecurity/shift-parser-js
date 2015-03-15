@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var expr = require("../helpers").expr;
 var testParseFailure = require("../assertions").testParseFailure;
@@ -26,14 +24,14 @@ suite("Parser", function () {
     testParse("(()=>0)", expr,
       { type: "ArrowExpression",
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
     testParse("() => 0", expr,
       { type: "ArrowExpression",
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
@@ -44,14 +42,14 @@ suite("Parser", function () {
             items: [],
             rest: { type: "BindingIdentifier", name: "a" }
           },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
     testParse("() => {}", expr,
       { type: "ArrowExpression",
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -62,7 +60,7 @@ suite("Parser", function () {
             items: [{ type: "BindingIdentifier", name: "a" }],
             rest: null
           },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
@@ -72,13 +70,11 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                new Shift.ArrayBinding(
-                  [{ type: "BindingIdentifier", name: "a" }],
-                  null)
+                { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null }
               ],
             rest: null
           },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
@@ -89,7 +85,7 @@ suite("Parser", function () {
             items: [{ type: "BindingIdentifier", name: "a" }],
             rest: null
           },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
@@ -99,15 +95,18 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                new Shift.ObjectBinding([
-                  { type: "BindingPropertyIdentifier",
+                {
+                  type: "ObjectBinding",
+                  properties: [{
+                    type: "BindingPropertyIdentifier",
                     binding: { type: "BindingIdentifier", name: "a" },
-                    init: null }
-                ])
+                    init: null
+                  }]
+                }
               ],
             rest: null
           },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
@@ -125,24 +124,22 @@ suite("Parser", function () {
                 items: [],
                 rest: null
               },
-            body: new Shift.LiteralNumericExpression(0)
+            body: { type: "LiteralNumericExpression", value: 0 }
           }
       }
     );
 
     testParse("() => 0, 1", expr,
-      new Shift.BinaryExpression(
-        ",",
-        { type: "ArrowExpression",
-          params:
-            { type: "FormalParameters",
-              items: [],
-              rest: null
-            },
-          body: new Shift.LiteralNumericExpression(0)
+      {
+        type: "BinaryExpression",
+        operator: ",",
+        left: {
+          type: "ArrowExpression",
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: { type: "LiteralNumericExpression", value: 0 }
         },
-        new Shift.LiteralNumericExpression(1)
-      ));
+        right: { type: "LiteralNumericExpression", value: 1 }
+      });
 
     testParse("() => 0 + 1", expr,
       { type: "ArrowExpression",
@@ -151,12 +148,12 @@ suite("Parser", function () {
             items: [],
             rest: null
           },
-        body:
-          new Shift.BinaryExpression(
-            "+",
-            new Shift.LiteralNumericExpression(0),
-            new Shift.LiteralNumericExpression(1)
-          )
+        body: {
+          type: "BinaryExpression",
+          operator: "+",
+          left: { type: "LiteralNumericExpression", value: 0 },
+          right: { type: "LiteralNumericExpression", value: 1 }
+        }
       }
     );
 
@@ -171,12 +168,12 @@ suite("Parser", function () {
               ],
             rest: null
           },
-        body:
-          new Shift.BinaryExpression(
-            "+",
-            new Shift.LiteralNumericExpression(0),
-            new Shift.LiteralNumericExpression(1)
-          )
+        body: {
+          type: "BinaryExpression",
+          operator: "+",
+          left: { type: "LiteralNumericExpression", value: 0 },
+          right: { type: "LiteralNumericExpression", value: 1 }
+        }
       }
     );
 
@@ -191,24 +188,24 @@ suite("Parser", function () {
               ],
             rest: { type: "BindingIdentifier", name: "c" }
           },
-        body:
-          new Shift.BinaryExpression(
-            "+",
-            new Shift.LiteralNumericExpression(0),
-            new Shift.LiteralNumericExpression(1)
-          )
+        body: {
+          type: "BinaryExpression",
+          operator: "+",
+          left: { type: "LiteralNumericExpression", value: 0 },
+          right: { type: "LiteralNumericExpression", value: 1 }
+        }
       }
     );
 
     testParse("() => (a) = 0", expr,
       { type: "ArrowExpression",
         params: { type: "FormalParameters", items: [], rest: null },
-        body:
-          new Shift.AssignmentExpression(
-            "=",
-            { type: "BindingIdentifier", name: "a" },
-            new Shift.LiteralNumericExpression(0)
-          )
+        body: {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: { type: "BindingIdentifier", name: "a" },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       }
     );
 
@@ -221,7 +218,7 @@ suite("Parser", function () {
             body:
               { type: "ArrowExpression",
                 params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "c" }], rest: null },
-                body: new Shift.LiteralNumericExpression(0)
+                body: { type: "LiteralNumericExpression", value: 0 }
               }
           }
       }
@@ -230,14 +227,14 @@ suite("Parser", function () {
     testParse("(x)=>{'use strict';}", expr,
       { type: "ArrowExpression",
         params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "x" }], rest: null },
-        body: new Shift.FunctionBody([new Shift.Directive("use strict")], [])
+        body: { type: "FunctionBody", directives: [{ type: "Directive", rawValue: "use strict" }], statements: [] }
       }
     );
 
     testParse("'use strict';(x)=>0", expr,
       { type: "ArrowExpression",
         params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "x" }], rest: null },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       }
     );
 
@@ -258,7 +255,7 @@ suite("Parser", function () {
           }],
           rest: null
         },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       });
 
     testParse("([x=0], [])=>0", expr,
@@ -281,7 +278,7 @@ suite("Parser", function () {
           }],
           rest: null
         },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       });
 
     testParse("(a, {x = 0})=>0", expr,
@@ -303,7 +300,7 @@ suite("Parser", function () {
           ],
           rest: null
         },
-        body: new Shift.LiteralNumericExpression(0)
+        body: { type: "LiteralNumericExpression", value: 0 }
       });
 
     testParseFailure("[]=>0", "Unexpected token =>");

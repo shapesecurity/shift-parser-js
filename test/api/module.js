@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParseModule = require("../assertions").testParseModule;
 var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 
@@ -25,7 +23,7 @@ function id(x) {
 
 suite("Parser", function () {
   suite("module", function () {
-    testParseModule("", id, new Shift.Module([]));
+    testParseModule("", id, { type: "Module", items: [] });
 
     testParseModuleFailure("/*", "Unexpected token ILLEGAL");
   });

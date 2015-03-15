@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var stmt = require("../helpers").stmt;
@@ -23,28 +21,50 @@ var stmt = require("../helpers").stmt;
 suite("Parser", function () {
   suite("declarations", function () {
     testParse("let a", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let",
-        [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
-        ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+        }
+      }
     );
 
     testParse("{ let a; }", stmt,
-      new Shift.BlockStatement(
-        new Shift.Block([
-          new Shift.VariableDeclarationStatement(
-            new Shift.VariableDeclaration(
-              "let",
-              [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)]))])));
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "VariableDeclarationStatement",
+            declaration: {
+              type: "VariableDeclaration",
+              kind: "let",
+              declarators: [{
+                type: "VariableDeclarator",
+                binding: { type: "BindingIdentifier", name: "a" },
+                init: null
+              }]
+            }
+          }]
+        }
+      });
 
     // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token let");
     testParse("while(true) var a", stmt,
-      new Shift.WhileStatement(
-        new Shift.LiteralBooleanExpression(true),
-        new Shift.VariableDeclarationStatement(
-          new Shift.VariableDeclaration(
-            "var",
-            [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)]))));
+      {
+        type: "WhileStatement",
+        test: { type: "LiteralBooleanExpression", value: true },
+        body: {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+          }
+        }
+      });
 
     testParseFailure("while(true) let a", "Unexpected identifier");
     testParseFailure("while(true) const a", "Unexpected token const");

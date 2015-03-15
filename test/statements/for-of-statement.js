@@ -14,42 +14,51 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
 
 suite("Parser", function () {
   suite("for in statement", function () {
     testParse("for (var x of list) process(x);", stmt,
-      new Shift.ForOfStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)
-        ]),
-        { type: "IdentifierExpression", name: "list" },
-        new Shift.ExpressionStatement(new Shift.CallExpression(
-          { type: "IdentifierExpression", name: "process" },
-          [{ type: "IdentifierExpression", name: "x" }]
-        ))
-      )
+      {
+        type: "ForOfStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+        },
+        right: { type: "IdentifierExpression", name: "list" },
+        body: {
+          type: "ExpressionStatement",
+          expression: {
+            type: "CallExpression",
+            callee: { type: "IdentifierExpression", name: "process" },
+            arguments: [{ type: "IdentifierExpression", name: "x" }]
+          }
+        }
+      }
     );
 
     testParse("for(var a of b);", stmt,
-      new Shift.ForOfStatement(
-        new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "a" }, null)
-        ]),
-        { type: "IdentifierExpression", name: "b" },
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForOfStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+        },
+        right: { type: "IdentifierExpression", name: "b" },
+        body: { type: "EmptyStatement" }
+      }
     );
 
     testParse("for(a of b);", stmt,
-      new Shift.ForOfStatement(
-        { type: "IdentifierExpression", name: "a" },
-        { type: "IdentifierExpression", name: "b" },
-        new Shift.EmptyStatement
-      )
+      {
+        type: "ForOfStatement",
+        left: { type: "IdentifierExpression", name: "a" },
+        right: { type: "IdentifierExpression", name: "b" },
+        body: { type: "EmptyStatement" }
+      }
     );
   });
 });

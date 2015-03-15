@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
@@ -44,26 +42,43 @@ suite("Parser", function() {
     // ES5: assignment to computed member expression
     // ES6: variable declaration statement
     testParse("let[a] = b;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator(
-          new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "a" }], null),
-          { type: "IdentifierExpression", name: "b" }
-        ),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null },
+            init: { type: "IdentifierExpression", name: "b" }
+          }]
+        }
+      }
     );
     testParse("const[a] = b;", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("const", [
-        new Shift.VariableDeclarator(
-          new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "a" }], null),
-          { type: "IdentifierExpression", name: "b" }
-        ),
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "const",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null },
+            init: { type: "IdentifierExpression", name: "b" }
+          }]
+        }
+      }
     );
 
     testParse("var let", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "let" }, null)
-      ])));
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "let" }, init: null }]
+        }
+      });
 
     testParseFailure("'use strict'; var let", "Unexpected token let");
     testParseFailure("var const", "Unexpected token const");
@@ -71,14 +86,19 @@ suite("Parser", function() {
     // ES5: invalid program
     // ES6: function declaration within a block
     testParse("{ function f(){} }", stmt,
-      new Shift.BlockStatement(new Shift.Block([
-        { type: "FunctionDeclaration",
-          isGenerator: false,
-          name: { type: "BindingIdentifier", name: "f" },
-          params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [])
+      {
+        type: "BlockStatement",
+        block: {
+          type: "Block",
+          statements: [{
+            type: "FunctionDeclaration",
+            isGenerator: false,
+            name: { type: "BindingIdentifier", name: "f" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] }
+          }]
         }
-      ]))
+      }
     );
   });
 
@@ -87,33 +107,52 @@ suite("Parser", function() {
     // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
     // ES6: yield has been moved from the future reserved words list to the keywords list
     testParse("var yield = function yield(){};", stmt,
-      new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator(
-          { type: "BindingIdentifier", name: "yield" },
-          { type: "FunctionExpression",
-            isGenerator: false,
-            name: { type: "BindingIdentifier", name: "yield" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: new Shift.FunctionBody([], [])
-          }
-        )
-      ]))
+      {
+        type: "VariableDeclarationStatement",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "yield" },
+            init: {
+              type: "FunctionExpression",
+              isGenerator: false,
+              name: { type: "BindingIdentifier", name: "yield" },
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: { type: "FunctionBody", directives: [], statements: [] }
+            }
+          }]
+        }
+      }
     );
 
     // ES5: this declares a function-scoped variable while at the same time assigning to the block-scoped variable
     // ES6: this particular construction is explicitly disallowed
     testParse("try {} catch(e) { var e = 0; }", stmt,
-      new Shift.TryCatchStatement(
-        new Shift.Block([]),
-        new Shift.CatchClause(
-          { type: "BindingIdentifier", name: "e" },
-          new Shift.Block([
-            new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-              new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "e" }, new Shift.LiteralNumericExpression(0))
-            ]))
-          ])
-        )
-      )
+      {
+        type: "TryCatchStatement",
+        body: { type: "Block", statements: [] },
+        catchClause: {
+          type: "CatchClause",
+          binding: { type: "BindingIdentifier", name: "e" },
+          body: {
+            type: "Block",
+            statements: [{
+              type: "VariableDeclarationStatement",
+              declaration: {
+                type: "VariableDeclaration",
+                kind: "var",
+                declarators: [{
+                  type: "VariableDeclarator",
+                  binding: { type: "BindingIdentifier", name: "e" },
+                  init: { type: "LiteralNumericExpression", value: 0 }
+                }]
+              }
+            }]
+          }
+        }
+      }
     );
 
     // ES5: allows any LeftHandSideExpression on the left of an assignment
@@ -132,22 +171,58 @@ suite("Parser", function() {
     testParseFailure("for(var x=1 of [1,2,3]) 0", "Invalid variable declaration in for-of statement");
     testParseFailure("for(let x=1 of [1,2,3]) 0", "Invalid variable declaration in for-of statement");
 
-    testParse("for(var x in [1,2]) 0", stmt, new Shift.ForInStatement(
-      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
-      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
-      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
-    testParse("for(let x in [1,2]) 0", stmt, new Shift.ForInStatement(
-      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
-      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
-      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
-    testParse("for(var x of [1,2]) 0", stmt, new Shift.ForOfStatement(
-      new Shift.VariableDeclaration("var", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
-      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
-      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
-    testParse("for(let x of [1,2]) 0", stmt, new Shift.ForOfStatement(
-      new Shift.VariableDeclaration("let", [new Shift.VariableDeclarator({ type: "BindingIdentifier", name: "x" }, null)]),
-      new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1), new Shift.LiteralNumericExpression(2)]),
-      new Shift.ExpressionStatement(new Shift.LiteralNumericExpression(0))));
+    testParse("for(var x in [1,2]) 0", stmt, {
+      type: "ForInStatement",
+      left: {
+        type: "VariableDeclaration",
+        kind: "var",
+        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+      },
+      right: {
+        type: "ArrayExpression",
+        elements: [{ type: "LiteralNumericExpression", value: 1 }, { type: "LiteralNumericExpression", value: 2 }]
+      },
+      body: { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } }
+    });
+    testParse("for(let x in [1,2]) 0", stmt, {
+      type: "ForInStatement",
+      left: {
+        type: "VariableDeclaration",
+        kind: "let",
+        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+      },
+      right: {
+        type: "ArrayExpression",
+        elements: [{ type: "LiteralNumericExpression", value: 1 }, { type: "LiteralNumericExpression", value: 2 }]
+      },
+      body: { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } }
+    });
+    testParse("for(var x of [1,2]) 0", stmt, {
+      type: "ForOfStatement",
+      left: {
+        type: "VariableDeclaration",
+        kind: "var",
+        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+      },
+      right: {
+        type: "ArrayExpression",
+        elements: [{ type: "LiteralNumericExpression", value: 1 }, { type: "LiteralNumericExpression", value: 2 }]
+      },
+      body: { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } }
+    });
+    testParse("for(let x of [1,2]) 0", stmt, {
+      type: "ForOfStatement",
+      left: {
+        type: "VariableDeclaration",
+        kind: "let",
+        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+      },
+      right: {
+        type: "ArrayExpression",
+        elements: [{ type: "LiteralNumericExpression", value: 1 }, { type: "LiteralNumericExpression", value: 2 }]
+      },
+      body: { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } }
+    });
 
     // ES5: allows unicode escape sequences in regular expression flags
     // ES6: disallowes unicode escape sequences in regular expression flags
@@ -168,14 +243,16 @@ suite("Parser", function() {
     testParseModuleFailure("-->", "Unexpected token >");
 
     testParseModule("a<!--b", moduleExpr,
-      new Shift.BinaryExpression("<",
-        { type: "IdentifierExpression", name: "a" },
-        new Shift.PrefixExpression("!",
-          new Shift.PrefixExpression("--",
-            { type: "IdentifierExpression", name: "b" }
-          )
-        )
-      )
+      {
+        type: "BinaryExpression",
+        operator: "<",
+        left: { type: "IdentifierExpression", name: "a" },
+        right: {
+          type: "PrefixExpression",
+          operator: "!",
+          operand: { type: "PrefixExpression", operator: "--", operand: { type: "IdentifierExpression", name: "b" } }
+        }
+      }
     );
 
   });

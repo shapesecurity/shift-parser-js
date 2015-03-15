@@ -14,55 +14,51 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
   suite("array expression", function () {
 
-    testParse("[]", expr, new Shift.ArrayExpression([]));
+    testParse("[]", expr, { type: "ArrayExpression", elements: [] });
 
-    testParse("[ ]", expr, new Shift.ArrayExpression([]));
+    testParse("[ ]", expr, { type: "ArrayExpression", elements: [] });
 
-    testParse("[ 0 ]", expr, new Shift.ArrayExpression([
-      new Shift.LiteralNumericExpression(0),
-    ]));
+    testParse("[ 0 ]", expr, { type: "ArrayExpression", elements: [{ type: "LiteralNumericExpression", value: 0 }] });
 
-    testParse("[ 0, ]", expr, new Shift.ArrayExpression([
-      new Shift.LiteralNumericExpression(0),
-    ]));
+    testParse("[ 0, ]", expr, { type: "ArrayExpression", elements: [{ type: "LiteralNumericExpression", value: 0 }] });
 
-    testParse("[ ,, 0 ]", expr, new Shift.ArrayExpression([
-      null,
-      null,
-      new Shift.LiteralNumericExpression(0),
-    ]));
+    testParse("[ ,, 0 ]", expr, {
+      type: "ArrayExpression",
+      elements: [null, null, { type: "LiteralNumericExpression", value: 0 }]
+    });
 
-    testParse("[ 1, 2, 3, ]", expr, new Shift.ArrayExpression([
-      new Shift.LiteralNumericExpression(1),
-      new Shift.LiteralNumericExpression(2),
-      new Shift.LiteralNumericExpression(3),
-    ]));
+    testParse("[ 1, 2, 3, ]", expr, {
+      type: "ArrayExpression",
+      elements: [{ type: "LiteralNumericExpression", value: 1 }, {
+        type: "LiteralNumericExpression",
+        value: 2
+      }, { type: "LiteralNumericExpression", value: 3 }]
+    });
 
-    testParse("[ 1, 2,, 3, ]", expr, new Shift.ArrayExpression([
-      new Shift.LiteralNumericExpression(1),
-      new Shift.LiteralNumericExpression(2),
-      null,
-      new Shift.LiteralNumericExpression(3),
-    ]));
+    testParse("[ 1, 2,, 3, ]", expr, {
+      type: "ArrayExpression",
+      elements: [{ type: "LiteralNumericExpression", value: 1 }, {
+        type: "LiteralNumericExpression",
+        value: 2
+      }, null, { type: "LiteralNumericExpression", value: 3 }]
+    });
 
-    testParse("[,,1,,,2,3,,]", expr, new Shift.ArrayExpression([
-      null,
-      null,
-      new Shift.LiteralNumericExpression(1),
-      null,
-      null,
-      new Shift.LiteralNumericExpression(2),
-      new Shift.LiteralNumericExpression(3),
-      null,
-    ]));
+    testParse("[,,1,,,2,3,,]", expr, {
+      type: "ArrayExpression",
+      elements: [null, null, {
+        type: "LiteralNumericExpression",
+        value: 1
+      }, null, null, { type: "LiteralNumericExpression", value: 2 }, {
+        type: "LiteralNumericExpression",
+        value: 3
+      }, null]
+    });
 
   });
 });

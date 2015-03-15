@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../../helpers").expr;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
@@ -56,11 +54,11 @@ suite("Parser", function () {
     testParse("0.", expr, { type: "LiteralNumericExpression", value: 0 });
 
     // Binary Numeric Literal
-    testParse("0b0", expr, new Shift.LiteralNumericExpression(0));
-    testParse("0b1", expr, new Shift.LiteralNumericExpression(1));
-    testParse("0b10", expr, new Shift.LiteralNumericExpression(2));
-    testParse("0B0", expr, new Shift.LiteralNumericExpression(0));
-    testParse("'use strict'; 0b0", expr, new Shift.LiteralNumericExpression(0));
+    testParse("0b0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0b1", expr, { type: "LiteralNumericExpression", value: 1 });
+    testParse("0b10", expr, { type: "LiteralNumericExpression", value: 2 });
+    testParse("0B0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("'use strict'; 0b0", expr, { type: "LiteralNumericExpression", value: 0 });
 
     testParseFailure("0b", "Unexpected token ILLEGAL");
     testParseFailure("0b1a", "Unexpected token ILLEGAL");
@@ -74,14 +72,14 @@ suite("Parser", function () {
     testParseFailure("0B12", "Unexpected token ILLEGAL");
 
     // Octal Numeric Literal
-    testParse("0o0", expr, new Shift.LiteralNumericExpression(0));
-    testParse("(0o0)", expr, new Shift.LiteralNumericExpression(0));
-    testParse("0o1", expr, new Shift.LiteralNumericExpression(1));
-    testParse("0o10", expr, new Shift.LiteralNumericExpression(8));
-    testParse("0O0", expr, new Shift.LiteralNumericExpression(0));
-    testParse("09", expr, new Shift.LiteralNumericExpression(9));
-    testParse("018", expr, new Shift.LiteralNumericExpression(18));
-    testParse("'use strict'; 0o0", expr, new Shift.LiteralNumericExpression(0));
+    testParse("0o0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("(0o0)", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("0o1", expr, { type: "LiteralNumericExpression", value: 1 });
+    testParse("0o10", expr, { type: "LiteralNumericExpression", value: 8 });
+    testParse("0O0", expr, { type: "LiteralNumericExpression", value: 0 });
+    testParse("09", expr, { type: "LiteralNumericExpression", value: 9 });
+    testParse("018", expr, { type: "LiteralNumericExpression", value: 18 });
+    testParse("'use strict'; 0o0", expr, { type: "LiteralNumericExpression", value: 0 });
 
     testParseFailure("0o", "Unexpected token ILLEGAL");
     testParseFailure("0o1a", "Unexpected token ILLEGAL");

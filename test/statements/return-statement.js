@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var expr = require("../helpers").expr;
 
@@ -27,7 +25,7 @@ suite("Parser", function () {
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
         body: { type: "FunctionBody", directives: [], statements: [
-          new Shift.ReturnStatement(null),
+          { type: "ReturnStatement", expression: null },
         ] }
       }
     );
@@ -37,7 +35,7 @@ suite("Parser", function () {
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
         body: { type: "FunctionBody", directives: [], statements: [
-          new Shift.ReturnStatement(null),
+          { type: "ReturnStatement", expression: null },
         ] }
       }
     );
@@ -47,7 +45,7 @@ suite("Parser", function () {
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
         body: { type: "FunctionBody", directives: [], statements: [
-          new Shift.ReturnStatement({ type: "IdentifierExpression", name: "x" }),
+          { type: "ReturnStatement", expression: { type: "IdentifierExpression", name: "x" } },
         ] }
       }
     );
@@ -57,7 +55,14 @@ suite("Parser", function () {
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
         body: { type: "FunctionBody", directives: [], statements: [
-          new Shift.ReturnStatement(new Shift.BinaryExpression("*", { type: "IdentifierExpression", name: "x" }, { type: "IdentifierExpression", name: "y" })),
+          { type: "ReturnStatement",
+            expression: {
+              type: "BinaryExpression",
+              operator: "*",
+              left: { type: "IdentifierExpression", name: "x" },
+              right: { type: "IdentifierExpression", name: "y" }
+            }
+          },
         ] }
       }
     );

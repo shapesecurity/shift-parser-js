@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
 var ShiftParser = require("../../");
 
 var testParseFailure = require("../assertions").testParseFailure;
@@ -39,168 +38,236 @@ function testExportDecl(code, tree) {
 suite("Parser", function () {
   suite("export declaration", function () {
 
-    testExportDecl("export * from \"a\"; var a;", new Shift.ExportAllFrom("a"));
+    testExportDecl("export * from \"a\"; var a;", { type: "ExportAllFrom", moduleSpecifier: "a" });
 
-    testExportDecl("export * from \"a\"; var a;", new Shift.ExportAllFrom("a"));
+    testExportDecl("export * from \"a\"; var a;", { type: "ExportAllFrom", moduleSpecifier: "a" });
 
-    testExportDecl("export {} from \"a\"; var a;", new Shift.ExportFrom([], "a"));
+    testExportDecl("export {} from \"a\"; var a;", { type: "ExportFrom", namedExports: [], moduleSpecifier: "a" });
 
-    testExportDecl("export {a} from \"a\"; var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, "a")
-    ], "a"));
+    testExportDecl("export {a} from \"a\"; var a;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
+      moduleSpecifier: "a"
+    });
 
-    testExportDecl("export {a,} from \"a\"; var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, "a")
-    ], "a"));
+    testExportDecl("export {a,} from \"a\"; var a;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
+      moduleSpecifier: "a"
+    });
 
-    testExportDecl("export {a,b} from \"a\"; var a,b;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, "a"),
-      new Shift.ExportSpecifier(null, "b")
-    ], "a"));
+    testExportDecl("export {a,b} from \"a\"; var a,b;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }, {
+        type: "ExportSpecifier",
+        name: null,
+        exportedName: "b"
+      }],
+      moduleSpecifier: "a"
+    });
 
-    testExportDecl("export {a as b} from \"a\"; var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier("a", "b")
-    ], "a"));
+    testExportDecl("export {a as b} from \"a\"; var a;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: "a", exportedName: "b" }],
+      moduleSpecifier: "a"
+    });
 
-    testExportDecl("export {as as as} from \"as\"; var as;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier("as", "as")
-    ], "as"));
+    testExportDecl("export {as as as} from \"as\"; var as;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: "as", exportedName: "as" }],
+      moduleSpecifier: "as"
+    });
 
-    testExportDecl("export {as as function} from \"as\"; var as;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier("as", "function")
-    ], "as"));
+    testExportDecl("export {as as function} from \"as\"; var as;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: "as", exportedName: "function" }],
+      moduleSpecifier: "as"
+    });
 
-    testExportDecl("export {a}\n var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, "a")
-    ], null));
+    testExportDecl("export {a}\n var a;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
+      moduleSpecifier: null
+    });
 
-    testExportDecl("export {a,}\n var a;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, "a")
-    ], null));
+    testExportDecl("export {a,}\n var a;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
+      moduleSpecifier: null
+    });
 
-    testExportDecl("export {a,b,}\n var a,b;", new Shift.ExportFrom([
-      new Shift.ExportSpecifier(null, "a"),
-      new Shift.ExportSpecifier(null, "b")
-    ], null));
+    testExportDecl("export {a,b,}\n var a,b;", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }, {
+        type: "ExportSpecifier",
+        name: null,
+        exportedName: "b"
+      }],
+      moduleSpecifier: null
+    });
 
     testExportDecl(
       "export var a = 0, b;",
-      new Shift.Export(new Shift.VariableDeclaration("var", [
-        new Shift.VariableDeclarator(
-          { type: "BindingIdentifier", name: "a" },
-          new Shift.LiteralNumericExpression(0)),
-        new Shift.VariableDeclarator(
-          { type: "BindingIdentifier", name: "b" },
-          null)])));
+      {
+        type: "Export",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "var",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "b" }, init: null }]
+        }
+      });
 
     testExportDecl(
       "export const a = 0, b = 0;",
-      new Shift.Export(new Shift.VariableDeclaration("const", [
-        new Shift.VariableDeclarator(
-          { type: "BindingIdentifier", name: "a" },
-          new Shift.LiteralNumericExpression(0)),
-        new Shift.VariableDeclarator(
-          { type: "BindingIdentifier", name: "b" },
-          new Shift.LiteralNumericExpression(0))])));
+      {
+        type: "Export",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "const",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "b" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        }
+      });
 
     testExportDecl(
       "export let a = 0, b = 0;",
-      new Shift.Export(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator(
-          { type: "BindingIdentifier", name: "a" },
-          new Shift.LiteralNumericExpression(0)),
-        new Shift.VariableDeclarator(
-          { type: "BindingIdentifier", name: "b" },
-          new Shift.LiteralNumericExpression(0))])));
+      {
+        type: "Export",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }, {
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "b" },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        }
+      });
 
     testExportDecl(
       "export let[a] = 0;",
-      new Shift.Export(new Shift.VariableDeclaration("let", [
-        new Shift.VariableDeclarator(
-          new Shift.ArrayBinding([
-            { type: "BindingIdentifier", name: "a" }
-          ], null),
-          new Shift.LiteralNumericExpression(0))
-      ])));
+      {
+        type: "Export",
+        declaration: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null },
+            init: { type: "LiteralNumericExpression", value: 0 }
+          }]
+        }
+      });
 
     testExportDecl(
       "export class A{} /* no semi */ false",
-      new Shift.Export(
-        new Shift.ClassDeclaration(
-          { type: "BindingIdentifier", name: "A" },
-          null,
-          []
-        )));
+      {
+        type: "Export",
+        declaration: {
+          type: "ClassDeclaration",
+          name: { type: "BindingIdentifier", name: "A" },
+          super: null,
+          elements: []
+        }
+      });
 
     testExportDecl(
       "export function A(){} /* no semi */ false",
-      new Shift.Export(
-        { type: "FunctionDeclaration",
+      {
+        type: "Export",
+        declaration: {
+          type: "FunctionDeclaration",
           isGenerator: false,
           name: { type: "BindingIdentifier", name: "A" },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [])
+          body: { type: "FunctionBody", directives: [], statements: [] }
         }
-      )
+      }
     );
 
     testExportDecl(
       "export default function (){} /* no semi */ false",
-      new Shift.ExportDefault(
-        { type: "FunctionDeclaration",
+      {
+        type: "ExportDefault",
+        body: {
+          type: "FunctionDeclaration",
           isGenerator: false,
           name: { type: "BindingIdentifier", name: "*default*" },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [])
+          body: { type: "FunctionBody", directives: [], statements: [] }
         }
-      )
+      }
     );
 
     testExportDecl(
       "export default class {} /* no semi */ false",
-      new Shift.ExportDefault(
-        new Shift.ClassDeclaration(
-          { type: "BindingIdentifier", name: "*default*" },
-          null,
-          []
-        )));
+      {
+        type: "ExportDefault",
+        body: {
+          type: "ClassDeclaration",
+          name: { type: "BindingIdentifier", name: "*default*" },
+          super: null,
+          elements: []
+        }
+      });
 
     testExportDecl(
       "export default 3 + 1",
-      new Shift.ExportDefault(
-        new Shift.BinaryExpression("+", new Shift.LiteralNumericExpression(3), new Shift.LiteralNumericExpression(1))
-      ));
+      {
+        type: "ExportDefault",
+        body: {
+          type: "BinaryExpression",
+          operator: "+",
+          left: { type: "LiteralNumericExpression", value: 3 },
+          right: { type: "LiteralNumericExpression", value: 1 }
+        }
+      });
 
     testExportDecl(
       "export default a",
-      new Shift.ExportDefault(
-        { type: "IdentifierExpression", name: "a" }
-      ));
+      { type: "ExportDefault", body: { type: "IdentifierExpression", name: "a" } });
 
-    testExportDecl("export default function a(){}", new Shift.ExportDefault(
-      { type: "FunctionDeclaration",
+    testExportDecl("export default function a(){}", {
+      type: "ExportDefault",
+      body: {
+        type: "FunctionDeclaration",
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "a" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
-    ));
+    });
 
-    testExportDecl("export default class a{}", new Shift.ExportDefault(
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "a" },
-        null,
-        []
-      )));
+    testExportDecl("export default class a{}", {
+      type: "ExportDefault",
+      body: { type: "ClassDeclaration", name: { type: "BindingIdentifier", name: "a" }, super: null, elements: [] }
+    });
 
-    testExportDecl("export default function* a(){}", new Shift.ExportDefault(
-      { type: "FunctionDeclaration",
+    testExportDecl("export default function* a(){}", {
+      type: "ExportDefault",
+      body: {
+        type: "FunctionDeclaration",
         isGenerator: true,
         name: { type: "BindingIdentifier", name: "a" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
-    ));
+    });
 
     testParseFailure("export * from \"a\"", "Unexpected token export");
     testParseModuleFailure("{export default 3}", "Unexpected token export");

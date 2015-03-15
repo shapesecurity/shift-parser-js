@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 var testParseFailure = require("../assertions").testParseFailure;
@@ -29,7 +27,7 @@ suite("Parser", function () {
         isGenerator: false,
         name: null,
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -38,10 +36,17 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "x" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement({ type: "IdentifierExpression", name: "y" }),
-          new Shift.ExpressionStatement(new Shift.CallExpression({ type: "IdentifierExpression", name: "z" }, [])),
-        ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: { type: "IdentifierExpression", name: "y" }
+          }, {
+            type: "ExpressionStatement",
+            expression: { type: "CallExpression", callee: { type: "IdentifierExpression", name: "z" }, arguments: [] }
+          }]
+        }
       }
     );
 
@@ -50,7 +55,7 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "eval" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -59,7 +64,7 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "arguments" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -76,7 +81,7 @@ suite("Parser", function () {
               ],
             rest: null
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -88,14 +93,15 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                new Shift.BindingWithDefault(
-                  { type: "BindingIdentifier", name: "a" },
-                  { type: "IdentifierExpression", name: "b" }
-                )
+                {
+                  type: "BindingWithDefault",
+                  binding: { type: "BindingIdentifier", name: "a" },
+                  init: { type: "IdentifierExpression", name: "b" }
+                }
               ],
             rest: null,
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -108,7 +114,7 @@ suite("Parser", function () {
             items: [],
             rest: { type: "BindingIdentifier", name: "a" }
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -121,7 +127,7 @@ suite("Parser", function () {
             items: [{ type: "BindingIdentifier", name: "a" }],
             rest: { type: "BindingIdentifier", name: "b" }
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -133,15 +139,18 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                new Shift.ObjectBinding([
-                  { type: "BindingPropertyIdentifier",
+                {
+                  type: "ObjectBinding",
+                  properties: [{
+                    type: "BindingPropertyIdentifier",
                     binding: { type: "BindingIdentifier", name: "a" },
-                    init: null }
-                ])
+                    init: null
+                  }]
+                }
               ],
             rest: null,
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -153,20 +162,22 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                new Shift.ObjectBinding([
-                  new Shift.BindingPropertyProperty(
-                    new Shift.StaticPropertyName("a"),
-                    { type: "BindingIdentifier", name: "x" }
-                  ),
-                  new Shift.BindingPropertyProperty(
-                    new Shift.StaticPropertyName("a"),
-                    { type: "BindingIdentifier", name: "y" }
-                  )
-                ])
+                {
+                  type: "ObjectBinding",
+                  properties: [{
+                    type: "BindingPropertyProperty",
+                    name: { type: "StaticPropertyName", value: "a" },
+                    binding: { type: "BindingIdentifier", name: "x" }
+                  }, {
+                    type: "BindingPropertyProperty",
+                    name: { type: "StaticPropertyName", value: "a" },
+                    binding: { type: "BindingIdentifier", name: "y" }
+                  }]
+                }
               ],
             rest: null
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -178,14 +189,11 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                new Shift.ArrayBinding(
-                  [{ type: "BindingIdentifier", name: "a" }],
-                  null
-                )
+                { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null }
               ],
             rest: null
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
@@ -197,32 +205,44 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                new Shift.ObjectBinding([
-                  { type: "BindingPropertyIdentifier",
+                {
+                  type: "ObjectBinding",
+                  properties: [{
+                    type: "BindingPropertyIdentifier",
                     binding: { type: "BindingIdentifier", name: "a" },
-                    init: new Shift.LiteralNumericExpression(0) }
-                ])
+                    init: { type: "LiteralNumericExpression", value: 0 }
+                  }]
+                }
               ],
             rest: null
           },
-        body: new Shift.FunctionBody([], [])
+        body: { type: "FunctionBody", directives: [], statements: [] }
       }
     );
 
     testParse("label: !function(){ label:; };", stmt,
-      new Shift.LabeledStatement(
-        "label",
-        new Shift.ExpressionStatement(new Shift.PrefixExpression("!",
-          { type: "FunctionExpression",
-            isGenerator: false,
-            name: null,
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: new Shift.FunctionBody([], [
-              new Shift.LabeledStatement("label", new Shift.EmptyStatement),
-            ])
+      {
+        type: "LabeledStatement",
+        label: "label",
+        body: {
+          type: "ExpressionStatement",
+          expression: {
+            type: "PrefixExpression",
+            operator: "!",
+            operand: {
+              type: "FunctionExpression",
+              isGenerator: false,
+              name: null,
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: {
+                type: "FunctionBody",
+                directives: [],
+                statements: [{ type: "LabeledStatement", label: "label", body: { type: "EmptyStatement" } }]
+              }
+            }
           }
-        ))
-      )
+        }
+      }
     );
 
     testParse("(function([]){})", expr,

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var testParse = require("../assertions").testParse;
 
@@ -48,15 +46,17 @@ suite("Parser", function () {
     );
 
     testParse("x = (0) ? 1 : 2", expr,
-      new Shift.AssignmentExpression(
-        "=",
-        { type: "BindingIdentifier", name: "x" },
-        new Shift.ConditionalExpression(
-          new Shift.LiteralNumericExpression(0),
-          new Shift.LiteralNumericExpression(1),
-          new Shift.LiteralNumericExpression(2)
-        )
-      )
+      {
+        type: "AssignmentExpression",
+        operator: "=",
+        binding: { type: "BindingIdentifier", name: "x" },
+        expression: {
+          type: "ConditionalExpression",
+          test: { type: "LiteralNumericExpression", value: 0 },
+          consequent: { type: "LiteralNumericExpression", value: 1 },
+          alternate: { type: "LiteralNumericExpression", value: 2 }
+        }
+      }
     );
   });
 });

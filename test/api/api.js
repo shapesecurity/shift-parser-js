@@ -16,7 +16,6 @@
 
 var expect = require("expect.js");
 var ShiftParser = require("../../");
-var Shift = require("shift-ast");
 var locationSanityCheck = require("../helpers").locationSanityCheck;
 
 suite("API", function () {
@@ -30,36 +29,38 @@ suite("API", function () {
   }
 
   function span(si, sl, sc, ei, el, ec) {
-    return new Shift.SourceSpan(new Shift.SourceLocation(si, sl, sc), new Shift.SourceLocation(ei, el, ec), null);
+    return {
+      start: { line: sl, column: sc, offset: si },
+      end: { line: el, column: ec, offset: ei },
+      source: null
+    };
   }
 
   test("for location information", function () {
     expect(ShiftParser.default("0", {loc: true})).to.eql(
-      withLoc(new Shift.Script(
-        withLoc(new Shift.FunctionBody(
-          [],
-          [
-            withLoc(new Shift.ExpressionStatement(
-              withLoc(new Shift.LiteralNumericExpression(0),
-                span(0, 1, 0, 1, 1, 1)
-              )
-            ), span(0, 1, 0, 1, 1, 1))
-          ]
-        ), span(0, 1, 0, 1, 1, 1))
-      ), span(0, 1, 0, 1, 1, 1))
+      withLoc({
+        type: "Script",
+        body: withLoc({
+          type: "FunctionBody",
+          directives: [],
+          statements: [withLoc({
+            type: "ExpressionStatement",
+            expression: withLoc({ type: "LiteralNumericExpression", value: 0 }, span(0, 1, 0, 1, 1, 1))
+          }, span(0, 1, 0, 1, 1, 1))]
+        }, span(0, 1, 0, 1, 1, 1))
+      }, span(0, 1, 0, 1, 1, 1))
     );
   });
 
   test("for location information", function () {
     expect(ShiftParser.parseModule("0", {loc: true})).to.eql(
-      withLoc(new Shift.Module(
-          [
-            withLoc(
-              new Shift.ExpressionStatement(
-                withLoc(new Shift.LiteralNumericExpression(0), span(0, 1, 0, 1, 1, 1))
-              ), span(0, 1, 0, 1, 1, 1))
-          ],
-          span(0, 1, 0, 1, 1, 1)),
+      withLoc({
+          type: "Module",
+          items: [withLoc({
+            type: "ExpressionStatement",
+            expression: withLoc({ type: "LiteralNumericExpression", value: 0 }, span(0, 1, 0, 1, 1, 1))
+          }, span(0, 1, 0, 1, 1, 1))]
+        },
         span(0, 1, 0, 1, 1, 1)));
   });
 

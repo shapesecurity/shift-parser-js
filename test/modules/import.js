@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
 var ShiftParser = require("../../");
 
 var testParseFailure = require("../assertions").testParseFailure;
@@ -39,102 +38,130 @@ function testImportDecl(code, tree) {
 suite("Parser", function () {
   suite("import declaration", function () {
 
-    testImportDecl("import 'a'", new Shift.Import(null, [], "a"));
+    testImportDecl("import 'a'", { type: "Import", defaultBinding: null, namedImports: [], moduleSpecifier: "a" });
 
     testImportDecl(
       "import * as a from 'a'",
-            new Shift.ImportNamespace(
-        null,
-        { type: "BindingIdentifier", name: "a" },
-        "a"));
+      {
+        type: "ImportNamespace",
+        defaultBinding: null,
+        namespaceBinding: { type: "BindingIdentifier", name: "a" },
+        moduleSpecifier: "a"
+      });
 
     testImportDecl(
       "import a from 'c'",
-      new Shift.Import("a", [], "c"));
+      { type: "Import", defaultBinding: "a", namedImports: [], moduleSpecifier: "c" });
 
     testImportDecl(
       "import a, {} from 'c'",
-      new Shift.Import("a", [], "c"));
+      { type: "Import", defaultBinding: "a", namedImports: [], moduleSpecifier: "c" });
 
     testImportDecl(
       "import {} from 'a'",
-            new Shift.Import(null, [], "a"));
+      { type: "Import", defaultBinding: null, namedImports: [], moduleSpecifier: "a" });
 
     testImportDecl(
       "import a, * as b from 'a'",
-            new Shift.ImportNamespace(
-        "a",
-        { type: "BindingIdentifier", name: "b" },
-        "a"));
+      {
+        type: "ImportNamespace",
+        defaultBinding: "a",
+        namespaceBinding: { type: "BindingIdentifier", name: "b" },
+        moduleSpecifier: "a"
+      });
 
     testImportDecl(
       "import a, {b} from 'c'",
-            new Shift.Import(
-        "a",
-        [new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" })],
-        "c"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{ type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "b" } }],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import a, {b as c} from 'c'",
-            new Shift.Import(
-        "a",
-        [new Shift.ImportSpecifier("b", { type: "BindingIdentifier", name: "c" })],
-        "c"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{ type: "ImportSpecifier", name: "b", binding: { type: "BindingIdentifier", name: "c" } }],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import a, {function as c} from 'c'",
-            new Shift.Import(
-        "a",
-        [new Shift.ImportSpecifier("function", { type: "BindingIdentifier", name: "c" })],
-        "c"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{
+          type: "ImportSpecifier",
+          name: "function",
+          binding: { type: "BindingIdentifier", name: "c" }
+        }],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import a, {as} from 'c'",
-            new Shift.Import(
-        "a",
-        [new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "as" })],
-        "c"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{ type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "as" } }],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import a, {as as c} from 'c'",
-            new Shift.Import(
-        "a",
-        [new Shift.ImportSpecifier("as", { type: "BindingIdentifier", name: "c" })],
-        "c"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{ type: "ImportSpecifier", name: "as", binding: { type: "BindingIdentifier", name: "c" } }],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import {as as as} from 'as'",
-            new Shift.Import(
-        null,
-        [new Shift.ImportSpecifier("as", { type: "BindingIdentifier", name: "as" })],
-        "as"));
+      {
+        type: "Import",
+        defaultBinding: null,
+        namedImports: [{ type: "ImportSpecifier", name: "as", binding: { type: "BindingIdentifier", name: "as" } }],
+        moduleSpecifier: "as"
+      });
 
     testImportDecl(
       "import a, {b,} from 'c'",
-            new Shift.Import(
-        "a",
-        [new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" })],
-        "c"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{ type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "b" } }],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import a, {b,c} from 'd'",
-            new Shift.Import(
-        "a",
-        [
-          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" }),
-          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "c" })
-        ],
-        "d"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{
+          type: "ImportSpecifier",
+          name: null,
+          binding: { type: "BindingIdentifier", name: "b" }
+        }, { type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "c" } }],
+        moduleSpecifier: "d"
+      });
 
     testImportDecl(
       "import a, {b,c,} from 'd'",
-            new Shift.Import(
-        "a",
-        [
-          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "b" }),
-          new Shift.ImportSpecifier(null, { type: "BindingIdentifier", name: "c" })
-        ],
-        "d"));
+      {
+        type: "Import",
+        defaultBinding: "a",
+        namedImports: [{
+          type: "ImportSpecifier",
+          name: null,
+          binding: { type: "BindingIdentifier", name: "b" }
+        }, { type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "c" } }],
+        moduleSpecifier: "d"
+      });
 
     testParseFailure("import 'a'", "Unexpected token import");
     testParseModuleFailure("import", "Unexpected end of input");

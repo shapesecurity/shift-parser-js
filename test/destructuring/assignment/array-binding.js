@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../../helpers").expr;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
@@ -24,136 +22,140 @@ suite("Parser", function () {
   suite("array binding", function () {
     suite("assignment", function () {
       testParse("[x] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [{ type: "BindingIdentifier", name: "x" }],
-            null
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "x" }], restElement: null },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[x,] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [{ type: "BindingIdentifier", name: "x" }],
-            null
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "x" }], restElement: null },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[x,,] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [{ type: "BindingIdentifier", name: "x" }, null],
-            null
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [{ type: "BindingIdentifier", name: "x" }, null],
+            restElement: null
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[[x]] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [
-              new Shift.ArrayBinding(
-                [{ type: "BindingIdentifier", name: "x" }],
-                null
-              ),
-            ],
-            null
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [{
+              type: "ArrayBinding",
+              elements: [{ type: "BindingIdentifier", name: "x" }],
+              restElement: null
+            }],
+            restElement: null
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[x, y, ...z] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [
-              { type: "BindingIdentifier", name: "x" },
-              { type: "BindingIdentifier", name: "y" },
-            ],
-            { type: "BindingIdentifier", name: "z" }
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [{ type: "BindingIdentifier", name: "x" }, { type: "BindingIdentifier", name: "y" }],
+            restElement: { type: "BindingIdentifier", name: "z" }
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[, x,,] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [
-              null,
-              { type: "BindingIdentifier", name: "x" },
-              null,
-            ],
-            null
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [null, { type: "BindingIdentifier", name: "x" }, null],
+            restElement: null
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[...[x]] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding([], new Shift.ArrayBinding([
-            { type: "BindingIdentifier", name: "x" },
-          ], null)),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [],
+            restElement: {
+              type: "ArrayBinding",
+              elements: [{ type: "BindingIdentifier", name: "x" }],
+              restElement: null
+            }
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[x, ...{0: y}] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [
-              { type: "BindingIdentifier", name: "x" },
-            ],
-            new Shift.ObjectBinding([
-              new Shift.BindingPropertyProperty(
-                new Shift.StaticPropertyName("0"),
-                { type: "BindingIdentifier", name: "y" }
-              ),
-            ])
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [{ type: "BindingIdentifier", name: "x" }],
+            restElement: {
+              type: "ObjectBinding",
+              properties: [{
+                type: "BindingPropertyProperty",
+                name: { type: "StaticPropertyName", value: "0" },
+                binding: { type: "BindingIdentifier", name: "y" }
+              }]
+            }
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[x, x] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [
-              { type: "BindingIdentifier", name: "x" },
-              { type: "BindingIdentifier", name: "x" },
-            ],
-            null
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [{ type: "BindingIdentifier", name: "x" }, { type: "BindingIdentifier", name: "x" }],
+            restElement: null
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[x, ...x] = 0", expr,
-        new Shift.AssignmentExpression(
-          "=",
-          new Shift.ArrayBinding(
-            [
-              { type: "BindingIdentifier", name: "x" },
-            ],
-            { type: "BindingIdentifier", name: "x" }
-          ),
-          new Shift.LiteralNumericExpression(0)
-        )
+        {
+          type: "AssignmentExpression",
+          operator: "=",
+          binding: {
+            type: "ArrayBinding",
+            elements: [{ type: "BindingIdentifier", name: "x" }],
+            restElement: { type: "BindingIdentifier", name: "x" }
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }
       );
 
       testParse("[x.a=a] = b", expr, {

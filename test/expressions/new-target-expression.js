@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
@@ -28,10 +26,11 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "f" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body:
-          new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.NewTargetExpression),
-          ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{ type: "ExpressionStatement", expression: { type: "NewTargetExpression" } }]
+        }
       }
     );
 
@@ -40,10 +39,11 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "f" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body:
-          new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.NewTargetExpression),
-          ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{ type: "ExpressionStatement", expression: { type: "NewTargetExpression" } }]
+        }
       }
     );
 
@@ -52,10 +52,14 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "f" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body:
-          new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.NewExpression(new Shift.NewTargetExpression, [])),
-          ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: { type: "NewExpression", callee: { type: "NewTargetExpression" }, arguments: [] }
+          }]
+        }
       }
     );
 
@@ -64,10 +68,14 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "f" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body:
-          new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.NewTargetExpression, [])),
-          ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: { type: "CallExpression", callee: { type: "NewTargetExpression" }, arguments: [] }
+          }]
+        }
       }
     );
 
@@ -76,12 +84,18 @@ suite("Parser", function () {
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "f" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body:
-          new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.NewExpression(new Shift.ArrayExpression([
-              new Shift.LiteralStringExpression("target"),
-            ]), [])),
-          ])
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "NewExpression",
+              callee: { type: "ArrayExpression", elements: [{ type: "LiteralStringExpression", value: "target" }] },
+              arguments: []
+            }
+          }]
+        }
       }
     );
 

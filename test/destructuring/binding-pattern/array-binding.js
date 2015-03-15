@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var stmt = require("../../helpers").stmt;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
@@ -24,73 +22,125 @@ suite("Parser", function () {
   suite("array binding", function () {
     suite("variable declarator", function () {
       testParse("var [,a] = 0;", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([null, { type: "BindingIdentifier", name: "a" }], null),
-            { type: "LiteralNumericExpression", value: 0 }
-          ),
-        ]))
+        {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: {
+                type: "ArrayBinding",
+                elements: [null, { type: "BindingIdentifier", name: "a" }],
+                restElement: null
+              },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }
+        }
       );
 
       testParse("var [a]=[1];", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "a" }], null),
-            new Shift.ArrayExpression([new Shift.LiteralNumericExpression(1)], null)
-          ),
-        ]))
+        {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: {
+                type: "ArrayBinding",
+                elements: [{ type: "BindingIdentifier", name: "a" }],
+                restElement: null
+              },
+              init: { type: "ArrayExpression", elements: [{ type: "LiteralNumericExpression", value: 1 }] }
+            }]
+          }
+        }
       );
 
       testParse("var [[a]]=0;", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([
-              new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "a" }], null)
-            ], null),
-            new Shift.LiteralNumericExpression(0)
-          ),
-        ]))
+        {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: {
+                type: "ArrayBinding",
+                elements: [{
+                  type: "ArrayBinding",
+                  elements: [{ type: "BindingIdentifier", name: "a" }],
+                  restElement: null
+                }],
+                restElement: null
+              },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }
+        }
       );
 
       testParse("var a, [a] = 0;", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            { type: "BindingIdentifier", name: "a" },
-            null
-          ),
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([
-              { type: "BindingIdentifier", name: "a" },
-            ], null),
-            { type: "LiteralNumericExpression", value: 0 }
-          ),
-        ]))
+        {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: { type: "BindingIdentifier", name: "a" },
+              init: null
+            }, {
+              type: "VariableDeclarator",
+              binding: {
+                type: "ArrayBinding",
+                elements: [{ type: "BindingIdentifier", name: "a" }],
+                restElement: null
+              },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }
+        }
       );
 
       testParse("var [a, a] = 0;", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding([
-              { type: "BindingIdentifier", name: "a" },
-              { type: "BindingIdentifier", name: "a" },
-            ], null),
-            { type: "LiteralNumericExpression", value: 0 }
-          ),
-        ]))
+        {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: {
+                type: "ArrayBinding",
+                elements: [{ type: "BindingIdentifier", name: "a" }, { type: "BindingIdentifier", name: "a" }],
+                restElement: null
+              },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }
+        }
       );
 
       testParse("var [a, ...a] = 0;", stmt,
-        new Shift.VariableDeclarationStatement(new Shift.VariableDeclaration("var", [
-          new Shift.VariableDeclarator(
-            new Shift.ArrayBinding(
-              [
-                { type: "BindingIdentifier", name: "a" },
-              ],
-              { type: "BindingIdentifier", name: "a" }
-            ),
-            { type: "LiteralNumericExpression", value: 0 }
-          ),
-        ]))
+        {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: {
+                type: "ArrayBinding",
+                elements: [{ type: "BindingIdentifier", name: "a" }],
+                restElement: { type: "BindingIdentifier", name: "a" }
+              },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }
+        }
       );
 
       testParseFailure("var [a.b] = 0", "Unexpected token .");
@@ -111,24 +161,31 @@ suite("Parser", function () {
 
     suite("catch clause", function () {
       testParse("try {} catch ([e]) {}", stmt,
-        new Shift.TryCatchStatement(
-          new Shift.Block([]),
-          new Shift.CatchClause(
-            new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "e" }], null),
-            new Shift.Block([])
-          )
-        )
+        {
+          type: "TryCatchStatement",
+          body: { type: "Block", statements: [] },
+          catchClause: {
+            type: "CatchClause",
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "e" }], restElement: null },
+            body: { type: "Block", statements: [] }
+          }
+        }
       );
 
       testParse("try {} catch ([e, ...a]) {}", stmt,
-        new Shift.TryCatchStatement(
-          new Shift.Block([]),
-          new Shift.CatchClause(
-            new Shift.ArrayBinding([{ type: "BindingIdentifier", name: "e" }],
-              { type: "BindingIdentifier", name: "a" }),
-            new Shift.Block([])
-          )
-        )
+        {
+          type: "TryCatchStatement",
+          body: { type: "Block", statements: [] },
+          catchClause: {
+            type: "CatchClause",
+            binding: {
+              type: "ArrayBinding",
+              elements: [{ type: "BindingIdentifier", name: "e" }],
+              restElement: { type: "BindingIdentifier", name: "a" }
+            },
+            body: { type: "Block", statements: [] }
+          }
+        }
       );
 
     });

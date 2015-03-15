@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 
@@ -26,131 +24,181 @@ suite("Parser", function () {
   suite("super call", function () {
 
     testParse("(class extends B { constructor() { super() } });", expr,
-      new Shift.ClassExpression(
-        null,
-        { type: "IdentifierExpression", name: "B" },
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("constructor"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.Super, [])),
-              ])
+      {
+        type: "ClassExpression",
+        name: null,
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A extends B { constructor() { super() } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        { type: "IdentifierExpression", name: "B" },
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("constructor"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.Super, [])),
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A extends B { \"constructor\"() { super() } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        { type: "IdentifierExpression", name: "B" },
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("constructor"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.Super, [])),
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A extends B { constructor() { ({a: super()}); } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        { type: "IdentifierExpression", name: "B" },
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("constructor"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(new Shift.ObjectExpression([
-                  new Shift.DataProperty(new Shift.StaticPropertyName("a"), new Shift.CallExpression(new Shift.Super, [])),
-                ])),
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: {
+                  type: "ObjectExpression",
+                  properties: [{
+                    type: "DataProperty",
+                    name: { type: "StaticPropertyName", value: "a" },
+                    expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                  }]
+                }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A extends B { constructor() { () => super(); } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        { type: "IdentifierExpression", name: "B" },
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("constructor"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(
-                  { type: "ArrowExpression",
-                    params: { type: "FormalParameters", items: [], rest: null },
-                    body: new Shift.CallExpression(new Shift.Super, [])
-                  }
-                )
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: {
+                  type: "ArrowExpression",
+                  params: { type: "FormalParameters", items: [], rest: null },
+                  body: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A extends B { constructor() { () => { super(); } } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        { type: "IdentifierExpression", name: "B" },
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("constructor"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(
-                  { type: "ArrowExpression",
-                    params: { type: "FormalParameters", items: [], rest: null },
-                    body: new Shift.FunctionBody([], [
-                      new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.Super, [])),
-                    ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: {
+                  type: "ArrowExpression",
+                  params: { type: "FormalParameters", items: [], rest: null },
+                  body: {
+                    type: "FunctionBody",
+                    directives: [],
+                    statements: [{
+                      type: "ExpressionStatement",
+                      expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                    }]
                   }
-                )
-              ])
+                }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParseFailure("function f() { (super)() }", "Unexpected token super");
@@ -163,156 +211,249 @@ suite("Parser", function () {
   suite("super member access", function () {
 
     testParse("({ a() { super.b(); } });", expr,
-      new Shift.ObjectExpression([
-        { type: "Method",
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Method",
           isGenerator: false,
-          name: new Shift.StaticPropertyName("a"),
+          name: { type: "StaticPropertyName", value: "a" },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.CallExpression(new Shift.StaticMemberExpression(new Shift.Super, "b"), [])),
-          ])
-        },
-      ])
+          body: {
+            type: "FunctionBody",
+            directives: [],
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "CallExpression",
+                callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                arguments: []
+              }
+            }]
+          }
+        }]
+      }
     );
 
     testParse("({ *a() { super.b = 0; } });", expr,
-      new Shift.ObjectExpression([
-        { type: "Method",
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Method",
           isGenerator: true,
-          name: new Shift.StaticPropertyName("a"),
+          name: { type: "StaticPropertyName", value: "a" },
           params: { type: "FormalParameters", items: [], rest: null },
-          body: new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.AssignmentExpression("=",
-              new Shift.StaticMemberExpression(new Shift.Super, "b"),
-              new Shift.LiteralNumericExpression(0)
-            )),
-          ])
-        },
-      ])
+          body: {
+            type: "FunctionBody",
+            directives: [],
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "AssignmentExpression",
+                operator: "=",
+                binding: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                expression: { type: "LiteralNumericExpression", value: 0 }
+              }
+            }]
+          }
+        }]
+      }
     );
 
     testParse("({ get a() { super[0] = 1; } });", expr,
-      new Shift.ObjectExpression([
-        new Shift.Getter(new Shift.StaticPropertyName("a"), new Shift.FunctionBody([], [
-          new Shift.ExpressionStatement(new Shift.AssignmentExpression("=",
-            new Shift.ComputedMemberExpression(new Shift.Super, new Shift.LiteralNumericExpression(0)),
-            new Shift.LiteralNumericExpression(1)
-          )),
-        ])),
-      ])
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Getter",
+          name: { type: "StaticPropertyName", value: "a" },
+          body: {
+            type: "FunctionBody",
+            directives: [],
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "AssignmentExpression",
+                operator: "=",
+                binding: {
+                  type: "ComputedMemberExpression",
+                  object: { type: "Super" },
+                  expression: { type: "LiteralNumericExpression", value: 0 }
+                },
+                expression: { type: "LiteralNumericExpression", value: 1 }
+              }
+            }]
+          }
+        }]
+      }
     );
 
     testParse("({ set a(x) { super.b[0] = 1; } });", expr,
-      new Shift.ObjectExpression([
-        { type: "Setter",
-          name: new Shift.StaticPropertyName("a"),
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Setter",
+          name: { type: "StaticPropertyName", value: "a" },
           param: { type: "BindingIdentifier", name: "x" },
-          body: new Shift.FunctionBody([], [
-            new Shift.ExpressionStatement(new Shift.AssignmentExpression("=",
-              new Shift.ComputedMemberExpression(new Shift.StaticMemberExpression(new Shift.Super, "b"), new Shift.LiteralNumericExpression(0)),
-              new Shift.LiteralNumericExpression(1)
-            )),
-          ])
-        },
-      ])
+          body: {
+            type: "FunctionBody",
+            directives: [],
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "AssignmentExpression",
+                operator: "=",
+                binding: {
+                  type: "ComputedMemberExpression",
+                  object: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                  expression: { type: "LiteralNumericExpression", value: 0 }
+                },
+                expression: { type: "LiteralNumericExpression", value: 1 }
+              }
+            }]
+          }
+        }]
+      }
     );
 
     testParse("(class { constructor() { super.x } });", expr,
-      new Shift.ClassExpression(null, null, [
-        new Shift.ClassElement(false,
-          { type: "Method",
+      {
+        type: "ClassExpression",
+        name: null,
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
             isGenerator: false,
-            name: new Shift.StaticPropertyName("constructor"),
+            name: { type: "StaticPropertyName", value: "constructor" },
             params: { type: "FormalParameters", items: [], rest: null },
-            body: new Shift.FunctionBody([], [
-              new Shift.ExpressionStatement(new Shift.StaticMemberExpression(new Shift.Super, "x")),
-            ])
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: { type: "StaticMemberExpression", object: { type: "Super" }, property: "x" }
+              }]
+            }
           }
-        ),
-      ])
+        }]
+      }
     );
 
     testParse("class A extends B { constructor() { super.x } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        { type: "IdentifierExpression", name: "B" },
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("constructor"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(new Shift.StaticMemberExpression(new Shift.Super, "x")),
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: { type: "StaticMemberExpression", object: { type: "Super" }, property: "x" }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A { a() { () => super.b; } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        null,
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("a"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(
-                  { type: "ArrowExpression",
-                    params: { type: "FormalParameters", items: [], rest: null },
-                    body: new Shift.StaticMemberExpression(new Shift.Super, "b")
-                  }
-                )
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "a" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: {
+                  type: "ArrowExpression",
+                  params: { type: "FormalParameters", items: [], rest: null },
+                  body: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" }
+                }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A { a() { new super.b; } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        null,
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("a"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(
-                  new Shift.NewExpression(new Shift.StaticMemberExpression(new Shift.Super, "b"), []))
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "a" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: {
+                  type: "NewExpression",
+                  callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                  arguments: []
+                }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParse("class A { a() { new super.b(); } }", stmt,
-      new Shift.ClassDeclaration(
-        { type: "BindingIdentifier", name: "A" },
-        null,
-        [
-          new Shift.ClassElement(false,
-            { type: "Method",
-              isGenerator: false,
-              name: new Shift.StaticPropertyName("a"),
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: new Shift.FunctionBody([], [
-                new Shift.ExpressionStatement(
-                    new Shift.NewExpression(new Shift.StaticMemberExpression(new Shift.Super, "b"), []))
-              ])
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: null,
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "a" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: [{
+                type: "ExpressionStatement",
+                expression: {
+                  type: "NewExpression",
+                  callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                  arguments: []
+                }
+              }]
             }
-          ),
-        ]
-      )
+          }
+        }]
+      }
     );
 
     testParseFailure("super.a", "Unexpected super property");

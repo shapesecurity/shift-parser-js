@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var Shift = require("shift-ast");
-
 var testParse = require("../assertions").testParse;
 var expr = require("../helpers").expr;
 
@@ -24,32 +22,38 @@ suite("Parser", function () {
 
   suite("generator method", function () {
 
-    testParse("({*a(){}})", expr, new Shift.ObjectExpression([
-      { type: "Method",
+    testParse("({*a(){}})", expr, {
+      type: "ObjectExpression",
+      properties: [{
+        type: "Method",
         isGenerator: true,
-        name: new Shift.StaticPropertyName("a"),
+        name: { type: "StaticPropertyName", value: "a" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
-      },
-    ]));
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      }]
+    });
 
-    testParse("({*yield(){}})", expr, new Shift.ObjectExpression([
-      { type: "Method",
+    testParse("({*yield(){}})", expr, {
+      type: "ObjectExpression",
+      properties: [{
+        type: "Method",
         isGenerator: true,
-        name: new Shift.StaticPropertyName("yield"),
+        name: { type: "StaticPropertyName", value: "yield" },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
-      },
-    ]));
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      }]
+    });
 
-    testParse("({*[yield](){}})", expr, new Shift.ObjectExpression([
-      { type: "Method",
+    testParse("({*[yield](){}})", expr, {
+      type: "ObjectExpression",
+      properties: [{
+        type: "Method",
         isGenerator: true,
-        name: new Shift.ComputedPropertyName({ type: "IdentifierExpression", name: "yield" }),
+        name: { type: "ComputedPropertyName", expression: { type: "IdentifierExpression", name: "yield" } },
         params: { type: "FormalParameters", items: [], rest: null },
-        body: new Shift.FunctionBody([], [])
-      },
-    ]));
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      }]
+    });
 
   });
 

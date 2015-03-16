@@ -18,7 +18,6 @@ var ShiftParser = require("../../dist/index.js");
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
-var locationSanityCheck = require("../helpers").locationSanityCheck;
 
 suite("Parser", function () {
   suite("class expression", function () {
@@ -27,7 +26,6 @@ suite("Parser", function () {
     function locationSanityTest(source) {
       test(source, function() {
         var tree = ShiftParser.default(source, {loc: true});
-        locationSanityCheck(tree);
       });
     }
 

@@ -46,7 +46,7 @@ suite("Parser", function () {
       { type: "ComputedMemberExpression", object: { type: "IdentifierExpression", name: "let" }, expression: { type: "IdentifierExpression", name: "let" } }
     );
 
-    testParse("(let.let)", expr,
+    testParse("let.let", expr,
       { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" }
     );
 
@@ -64,14 +64,6 @@ suite("Parser", function () {
         init: { type: "CallExpression", callee: { type: "IdentifierExpression", name: "let" }, arguments: [] },
         test: null,
         update: null,
-        body: { type: "EmptyStatement"}
-      }
-    );
-
-    testParse("for(let in 0);", stmt,
-      { type: "ForInStatement",
-        left: { type: "IdentifierExpression", name: "let" },
-        right: { type: "LiteralNumericExpression", value: 0},
         body: { type: "EmptyStatement"}
       }
     );
@@ -98,9 +90,6 @@ suite("Parser", function () {
         body: { type: "EmptyStatement"}
       }
     );
-
-    testParseFailure("for(let of 0);", "Unexpected token of");
-    testParseFailure("for(let.let of 0);", "Unexpected token of");
   });
 
   suite("unicode identifier", function () {

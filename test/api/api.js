@@ -16,7 +16,6 @@
 
 var expect = require("expect.js");
 var ShiftParser = require("../../");
-var locationSanityCheck = require("../helpers").locationSanityCheck;
 
 suite("API", function () {
   test("should exist", function () {
@@ -67,13 +66,11 @@ suite("API", function () {
   function parseModule(name) {
     var source = require("fs").readFileSync(require.resolve(name), "utf-8");
     var tree = ShiftParser.parseModule(source, {loc: true});
-    locationSanityCheck(tree);
   }
 
   function parseScript(name) {
     var source = require("fs").readFileSync(require.resolve(name), "utf-8");
     var tree = ShiftParser.parseScript(source, {loc: true});
-    locationSanityCheck(tree);
   }
 
   test("location sanity test", function () {

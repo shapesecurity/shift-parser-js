@@ -2,12 +2,15 @@ var expect = require("expect.js");
 var parse = require("../").default;
 var parseModule = require("../").parseModule;
 var locationSanityCheck = require("./helpers").locationSanityCheck;
+var schemaCheck = require("./helpers").schemaCheck;
+var SHIFT_SPEC = require("shift-spec").default;
 
 exports.testParse = function testParse(program, accessor, expected) {
   var args = arguments.length;
   test(program, function () {
     expect(args).to.be(testParse.length);
     var tree = parse(program, { loc: true });
+    schemaCheck(tree, SHIFT_SPEC.Script);
     locationSanityCheck(tree);
     expect(accessor(parse(program))).to.eql(expected);
   });
@@ -18,6 +21,7 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
   test(program, function () {
     expect(args).to.be(testParseModule.length);
     var tree = parseModule(program, { loc: true });
+    schemaCheck(tree, SHIFT_SPEC.Module);
     locationSanityCheck(tree);
     expect(accessor(parseModule(program))).to.eql(expected);
   });

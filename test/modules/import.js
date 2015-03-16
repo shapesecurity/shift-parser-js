@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-var ShiftParser = require("../../");
-
 var testParseFailure = require("../assertions").testParseFailure;
 var testParseModule = require("../assertions").testParseModule;
 var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 
 var moduleItem = require("../helpers").moduleItem;
-var locationSanityCheck = require("../helpers").locationSanityCheck;
-
-function locationSanityTest(source) {
-  test(source, function() {
-    var tree = ShiftParser.parseModule(source, {loc: true});
-    locationSanityCheck(tree);
-  });
-}
 
 function testImportDecl(code, tree) {
   testParseModule(code, moduleItem, tree);
-  locationSanityTest(code);
 }
 
 suite("Parser", function () {
@@ -51,11 +40,21 @@ suite("Parser", function () {
 
     testImportDecl(
       "import a from 'c'",
-      { type: "Import", defaultBinding: "a", namedImports: [], moduleSpecifier: "c" });
+      {
+        type: "Import",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
+        namedImports: [],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import a, {} from 'c'",
-      { type: "Import", defaultBinding: "a", namedImports: [], moduleSpecifier: "c" });
+      {
+        type: "Import",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
+        namedImports: [],
+        moduleSpecifier: "c"
+      });
 
     testImportDecl(
       "import {} from 'a'",
@@ -65,7 +64,7 @@ suite("Parser", function () {
       "import a, * as b from 'a'",
       {
         type: "ImportNamespace",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namespaceBinding: { type: "BindingIdentifier", name: "b" },
         moduleSpecifier: "a"
       });
@@ -74,7 +73,7 @@ suite("Parser", function () {
       "import a, {b} from 'c'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{ type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "b" } }],
         moduleSpecifier: "c"
       });
@@ -83,7 +82,7 @@ suite("Parser", function () {
       "import a, {b as c} from 'c'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{ type: "ImportSpecifier", name: "b", binding: { type: "BindingIdentifier", name: "c" } }],
         moduleSpecifier: "c"
       });
@@ -92,7 +91,7 @@ suite("Parser", function () {
       "import a, {function as c} from 'c'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{
           type: "ImportSpecifier",
           name: "function",
@@ -105,7 +104,7 @@ suite("Parser", function () {
       "import a, {as} from 'c'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{ type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "as" } }],
         moduleSpecifier: "c"
       });
@@ -114,7 +113,7 @@ suite("Parser", function () {
       "import a, {as as c} from 'c'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{ type: "ImportSpecifier", name: "as", binding: { type: "BindingIdentifier", name: "c" } }],
         moduleSpecifier: "c"
       });
@@ -132,7 +131,7 @@ suite("Parser", function () {
       "import a, {b,} from 'c'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{ type: "ImportSpecifier", name: null, binding: { type: "BindingIdentifier", name: "b" } }],
         moduleSpecifier: "c"
       });
@@ -141,7 +140,7 @@ suite("Parser", function () {
       "import a, {b,c} from 'd'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{
           type: "ImportSpecifier",
           name: null,
@@ -154,7 +153,7 @@ suite("Parser", function () {
       "import a, {b,c,} from 'd'",
       {
         type: "Import",
-        defaultBinding: "a",
+        defaultBinding: { type: "BindingIdentifier", name: "a" },
         namedImports: [{
           type: "ImportSpecifier",
           name: null,

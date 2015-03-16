@@ -16,6 +16,7 @@
 
 var stmt = require("../helpers").stmt;
 var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("for in statement", function () {
@@ -55,10 +56,51 @@ suite("Parser", function () {
     testParse("for(a of b);", stmt,
       {
         type: "ForOfStatement",
-        left: { type: "IdentifierExpression", name: "a" },
+        left: { type: "BindingIdentifier", name: "a" },
         right: { type: "IdentifierExpression", name: "b" },
         body: { type: "EmptyStatement" }
       }
     );
+
+    testParse("for(let [a] of b);", stmt,
+      {
+        type: "ForOfStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: {
+              type: "ArrayBinding",
+              elements: [{ type: "BindingIdentifier", name: "a" }],
+              restElement: null
+            },
+            init: null
+          }]
+        },
+        right: { type: "IdentifierExpression", name: "b" },
+        body: { type: "EmptyStatement" }
+      }
+    );
+
+    testParse("for(let of of b);", stmt,
+      {
+        type: "ForOfStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "of" },
+            init: null
+          }]
+        },
+        right: { type: "IdentifierExpression", name: "b" },
+        body: { type: "EmptyStatement" }
+      }
+    );
+
+    testParseFailure("for(let of 0);", "Unexpected number");
+    testParseFailure("for(let.let of 0);", "Invalid left-hand-side expression in for-of statement");
   });
 });

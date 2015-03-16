@@ -235,5 +235,16 @@ suite("Parser", function () {
         update: { type: "IdentifierExpression", name: "c" } }
     );
 
+    testParse("for(let of;;);", stmt,
+      { type: "ForStatement",
+        body: { type: "EmptyStatement" },
+        init: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "of" }, init: null }]
+        },
+        test: null,
+        update: null }
+    );
   });
 });

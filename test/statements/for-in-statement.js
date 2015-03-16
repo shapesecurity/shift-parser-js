@@ -29,7 +29,7 @@ suite("Parser", function () {
                 callee: { type: "IdentifierExpression", name: "process" },
                 arguments:
                   [ { type: "IdentifierExpression", name: "x" } ] } },
-        left: { type: "IdentifierExpression", name: "x" },
+        left: { type: "BindingIdentifier", name: "x" },
         right: { type: "IdentifierExpression", name: "list" } }
     );
 
@@ -89,15 +89,14 @@ suite("Parser", function () {
     testParse("for(a in b);", stmt,
       { type: "ForInStatement",
         body: { type: "EmptyStatement" },
-        left: { type: "IdentifierExpression", name: "a" },
+        left: { type: "BindingIdentifier", name: "a" },
         right: { type: "IdentifierExpression", name: "b" } }
     );
 
-    // TODO: a should be a BindingIdentifier, not an IdentifierExpression
     testParse("for(a in b);", stmt,
       {
         type: "ForInStatement",
-        left: { type: "IdentifierExpression", name: "a" },
+        left: { type: "BindingIdentifier", name: "a" },
         right: { type: "IdentifierExpression", name: "b" },
         body: { type: "EmptyStatement" }
       }
@@ -111,5 +110,16 @@ suite("Parser", function () {
         body: { type: "EmptyStatement" }
       }
     );
+
+    testParse("for(let of in of);", stmt, {
+      type: "ForInStatement",
+      left: {
+        type: "VariableDeclaration",
+        kind: "let",
+        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "of" }, init: null }]
+      },
+      right: { type: "IdentifierExpression", name: "of" },
+      body: { type: "EmptyStatement" }
+    });
   });
 });

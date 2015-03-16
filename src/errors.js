@@ -55,6 +55,7 @@ export const ErrorMessages = {
   ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list",
   INVALID_VAR_INIT_FOR_IN: "Invalid variable declaration in for-in statement",
   INVALID_VAR_INIT_FOR_OF: "Invalid variable declaration in for-of statement",
+  INVALID_VAR_LHS_FOR_OF: "Invalid left-hand-side expression in for-of statement",
   UNEXPECTED_SUPER_CALL: "Unexpected super call",
   UNEXPECTED_SUPER_PROPERTY: "Unexpected super property",
   IMPORT_DUPE: "Duplicate imported names in import declaration",

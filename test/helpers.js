@@ -163,8 +163,9 @@ function locationSanityCheck(node, parentSpan, prevLocation) {
 
   checkLocation(node.loc);
 
-  if (sourceLocationCompare(node.loc.start, node.loc.end) !== LT) {
-    expect().fail("Location information indicates that the node has zero-length");
+  var compareEnds = sourceLocationCompare(node.loc.start, node.loc.end);
+  if (compareEnds === GT) {
+    expect().fail("Location information indicates that the node has negative length");
   }
 
   if (prevLocation) {

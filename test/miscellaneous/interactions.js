@@ -429,6 +429,7 @@ suite("Parser", function () {
         arguments: [{ type: "ThisExpression" }]
       }
     );
+
     testParse("(function(){ var version = 1; /* sync */ }).call(this)", expr,
       {
         type: "CallExpression",
@@ -534,6 +535,93 @@ suite("Parser", function () {
                           operator: "--" },
                       right: { type: "LiteralNumericExpression", value: 0 } } } ] } }
     );
+
+    // super-properties can be the target of destructuring assignment
+
+    testParse("class A extends B { a() { [super.b] = c } }", stmt,
+      { type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [
+          { type: "ClassElement",
+            isStatic: false,
+            method:
+              { type: "Method",
+                isGenerator: false,
+                name: { type: "StaticPropertyName", value: "a" },
+                params: { type: "FormalParameters", items: [], rest: null },
+                body:
+                  { type: "FunctionBody",
+                    directives: [],
+                    statements: [
+                      { type: "ExpressionStatement",
+                        expression:
+                          { type: "AssignmentExpression",
+                            binding:
+                              { type: "ArrayBinding",
+                                elements: [
+                                  { type: "StaticMemberExpression",
+                                    object: { type: "Super" },
+                                    property: "b"
+                                  }
+                                ],
+                                restElement: null
+                              },
+                            operator: "=",
+                            expression: { type: "IdentifierExpression", name: "c" }
+                          }
+                      }
+                    ]
+                  }
+              }
+          }
+        ]
+      }
+    )
+
+    testParse("class A extends B { a() { ({b: super[c]}) = d } }", stmt,
+      { type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [
+          { type: "ClassElement",
+            isStatic: false,
+            method:
+              { type: "Method",
+                isGenerator: false,
+                name: { type: "StaticPropertyName", value: "a" },
+                params: { type: "FormalParameters", items: [], rest: null },
+                body:
+                  { type: "FunctionBody",
+                    directives: [],
+                    statements: [
+                      { type: "ExpressionStatement",
+                        expression:
+                          { type: "AssignmentExpression",
+                            binding:
+                              { type: "ObjectBinding",
+                                properties: [
+                                  { type: "BindingPropertyProperty",
+                                    name: { type: "StaticPropertyName", value: "b" },
+                                    binding:
+                                      { type: "ComputedMemberExpression",
+                                        object: { type: "Super" },
+                                        expression: { type: "IdentifierExpression", name: "c" }
+                                      }
+                                  }
+                                ]
+                              },
+                            operator: "=",
+                            expression: { type: "IdentifierExpression", name: "d" }
+                          }
+                      }
+                    ]
+                  }
+              }
+          }
+        ]
+      }
+    )
 
   });
 });

@@ -18,9 +18,14 @@ var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
 
 var testParse = require("./assertions").testParse;
+var testParseModule = require("./assertions").testParseModule;
 
 function directives(program) {
   return program.body.directives;
+}
+
+function id(x) {
+  return x;
 }
 
 suite("Parser", function () {
@@ -123,6 +128,17 @@ suite("Parser", function () {
         right: { type: "LiteralNumericExpression", value: 0 }
       }
     );
+
+
+    testParseModule("\"use strict\";", id,
+      { type: "Module",
+        items: [
+          { type: "ExpressionStatement",
+            expression: { type: "LiteralStringExpression", value: "use strict" }
+          }
+        ]
+      }
+    )
 
   });
 });

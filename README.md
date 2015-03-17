@@ -12,7 +12,7 @@ parser that produces a [Shift format](https://github.com/shapesecurity/shift-spe
 
 [Stable](http://nodejs.org/api/documentation.html#documentation_stability_index).
 
-The parser supports version 6 (release candidate 1) of the ECMA-262 standard.
+The parser supports version 6 (release candidate 2) of the ECMA-262 standard.
 
 
 ## Installation

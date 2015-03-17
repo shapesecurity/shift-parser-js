@@ -84,7 +84,6 @@ export const TokenType = {
   GTE: {klass: TokenClass.Punctuator, name: ">="},
   INSTANCEOF: {klass: TokenClass.Keyword, name: "instanceof"},
   IN: {klass: TokenClass.Keyword, name: "in"},
-  OF: {klass: TokenClass.Keyword, name: "of"},
   NOT: {klass: TokenClass.Punctuator, name: "!"},
   BIT_NOT: {klass: TokenClass.Punctuator, name: "~"},
   DELETE: {klass: TokenClass.Keyword, name: "delete"},
@@ -396,11 +395,6 @@ export default class Tokenizer {
           case "d":
             if (id.charAt(1) === "o") {
               return TokenType.DO;
-            }
-            break;
-          case "o":
-            if (id.charAt(1) === "f") {
-              return TokenType.OF;
             }
             break;
           default:

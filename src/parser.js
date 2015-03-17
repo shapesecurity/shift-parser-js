@@ -413,8 +413,8 @@ export class Parser extends Tokenizer {
         this.consumeSemicolon();
         return this.markLocation({ type: "Import", defaultBinding: null, namedImports: [], moduleSpecifier }, startLocation);
       case TokenType.IDENTIFIER:
-        defaultBinding = this.expect(TokenType.IDENTIFIER).value;
-        boundNames["$" + defaultBinding] = true;
+        defaultBinding = this.parseBindingIdentifier();
+        boundNames["$" + defaultBinding.name] = true;
         if (!this.eat(TokenType.COMMA)) {
           return this.markLocation({ type: "Import", defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() }, startLocation);
         }
@@ -909,13 +909,14 @@ export class Parser extends Tokenizer {
     } else {
       let startsWithLet = this.match(TokenType.LET) || this.match(TokenType.IDENTIFIER) && this.lookahead.value === "let";
       let isForDecl = this.lookaheadLexicalDeclaration();
+      let leftLocation = this.getLocation();
       if (this.match(TokenType.VAR) || isForDecl) {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
         let init = this.parseVariableDeclaration({inFor: true});
         this.allowIn = previousAllowIn;
 
-        if (init.declarators.length === 1 && (this.match(TokenType.IN) || this.match(TokenType.OF))) {
+        if (init.declarators.length === 1 && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
           let type;
 
           if (this.match(TokenType.IN)) {
@@ -961,21 +962,33 @@ export class Parser extends Tokenizer {
       } else {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
-        let init = this.parseExpression();
+        let {expr, pattern, exprError} = this.parseAssignmentExpressionOrBindingElement();
         this.allowIn = previousAllowIn;
 
-        if (this.match(TokenType.IN) || !startsWithLet && this.match(TokenType.OF)) {
-          if (!Parser.isValidSimpleAssignmentTarget(init)) {
-            throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
+        if (pattern && pattern.type !== 'BindingWithDefault' && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
+          if (startsWithLet && this.matchContextualKeyword("of")) {
+            throw this.createError(ErrorMessages.INVALID_VAR_LHS_FOR_OF);
           }
-
           let type = this.match(TokenType.IN) ? "ForInStatement" : "ForOfStatement";
 
           this.lex();
           right = this.parseExpression();
 
-          return { type, left: init, right, body: this.getIteratorStatementEpilogue() };
+          return { type, left: pattern, right, body: this.getIteratorStatementEpilogue() };
         } else {
+          if (!expr) {
+            throw exprError;
+          }
+          while (this.eat(TokenType.COMMA)) {
+            let rhs = this.parseAssignmentExpression();
+            expr = this.markLocation({ type: "BinaryExpression", left: expr, operator: ",", right: rhs}, leftLocation);
+          }
+          if (this.match(TokenType.IN)) {
+            throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
+          }
+          if (this.matchContextualKeyword("of")) {
+            throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
+          }
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
             test = this.parseExpression();
@@ -984,7 +997,7 @@ export class Parser extends Tokenizer {
           if (!this.match(TokenType.RPAREN)) {
             right = this.parseExpression();
           }
-          return { type: "ForStatement", init, test, update: right, body: this.getIteratorStatementEpilogue() };
+          return { type: "ForStatement", init: expr, test, update: right, body: this.getIteratorStatementEpilogue() };
         }
       }
     }
@@ -2394,7 +2407,7 @@ export class Parser extends Tokenizer {
         return {
           name: this.markLocation({
             type: "StaticPropertyName",
-            value: numLiteral.type === "LiteralInfinityExpression" ? "" + 1 / 0 : numLiteral.value
+            value: "" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value)
           }, startLocation),
           binding: null
         };

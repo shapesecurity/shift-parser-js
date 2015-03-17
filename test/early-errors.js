@@ -255,18 +255,18 @@ suite("Parser", function () {
     // It is a Syntax Error if LeftHandSideExpression is either an ObjectLiteral or an ArrayLiteral and if the lexical token sequence matched by LeftHandSideExpression cannot be parsed with no tokens left over using AssignmentPattern as the goal symbol.
     testParseFailure("for({a: 0} in 0);", "Invalid left-hand side in for-in");
     testParseFailure("for([0] in 0);", "Invalid left-hand side in for-in");
-    testParseFailure("for({a: 0} of 0);", "Invalid left-hand side in for-in");
-    testParseFailure("for([0] of 0);", "Invalid left-hand side in for-in");
+    testParseFailure("for({a: 0} of 0);", "Invalid left-hand side in for-of");
+    testParseFailure("for([0] of 0);", "Invalid left-hand side in for-of");
     // It is a Syntax Error if IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.
     testParseFailure("for(0 in 0);", "Invalid left-hand side in for-in");
-    testParseFailure("for(0 of 0);", "Invalid left-hand side in for-in");
+    testParseFailure("for(0 of 0);", "Invalid left-hand side in for-of");
     // It is a Syntax Error if the LeftHandSideExpression is CoverParenthesizedExpressionAndArrowParameterList : ( Expression ) and Expression derives a production that would produce a Syntax Error according to these rules if that production is substituted for LeftHandSideExpression. This rule is recursively applied.
     testParseFailure("for(({a: 0}) in 0);", "Invalid left-hand side in for-in");
     testParseFailure("for(([0]) in 0);", "Invalid left-hand side in for-in");
-    testParseFailure("for(({a: 0}) of 0);", "Invalid left-hand side in for-in");
-    testParseFailure("for(([0]) of 0);", "Invalid left-hand side in for-in");
+    testParseFailure("for(({a: 0}) of 0);", "Invalid left-hand side in for-of");
+    testParseFailure("for(([0]) of 0);", "Invalid left-hand side in for-of");
     testParseFailure("for((0) in 0);", "Invalid left-hand side in for-in");
-    testParseFailure("for((0) of 0);", "Invalid left-hand side in for-in");
+    testParseFailure("for((0) of 0);", "Invalid left-hand side in for-of");
     // It is a Syntax Error if the BoundNames of ForDeclaration contains "let".
     testParseFailure("for(let let in 0);", "Invalid lexical binding name 'let'");
     testParseFailure("for(const let in 0);", "Invalid lexical binding name 'let'");

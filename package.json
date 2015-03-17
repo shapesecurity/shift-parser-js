@@ -17,19 +17,17 @@
     "build": "babel --auxiliary-comment 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src",
     "watch": "babel --auxiliary-comment 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src --watch",
     "generate-coverage": "istanbul cover _mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot --recursive test",
-    "check-coverage": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100",
-    "cjsify": "cjsify --export ShiftParser dist/index.js > shift-parser.js"
+    "check-coverage": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100"
   },
   "dependencies": {
-    "esutils": "^2.0.0"
+    "esutils": "^2.0.2"
   },
   "devDependencies": {
-    "babel": "4.3.0",
-    "commonjs-everywhere": "0.9.7",
+    "babel": "4.7.13",
     "everything.js": "^1.0.0",
     "expect.js": "0.3.1",
-    "istanbul": "0.3.5",
-    "mocha": "2.0.1"
+    "istanbul": "0.3.8",
+    "mocha": "2.2.1"
   },
   "keywords": [
     "Shift",

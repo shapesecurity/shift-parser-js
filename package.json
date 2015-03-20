@@ -33,6 +33,7 @@
     "everything.js": "^1.0.0",
     "expect.js": "0.3.1",
     "istanbul": "0.3.8",
+    "microtime": "^1.2.0",
     "mocha": "2.2.1",
     "tick": "^0.1.1"
   },

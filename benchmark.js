@@ -28,7 +28,8 @@ function benchmarkParsing(fileName) {
       parse(source, { loc: true });
     },
     onComplete: function () {
-      console.log(this + "");
+      console.log(this.toString());
+      console.log("Mean = " + (this.stats.mean * 1000).toFixed(2) + "ms.");
     }
   }).run();
 }

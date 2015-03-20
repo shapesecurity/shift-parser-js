@@ -399,7 +399,7 @@ export class Parser extends Tokenizer {
 
   parseFromClause() {
     this.expectContextualKeyword("from");
-    let value = this.expect(TokenType.STRING)._value;
+    let value = this.expect(TokenType.STRING).str;
     this.consumeSemicolon();
     return value;
   }
@@ -409,7 +409,7 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.IMPORT);
     switch (this.lookahead.type) {
       case TokenType.STRING:
-        moduleSpecifier = this.lex()._value;
+        moduleSpecifier = this.lex().str;
         this.consumeSemicolon();
         return this.markLocation({ type: "Import", defaultBinding: null, namedImports: [], moduleSpecifier }, startLocation);
       case TokenType.IDENTIFIER:
@@ -1814,10 +1814,10 @@ export class Parser extends Tokenizer {
     let token = this.lookahead;
     if (token.tail) {
       this.lex();
-      return [this.markLocation({ type: "TemplateElement", rawValue: token.value.slice(1, -1) }, startLocation)];
+      return [this.markLocation({ type: "TemplateElement", rawValue: token.slice.text.slice(1, -1) }, startLocation)];
     }
     let result = [
-      this.markLocation({ type: "TemplateElement", rawValue: this.lex().value.slice(1, -2) }, startLocation)
+      this.markLocation({ type: "TemplateElement", rawValue: this.lex().slice.text.slice(1, -2) }, startLocation)
     ];
     while (true) {
       result.push(this.parseExpression());
@@ -1831,10 +1831,10 @@ export class Parser extends Tokenizer {
       startLocation = this.getLocation();
       token = this.lex();
       if (token.tail) {
-        result.push(this.markLocation({ type: "TemplateElement", rawValue: token.value.slice(1, -1) }, startLocation));
+        result.push(this.markLocation({ type: "TemplateElement", rawValue: token.slice.text.slice(1, -1) }, startLocation));
         return result;
       } else {
-        result.push(this.markLocation({ type: "TemplateElement", rawValue: token.value.slice(1, -2) }, startLocation));
+        result.push(this.markLocation({ type: "TemplateElement", rawValue: token.slice.text.slice(1, -2) }, startLocation));
       }
     }
   }
@@ -1947,11 +1947,11 @@ export class Parser extends Tokenizer {
       throw this.createErrorWithLocation(this.lookahead, ErrorMessages.STRICT_OCTAL_LITERAL);
     }
     let token2 = this.lex();
-    let node = token2._value === 1 / 0 ? {
+    let node = token2.value === 1 / 0 ? {
       type: "LiteralInfinityExpression"
     } : {
       type: "LiteralNumericExpression",
-      value: token2._value
+      value: token2.value
     };
     return this.markLocation(node, startLocation);
   }
@@ -1962,7 +1962,7 @@ export class Parser extends Tokenizer {
       throw this.createErrorWithLocation(this.lookahead, ErrorMessages.STRICT_OCTAL_LITERAL);
     }
     let token2 = this.lex();
-    return this.markLocation({ type: "LiteralStringExpression", value: token2._value }, startLocation);
+    return this.markLocation({ type: "LiteralStringExpression", value: token2.str }, startLocation);
   }
 
   parseIdentifierName() {

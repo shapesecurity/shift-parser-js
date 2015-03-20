@@ -149,85 +149,6 @@ const PUNCTUATOR_START = [
   F, F, F, F, F, F, F, F, F, F, F, F, F, T, F, T, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
   F, F, F, F, F, F, T, T, T, T, F];
 
-export class Token {
-  constructor(type, slice, octal) {
-    this.type = type;
-    this.slice = slice;
-    this.octal = octal;
-  }
-}
-
-export class IdentifierLikeToken extends Token {
-  constructor(type, slice) {
-    super(type, slice, false);
-  }
-
-  get value() {
-    return this.slice.text;
-  }
-}
-
-export class IdentifierToken extends IdentifierLikeToken {
-  constructor(slice) {
-    super(TokenType.IDENTIFIER, slice);
-  }
-}
-
-export class KeywordToken extends IdentifierLikeToken {
-  constructor(type, slice) {
-    super(type, slice);
-  }
-}
-
-export class PunctuatorToken extends Token {
-  constructor(type, slice) {
-    super(type, slice, false);
-  }
-
-  get value() {
-    return this.type.name;
-  }
-}
-
-export class RegularExpressionLiteralToken extends Token {
-  constructor(slice, value) {
-    super(TokenType.REGEXP, slice, false);
-    this._value = value;
-  }
-
-  get value() {
-    return this._value;
-  }
-}
-
-export class NumericLiteralToken extends Token {
-  constructor(slice, value = +slice.text, legacyOctal = false) {
-    super(TokenType.NUMBER, slice, legacyOctal);
-    this._value = value;
-  }
-}
-
-export class StringLiteralToken extends Token {
-  constructor(slice, value, octal) {
-    super(TokenType.STRING, slice, octal);
-    this._value = value;
-  }
-}
-
-export class TemplateToken extends Token {
-  constructor(tail, slice) {
-    super(TokenType.TEMPLATE, slice);
-    this.tail = tail;
-    this.value = slice.text;
-  }
-}
-
-export class EOFToken extends Token {
-  constructor(slice) {
-    super(TokenType.EOS, slice, false);
-  }
-}
-
 export class JsError extends Error {
   constructor(index, line, column, msg) {
     this.index = index;
@@ -339,7 +260,7 @@ export default class Tokenizer {
 
   createErrorWithLocation(location, message, arg) {
     let msg = message.replace(/{(\d+)}/g, () => arg);
-    if (location instanceof Token) {
+    if (location.slice && location.slice.startLocation) {
       location = location.slice.startLocation;
     }
     return new JsError(location.offset, location.line, location.column + 1, msg);
@@ -375,7 +296,7 @@ export default class Tokenizer {
     // Some others are from future reserved words.
 
     if (id.length === 1 || id.length > 10) {
-      return TokenType.ILLEGAL;
+      return TokenType.IDENTIFIER;
     }
 
     /* istanbul ignore next */
@@ -631,7 +552,7 @@ export default class Tokenizer {
       default:
         break;
     }
-    return TokenType.ILLEGAL;
+    return TokenType.IDENTIFIER;
   }
 
   skipSingleLineComment(offset) {
@@ -924,16 +845,7 @@ export default class Tokenizer {
     let slice = this.getSlice(start, startLocation);
     slice.text = id;
 
-    if (id.length === 1) {
-      return new IdentifierToken(slice);
-    }
-
-    let subType = Tokenizer.getKeyword(id, this.strict);
-    if (subType !== TokenType.ILLEGAL) {
-      return new KeywordToken(subType, slice);
-    }
-
-    return new IdentifierToken(slice);
+    return { type: Tokenizer.getKeyword(id, this.strict), value: id, slice: slice };
   }
 
   getLocation() {
@@ -1068,7 +980,7 @@ export default class Tokenizer {
     let start = this.index;
     let subType = this.scanPunctuatorHelper();
     this.index += subType.name.length;
-    return new PunctuatorToken(subType, this.getSlice(start, startLocation));
+    return { type: subType, value: subType.name, slice: this.getSlice(start, startLocation) };
   }
 
   scanHexLiteral(start, startLocation) {
@@ -1093,7 +1005,7 @@ export default class Tokenizer {
     this.index = i;
 
     let slice = this.getSlice(start, startLocation);
-    return new NumericLiteralToken(slice, parseInt(slice.text.substr(2), 16));
+    return { type: TokenType.NUMBER, value: parseInt(slice.text.substr(2), 16), slice };
   }
 
   scanBinaryLiteral(start, startLocation) {
@@ -1116,7 +1028,12 @@ export default class Tokenizer {
       throw this.createILLEGAL();
     }
 
-    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(offset), 2), false);
+    return {
+      type: TokenType.NUMBER,
+      value: parseInt(this.getSlice(start, startLocation).text.substr(offset), 2),
+      slice: this.getSlice(start, startLocation),
+      octal: false
+    };
   }
 
   scanOctalLiteral(start, startLocation) {
@@ -1135,7 +1052,12 @@ export default class Tokenizer {
       throw this.createILLEGAL();
     }
 
-    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(2), 8), false);
+    return {
+      type: TokenType.NUMBER,
+      value: parseInt(this.getSlice(start, startLocation).text.substr(2), 8),
+      slice: this.getSlice(start, startLocation),
+      octal: false
+    };
   }
 
   scanLegacyOctalLiteral(start, startLocation) {
@@ -1155,7 +1077,12 @@ export default class Tokenizer {
       }
     }
 
-    return new NumericLiteralToken(this.getSlice(start, startLocation), parseInt(this.getSlice(start, startLocation).text.substr(1), isOctal ? 8 : 10), true);
+    return {
+      type: TokenType.NUMBER,
+      slice: this.getSlice(start, startLocation),
+      value: parseInt(this.getSlice(start, startLocation).text.substr(1), isOctal ? 8 : 10),
+      octal: true
+    };
   }
 
   scanNumericLiteral() {
@@ -1184,7 +1111,13 @@ export default class Tokenizer {
           return this.scanLegacyOctalLiteral(start, startLocation);
         }
       } else {
-        return new NumericLiteralToken(this.getSlice(start, startLocation));
+        let slice = this.getSlice(start, startLocation);
+        return {
+          type: TokenType.NUMBER,
+          value: +slice.text,
+          slice,
+          octal: false
+        };
       }
     } else if (ch !== ".") {
       // Must be "1".."9"
@@ -1192,7 +1125,13 @@ export default class Tokenizer {
       while ("0" <= ch && ch <= "9") {
         this.index++;
         if (this.index === this.source.length) {
-          return new NumericLiteralToken(this.getSlice(start, startLocation));
+          let slice = this.getSlice(start, startLocation);
+          return {
+            type: TokenType.NUMBER,
+            value: +slice.text,
+            slice,
+            octal: false
+          };
         }
         ch = this.source.charAt(this.index);
       }
@@ -1202,7 +1141,13 @@ export default class Tokenizer {
     if (ch === ".") {
       this.index++;
       if (this.index === this.source.length) {
-        return new NumericLiteralToken(this.getSlice(start, startLocation));
+        let slice = this.getSlice(start, startLocation);
+        return {
+          type: TokenType.NUMBER,
+          value: +slice.text,
+          slice,
+          octal: false
+        };
       }
 
       ch = this.source.charAt(this.index);
@@ -1210,7 +1155,13 @@ export default class Tokenizer {
         e++;
         this.index++;
         if (this.index === this.source.length) {
-          return new NumericLiteralToken(this.getSlice(start, startLocation));
+          let slice = this.getSlice(start, startLocation);
+          return {
+            type: TokenType.NUMBER,
+            value: +slice.text,
+            slice,
+            octal: false
+          };
         }
         ch = this.source.charAt(this.index);
       }
@@ -1255,7 +1206,15 @@ export default class Tokenizer {
       throw this.createILLEGAL();
     }
 
-    return new NumericLiteralToken(this.getSlice(start, startLocation));
+    {
+      let slice = this.getSlice(start, startLocation);
+      return {
+        type: TokenType.NUMBER,
+        value: +slice.text,
+        slice,
+        octal: false
+      };
+    }
   }
 
   scanStringEscape(str, octal) {
@@ -1360,7 +1319,7 @@ export default class Tokenizer {
       let ch = this.source.charAt(this.index);
       if (ch === quote) {
         this.index++;
-        return new StringLiteralToken(this.getSlice(start, startLocation), str, octal);
+        return { type: TokenType.STRING, slice: this.getSlice(start, startLocation), str, octal };
       } else if (ch === "\\") {
         [str, octal] = this.scanStringEscape(str, octal);
       } else if (isLineTerminator(ch.charCodeAt(0))) {
@@ -1383,11 +1342,11 @@ export default class Tokenizer {
       switch (ch) {
         case 0x60:  // `
           this.index++;
-          return new TemplateToken(true, this.getSlice(start, startLocation));
+          return { type: TokenType.TEMPLATE, tail: true, slice: this.getSlice(start, startLocation) };
         case 0x24:  // $
           if (this.source.charCodeAt(this.index + 1) === 0x7B) {  // {
             this.index += 2;
-            return new TemplateToken(false, this.getSlice(start, startLocation));
+            return { type: TokenType.TEMPLATE, tail: false, slice: this.getSlice(start, startLocation) };
           }
           this.index++;
           break;
@@ -1460,7 +1419,7 @@ export default class Tokenizer {
       this.index++;
       str += ch;
     }
-    return new RegularExpressionLiteralToken(this.getSlice(start, startLocation), str);
+    return { type: TokenType.REGEXP, value: str, slice: this.getSlice(start, startLocation) };
   }
 
   advance() {
@@ -1483,7 +1442,7 @@ export default class Tokenizer {
     }
 
     if (this.index >= this.source.length) {
-      return new EOFToken(this.getSlice(this.index, startLocation));
+      return { type: TokenType.EOS, slice: this.getSlice(this.index, startLocation) };
     }
 
     let charCode = this.source.charCodeAt(this.index);

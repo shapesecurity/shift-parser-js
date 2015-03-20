@@ -24,15 +24,22 @@ npm install shift-parser
 
 ## Usage
 
-```js
+```es6
 import parse from "shift-parser";
 let ast = parse("/* ECMAScript program text */");
 ```
 
-```js
+```es6
 import {parseScript, parseModule} from "shift-parser";
 let scriptAST = parseScript("/* ECMAScript Script text */");
 let moduleAST = parseModule("/* ECMAScript Module text */");
+```
+
+Or in node.js:
+
+```js
+var parseScript = require("shift-parser").parseScript;
+var scriptAST = parseScript("/* ECMAScript Script text */");
 ```
 
 

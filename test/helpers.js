@@ -15,6 +15,7 @@
  */
 
 var expect = require("expect.js");
+var SHIFT_SPEC = require("shift-spec").default;
 
 function stmt(program) {
   return program.body.statements[0];
@@ -24,98 +25,87 @@ function expr(program) {
   return stmt(program).expression;
 }
 
+function schemaCheckUnion(node, spec) {
+  if (spec.typeName === 'Union') {
+    return spec.arguments.some(function (argument) {
+      return schemaCheckUnion(node, argument);
+    });
+  } else if (spec.typeName === node.type) {
+    schemaCheck(node, spec);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+var fieldDatabase = Object.create(null);
+for (var type in SHIFT_SPEC) {
+  fieldDatabase[type] = {};
+  SHIFT_SPEC[type].fields.forEach(function (field) {
+    fieldDatabase[type][field] = true;
+  });
+}
+
+function schemaCheck(node, spec) {
+  switch (spec.typeName) {
+    case "List":
+      if (!Array.isArray(node)) {
+        expect().fail("node must be an array, but it is: " + JSON.stringify(node, null, 2));
+      }
+      node.forEach(function (n) {
+        schemaCheck(n, spec.argument);
+      });
+      return;
+    case "Union":
+      if (!schemaCheckUnion(node, spec)) {
+        expect().fail("node cannot exist in this position.");
+      }
+      return;
+    case "Maybe":
+      if (node) {
+        schemaCheck(node, spec.argument);
+      }
+      return;
+    case "Enum":
+      if (typeof node !== "string") {
+        expect().fail("enum must be of string type.");
+      }
+      if (spec.values.indexOf(node) < 0) {
+        expect().fail("illegal enum value '" + node + "'. accepted values: [" + spec.values + "]");
+      }
+      return;
+    case "Boolean":
+      if (typeof node !== "boolean") {
+        expect(typeof node).eql("boolean");
+      }
+      return;
+    case "Number":
+      if (typeof node !== "number") {
+        expect(typeof node).eql("number");
+      }
+      return;
+    case "String":
+      if (typeof node !== "string") {
+        expect(typeof node).eql("string");
+      }
+      return;
+  }
+
+  spec.fields.forEach(function (field) {
+    if (field.name === "type") {
+      if (node.type !== field.value) {
+        expect(node.type).eql(field.value);
+      }
+    } else {
+      if (!node.hasOwnProperty(field.name)) {
+        expect(node).to.have.key(field.name);
+      }
+      schemaCheck(node[field.name], field.type);
+    }
+  });
+}
 
 var LT = -1, EQ = 0, GT = 1;
-
-var SPEC = {
-  ArrayBinding: ["elements", "restElement"],
-  ArrayExpression: ["elements"],
-  ArrowExpression: ["parameters", "restParameter", "body"],
-  AssignmentExpression: ["operator", "binding", "expression"],
-  BinaryExpression: ["operator", "left", "right"],
-  BindingIdentifier: ["name"],
-  BindingPropertyIdentifier: ["binding", "init"],
-  BindingPropertyProperty: ["name", "binding"],
-  BindingWithDefault: ["binding", "init"],
-  Block: ["statements"],
-  BlockStatement: ["block"],
-  BreakStatement: ["label"],
-  CallExpression: ["callee", "arguments"],
-  CatchClause: ["binding", "body"],
-  ClassDeclaration: ["name", "super", "elements"],
-  ClassElement: ["isStatic", "method"],
-  ClassExpression: ["name", "super", "elements"],
-  ComputedMemberExpression: ["object", "expression"],
-  ComputedPropertyName: ["expression"],
-  ConditionalExpression: ["test", "consequent", "alternate"],
-  ContinueStatement: ["label"],
-  DataProperty: ["name", "expression"],
-  DebuggerStatement: [],
-  Directive: ["rawValue"],
-  DoWhileStatement: ["body", "test"],
-  EmptyStatement: [],
-  Export: ["declaration"],
-  ExportAllFrom: ["moduleSpecifier"],
-  ExportDefault: ["value"],
-  ExportFrom: ["namedExports", "moduleSpecifier"],
-  ExportSpecifier: ["name", "exportedName"],
-  ExpressionStatement: ["expression"],
-  ForInStatement: ["left", "right", "body"],
-  ForOfStatement: ["left", "right", "body"],
-  ForStatement: ["init", "test", "update", "body"],
-  FunctionBody: ["directives", "statements"],
-  FunctionDeclaration: ["isGenerator", "name", "parameters", "restParameter", "body"],
-  FunctionExpression: ["isGenerator", "name", "parameters", "restParameter", "body"],
-  Getter: ["name", "body"],
-  IdentifierExpression: ["name"],
-  IfStatement: ["test", "consequent", "alternate"],
-  Import: ["defaultBinding", "namedImports", "moduleSpecifier"],
-  ImportNamespace: ["defaultBinding", "namespaceBinding", "moduleSpecifier"],
-  ImportSpecifier: ["name", "binding"],
-  LabeledStatement: ["label", "body"],
-  LiteralBooleanExpression: ["value"],
-  LiteralInfinityExpression: [],
-  LiteralNullExpression: [],
-  LiteralNumericExpression: ["value"],
-  LiteralRegExpExpression: ["pattern", "flags"],
-  LiteralStringExpression: ["value"],
-  Method: ["isGenerator", "name", "parameters", "restParameter", "body"],
-  Module: ["items"],
-  NamedImports: ["importSpecifiers"],
-  NewExpression: ["callee", "arguments"],
-  NewTargetExpression: [],
-  ObjectBinding: ["properties"],
-  ObjectExpression: ["properties"],
-  PostfixExpression: ["operand", "operator"],
-  PrefixExpression: ["operator", "operand"],
-  ReturnStatement: ["expression"],
-  Script: ["body"],
-  Setter: ["name", "parameter", "body"],
-  ShorthandProperty: ["name"],
-  SourceLocation: ["offset", "line", "column"],
-  SourceSpan: ["start", "end", "source"],
-  SpreadElement: ["expression"],
-  StaticMemberExpression: ["object", "property"],
-  StaticPropertyName: ["value"],
-  Super: [],
-  SwitchCase: ["test", "consequent"],
-  SwitchDefault: ["consequent"],
-  SwitchStatement: ["discriminant", "cases"],
-  SwitchStatementWithDefault: ["discriminant", "preDefaultCases", "defaultCase", "postDefaultCases"],
-  TemplateElement: ["rawValue"],
-  TemplateExpression: ["tag", "elements"],
-  ThisExpression: [],
-  ThrowStatement: ["expression"],
-  TryCatchStatement: ["body", "catchClause"],
-  TryFinallyStatement: ["body", "catchClause", "finalizer"],
-  VariableDeclaration: ["kind", "declarators"],
-  VariableDeclarationStatement: ["declaration"],
-  VariableDeclarator: ["binding", "init"],
-  WhileStatement: ["test", "body"],
-  WithStatement: ["object", "body"],
-  YieldExpression: ["expression"],
-  YieldGeneratorExpression: ["expression"],
-};
 
 function sourceLocationCompare(loc1, loc2) {
   if (loc1.offset < loc2.offset) {
@@ -177,14 +167,15 @@ function locationSanityCheck(node, parentSpan, prevLocation) {
     expectSourceSpanContains(parentSpan, loc);
   }
   var last = null;
-  for (var i = 0; i < SPEC[node.type].length; i++) {
-    var field = SPEC[node.type][i];
-    if (!node[field]) return;
-    if (typeof node[field].type === "string") {  // subnode
-      locationSanityCheck(node[field], loc, last);
-      last = node[field].loc.end;
-    } else if (Array.isArray(node[field])) {
-      var childList = node[field];
+  var spec = SHIFT_SPEC[node.type].fields;
+  for (var i = 0; i < spec.length; i++) {
+    var field = spec[i];
+    if (node[field.name] === null) return;
+    if (typeof node[field.name].type === "string") {  // subnode
+      locationSanityCheck(node[field.name], loc, last);
+      last = node[field.name].loc.end;
+    } else if (Array.isArray(node[field.name])) {
+      var childList = node[field.name];
       for (var j = 0; j < childList.length; j++) {
         var child = childList[j];
         if (!child) return;
@@ -199,3 +190,4 @@ exports.moduleItem = moduleItem;
 exports.expr = expr;
 exports.stmt = stmt;
 exports.locationSanityCheck = locationSanityCheck;
+exports.schemaCheck = schemaCheck;

@@ -35,7 +35,8 @@
     "istanbul": "0.3.8",
     "microtime": "^1.2.0",
     "mocha": "2.2.1",
-    "tick": "^0.1.1"
+    "tick": "^0.1.1",
+    "shift-spec": "2.1.1"
   },
   "keywords": [
     "Shift",

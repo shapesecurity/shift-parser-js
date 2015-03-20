@@ -285,7 +285,8 @@ suite("Parser", function () {
       {
         type: "ArrowExpression",
         params: {
-          type: "FormalParameters", items: [
+          type: "FormalParameters",
+          items: [
             { type: "BindingIdentifier", name: "a" },
             {
               type: "ObjectBinding",
@@ -302,6 +303,43 @@ suite("Parser", function () {
         },
         body: { type: "LiteralNumericExpression", value: 0 }
       });
+
+    testParse("({x = 0}, {y = 0}, {z = 0})=>0", expr, {
+      type: "ArrowExpression",
+      params: {
+        type: "FormalParameters",
+        items: [{
+          type: "ObjectBinding",
+          properties: [
+            {
+              type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "x" },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }
+          ]
+        }, {
+          type: "ObjectBinding",
+          properties: [
+            {
+              type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "y" },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }
+          ]
+        }, {
+          type: "ObjectBinding",
+          properties: [
+            {
+              type: "BindingPropertyIdentifier",
+              binding: { type: "BindingIdentifier", name: "z" },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }
+          ]
+        }],
+        "rest": null
+      },
+      body: { type: "LiteralNumericExpression", value: 0 }
+    });
 
     testParseFailure("[]=>0", "Unexpected token =>");
     testParseFailure("() + 1", "Unexpected token +");

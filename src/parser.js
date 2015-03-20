@@ -130,6 +130,11 @@ export class Parser extends Tokenizer {
     this.allowLabeledFunction = true;
     this.module = false;
     this.strict = false;
+
+    // Cover grammar
+    this.isBindingElement = true;
+    this.isAssignmentTarget = true;
+    this.firstExprError = null;
   }
 
   eat(tokenType) {
@@ -638,7 +643,8 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     let originalLDN = this.LDN;
     this.LDN = [];
-    var stmt = this.wrapVDN(() => this.parseStatementHelper(allowLabeledFunction, originalLDN, isTopLevel));
+    var stmt = this.wrapVDN(() => this.isolateCoverGrammar(() =>
+      this.parseStatementHelper(allowLabeledFunction, originalLDN, isTopLevel)));
     this.LDN = originalLDN;
     return this.markLocation(stmt, startLocation);
   }
@@ -838,7 +844,6 @@ export class Parser extends Tokenizer {
 
   static isValidSimpleAssignmentTarget(node) {
     switch (node.type) {
-      case "BindingIdentifier":
       case "IdentifierExpression":
       case "ComputedMemberExpression":
       case "StaticMemberExpression":
@@ -850,6 +855,7 @@ export class Parser extends Tokenizer {
   static boundNames(node) {
     switch (node.type) {
       case "BindingIdentifier":
+      case "IdentifierExpression":
         return [node.name];
       case "BindingWithDefault":
         return Parser.boundNames(node.binding);
@@ -962,10 +968,10 @@ export class Parser extends Tokenizer {
       } else {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
-        let {expr, pattern, exprError} = this.parseAssignmentExpressionOrBindingElement();
+        let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
         this.allowIn = previousAllowIn;
 
-        if (pattern && pattern.type !== 'BindingWithDefault' && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
+        if (this.isAssignmentTarget && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
           if (startsWithLet && this.matchContextualKeyword("of")) {
             throw this.createError(ErrorMessages.INVALID_VAR_LHS_FOR_OF);
           }
@@ -974,10 +980,10 @@ export class Parser extends Tokenizer {
           this.lex();
           right = this.parseExpression();
 
-          return { type, left: pattern, right, body: this.getIteratorStatementEpilogue() };
+          return { type, left: Parser.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() };
         } else {
-          if (!expr) {
-            throw exprError;
+          if (this.firstExprError) {
+            throw this.firstExprError;
           }
           while (this.eat(TokenType.COMMA)) {
             let rhs = this.parseAssignmentExpression();
@@ -1308,10 +1314,98 @@ export class Parser extends Tokenizer {
     return [this.markLocation({ type: "VariableDeclarator", binding, init }, startLocation), bound];
   }
 
-  static getExpr({expr, exprError}) {
-    if (!expr) throw exprError;
-    return expr;
+  isolateCoverGrammar(parser) {
+    var oldIsBindingElement = this.isBindingElement,
+      oldIsAssignmentTarget = this.isAssignmentTarget,
+      oldFirstExprError = this.firstExprError,
+      result;
+    this.isBindingElement = true;
+    this.isAssignmentTarget = true;
+    this.firstExprError = null;
+    result = parser.call(this);
+    if (this.firstExprError !== null) {
+      throw this.firstExprError;
+    }
+    this.isBindingElement = oldIsBindingElement;
+    this.isAssignmentTarget = oldIsAssignmentTarget;
+    this.firstExprError = oldFirstExprError;
+    return result;
   }
+
+  inheritCoverGrammar(parser) {
+    var oldIsBindingElement = this.isBindingElement,
+      oldIsAssignmentTarget = this.isAssignmentTarget,
+      oldFirstExprError = this.firstExprError,
+      result;
+    this.isBindingElement = true;
+    this.isAssignmentTarget = true;
+    this.firstExprError = null;
+    result = parser.call(this);
+    this.isBindingElement = this.isBindingElement && oldIsBindingElement;
+    this.isAssignmentTarget = this.isAssignmentTarget && oldIsAssignmentTarget;
+    this.firstExprError = oldFirstExprError || this.firstExprError;
+    return result;
+  }
+
+  static transformDestructuring(node) {
+    switch (node.type) {
+      case "ObjectExpression":
+        return copyLocation(node, {
+          type: "ObjectBinding",
+          properties: node.properties.map(Parser.transformDestructuring)
+        });
+      case "DataProperty":
+        return copyLocation(node, {
+          type: "BindingPropertyProperty",
+          name: node.name,
+          binding: Parser.transformDestructuring(node.expression)
+        });
+      case "ShorthandProperty":
+        return copyLocation(node, {
+          type: "BindingPropertyIdentifier",
+          binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
+          init: null,
+        });
+      case "ArrayExpression":
+        let last = node.elements[node.elements.length - 1];
+        if (last != null && last.type === "SpreadElement") {
+          return copyLocation(node, {
+            type: "ArrayBinding",
+            elements: node.elements.slice(0, -1).map(e => e && Parser.transformDestructuring(e)),
+            restElement: copyLocation(last.expression, Parser.transformDestructuring(last.expression))
+          });
+        } else {
+          return copyLocation(node, {
+            type: "ArrayBinding",
+            elements: node.elements.map(e => e && Parser.transformDestructuring(e)),
+            restElement: null
+          });
+        }
+      case "AssignmentExpression":
+        return copyLocation(node, {
+          type: "BindingWithDefault",
+          binding: Parser.transformDestructuring(node.binding),
+          init: node.expression
+        });
+      case "IdentifierExpression":
+        return copyLocation(node, { type: "BindingIdentifier", name: node.name });
+      case "StaticPropertyName":
+        return copyLocation(node, { type: "BindingIdentifier", name: node.value });
+      case "ComputedMemberExpression":
+      case "StaticMemberExpression":
+      case "ArrayBinding":
+      case "BindingIdentifier":
+      case "BindingPropertyIdentifier":
+      case "BindingPropertyProperty":
+      case "BindingWithDefault":
+      case "ObjectBinding":
+        return node;
+      // istanbul ignore next
+      default:
+        throw new Error("Not reached");
+    }
+  }
+
 
   parseExpression() {
     let startLocation = this.getLocation();
@@ -1336,7 +1430,7 @@ export class Parser extends Tokenizer {
     // Convert param list.
     let {params = null, rest = null} = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
-      if (head.type === "BindingIdentifier") {
+      if (head.type === "IdentifierExpression") {
         let name = head.name;
         if (STRICT_MODE_RESERVED_WORD.hasOwnProperty(name)) {
           throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
@@ -1344,7 +1438,7 @@ export class Parser extends Tokenizer {
         if (isRestrictedWord(name)) {
           throw this.createError(ErrorMessages.STRICT_PARAM_NAME);
         }
-        params = [head];
+        params = [Parser.transformDestructuring(head)];
       } else {
         throw this.createUnexpected(arrow);
       }
@@ -1366,7 +1460,7 @@ export class Parser extends Tokenizer {
   }
 
   parseAssignmentExpression() {
-    return Parser.getExpr(this.parseAssignmentExpressionOrBindingElement());
+    return this.isolateCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
   }
 
   parseAssignmentExpressionOrBindingElement() {
@@ -1374,13 +1468,16 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
 
     if (this.allowYieldExpression && !this.inGeneratorParameter && this.lookahead.type === TokenType.YIELD) {
-      return { expr: this.parseYieldExpression(), pattern: null, isBindingElement: false };
+      this.isBindingElement = this.isAssignmentTarget = false;
+      return this.parseYieldExpression();
     }
 
-    let { expr, pattern, isBindingElement, exprError } = this.parseConditionalExpression();
+    let expr = this.parseConditionalExpression();
 
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
-      return { expr: this.parseArrowExpressionTail(pattern, startLocation), pattern: null, isBindingElement: false };
+      this.isBindingElement = this.isAssignmentTarget = false;
+      this.firstExprError = null;
+      return this.parseArrowExpressionTail(expr, startLocation);
     }
 
     let isAssignmentOperator = false;
@@ -1401,24 +1498,26 @@ export class Parser extends Tokenizer {
         break;
     }
     if (isAssignmentOperator) {
-      if (!pattern || !Parser.isValidSimpleAssignmentTarget(pattern)) {
+      if (!this.isAssignmentTarget || !Parser.isValidSimpleAssignmentTarget(expr)) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
-      if (pattern.type === "BindingIdentifier") {
-        if (this.strict && isRestrictedWord(pattern.name)) {
+      expr = Parser.transformDestructuring(expr);
+      if (expr.type === "BindingIdentifier") {
+        if (this.strict && isRestrictedWord(expr.name)) {
           throw this.createErrorWithLocation(token, ErrorMessages.STRICT_LHS_ASSIGNMENT);
         }
       }
     } else if (operator.type === TokenType.ASSIGN) {
-      if (!pattern) {
+      if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
-      let bound = Parser.boundNames(pattern);
+      expr = Parser.transformDestructuring(expr);
+      let bound = Parser.boundNames(expr);
         if (this.strict && bound.some(isRestrictedWord)) {
           throw this.createErrorWithLocation(token, ErrorMessages.STRICT_LHS_ASSIGNMENT);
         }
     } else {
-      return { expr, pattern, isBindingElement, exprError };
+      return expr;
     }
 
     this.lex();
@@ -1427,21 +1526,13 @@ export class Parser extends Tokenizer {
     let rhs = this.parseAssignmentExpression();
 
     this.inGeneratorParameter = previousInGeneratorParameter;
-    return {
-      expr: pattern && this.markLocation({
+    this.firstExprError = null;
+    return this.markLocation({
         type: "AssignmentExpression",
-        binding: pattern,
+      binding: expr,
         operator: operator.type.name,
         expression: rhs
-      }, startLocation),
-      pattern: pattern && this.markLocation({
-        type: "BindingWithDefault",
-        binding: pattern,
-        init: rhs
-      }, startLocation),
-      isBindingElement,
-      exprError
-    };
+    }, startLocation);
   }
 
   lookaheadAssignmentExpression() {
@@ -1493,25 +1584,22 @@ export class Parser extends Tokenizer {
   parseConditionalExpression() {
     let startLocation = this.getLocation();
     let test = this.parseBinaryExpression();
-    if (!test.expr) return test;
+    if (this.firstExprError) {
+      return test;
+    }
     if (this.eat(TokenType.CONDITIONAL)) {
       let previousAllowIn = this.allowIn;
       this.allowIn = true;
-      let consequent = this.parseAssignmentExpression();
+      let consequent = this.isolateCoverGrammar(this.parseAssignmentExpression);
       this.allowIn = previousAllowIn;
       this.expect(TokenType.COLON);
-      let alternate = this.parseAssignmentExpression();
-      return {
-        expr: this.markLocation({
+      let alternate = this.isolateCoverGrammar(this.parseAssignmentExpression);
+      return this.markLocation({
           type: "ConditionalExpression",
-          test: test.expr,
+        test,
           consequent,
           alternate
-        }, startLocation),
-        pattern: null,
-        isBindingElement: false,
-        exprError: null
-      };
+      }, startLocation);
     }
 
     return test;
@@ -1551,25 +1639,25 @@ export class Parser extends Tokenizer {
 
   parseBinaryExpression() {
     let location = this.getLocation();
-    let unary = this.parseUnaryExpression();
-    if (!unary.expr) {
-      return unary;
+    let left = this.parseUnaryExpression();
+    if (this.firstExprError) {
+      return left;
     }
 
     let operator = this.lookahead.type;
 
     let isBinaryOperator = this.isBinaryOperator(operator);
     if (!isBinaryOperator) {
-      return unary;
+      return left;
     }
 
-    let left = unary.expr;
+    this.isBindingElement = this.isAssignmentTarget = false;
 
     this.lex();
     let stack = [];
     stack.push({location, left, operator, precedence: BinaryPrecedence[operator.name]});
     location = this.getLocation();
-    let right = Parser.getExpr(this.parseUnaryExpression());
+    let right = this.isolateCoverGrammar(this.parseUnaryExpression);
     operator = this.lookahead.type;
     isBinaryOperator = this.isBinaryOperator(this.lookahead.type);
     while (isBinaryOperator) {
@@ -1588,26 +1676,21 @@ export class Parser extends Tokenizer {
       stack.push({location, left: right, operator, precedence});
       location = this.getLocation();
 
-      right = Parser.getExpr(this.parseUnaryExpression());
+      right = this.isolateCoverGrammar(this.parseUnaryExpression);
 
       operator = this.lookahead.type;
       isBinaryOperator = this.isBinaryOperator(operator);
     }
 
     // Final reduce to clean-up the stack.
-    return {
-      expr: stack.reduceRight((expr, stackItem) =>
-          this.markLocation({
-            type: "BinaryExpression",
-            left: stackItem.left,
-            operator: stackItem.operator.name,
-            right: expr
-          }, stackItem.location),
-        right),
-      pattern: null,
-      isBindingElement: false,
-      exprError: null
-    };
+    return stack.reduceRight((expr, stackItem) =>
+        this.markLocation({
+          type: "BinaryExpression",
+          left: stackItem.left,
+          operator: stackItem.operator.name,
+          right: expr
+        }, stackItem.location),
+      right);
   }
 
   static isPrefixOperator(type) {
@@ -1637,7 +1720,8 @@ export class Parser extends Tokenizer {
     }
 
     this.lex();
-    let expr = Parser.getExpr(this.parseUnaryExpression());
+    this.isBindingElement = this.isAssignmentTarget = false;
+    let expr = this.isolateCoverGrammar(this.parseUnaryExpression);
     switch (operator.type) {
       case TokenType.INC:
       case TokenType.DEC:
@@ -1661,30 +1745,27 @@ export class Parser extends Tokenizer {
         break;
     }
 
-    return {
-      expr: this.markLocation({ type: "PrefixExpression", operator: operator.value, operand: expr }, startLocation),
-      pattern: null,
-      isBindingElement: false,
-      exprError: null,
-    };
+    return this.markLocation({ type: "PrefixExpression", operator: operator.value, operand: expr }, startLocation);
   }
 
   parsePostfixExpression() {
     let startLocation = this.getLocation();
 
-    let lhs = this.parseLeftHandSideExpression({ allowCall: true });
-    if (!lhs.expr) return lhs;
+    let operand = this.parseLeftHandSideExpression({ allowCall: true });
+    if (this.firstExprError) return operand;
 
     if (this.hasLineTerminatorBeforeNext) {
-      return lhs;
+      return operand;
     }
 
     let operator = this.lookahead;
     if (operator.type !== TokenType.INC && operator.type !== TokenType.DEC) {
-      return lhs;
+      return operand;
     }
 
-    let operand = Parser.getExpr(lhs);
+    if (!this.isAssignmentTarget) {
+      throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+    }
 
     if (!Parser.isValidSimpleAssignmentTarget(operand)) {
       throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
@@ -1699,12 +1780,7 @@ export class Parser extends Tokenizer {
       }
     }
 
-    return {
-      expr: this.markLocation({ type: "PostfixExpression", operand, operator: operator.value }, startLocation),
-      pattern: null,
-      isBindingElement: false,
-      exprError: null
-    };
+    return this.markLocation({ type: "PostfixExpression", operand, operator: operator.value }, startLocation);
   }
 
   parseLeftHandSideExpression({allowCall}) {
@@ -1712,10 +1788,11 @@ export class Parser extends Tokenizer {
     let previousAllowIn = this.allowIn;
     this.allowIn = allowCall;
 
-    let expr, pattern, isBindingElement, exprError, token = this.lookahead;
+    let expr, token = this.lookahead;
 
     if (this.eat(TokenType.SUPER)) {
-      isBindingElement = false;
+      this.isBindingElement = false;
+      this.isAssignmentTarget = false;
       expr = this.markLocation({ type: "Super" }, startLocation);
       if (this.match(TokenType.LPAREN)) {
         if (allowCall) {
@@ -1738,7 +1815,7 @@ export class Parser extends Tokenizer {
             object: expr,
             expression: this.parseComputedMember()
           }, startLocation);
-          pattern = expr;
+          this.isAssignmentTarget = true;
         } else {
           throw this.createErrorWithLocation(startLocation, ErrorMessages.UNEXPECTED_SUPER_PROPERTY);
         }
@@ -1749,7 +1826,7 @@ export class Parser extends Tokenizer {
             object: expr,
             property: this.parseNonComputedMember()
           }, startLocation);
-          pattern = expr;
+          this.isAssignmentTarget = true;
         } else {
           throw this.createErrorWithLocation(startLocation, ErrorMessages.UNEXPECTED_SUPER_PROPERTY);
         }
@@ -1757,48 +1834,48 @@ export class Parser extends Tokenizer {
         throw this.createUnexpected(token);
       }
     } else if (this.match(TokenType.NEW)) {
+      this.isBindingElement = this.isAssignmentTarget = false;
       expr = this.parseNewExpression();
     } else {
-      let pe = this.parsePrimaryExpression();
-      if (!pe.expr) {
-        return pe;
+      expr = this.parsePrimaryExpression();
+      if (this.firstExprError) {
+        return expr;
       }
-      ({ expr, pattern, isBindingElement, exprError } = pe);
     }
 
     while (true) {
       if (allowCall && this.match(TokenType.LPAREN)) {
-        isBindingElement = false;
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
         expr = this.markLocation({
           type: "CallExpression",
           callee: expr,
           arguments: this.parseArgumentList()
         }, startLocation);
-        pattern = null;
       } else if (this.match(TokenType.LBRACK)) {
-        isBindingElement = false;
+        this.isBindingElement = false;
+        this.isAssignmentTarget = true;
         expr = this.markLocation({
           type: "ComputedMemberExpression",
           object: expr,
           expression: this.parseComputedMember()
         }, startLocation);
-        pattern = expr;
       } else if (this.match(TokenType.PERIOD)) {
-        isBindingElement = false;
+        this.isBindingElement = false;
+        this.isAssignmentTarget = true;
         expr = this.markLocation({
           type: "StaticMemberExpression",
           object: expr,
           property: this.parseNonComputedMember()
         }, startLocation);
-        pattern = expr;
       } else if (this.match(TokenType.TEMPLATE)) {
-        isBindingElement = false;
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
         expr = this.markLocation({
           type: "TemplateExpression",
           tag: expr,
           elements: this.parseTemplateElements()
         }, startLocation);
-        pattern = null;
       } else {
         break;
       }
@@ -1806,7 +1883,7 @@ export class Parser extends Tokenizer {
 
     this.allowIn = previousAllowIn;
 
-    return { expr, pattern, isBindingElement, exprError };
+    return expr;
   }
 
   parseTemplateElements() {
@@ -1867,7 +1944,7 @@ export class Parser extends Tokenizer {
       }
       return this.markLocation({ type: "NewTargetExpression" }, startLocation);
     }
-    let callee = Parser.getExpr(this.parseLeftHandSideExpression({ allowCall: false }));
+    let callee = this.isolateCoverGrammar(() => this.parseLeftHandSideExpression({ allowCall: false }));
     return this.markLocation({
       type: "NewExpression",
       callee,
@@ -1882,47 +1959,60 @@ export class Parser extends Tokenizer {
 
     let startLocation = this.getLocation();
 
-    function primary(expr) {
-      return { expr, pattern: null, isBindingElement: false, exprError: null }
-    }
     switch (this.lookahead.type) {
       case TokenType.YIELD:
       case TokenType.IDENTIFIER:
       {
-        let expr = this.markLocation({ type: "IdentifierExpression", name: this.parseIdentifier() }, startLocation);
-        let pattern = this.markLocation({ type: "BindingIdentifier", name: expr.name }, startLocation);
-        return { expr, pattern, isBindingElement: true, exprError: null };
+        return this.markLocation({ type: "IdentifierExpression", name: this.parseIdentifier() }, startLocation);
       }
       case TokenType.STRING:
-        return primary(this.parseStringLiteral());
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.parseStringLiteral();
       case TokenType.NUMBER:
-        return primary(this.parseNumericLiteral());
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.parseNumericLiteral();
       case TokenType.THIS:
         this.lex();
-        return primary(this.markLocation({ type: "ThisExpression" }, startLocation));
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.markLocation({ type: "ThisExpression" }, startLocation);
       case TokenType.FUNCTION:
-        return primary(this.markLocation(this.parseFunction({ isExpr: true }), startLocation));
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.markLocation(this.parseFunction({ isExpr: true }), startLocation);
       case TokenType.TRUE:
         this.lex();
-        return primary(this.markLocation({ type: "LiteralBooleanExpression", value: true }, startLocation));
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.markLocation({ type: "LiteralBooleanExpression", value: true }, startLocation);
       case TokenType.FALSE:
         this.lex();
-        return primary(this.markLocation({ type: "LiteralBooleanExpression", value: false }, startLocation));
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.markLocation({ type: "LiteralBooleanExpression", value: false }, startLocation);
       case TokenType.NULL:
         this.lex();
-        return primary(this.markLocation({ type: "LiteralNullExpression" }, startLocation));
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.markLocation({ type: "LiteralNullExpression" }, startLocation);
       case TokenType.LBRACK:
         return this.parseArrayExpression();
       case TokenType.LBRACE:
         return this.parseObjectExpression();
       case TokenType.TEMPLATE:
-        return primary(this.markLocation({
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.markLocation({
           type: "TemplateExpression",
           tag: null,
           elements: this.parseTemplateElements()
-        }, startLocation));
+        }, startLocation);
       case TokenType.DIV:
       case TokenType.ASSIGN_DIV:
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
         this.lookahead = this.scanRegExp(this.lookahead.type === TokenType.DIV ? "/" : "/=");
         let token = this.lex();
         let lastSlash = token.value.lastIndexOf("/");
@@ -1933,9 +2023,11 @@ export class Parser extends Tokenizer {
         } catch (unused) {
           throw this.createErrorWithLocation(token, ErrorMessages.INVALID_REGULAR_EXPRESSION);
         }
-        return primary(this.markLocation({ type: "LiteralRegExpExpression", pattern, flags }, startLocation));
+        return this.markLocation({ type: "LiteralRegExpExpression", pattern, flags }, startLocation);
       case TokenType.CLASS:
-        return primary(this.parseClass({ isExpr: true }));
+        this.isBindingElement = false;
+        this.isAssignmentTarget = false;
+        return this.parseClass({ isExpr: true });
       default:
         throw this.createUnexpected(this.lex());
     }
@@ -2040,50 +2132,38 @@ export class Parser extends Tokenizer {
     //  3. Parameter list of arrow function
     let rest = null;
     let start = this.expect(TokenType.LPAREN);
-    let token = this.lookahead;
     if (this.eat(TokenType.RPAREN)) {
       this.ensureArrow();
+      this.isBindingElement = false;
+      this.isAssignmentTarget = false;
       return {
-        expr: null,
-        pattern: {
           type: ARROW_EXPRESSION_PARAMS,
           params: [],
           rest: null
-        },
-        isBindingElement: false,
-        exprError: this.createUnexpected(token),
       };
     } else if (this.eat(TokenType.ELLIPSIS)) {
       rest = this.parseBindingIdentifier();
       this.expect(TokenType.RPAREN);
       this.ensureArrow();
+      this.isBindingElement = false;
+      this.isAssignmentTarget = false;
       return {
-        expr: null,
-        pattern: {
-          type: ARROW_EXPRESSION_PARAMS,
-          params: [],
-          rest: rest
-        },
-        isBindingElement: false,
-        exprError: this.createUnexpected(token),
+        type: ARROW_EXPRESSION_PARAMS,
+        params: [],
+        rest: rest
       };
     }
 
 
     let startLocation = this.getLocation();
-    let {
-      expr: group,  // if it is a possible expression
-      pattern: assignmentTarget,  // if it can be an assignment pattern
-      isBindingElement: possibleBindings,  // if it can be an binding element, it can be part of arrow expression
-      exprError: firstExprError,
-      } = this.parseAssignmentExpressionOrBindingElement();
+    let group = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
 
-    let params = possibleBindings ? [assignmentTarget] : null;
+    let params = this.isBindingElement ? [group] : null;
 
     while (this.eat(TokenType.COMMA)) {
-      assignmentTarget = null;
+      this.isAssignmentTarget = false;
       if (this.match(TokenType.ELLIPSIS)) {
-        if (!possibleBindings) {
+        if (!this.isBindingElement) {
           throw this.createUnexpected(this.lookahead);
         }
         this.lex();
@@ -2098,19 +2178,15 @@ export class Parser extends Tokenizer {
       } else {
         let nextLocation = this.getLocation();
         // Can be either binding element or assignment target.
-        let { expr, pattern, isBindingElement, exprError } = this.parseAssignmentExpressionOrBindingElement();
-        if (!isBindingElement) {
-          possibleBindings = false;
+        let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+        if (!this.isBindingElement) {
           params = null;
-        } else if (params) {
-          params.push(pattern);
+        } else {
+          params.push(expr);
         }
-        if (!expr) {
-          firstExprError = firstExprError || exprError;
+
+        if (this.firstExprError) {
           group = null;
-          if (!params) {
-            throw firstExprError;
-          }
         } else {
           group = this.markLocation({
             type: "BinaryExpression",
@@ -2125,11 +2201,13 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.RPAREN);
 
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
-      if (!possibleBindings) {
+      if (!this.isBindingElement) {
         throw this.createErrorWithLocation(start, ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
       }
       // check dup params
       let allBoundNames = [];
+
+      params = params.map(Parser.transformDestructuring);
 
       params.forEach(expr => {
         allBoundNames = allBoundNames.concat(Parser.boundNames(expr));
@@ -2153,26 +2231,15 @@ export class Parser extends Tokenizer {
         throw this.createError(ErrorMessages.STRICT_RESERVED_WORD);
       }
 
-      return {
-        expr: null,
-        pattern: { type: ARROW_EXPRESSION_PARAMS, params, rest },
-        isBindingElement: false,
-        exprError: this.createUnexpected(this.lookahead),
-      };
+      this.isBindingElement = false;
+      return { type: ARROW_EXPRESSION_PARAMS, params, rest };
     } else {
       // Ensure assignment pattern:
       if (rest) {
         this.ensureArrow();
       }
-      if (!group) {
-        throw firstExprError;
-      }
-      return {
-        expr: group,
-        pattern: assignmentTarget,
-        isBindingElement: false,
-        exprError: null
-      };
+      this.isBindingElement = false;
+      return group;
     }
   }
 
@@ -2181,84 +2248,44 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.LBRACK);
 
-    let exprs = [], patterns = [], restElement = null, allBindingElements = true, firstExprError = null;
+    let exprs = [];
 
     while (true) {
       if (this.match(TokenType.RBRACK)) {
         break;
       }
       if (this.eat(TokenType.COMMA)) {
-        exprs && exprs.push(null);
-        patterns && patterns.push(null);
+        exprs.push(null);
       } else {
         let elementLocation = this.getLocation();
+        let expr;
         if (this.eat(TokenType.ELLIPSIS)) {
           // Spread/Rest element
-          let { expr, pattern, isBindingElement, exprError } = this.parseAssignmentExpressionOrBindingElement();
-          firstExprError = firstExprError || exprError;
-
-          allBindingElements = allBindingElements && isBindingElement;
-
-          if (!expr) {
-            exprs = null;
-            if (!patterns) {
-              throw firstExprError;
-            }
-          } else {
-            expr = this.markLocation({ type: "SpreadElement", expression: expr }, elementLocation);
+          expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+          if (!this.isAssignmentTarget && this.firstExprError) {
+            throw this.firstExprError;
           }
-
-          if (!pattern) {
-            patterns = null;
-            if (!exprs) {
-              throw firstExprError;
-            }
-          } else if (patterns) {
-            // When isBindingElementNext is true, patternNext is present.
-            restElement = pattern;
+          expr = this.markLocation({ type: "SpreadElement", expression: expr }, elementLocation);
+          if (!this.match(TokenType.RBRACK)) {
+            this.isAssignmentTarget = this.isBindingElement = false;
           }
-
-          exprs && exprs.push(expr);
         } else {
-          let { expr, pattern, isBindingElement, exprError } = this.parseAssignmentExpressionOrBindingElement();
-
-          allBindingElements = allBindingElements && isBindingElement;
-
-          if (!expr) {
-            firstExprError = firstExprError || exprError;
-            exprs = null;
-            if (!patterns) {
-              throw exprError;
-            }
+          expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+          if (!this.isAssignmentTarget && this.firstExprError) {
+            throw this.firstExprError;
           }
-          if (!pattern) {
-            patterns = null;
-            if (!exprs) {
-              throw firstExprError;
-            }
-          }
-          exprs && exprs.push(expr);
-          patterns && patterns.push(pattern);
         }
+        exprs.push(expr);
 
         if (!this.match(TokenType.RBRACK)) {
           this.expect(TokenType.COMMA);
-          if (restElement) {
-            patterns = null;
-            allBindingElements = false;
-          }
         }
       }
     }
 
     this.expect(TokenType.RBRACK);
 
-    return {
-      expr: exprs && this.markLocation({ type: "ArrayExpression", elements: exprs }, startLocation),
-      pattern: patterns && this.markLocation({ type: "ArrayBinding", elements: patterns, restElement }, startLocation),
-      isBindingElement: allBindingElements,
-      exprError: firstExprError
-    };
+    return this.markLocation({ type: "ArrayExpression", elements: exprs }, startLocation);
   }
 
   parseObjectExpression() {
@@ -2266,65 +2293,28 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.LBRACE);
 
-    let properties = [], bindingProperties = [], isBindingElement = true, exprError = null;
+    let properties = [];
     let has__proto__ = [false];
     while (!this.match(TokenType.RBRACE)) {
-      let {
-        property,
-        bindingProperty,
-        isBindingElement: isBindingElementNext,
-        exprError: exprErrorNext
-        } = this.parsePropertyDefinition(has__proto__);
-      if (properties) {
-        if (property) {
-          properties.push(property);
-        } else {
-          exprError = exprError || exprErrorNext;
-          properties = null;
-        }
-      }
-
-      if (bindingProperties) {
-        if (bindingProperty) {
-          bindingProperties.push(bindingProperty);
-          isBindingElement = isBindingElement && isBindingElementNext;
-        } else {
-          bindingProperties = false;
-          isBindingElement = false;
-        }
-      }
-
+      let property = this.inheritCoverGrammar(() => this.parsePropertyDefinition(has__proto__));
+      properties.push(property);
       if (!this.match(TokenType.RBRACE)) {
         this.expect(TokenType.COMMA);
       }
     }
-
     this.expect(TokenType.RBRACE);
-
-    return {
-      expr: properties && this.markLocation({ type: "ObjectExpression", properties }, startLocation),
-      pattern: bindingProperties && this.markLocation({
-        type: "ObjectBinding",
-        properties: bindingProperties
-      }, startLocation),
-      isBindingElement,
-      exprError
-    };
+    return this.markLocation({ type: "ObjectExpression", properties }, startLocation);
   }
 
   parsePropertyDefinition(has__proto__) {
     let startLocation = this.getLocation();
     let token = this.lookahead;
 
-    let {methodOrKey, kind, binding} = this.parseMethodDefinition(false);
+    let {methodOrKey, kind} = this.parseMethodDefinition(false);
     switch (kind) {
       case "method":
-        return {
-          property: methodOrKey,
-          bindingProperty: null,
-          isBindingElement: false,
-          exprError: null,
-        };
+        this.isBindingElement = this.isAssignmentTarget = false;
+        return methodOrKey;
       case "identifier": // IdentifierReference,
         if (this.eat(TokenType.ASSIGN)) {
           // CoverInitializedName
@@ -2332,28 +2322,19 @@ export class Parser extends Tokenizer {
             (this.strict || this.allowYieldExpression || this.inGeneratorBody || this.inGeneratorParameter)) {
             throw this.createUnexpected(token);
           }
-          let init = this.parseAssignmentExpression();
-          return {
-            property: null,
-            bindingProperty: this.markLocation({ type: "BindingPropertyIdentifier", binding, init, }, startLocation),
-            isBindingElement: true,
-            exprError: this.createErrorWithLocation(startLocation, ErrorMessages.ILLEGAL_PROPERTY)
-          };
+          let init = this.isolateCoverGrammar(this.parseAssignmentExpression);
+          this.firstExprError = this.createErrorWithLocation(startLocation, ErrorMessages.ILLEGAL_PROPERTY);
+          return this.markLocation({
+            type: "BindingPropertyIdentifier",
+            binding: Parser.transformDestructuring(methodOrKey),
+            init
+          }, startLocation);
         } else if (!this.match(TokenType.COLON)) {
           if (token.type !== TokenType.IDENTIFIER && token.type !== TokenType.YIELD ||
             (this.strict || this.allowYieldExpression) && methodOrKey.value === "yield") {
             throw this.createUnexpected(token);
           }
-          return {
-            property: this.markLocation({ type: "ShorthandProperty", name: methodOrKey.value }, startLocation),
-            bindingProperty: this.markLocation({
-              type: "BindingPropertyIdentifier",
-              binding: binding,
-              init: null,
-            }, startLocation),
-            isBindingElement: true,
-            exprError: null
-          }
+          return this.markLocation({ type: "ShorthandProperty", name: methodOrKey.value }, startLocation);
         }
     }
 
@@ -2369,19 +2350,8 @@ export class Parser extends Tokenizer {
       }
     }
 
-    let { expr, pattern, isBindingElement, exprError } = this.parseAssignmentExpressionOrBindingElement();
-    return {
-      property: expr && this.markLocation({
-        type: "DataProperty", name: methodOrKey, expression: expr
-      }, startLocation),
-      bindingProperty: pattern && this.markLocation({
-        type: "BindingPropertyProperty",
-        name: methodOrKey,
-        binding: pattern
-      }, startLocation),
-      isBindingElement,
-      exprError,
-    };
+    let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+    return this.markLocation({ type: "DataProperty", name: methodOrKey, expression: expr }, startLocation);
   }
 
   parsePropertyName() {
@@ -2587,7 +2557,7 @@ export class Parser extends Tokenizer {
       this.allowYieldExpression = false;
     }
     if (this.eat(TokenType.EXTENDS)) {
-      heritage = Parser.getExpr(this.parseLeftHandSideExpression({ allowCall: true }));
+      heritage = this.isolateCoverGrammar(() => this.parseLeftHandSideExpression({ allowCall: true }));
     }
 
     this.expect(TokenType.LBRACE);

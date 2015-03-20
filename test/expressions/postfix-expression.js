@@ -16,6 +16,7 @@
 
 var expr = require("../helpers").expr;
 var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
   suite("postfix expression", function () {
@@ -56,6 +57,9 @@ suite("Parser", function () {
         operand: { type: "IdentifierExpression", name: "arguments" },
         operator: "--" }
     );
+
+    testParseFailure("[x]--", "Invalid left-hand side in assignment");
+    testParseFailure("this--", "Invalid left-hand side in assignment");
 
   });
 });

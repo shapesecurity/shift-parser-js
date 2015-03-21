@@ -69,9 +69,9 @@ suite("Parser", function () {
     testParse("((((((((((((((((((((((((((((((((((((((((a))))))))))))))))))))))))))))))))))))))))", expr,
       { type: "IdentifierExpression", name: "a" });
 
-    testParseFailure("(0, {a = 0}) = 0", "Illegal property initializer");
+    testParseFailure("(0, {a = 0}) = 0", "Invalid left-hand side in assignment");
     testParseFailure("({a = 0})", "Illegal property initializer");
-    testParseFailure("(0, {a = 0}) => 0", "Illegal property initializer");
+    testParseFailure("(0, {a = 0}) => 0", "Illegal arrow function parameter list");
     testParseFailure("({a = 0}, {a = 0}, 0) => 0", "Unexpected number");
   });
 });

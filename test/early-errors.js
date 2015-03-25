@@ -343,15 +343,15 @@ suite("Parser", function () {
     //  (see Annex B 3.2)
 
     // 13.14.1
-    // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the LexicallyDeclaredNames of Block.
-    //  (see Annex B 3.5)
-    // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the VarDeclaredNames of Block.
-    //  (see Annex B 3.5)
-    // TODO: add early error text from ES6 draft 35; https://bugs.ecmascript.org/show_bug.cgi?id=4087#c2
+    // It is a Syntax Error if BoundNames of CatchParameter contains any duplicate elements.
     testParseFailure("try {} catch ([e, e]) {}", "Duplicate binding 'e'");
     testParseFailure("try {} catch ({e, e}) {}", "Duplicate binding 'e'");
     testParseFailure("try {} catch ({a: e, b: e}) {}", "Duplicate binding 'e'");
     testParseFailure("try {} catch ({e = 0, a: e}) {}", "Duplicate binding 'e'");
+    // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the LexicallyDeclaredNames of Block.
+    //  (see Annex B 3.5)
+    // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the VarDeclaredNames of Block.
+    //  (see Annex B 3.5)
 
     // 14.1.2
     // If the source code matching this production is strict code, the Early Error rules for StrictFormalParameters : FormalParameters are applied.

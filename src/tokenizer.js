@@ -124,8 +124,6 @@ export const TokenType = {
   STRING: {klass: TokenClass.StringLiteral, name: ""},
   REGEXP: {klass: TokenClass.RegularExpression, name: ""},
   IDENTIFIER: {klass: TokenClass.Ident, name: ""},
-  FUTURE_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
-  FUTURE_STRICT_RESERVED_WORD: {klass: TokenClass.Keyword, name: ""},
   CONST: {klass: TokenClass.Keyword, name: "const"},
   TEMPLATE: {klass: TokenClass.TemplateElement, name: ""},
   ILLEGAL: {klass: TokenClass.Illegal, name: ""}
@@ -182,7 +180,6 @@ export default class Tokenizer {
     this.lastIndex = 0;
     this.lastLine = 0;
     this.lastLineStart = 0;
-    this.strict = false;
     this.hasLineTerminatorBeforeNext = false;
     this.tokenIndex = 0;
   }
@@ -200,7 +197,6 @@ export default class Tokenizer {
       lastLine: this.lastLine,
       lastLineStart: this.lastLineStart,
       lookahead: this.lookahead,
-      strict: this.strict,
       hasLineTerminatorBeforeNext: this.hasLineTerminatorBeforeNext,
       tokenIndex: this.tokenIndex
     };
@@ -218,7 +214,6 @@ export default class Tokenizer {
     this.lastLine = state.lastLine;
     this.lastLineStart = state.lastLineStart;
     this.lookahead = state.lookahead;
-    this.strict = state.strict;
     this.hasLineTerminatorBeforeNext = state.hasLineTerminatorBeforeNext;
     this.tokenIndex = state.tokenIndex;
   }
@@ -243,27 +238,21 @@ export default class Tokenizer {
       case TokenClass.Ident:
         return this.createError(ErrorMessages.UNEXPECTED_IDENTIFIER);
       case TokenClass.Keyword:
-        if (token.type === TokenType.FUTURE_RESERVED_WORD) {
-          return this.createError(ErrorMessages.UNEXPECTED_RESERVED_WORD);
-        }
-        if (token.type === TokenType.FUTURE_STRICT_RESERVED_WORD) {
-          return this.createError(ErrorMessages.STRICT_RESERVED_WORD);
-        }
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
       case TokenClass.Punctuator:
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
     }
   }
 
-  createError(message, arg) {
+  createError(message) {
     /* istanbul ignore next */
-    let msg = message.replace(/{(\d+)}/g, () => JSON.stringify(arg));
+    let msg = message.replace(/{(\d+)}/g, (_, n) => JSON.stringify(arguments[+n + 1]));
     return new JsError(this.startIndex, this.startLine + 1, this.startIndex - this.startLineStart + 1, msg);
   }
 
-  createErrorWithLocation(location, message, arg) {
+  createErrorWithLocation(location, message) {
     /* istanbul ignore next */
-    let msg = message.replace(/{(\d+)}/g, () => JSON.stringify(arg));
+    let msg = message.replace(/{(\d+)}/g, (_, n) => JSON.stringify(arguments[+n + 2]));
     if (location.slice && location.slice.startLocation) {
       location = location.slice.startLocation;
     }
@@ -294,11 +283,7 @@ export default class Tokenizer {
     return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5) === ch5 && id.charAt(6) === ch6 && id.charAt(7) === ch7;
   }
 
-  static getKeyword(id, strict) {
-    // "const" is specialized as Keyword in V8.
-    // "yield" and "let" are for compatibility with SpiderMonkey and ES.next.
-    // Some others are from future reserved words.
-
+  static getKeyword(id) {
     if (id.length === 1 || id.length > 10) {
       return TokenType.IDENTIFIER;
     }
@@ -321,8 +306,6 @@ export default class Tokenizer {
             if (id.charAt(1) === "o") {
               return TokenType.DO;
             }
-            break;
-          default:
             break;
         }
         break;
@@ -349,11 +332,9 @@ export default class Tokenizer {
             }
             break;
           case "l":
-            if (strict && Tokenizer.cse2(id, "e", "t")) {
+            if (Tokenizer.cse2(id, "e", "t")) {
               return TokenType.LET;
             }
-            break;
-          default:
             break;
         }
         break;
@@ -374,8 +355,6 @@ export default class Tokenizer {
           case "e":
             if (Tokenizer.cse3(id, "l", "s", "e")) {
               return TokenType.ELSE;
-            } else if (Tokenizer.cse3(id, "n", "u", "m")) {
-              return TokenType.FUTURE_RESERVED_WORD;
             }
             break;
           case "c":
@@ -393,28 +372,26 @@ export default class Tokenizer {
               return TokenType.WITH;
             }
             break;
-          default:
-            break;
         }
         break;
       case 5:
         switch (id.charAt(0)) {
-          case "w": // WHILE
+          case "w":
             if (Tokenizer.cse4(id, "h", "i", "l", "e")) {
               return TokenType.WHILE;
             }
             break;
-          case "b": // BREAK
+          case "b":
             if (Tokenizer.cse4(id, "r", "e", "a", "k")) {
               return TokenType.BREAK;
             }
             break;
-          case "f": // FALSE
+          case "f":
             if (Tokenizer.cse4(id, "a", "l", "s", "e")) {
               return TokenType.FALSE;
             }
             break;
-          case "c": // CATCH
+          case "c":
             if (Tokenizer.cse4(id, "a", "t", "c", "h")) {
               return TokenType.CATCH;
             } else if (Tokenizer.cse4(id, "o", "n", "s", "t")) {
@@ -423,22 +400,20 @@ export default class Tokenizer {
               return TokenType.CLASS;
             }
             break;
-          case "t": // THROW
+          case "t":
             if (Tokenizer.cse4(id, "h", "r", "o", "w")) {
               return TokenType.THROW;
             }
             break;
-          case "y": // YIELD
+          case "y":
             if (Tokenizer.cse4(id, "i", "e", "l", "d")) {
               return TokenType.YIELD;
             }
             break;
-          case "s": // SUPER
+          case "s":
             if (Tokenizer.cse4(id, "u", "p", "e", "r")) {
               return TokenType.SUPER;
             }
-            break;
-          default:
             break;
         }
         break;
@@ -462,8 +437,6 @@ export default class Tokenizer {
           case "s":
             if (Tokenizer.cse5(id, "w", "i", "t", "c", "h")) {
               return TokenType.SWITCH;
-            } else if (Tokenizer.cse5(id, "t", "a", "t", "i", "c")) {
-              return strict ? TokenType.FUTURE_STRICT_RESERVED_WORD : TokenType.IDENTIFIER;
             }
             break;
           case "e":
@@ -476,41 +449,24 @@ export default class Tokenizer {
               return TokenType.IMPORT;
             }
             break;
-          case "p":
-            if (strict && Tokenizer.cse5(id, "u", "b", "l", "i", "c")) {
-              return TokenType.FUTURE_STRICT_RESERVED_WORD;
-            }
-            break;
-          default:
-            break;
         }
         break;
       case 7:
         switch (id.charAt(0)) {
-          case "d": // default
+          case "d":
             if (Tokenizer.cse6(id, "e", "f", "a", "u", "l", "t")) {
               return TokenType.DEFAULT;
             }
             break;
-          case "f": // finally
+          case "f":
             if (Tokenizer.cse6(id, "i", "n", "a", "l", "l", "y")) {
               return TokenType.FINALLY;
             }
             break;
-          case "e": // extends
+          case "e":
             if (Tokenizer.cse6(id, "x", "t", "e", "n", "d", "s")) {
               return TokenType.EXTENDS;
             }
-            break;
-          case "p":
-            if (strict) {
-              let s = id;
-              if (s === "private" || s === "package") {
-                return TokenType.FUTURE_STRICT_RESERVED_WORD;
-              }
-            }
-            break;
-          default:
             break;
         }
         break;
@@ -531,29 +487,12 @@ export default class Tokenizer {
               return TokenType.DEBUGGER;
             }
             break;
-          default:
-            break;
-        }
-        break;
-      case 9:
-        if (strict && (id.charAt(0) === "p" || id.charAt(0) === "i")) {
-          let s = id;
-          if (s === "protected" || s === "interface") {
-            return TokenType.FUTURE_STRICT_RESERVED_WORD;
-          }
         }
         break;
       case 10:
-      {
-        let s = id;
-        if (s === "instanceof") {
+        if (id === "instanceof") {
           return TokenType.INSTANCEOF;
-        } else if (strict && s === "implements") {
-          return TokenType.FUTURE_STRICT_RESERVED_WORD;
         }
-      }
-        break;
-      default:
         break;
     }
     return TokenType.IDENTIFIER;
@@ -849,7 +788,7 @@ export default class Tokenizer {
     let slice = this.getSlice(start, startLocation);
     slice.text = id;
 
-    return { type: Tokenizer.getKeyword(id, this.strict), value: id, slice: slice };
+    return { type: Tokenizer.getKeyword(id), value: id, slice: slice };
   }
 
   getLocation() {
@@ -1109,9 +1048,6 @@ export default class Tokenizer {
           this.index++;
           return this.scanOctalLiteral(start, startLocation);
         } else if ("0" <= ch && ch <= "9") {
-          if (this.strict) {
-            throw this.createErrorWithLocation(startLocation, ErrorMessages.STRICT_OCTAL_LITERAL);
-          }
           return this.scanLegacyOctalLiteral(start, startLocation);
         }
       } else {
@@ -1385,12 +1321,12 @@ export default class Tokenizer {
         ch = this.source.charAt(this.index);
         // ECMA-262 7.8.5
         if (isLineTerminator(ch.charCodeAt(0))) {
-          throw this.createError(ErrorMessages.UNTERMINATED_REG_EXP);
+          throw this.createError(ErrorMessages.UNTERMINATED_REGEXP);
         }
         str += ch;
         this.index++;
       } else if (isLineTerminator(ch.charCodeAt(0))) {
-        throw this.createError(ErrorMessages.UNTERMINATED_REG_EXP);
+        throw this.createError(ErrorMessages.UNTERMINATED_REGEXP);
       } else {
         if (classMarker) {
           if (ch === "]") {
@@ -1412,12 +1348,15 @@ export default class Tokenizer {
     }
 
     if (!terminated) {
-      throw this.createError(ErrorMessages.UNTERMINATED_REG_EXP);
+      throw this.createError(ErrorMessages.UNTERMINATED_REGEXP);
     }
 
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if (!isIdentifierPart(ch.charCodeAt(0)) && ch !== "\\") {
+      if (ch === "\\") {
+        throw this.createError(ErrorMessages.INVALID_REGEXP_FLAGS);
+      }
+      if (!isIdentifierPart(ch.charCodeAt(0))) {
         break;
       }
       this.index++;

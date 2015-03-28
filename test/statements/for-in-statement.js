@@ -15,6 +15,7 @@
  */
 
 var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
@@ -121,5 +122,20 @@ suite("Parser", function () {
       right: { type: "IdentifierExpression", name: "of" },
       body: { type: "EmptyStatement" }
     });
+
+    testParse("for(const a in b);", stmt, {
+      type: "ForInStatement",
+      left: {
+        type: "VariableDeclaration",
+        kind: "const",
+        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+      },
+      right: { type: "IdentifierExpression", name: "b" },
+      body: { type: "EmptyStatement" }
+    });
+
+    testParseFailure("for(let a = 0 in b);", "Invalid variable declaration in for-in statement");
+    testParseFailure("for(const a = 0 in b);", "Invalid variable declaration in for-in statement");
+
   });
 });

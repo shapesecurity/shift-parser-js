@@ -187,17 +187,5 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("function* a(){function a(a=yield){}}", "Unexpected token \"yield\"");
-    testParseFailure("function* a(){function* a(yield){}}", "Unexpected token \"yield\"");
-    testParseFailure("function* a([yield]){}", "Unexpected token \"yield\"");
-    testParseFailure("function* a({yield}){}", "Unexpected token \"yield\"");
-    testParseFailure("function* a({yield=0}){}", "Unexpected token \"yield\"");
-    testParseFailure("function* a({a:yield}){}", "Unexpected token \"yield\"");
-    testParseFailure("function* a([yield,...a]){}", "Unexpected token \"yield\"");
-    testParseFailure("function* a(){var yield}", "Unexpected token \"yield\"");
-    testParseFailure("function yield(){\"use strict\";}", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\";function yield(){}", "Unexpected token \"yield\"");
-    testParseFailure("({a(yield){}})", "Use of future reserved word in strict mode");
-    testParseFailure("function *a(){function b(){yield}}", "Unexpected token \"yield\"");
   });
 });

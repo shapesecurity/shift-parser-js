@@ -59,9 +59,10 @@ suite("Parser", function () {
     testParseFailure("('\u2028')", "Unexpected \"\u2028\"");
     testParseFailure("('\u2029')", "Unexpected \"\u2029\"");
     testParseFailure("('\\u{2028')", "Unexpected \"{\"");
-    testParseFailure("'use strict'; ('\\1')", "Octal literals are not allowed in strict mode.");
-    testParseFailure("'use strict'; ('\\01')", "Octal literals are not allowed in strict mode.");
-    testParseFailure("'use strict'; ('\\000')", "Octal literals are not allowed in strict mode.");
 
+    // early grammar error: 11.8.4.1
+    // It is a Syntax Error if the MV of HexDigits > 1114111.
+    testParseFailure("(\"\\u{110000}\")", "Unexpected \"{\"");
+    testParseFailure("(\"\\u{FFFFFFF}\")", "Unexpected \"{\"");
   });
 });

@@ -401,6 +401,14 @@ suite("Parser", function () {
       { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: "a" }] }
     );
 
+    testParse("({let})", expr,
+      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: "let" }] }
+    );
+
+    testParse("({yield})", expr,
+      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: "yield" }] }
+    );
+
     testParse("({a, b: 0, c})", expr,
       {
         type: "ObjectExpression",

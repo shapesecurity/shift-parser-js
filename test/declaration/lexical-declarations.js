@@ -66,12 +66,12 @@ suite("Parser", function () {
         }
       });
 
-    testParseFailure("while(true) let a", "Unexpected identifier");
+    testParseFailure("while(true) let a", "Unexpected token \"let\"");
     testParseFailure("while(true) const a", "Unexpected token \"const\"");
-    testParseFailure("with(true) let a", "Unexpected identifier");
+    testParseFailure("with(true) let a", "Unexpected token \"let\"");
     testParseFailure("with(true) class a {}", "Unexpected token \"class\"");
 
-    testParseFailure("a: let a", "Unexpected identifier");
+    testParseFailure("a: let a", "Unexpected token \"let\"");
 
   });
 });

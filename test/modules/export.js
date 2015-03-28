@@ -290,6 +290,5 @@ suite("Parser", function () {
     testParseModuleFailure("export function () {}", "Unexpected token \"(\"");
     testParseModuleFailure("export default default", "Unexpected token \"default\"");
     testParseModuleFailure("export default function", "Unexpected end of input");
-    testParseModuleFailure("export default let", "Unexpected token \"let\"");
   });
 });

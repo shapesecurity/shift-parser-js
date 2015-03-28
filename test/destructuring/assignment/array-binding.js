@@ -291,8 +291,9 @@ suite("Parser", function () {
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
+      testParseFailure("[x] += 0", "Invalid left-hand side in assignment");
       testParseFailure("[, x, ...y,] = 0", "Invalid left-hand side in assignment");
-      testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment"); // TODO(bzhang): Unexpected token \",\"
+      testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[...x,,] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[0,{a=0}] = 0", "Illegal property initializer");

@@ -15,7 +15,6 @@
  */
 
 var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
@@ -71,6 +70,5 @@ suite("Parser", function () {
     testParse("function *a(){yield/=3/}", yde, { type: "LiteralRegExpExpression", pattern: "=3", flags: "" });
     testParse("function *a(){yield class{}}", yde, { type: "ClassExpression", name: null, super: null, elements: [] });
 
-    testParseFailure("function *a(){ return ({set a(yield){}}); }", "Unexpected token \"yield\"");
   });
 });

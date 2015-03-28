@@ -90,25 +90,11 @@ suite("Parser", function () {
     testParseFailure("x\\", "Unexpected end of input");
     testParseFailure("x\\u005c", "Unexpected end of input");
     testParseFailure("x\\u002a", "Unexpected end of input");
-    testParseFailure("var x = /(s/g", "Invalid regular expression");
     testParseFailure("a\\u", "Unexpected end of input");
     testParseFailure("\\ua", "Unexpected \"a\"");
     testParseFailure("/", "Invalid regular expression: missing /");
     testParseFailure("/test", "Invalid regular expression: missing /");
     testParseFailure("/test\n/", "Invalid regular expression: missing /");
-    testParseFailure("var x = /[a-z]/\\ux", "Invalid regular expression");
-    testParseFailure("var x = /[a-z\n]/\\ux", "Invalid regular expression: missing /");
-    testParseFailure("var x = /[a-z]/\\\\ux", "Invalid regular expression");
-    testParseFailure("var x = /[P QR]/\\\\u0067", "Invalid regular expression");
-    testParseFailure("3 = 4", "Invalid left-hand side in assignment");
-    testParseFailure("func() = 4", "Invalid left-hand side in assignment");
-    testParseFailure("(1 + 1) = 10", "Invalid left-hand side in assignment");
-    testParseFailure("1++", "Invalid left-hand side in assignment");
-    testParseFailure("1--", "Invalid left-hand side in assignment");
-    testParseFailure("++1", "Invalid left-hand side in assignment");
-    testParseFailure("--1", "Invalid left-hand side in assignment");
-    testParseFailure("--(1+1)", "Invalid left-hand side in assignment");
-    testParseFailure("(1+1)--", "Invalid left-hand side in assignment");
     testParseFailure("for((1 + 1) in list) process(x);", "Invalid left-hand side in for-in");
     testParseFailure("[", "Unexpected end of input");
     testParseFailure("[,", "Unexpected end of input");
@@ -142,9 +128,7 @@ suite("Parser", function () {
     testParseFailure("if.a;", "Unexpected token \".\"");
     testParseFailure("a if;", "Unexpected token \"if\"");
     testParseFailure("a class;", "Unexpected token \"class\"");
-    testParseFailure("break\n", "Illegal break statement");
     testParseFailure("break 1;", "Unexpected number");
-    testParseFailure("continue\n", "Illegal continue statement");
     testParseFailure("continue 2;", "Unexpected number");
     testParseFailure("throw", "Unexpected end of input");
     testParseFailure("throw;", "Unexpected token \";\"");
@@ -164,9 +148,6 @@ suite("Parser", function () {
     testParseFailure("try {} catch (answer()) {} ", "Unexpected token \"(\"");
     testParseFailure("try {} catch (-x) {} ", "Unexpected token \"-\"");
     testParseFailure("\u203F = 10", "Unexpected \"\u203F\"");
-    testParseFailure("const x = 12, y;", "Unexpected token \";\"");
-    testParseFailure("const x, y = 12;", "Unexpected token \",\"");
-    testParseFailure("const x;", "Unexpected token \";\"");
     testParseFailure("switch (c) { default: default: }", "More than one default clause in switch statement");
     testParseFailure("new X().\"s\"", "Unexpected string");
     testParseFailure("/*", "Unexpected end of input");
@@ -195,129 +176,10 @@ suite("Parser", function () {
     testParseFailure("\"\\", "Unexpected end of input");
     testParseFailure("\"\\u", "Unexpected end of input");
     testParseFailure("try { } catch() {}", "Unexpected token \")\"");
-    testParseFailure("return", "Illegal return statement");
-    testParseFailure("break", "Illegal break statement");
-    testParseFailure("continue", "Illegal continue statement");
-    testParseFailure("switch (x) { default: continue; }", "Illegal continue statement");
     testParseFailure("do { x } *", "Unexpected token \"*\"");
-    testParseFailure("while (true) { break x; }", "Undefined label \"x\"");
-    testParseFailure("while (true) { continue x; }", "Undefined label \"x\"");
-    testParseFailure("x: while (true) { (function () { break x; }); }", "Undefined label \"x\"");
-    testParseFailure("x: while (true) { (function () { continue x; }); }", "Undefined label \"x\"");
-    testParseFailure("x: while (true) { (function () { break; }); }", "Illegal break statement");
-    testParseFailure("x: while (true) { (function () { continue; }); }", "Illegal continue statement");
-    testParseFailure("x: while (true) { x: while (true) { } }", "Label \"x\" has already been declared");
-    testParseFailure("(function () { \'use strict\'; delete i; }())", "Delete of an unqualified identifier in strict mode.");
-    testParseFailure("(function () { \'use strict\'; with (i); }())", "Strict mode code may not include a with statement");
-    testParseFailure("function hello() {\'use strict\'; var eval = 10; }",
-        "Variable name may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; var arguments = 10; }",
-        "Variable name may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; try { } catch (eval) { } }",
-        "Catch variable may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; try { } catch (arguments) { } }",
-        "Catch variable may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; eval = 10; }",
-        "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello() {\'use strict\'; arguments = 10; }",
-        "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello() {\'use strict\'; ++eval; }",
-        "Prefix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; --eval; }",
-        "Prefix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; ++arguments; }",
-        "Prefix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; --arguments; }",
-        "Prefix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; eval++; }",
-        "Postfix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; eval--; }",
-        "Postfix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; arguments++; }",
-        "Postfix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; arguments--; }",
-        "Postfix increment/decrement may not have eval or arguments operand in strict mode");
-    testParseFailure("function hello() {\'use strict\'; function eval() { } }",
-        "Function name may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; function arguments() { } }",
-        "Function name may not be eval or arguments in strict mode");
-    testParseFailure("function eval() {\'use strict\'; }", "Function name may not be eval or arguments in strict mode");
-    testParseFailure("function arguments() {\'use strict\'; }", "Function name may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; (function eval() { }()) }",
-        "Function name may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; (function arguments() { }()) }",
-        "Function name may not be eval or arguments in strict mode");
-    testParseFailure("(function eval() {\'use strict\'; })()", "Function name may not be eval or arguments in strict mode");
-    testParseFailure("(function arguments() {\'use strict\'; })()",
-        "Function name may not be eval or arguments in strict mode");
-    testParseFailure("function hello() {\'use strict\'; ({ s: function eval() { } }); }",
-        "Function name may not be eval or arguments in strict mode");
-    testParseFailure("(function package() {\'use strict\'; })()", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() {\'use strict\'; ({ i: 10, set s(eval) { } }); }",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello() {\'use strict\'; ({ set s(eval) { } }); }",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello() {\'use strict\'; ({ s: function s(eval) { } }); }",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello(eval) {\'use strict\';}",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello(arguments) {\'use strict\';}",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello() { \'use strict\'; function inner(eval) {} }",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function hello() { \'use strict\'; function inner(arguments) {} }",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure(" \"\\1\"; \'use strict\';", "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; \"\\1\"; }", "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; 021; }", "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; ({ \"\\1\": 0 }); }",
-        "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; ({ 021: 0 }); }",
-        "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \'use strict\'; ({ 08: 0 }); }",
-      "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \"octal directive\\1\"; \"use strict\"; }",
-        "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \"octal directive\\1\"; \"octal directive\\2\"; \"use strict\"; }",
-        "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \"use strict\"; function inner() { \"octal directive\\1\"; } }",
-        "Octal literals are not allowed in strict mode.");
-    testParseFailure("function hello() { \"use strict\"; var implements; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var interface; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var package; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var private; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var protected; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var public; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var static; }", "Use of future reserved word in strict mode");
-    testParseFailure("function hello() { \"use strict\"; var yield; }", "Unexpected token \"yield\"");
-    testParseFailure("function hello() { \"use strict\"; var let; }", "Unexpected token \"let\"");
-    testParseFailure("function hello(static) { \"use strict\"; }", "Use of future reserved word in strict mode");
-    testParseFailure("function static() { \"use strict\"; }", "Use of future reserved word in strict mode");
-    testParseFailure("function eval(a) { \"use strict\"; }", "Function name may not be eval or arguments in strict mode");
-    testParseFailure("function arguments(a) { \"use strict\"; }",
-        "Function name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; function static() { }", "Use of future reserved word in strict mode");
-    testParseFailure("function a(t, t) { \"use strict\"; }", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("function a(eval) { \"use strict\"; }",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function a(package) { \"use strict\"; }", "Use of future reserved word in strict mode");
-    testParseFailure("function a() { \"use strict\"; function b(t, t) { }; }",
-        "Strict mode function may not have duplicate parameter names");
-    testParseFailure("(function a(t, t) { \"use strict\"; })",
-        "Strict mode function may not have duplicate parameter names");
-    testParseFailure("function a() { \"use strict\"; (function b(t, t) { }); }",
-        "Strict mode function may not have duplicate parameter names");
-    testParseFailure("(function a(eval) { \"use strict\"; })",
-        "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("(function a(package) { \"use strict\"; })", "Use of future reserved word in strict mode");
-    testParseFailure("__proto__: __proto__: 0;", "Label \"__proto__\" has already been declared");
-    testParseFailure("\"use strict\"; function t(__proto__, __proto__) { }",
-        "Strict mode function may not have duplicate parameter names");
-    testParseFailure("({__proto__:1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");
-    testParseFailure("({\'__proto__\':1,__proto__:2})", "Duplicate __proto__ property in object literal not allowed");
-    testParseFailure("{ \"use strict\"; ({__proto__:1,__proto__:2}) }", "Duplicate __proto__ property in object literal not allowed");
     testParseFailure("var", "Unexpected end of input");
-    testParseFailure("const", "Unexpected end of input");
+    testParseFailure("const", "Unexpected token \"const\"");
+    testParseFailure("a enum", "Unexpected identifier");
     testParseFailure("{ ;  ;  ", "Unexpected end of input");
     testParseFailure("({get +:3})", "Unexpected token \"+\"");
     testParseFailure("({get +:3})", "Unexpected token \"+\"");

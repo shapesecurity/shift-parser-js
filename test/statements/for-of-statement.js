@@ -19,7 +19,7 @@ var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
-  suite("for in statement", function () {
+  suite("for of statement", function () {
     testParse("for (var x of list) process(x);", stmt,
       {
         type: "ForOfStatement",

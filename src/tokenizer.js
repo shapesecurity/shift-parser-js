@@ -227,7 +227,9 @@ export default class Tokenizer {
     this.startIndex = this.index;
     this.startLine = this.line;
     this.startLineStart = this.lineStart;
-    return this.createError(ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN);
+    return this.index < this.source.length
+      ? this.createError(ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, this.source.charAt(this.index))
+      : this.createError(ErrorMessages.UNEXPECTED_EOS);
   }
 
   createUnexpected(token) {
@@ -254,12 +256,14 @@ export default class Tokenizer {
   }
 
   createError(message, arg) {
-    let msg = message.replace(/{(\d+)}/g, () => arg);
+    /* istanbul ignore next */
+    let msg = message.replace(/{(\d+)}/g, () => JSON.stringify(arg));
     return new JsError(this.startIndex, this.startLine + 1, this.startIndex - this.startLineStart + 1, msg);
   }
 
   createErrorWithLocation(location, message, arg) {
-    let msg = message.replace(/{(\d+)}/g, () => arg);
+    /* istanbul ignore next */
+    let msg = message.replace(/{(\d+)}/g, () => JSON.stringify(arg));
     if (location.slice && location.slice.startLocation) {
       location = location.slice.startLocation;
     }
@@ -1355,7 +1359,7 @@ export default class Tokenizer {
           let location = this.getLocation();
           let octal = this.scanStringEscape("", false)[1];
           if (octal) {
-            throw this.createErrorWithLocation(location, ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN);
+            throw this.createILLEGAL();
           }
           break;
         }

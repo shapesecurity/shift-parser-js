@@ -26,7 +26,7 @@ suite("Parser", function () {
       super: null,
       elements: []
     });
-    testParseFailure("class {}", "Unexpected token {");
-    testParseFailure("class extends A{}", "Unexpected token extends");
+    testParseFailure("class {}", "Unexpected token \"{\"");
+    testParseFailure("class extends A{}", "Unexpected token \"extends\"");
   });
 });

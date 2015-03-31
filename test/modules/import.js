@@ -162,22 +162,22 @@ suite("Parser", function () {
         moduleSpecifier: "d"
       });
 
-    testParseFailure("import 'a'", "Unexpected token import");
+    testParseFailure("import 'a'", "Unexpected token \"import\"");
     testParseModuleFailure("import", "Unexpected end of input");
-    testParseModuleFailure("import;", "Unexpected token ;");
+    testParseModuleFailure("import;", "Unexpected token \";\"");
     testParseModuleFailure("import {}", "Unexpected end of input");
-    testParseModuleFailure("import {};", "Unexpected token ;");
-    testParseModuleFailure("import {} from;", "Unexpected token ;");
-    testParseModuleFailure("import {,} from 'a';", "Unexpected token ,");
-    testParseModuleFailure("import {b,,} from 'a';", "Unexpected token ,");
-    testParseModuleFailure("import {b as,} from 'a';", "Unexpected token ,");
-    testParseModuleFailure("import {function} from 'a';", "Unexpected token }");
-    testParseModuleFailure("import {a as function} from 'a';", "Unexpected token function");
-    testParseModuleFailure("import {b,,c} from 'a';", "Unexpected token ,");
-    testParseModuleFailure("import {b,c,,} from 'a';", "Unexpected token ,");
+    testParseModuleFailure("import {};", "Unexpected token \";\"");
+    testParseModuleFailure("import {} from;", "Unexpected token \";\"");
+    testParseModuleFailure("import {,} from 'a';", "Unexpected token \",\"");
+    testParseModuleFailure("import {b,,} from 'a';", "Unexpected token \",\"");
+    testParseModuleFailure("import {b as,} from 'a';", "Unexpected token \",\"");
+    testParseModuleFailure("import {function} from 'a';", "Unexpected token \"}\"");
+    testParseModuleFailure("import {a as function} from 'a';", "Unexpected token \"function\"");
+    testParseModuleFailure("import {b,,c} from 'a';", "Unexpected token \",\"");
+    testParseModuleFailure("import {b,c,,} from 'a';", "Unexpected token \",\"");
     testParseModuleFailure("import * As a from 'a'", "Unexpected identifier");
-    testParseModuleFailure("import / as a from 'a'", "Unexpected token /");
-    testParseModuleFailure("import * as b, a from 'a'", "Unexpected token ,");
+    testParseModuleFailure("import / as a from 'a'", "Unexpected token \"/\"");
+    testParseModuleFailure("import * as b, a from 'a'", "Unexpected token \",\"");
     testParseModuleFailure("import a as b from 'a'", "Unexpected identifier");
     testParseModuleFailure("import a, b from 'a'", "Unexpected identifier");
 

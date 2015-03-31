@@ -37,7 +37,7 @@ suite("Parser", function () {
       right: { type: "IdentifierExpression", name: "a" }
     }]);
 
-    testParseFailure("function *a(){yield\n*a}", "Unexpected token *");
-    testParseFailure("function *a(){yield*}", "Unexpected token }");
+    testParseFailure("function *a(){yield\n*a}", "Unexpected token \"*\"");
+    testParseFailure("function *a(){yield*}", "Unexpected token \"}\"");
   });
 });

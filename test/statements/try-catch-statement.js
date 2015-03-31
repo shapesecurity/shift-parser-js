@@ -144,6 +144,6 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("try {} catch ((e)) {}", "Unexpected token (");
+    testParseFailure("try {} catch ((e)) {}", "Unexpected token \"(\"");
   });
 });

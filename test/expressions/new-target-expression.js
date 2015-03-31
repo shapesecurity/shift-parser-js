@@ -100,7 +100,7 @@ suite("Parser", function () {
     );
 
     testParseFailure("function f() { new.anythingElse; }", "Unexpected identifier");
-    testParseFailure("function f() { new..target; }", "Unexpected token .");
+    testParseFailure("function f() { new..target; }", "Unexpected token \".\"");
 
   });
 });

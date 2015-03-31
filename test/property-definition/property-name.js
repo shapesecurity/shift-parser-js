@@ -251,6 +251,6 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("({[1,2]:3})", "Unexpected token ,");
+    testParseFailure("({[1,2]:3})", "Unexpected token \",\"");
   });
 });

@@ -315,7 +315,7 @@ suite("Parser", function () {
 
     // Const Statement
     testParseFailure("const x", "Unexpected end of input");
-    testParseFailure("{ const x }", "Unexpected token }");
+    testParseFailure("{ const x }", "Unexpected token \"}\"");
     testParse("{ const x = 0 }", stmt,
       {
         type: "BlockStatement",
@@ -387,15 +387,15 @@ suite("Parser", function () {
       }
     );
 
-    // FIXME(bzhang): testParseFailure("var a[0]=0;", "Unexpected token 'a'");
-    // FIXME(bzhang): testParseFailure("var (a)=0;", "Unexpected token '('");
-    testParseFailure("var new A = 0;", "Unexpected token new");
-    testParseFailure("var (x)", "Unexpected token (");
-    testParseFailure("var this", "Unexpected token this");
-    testParseFailure("var a.b;", "Unexpected token .");
-    testParseFailure("var [a];", "Unexpected token ;");
-    testParseFailure("var {a};", "Unexpected token ;");
-    testParseFailure("var {a:a};", "Unexpected token ;");
+    // FIXME(bzhang): testParseFailure("var a[0]=0;", "Unexpected token \"'a'\"");
+    // FIXME(bzhang): testParseFailure("var (a)=0;", "Unexpected token \"'('\"");
+    testParseFailure("var new A = 0;", "Unexpected token \"new\"");
+    testParseFailure("var (x)", "Unexpected token \"(\"");
+    testParseFailure("var this", "Unexpected token \"this\"");
+    testParseFailure("var a.b;", "Unexpected token \".\"");
+    testParseFailure("var [a];", "Unexpected token \";\"");
+    testParseFailure("var {a};", "Unexpected token \";\"");
+    testParseFailure("var {a:a};", "Unexpected token \";\"");
     testParseFailure("'use strict'; var enum;", "Unexpected reserved word");
   });
 });

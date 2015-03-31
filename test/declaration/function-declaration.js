@@ -228,10 +228,10 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("a: function* a(){}", "Unexpected token *");
+    testParseFailure("a: function* a(){}", "Unexpected token \"*\"");
 
-    testParseFailure("while(true) function a(){}", "Unexpected token function");
-    testParseFailure("with(true) function a(){}", "Unexpected token function");
-    testParseFailure("a: function* a(){}", "Unexpected token *");
+    testParseFailure("while(true) function a(){}", "Unexpected token \"function\"");
+    testParseFailure("with(true) function a(){}", "Unexpected token \"function\"");
+    testParseFailure("a: function* a(){}", "Unexpected token \"*\"");
   });
 });

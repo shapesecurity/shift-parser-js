@@ -143,20 +143,20 @@ suite("Parser", function () {
         }
       );
 
-      testParseFailure("var [a.b] = 0", "Unexpected token .");
-      testParseFailure("var ([x]) = 0", "Unexpected token (");
+      testParseFailure("var [a.b] = 0", "Unexpected token \".\"");
+      testParseFailure("var ([x]) = 0", "Unexpected token \"(\"");
     });
 
     suite("formal parameter", function () {
       // passing cases are tested in other function test cases.
       testParseFailure("([a.b]) => 0", "Illegal arrow function parameter list");
-      testParseFailure("function a([a.b]) {}", "Unexpected token .");
-      testParseFailure("function* a([a.b]) {}", "Unexpected token .");
-      testParseFailure("(function ([a.b]) {})", "Unexpected token .");
-      testParseFailure("(function* ([a.b]) {})", "Unexpected token .");
-      testParseFailure("({a([a.b]){}})", "Unexpected token .");
-      testParseFailure("({*a([a.b]){}})", "Unexpected token .");
-      testParseFailure("({set a([a.b]){}})", "Unexpected token .");
+      testParseFailure("function a([a.b]) {}", "Unexpected token \".\"");
+      testParseFailure("function* a([a.b]) {}", "Unexpected token \".\"");
+      testParseFailure("(function ([a.b]) {})", "Unexpected token \".\"");
+      testParseFailure("(function* ([a.b]) {})", "Unexpected token \".\"");
+      testParseFailure("({a([a.b]){}})", "Unexpected token \".\"");
+      testParseFailure("({*a([a.b]){}})", "Unexpected token \".\"");
+      testParseFailure("({set a([a.b]){}})", "Unexpected token \".\"");
     });
 
     suite("catch clause", function () {

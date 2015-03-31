@@ -258,8 +258,8 @@ suite("Parser", function () {
         body: { type: "FunctionBody", directives: [], statements: [] }
       });
 
-    testParseFailure("(function(...a, b){})", "Unexpected token ,");
-    testParseFailure("(function((a)){})", "Unexpected token (");
+    testParseFailure("(function(...a, b){})", "Unexpected token \",\"");
+    testParseFailure("(function((a)){})", "Unexpected token \"(\"");
     testParseFailure("(function(package){'use strict';})", "Use of future reserved word in strict mode");
   });
 });

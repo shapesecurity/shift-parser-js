@@ -341,14 +341,14 @@ suite("Parser", function () {
       body: { type: "LiteralNumericExpression", value: 0 }
     });
 
-    testParseFailure("[]=>0", "Unexpected token =>");
-    testParseFailure("() + 1", "Unexpected token +");
+    testParseFailure("[]=>0", "Unexpected token \"=>\"");
+    testParseFailure("() + 1", "Unexpected token \"+\"");
     testParseFailure("1 + ()", "Unexpected end of input");
     testParseFailure("1 + ()", "Unexpected end of input");
-    testParseFailure("(a)\n=> 0", "Unexpected token =>");
-    testParseFailure("a\n=> 0", "Unexpected token =>");
+    testParseFailure("(a)\n=> 0", "Unexpected token \"=>\"");
+    testParseFailure("a\n=> 0", "Unexpected token \"=>\"");
     testParseFailure("((a)) => 1", "Illegal arrow function parameter list");
-    testParseFailure("((a),...a) => 1", "Unexpected token ...");
+    testParseFailure("((a),...a) => 1", "Unexpected token \"...\"");
     testParseFailure("(a,...a)", "Unexpected end of input");
     testParseFailure("(a,...a)\n", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\r\n*/ => 0", "Unexpected line terminator");
@@ -357,9 +357,9 @@ suite("Parser", function () {
     testParseFailure("(a,...a)/*\n*/ => 0", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\r*/ => 0", "Unexpected line terminator");
     testParseFailure("(a,...a)/*\u202a*/", "Unexpected end of input");
-    testParseFailure("() <= 0", "Unexpected token <=");
-    testParseFailure("() ? 0", "Unexpected token ?");
-    testParseFailure("() + 0", "Unexpected token +");
+    testParseFailure("() <= 0", "Unexpected token \"<=\"");
+    testParseFailure("() ? 0", "Unexpected token \"?\"");
+    testParseFailure("() + 0", "Unexpected token \"+\"");
     testParseFailure("(10) => 0", "Illegal arrow function parameter list");
     testParseFailure("(10, 20) => 0", "Illegal arrow function parameter list");
   });

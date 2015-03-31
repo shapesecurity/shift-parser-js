@@ -60,16 +60,16 @@ suite("Parser", function () {
     testParse("0B0", expr, { type: "LiteralNumericExpression", value: 0 });
     testParse("'use strict'; 0b0", expr, { type: "LiteralNumericExpression", value: 0 });
 
-    testParseFailure("0b", "Unexpected token ILLEGAL");
-    testParseFailure("0b1a", "Unexpected token ILLEGAL");
-    testParseFailure("0b9", "Unexpected token ILLEGAL");
-    testParseFailure("0b18", "Unexpected token ILLEGAL");
-    testParseFailure("0b12", "Unexpected token ILLEGAL");
-    testParseFailure("0B", "Unexpected token ILLEGAL");
-    testParseFailure("0B1a", "Unexpected token ILLEGAL");
-    testParseFailure("0B9", "Unexpected token ILLEGAL");
-    testParseFailure("0B18", "Unexpected token ILLEGAL");
-    testParseFailure("0B12", "Unexpected token ILLEGAL");
+    testParseFailure("0b", "Unexpected end of input");
+    testParseFailure("0b1a", "Unexpected \"a\"");
+    testParseFailure("0b9", "Unexpected \"9\"");
+    testParseFailure("0b18", "Unexpected \"8\"");
+    testParseFailure("0b12", "Unexpected \"2\"");
+    testParseFailure("0B", "Unexpected end of input");
+    testParseFailure("0B1a", "Unexpected \"a\"");
+    testParseFailure("0B9", "Unexpected \"9\"");
+    testParseFailure("0B18", "Unexpected \"8\"");
+    testParseFailure("0B12", "Unexpected \"2\"");
 
     // Octal Numeric Literal
     testParse("0o0", expr, { type: "LiteralNumericExpression", value: 0 });
@@ -81,14 +81,14 @@ suite("Parser", function () {
     testParse("018", expr, { type: "LiteralNumericExpression", value: 18 });
     testParse("'use strict'; 0o0", expr, { type: "LiteralNumericExpression", value: 0 });
 
-    testParseFailure("0o", "Unexpected token ILLEGAL");
-    testParseFailure("0o1a", "Unexpected token ILLEGAL");
-    testParseFailure("0o9", "Unexpected token ILLEGAL");
-    testParseFailure("0o18", "Unexpected token ILLEGAL");
-    testParseFailure("0O", "Unexpected token ILLEGAL");
-    testParseFailure("0O1a", "Unexpected token ILLEGAL");
-    testParseFailure("0O9", "Unexpected token ILLEGAL");
-    testParseFailure("0O18", "Unexpected token ILLEGAL");
+    testParseFailure("0o", "Unexpected end of input");
+    testParseFailure("0o1a", "Unexpected \"a\"");
+    testParseFailure("0o9", "Unexpected \"9\"");
+    testParseFailure("0o18", "Unexpected \"8\"");
+    testParseFailure("0O", "Unexpected end of input");
+    testParseFailure("0O1a", "Unexpected \"a\"");
+    testParseFailure("0O9", "Unexpected \"9\"");
+    testParseFailure("0O18", "Unexpected \"8\"");
 
   });
 });

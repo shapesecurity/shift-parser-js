@@ -323,11 +323,11 @@ suite("Parser", function () {
     testParseFailure("(class {a})", "Only methods are allowed in classes");
     testParseFailure("(class {3:0})", "Only methods are allowed in classes");
     testParseFailure("(class {[3]:0})", "Only methods are allowed in classes");
-    testParseFailure("(class {)", "Unexpected token )");
-    testParseFailure("(class extends a,b {})", "Unexpected token ,");
-    testParseFailure("(class extends !a {})", "Unexpected token !");
-    testParseFailure("(class [a] {})", "Unexpected token [");
-    testParseFailure("(class {[a,b](){}})", "Unexpected token ,");
+    testParseFailure("(class {)", "Unexpected token \")\"");
+    testParseFailure("(class extends a,b {})", "Unexpected token \",\"");
+    testParseFailure("(class extends !a {})", "Unexpected token \"!\"");
+    testParseFailure("(class [a] {})", "Unexpected token \"[\"");
+    testParseFailure("(class {[a,b](){}})", "Unexpected token \",\"");
 
     locationSanityTest("(class {})");
     locationSanityTest("(class A {})");

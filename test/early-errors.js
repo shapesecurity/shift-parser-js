@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2014 Shape Security, Inc.
  *
@@ -23,16 +22,16 @@ suite("Parser", function () {
 
     // 11.6.1.1
     // It is a Syntax Error if SV(UnicodeEscapeSequence) is neither the UTF16Encoding (10.1.1) of a single Unicode code point with the Unicode property “ID_Start” nor "$" or "_".
-    testParseFailure("\\u0000", "Unexpected token ILLEGAL");
-    testParseFailure("\\u{0}", "Unexpected token ILLEGAL");
+    testParseFailure("\\u0000", "Unexpected end of input");
+    testParseFailure("\\u{0}", "Unexpected end of input");
     // It is a Syntax Error if SV(UnicodeEscapeSequence) is neither the UTF16Encoding (10.1.1) of a single Unicode code point with the Unicode property “ID_Continue” nor "$" or "_" nor the UTF16Encoding of either <ZWNJ> or <ZWJ>.
-    testParseFailure("a\\u0000", "Unexpected token ILLEGAL");
-    testParseFailure("a\\u{0}", "Unexpected token ILLEGAL");
+    testParseFailure("a\\u0000", "Unexpected end of input");
+    testParseFailure("a\\u{0}", "Unexpected end of input");
 
     // 11.8.4.1
     // It is a Syntax Error if the MV of HexDigits > 1114111.
-    testParseFailure("(\"\\u{110000}\")", "Unexpected token ILLEGAL");
-    testParseFailure("(\"\\u{FFFFFFF}\")", "Unexpected token ILLEGAL");
+    testParseFailure("(\"\\u{110000}\")", "Unexpected \"{\"");
+    testParseFailure("(\"\\u{FFFFFFF}\")", "Unexpected \"{\"");
 
     // 11.8.5.1
     // It is a Syntax Error if IdentifierPart contains a Unicode escape sequence.
@@ -54,10 +53,10 @@ suite("Parser", function () {
     testParseFailure("'use strict'; ({a: arguments} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
     testParseFailure("'use strict'; ({a: arguments = 0} = 0)", "Assignment to eval or arguments is not allowed in strict mode");
 
-    testParseFailure("\"use strict\"; var eval;", "Variable name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; var arguments;", "Variable name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; let [eval] = 0;", "Variable name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; const {a: eval} = 0;", "Variable name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; var eval;", "Variable name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; var arguments;", "Variable name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; let [eval] = 0;", "Variable name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; const {a: eval} = 0;", "Variable name may not be eval or arguments in strict mode");
     testParseModuleFailure("var eval;", "Variable name may not be eval or arguments in strict mode");
 
     testParseFailure("eval=>0", "Parameter name eval or arguments is not allowed in strict mode");
@@ -65,48 +64,48 @@ suite("Parser", function () {
     testParseFailure("(eval)=>0", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("(arguments)=>0", "Parameter name eval or arguments is not allowed in strict mode");
 
-    testParseFailure("\"use strict\"; function f(eval){}", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function f(eval){ \"use strict\"; }", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("\"use strict\"; !function (eval){}", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("!function (eval){ \"use strict\"; }", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("\"use strict\"; function* f(eval){}", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("function* f(eval){ \"use strict\"; }", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("\"use strict\"; !function* (eval){}", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("!function* (eval){ \"use strict\"; }", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; function f(eval){}", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("function f(eval){ 'use strict'; }", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; !function (eval){}", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("!function (eval){ 'use strict'; }", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; function* f(eval){}", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("function* f(eval){ 'use strict'; }", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; !function* (eval){}", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("!function* (eval){ 'use strict'; }", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("!{ f(eval){} };", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("!{ *f(eval){} };", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("\"use strict\"; !{ set f(eval){} };", "Parameter name eval or arguments is not allowed in strict mode");
-    testParseFailure("!{ set f(eval){ \"use strict\"; } };", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; !{ set f(eval){} };", "Parameter name eval or arguments is not allowed in strict mode");
+    testParseFailure("!{ set f(eval){ 'use strict'; } };", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("class A { f(eval){} };", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("class A { *f(eval){} };", "Parameter name eval or arguments is not allowed in strict mode");
     testParseFailure("class A { set f(eval){} };", "Parameter name eval or arguments is not allowed in strict mode");
     // It is a Syntax Error if this production has a [Yield] parameter.
     //  (error)
     // It is a Syntax Error if the code match by this production is contained in strict code.
-    testParseFailure("\"use strict\"; +yield;", "Unexpected token yield");
-    testParseFailure("\"use strict\"; yield:;", "Unexpected token yield");
-    testParseFailure("\"use strict\"; var [yield];", "Unexpected token yield");
+    testParseFailure("'use strict'; +yield;", "Unexpected token \"yield\"");
+    testParseFailure("'use strict'; yield:;", "Unexpected token \"yield\"");
+    testParseFailure("'use strict'; var [yield];", "Unexpected token \"yield\"");
     // It is a Syntax Error if the code match by this production is within the GeneratorBody of a GeneratorMethod, GeneratorDeclaration, or GeneratorExpression.
-    testParseFailure("function* f(){ function* f(a = +yield){} }", "Unexpected token yield");
-    testParseFailure("(function* f(){ function* f(a = +yield){} })", "Unexpected token yield");
-    testParseFailure("!{ *f(){ function* f(a = +yield){} } };", "Unexpected token yield");
+    testParseFailure("function* f(){ function* f(a = +yield){} }", "Unexpected token \"yield\"");
+    testParseFailure("(function* f(){ function* f(a = +yield){} })", "Unexpected token \"yield\"");
+    testParseFailure("!{ *f(){ function* f(a = +yield){} } };", "Unexpected token \"yield\"");
     // It is a Syntax Error if this production has a [Yield] parameter and StringValue of Identifier is "yield".
     //  (error)
     // It is a Syntax Error if this phrase is contained in strict code and the StringValue of IdentifierName is: "implements", "interface", "let", "package", "private", "protected", "public", "static", or "yield".
-    testParseFailure("\"use strict\"; +implements;", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\"; +interface;", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\"; +let;", "Unexpected token let");
-    testParseFailure("\"use strict\"; +package;", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\"; +private;", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\"; +protected;", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\"; +public;", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\"; +static;", "Use of future reserved word in strict mode");
-    testParseFailure("\"use strict\"; +yield;", "Unexpected token yield");
+    testParseFailure("'use strict'; +implements;", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; +interface;", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; +let;", "Unexpected token \"let\"");
+    testParseFailure("'use strict'; +package;", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; +private;", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; +protected;", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; +public;", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; +static;", "Use of future reserved word in strict mode");
+    testParseFailure("'use strict'; +yield;", "Unexpected token \"yield\"");
     testParseFailure("package=>0", "Use of future reserved word in strict mode");
     testParseFailure("(package)=>0", "Use of future reserved word in strict mode");
     testParseFailure("([let])=>0", "Use of future reserved word in strict mode");
-    testParseFailure("function*a(yield){}", "Unexpected token yield");
-    testParseFailure("class A {set a(yield){}}", "Unexpected token yield");
+    testParseFailure("function*a(yield){}", "Unexpected token \"yield\"");
+    testParseFailure("class A {set a(yield){}}", "Unexpected token \"yield\"");
     // It is a Syntax Error if StringValue of IdentifierName is the same string value as the StringValue of any ReservedWord except for yield.
     //  (error)
 
@@ -148,10 +147,10 @@ suite("Parser", function () {
 
     // 12.5.4.1
     // It is a Syntax Error if the UnaryExpression is contained in strict code and the derived UnaryExpression is PrimaryExpression : IdentifierReference.
-    testParseFailure("\"use strict\" delete a;", "Unexpected token delete");
+    testParseFailure("'use strict' delete a;", "Unexpected token \"delete\"");
     // It is a Syntax Error if the derived UnaryExpression is PrimaryExpression : CoverParenthesizedExpressionAndArrowParameterList and CoverParenthesizedExpressionAndArrowParameterList ultimately derives a phrase that, if used in place of UnaryExpression, would produce a Syntax Error according to these rules. This rule is recursively applied.
-    testParseFailure("\"use strict\" delete (...a);", "Unexpected token delete");
-    testParseFailure("\"use strict\" delete ((a));", "Unexpected token delete");
+    testParseFailure("'use strict' delete (...a);", "Unexpected token \"delete\"");
+    testParseFailure("'use strict' delete ((a));", "Unexpected token \"delete\"");
 
     // 12.14.1
     // It is a Syntax Error if LeftHandSideExpression is either an ObjectLiteral or an ArrayLiteral and the lexical token sequence matched by LeftHandSideExpression cannot be parsed with no tokens left over using AssignmentPattern as the goal symbol.
@@ -169,10 +168,10 @@ suite("Parser", function () {
 
     // 12.14.5.1
     // It is a Syntax Error if IsValidSimpleAssignmentTarget of IdentifierReference is false.
-    testParseFailure("\"use strict\"; ({eval} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("\"use strict\"; ({eval = 0} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("\"use strict\"; ({arguments} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
-    testParseFailure("\"use strict\"; ({arguments = 0} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({eval} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({eval = 0} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({arguments} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
+    testParseFailure("'use strict'; ({arguments = 0} = 0);", "Assignment to eval or arguments is not allowed in strict mode");
     // It is a Syntax Error if LeftHandSideExpression is either an ObjectLiteral or an ArrayLiteral and if the lexical token sequence matched by LeftHandSideExpression cannot be parsed with no tokens left over using AssignmentPattern as the goal symbol.
     testParseFailure("[...{a: 0}] = 0;", "Invalid left-hand side in assignment");
     testParseFailure("[...[0]] = 0;", "Invalid left-hand side in assignment");
@@ -182,74 +181,74 @@ suite("Parser", function () {
 
     // 13.1.1
     // It is a Syntax Error if the LexicallyDeclaredNames of StatementList contains any duplicate entries.
-    testParseFailure("{ let a; let a; }", "Duplicate binding 'a'");
-    testParseFailure("{ let a; const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("{ const a = 0; let a; }", "Duplicate binding 'a'");
-    testParseFailure("{ const a = 0; const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("{ function a(){} function a(){} }", "Duplicate binding 'a'");
-    testParseFailure("{ function a(){} function* a(){} }", "Duplicate binding 'a'");
-    testParseFailure("{ let a; function a(){} }", "Duplicate binding 'a'");
-    testParseFailure("{ const a = 0; function a(){} }", "Duplicate binding 'a'");
+    testParseFailure("{ let a; let a; }", "Duplicate binding \"a\"");
+    testParseFailure("{ let a; const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("{ const a = 0; let a; }", "Duplicate binding \"a\"");
+    testParseFailure("{ const a = 0; const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("{ function a(){} function a(){} }", "Duplicate binding \"a\"");
+    testParseFailure("{ function a(){} function* a(){} }", "Duplicate binding \"a\"");
+    testParseFailure("{ let a; function a(){} }", "Duplicate binding \"a\"");
+    testParseFailure("{ const a = 0; function a(){} }", "Duplicate binding \"a\"");
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of StatementList also occurs in the VarDeclaredNames of StatementList.
-    testParseFailure("{ let a; var a; }", "Duplicate binding 'a'");
-    testParseFailure("{ let a; { var a; } }", "Duplicate binding 'a'");
-    testParseFailure("{ var a; let a; }", "Duplicate binding 'a'");
-    testParseFailure("{ const a = 0; var a; }", "Duplicate binding 'a'");
-    testParseFailure("{ var a; const a = 0; }", "Duplicate binding 'a'");
+    testParseFailure("{ let a; var a; }", "Duplicate binding \"a\"");
+    testParseFailure("{ let a; { var a; } }", "Duplicate binding \"a\"");
+    testParseFailure("{ var a; let a; }", "Duplicate binding \"a\"");
+    testParseFailure("{ const a = 0; var a; }", "Duplicate binding \"a\"");
+    testParseFailure("{ var a; const a = 0; }", "Duplicate binding \"a\"");
 
     // 13.2.1.1
     // It is a Syntax Error if the BoundNames of BindingList contains "let".
-    testParseFailure("let let;", "Invalid lexical binding name 'let'");
-    testParseFailure("let a, let;", "Invalid lexical binding name 'let'");
-    testParseFailure("let a, let = 0;", "Invalid lexical binding name 'let'");
+    testParseFailure("let let;", "Invalid lexical binding name \"let\"");
+    testParseFailure("let a, let;", "Invalid lexical binding name \"let\"");
+    testParseFailure("let a, let = 0;", "Invalid lexical binding name \"let\"");
     // It is a Syntax Error if the BoundNames of BindingList contains any duplicate entries.
-    testParseFailure("let a, a;", "Duplicate binding 'a'");
-    testParseFailure("let a, b, a;", "Duplicate binding 'a'");
-    testParseFailure("let a = 0, a = 1;", "Duplicate binding 'a'");
-    testParseFailure("const a = 0, a = 1;", "Duplicate binding 'a'");
-    testParseFailure("const a = 0, b = 1, a = 2;", "Duplicate binding 'a'");
-    testParseFailure("let a, [a] = 0;", "Duplicate binding 'a'");
-    testParseFailure("let [a, a] = 0;", "Duplicate binding 'a'");
-    testParseFailure("let [a, ...a] = 0;", "Duplicate binding 'a'");
-    testParseFailure("let \\u{61}, \\u{0061};", "Duplicate binding 'a'");
-    testParseFailure("let \\u0061, \\u{0061};", "Duplicate binding 'a'");
-    testParseFailure("let x\\u{61}, x\\u{0061};", "Duplicate binding 'xa'");
-    testParseFailure("let x\\u{E01D5}, x\uDB40\uDDD5;", "Duplicate binding 'x\uDB40\uDDD5'");
-    testParseFailure("let x\\u{E01D5}, x\\uDB40\\uDDD5;", "Duplicate binding 'x\uDB40\uDDD5'");
+    testParseFailure("let a, a;", "Duplicate binding \"a\"");
+    testParseFailure("let a, b, a;", "Duplicate binding \"a\"");
+    testParseFailure("let a = 0, a = 1;", "Duplicate binding \"a\"");
+    testParseFailure("const a = 0, a = 1;", "Duplicate binding \"a\"");
+    testParseFailure("const a = 0, b = 1, a = 2;", "Duplicate binding \"a\"");
+    testParseFailure("let a, [a] = 0;", "Duplicate binding \"a\"");
+    testParseFailure("let [a, a] = 0;", "Duplicate binding \"a\"");
+    testParseFailure("let [a, ...a] = 0;", "Duplicate binding \"a\"");
+    testParseFailure("let \\u{61}, \\u{0061};", "Duplicate binding \"a\"");
+    testParseFailure("let \\u0061, \\u{0061};", "Duplicate binding \"a\"");
+    testParseFailure("let x\\u{61}, x\\u{0061};", "Duplicate binding \"xa\"");
+    testParseFailure("let x\\u{E01D5}, x\uDB40\uDDD5;", "Duplicate binding \"x\uDB40\uDDD5\"");
+    testParseFailure("let x\\u{E01D5}, x\\uDB40\\uDDD5;", "Duplicate binding \"x\uDB40\uDDD5\"");
 
     // It is a Syntax Error if Initializer is not present and IsConstantDeclaration of the LexicalDeclaration containing this production is true.
-    testParseFailure("const a;", "Unexpected token ;");
+    testParseFailure("const a;", "Unexpected token \";\"");
 
     // 13.5.1
     // It is a Syntax Error if IsLabelledFunction(Statement) is true for any occurrence of Statement in these rules.
-    testParseFailure("if(0) label: function f(){}", "Unexpected token function");
-    testParseFailure("if(0) label: function f(){} else ;", "Unexpected token function");
-    testParseFailure("if(0) ; else label: function f(){}", "Unexpected token function");
-    testParseFailure("if(0) labelA: function f(){} else labelB: function g(){}", "Unexpected token function");
+    testParseFailure("if(0) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("if(0) label: function f(){} else ;", "Unexpected token \"function\"");
+    testParseFailure("if(0) ; else label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("if(0) labelA: function f(){} else labelB: function g(){}", "Unexpected token \"function\"");
 
     // 13.6.0.1
     // It is a Syntax Error if IsLabelledFunction(Statement) is true for any occurrence of Statement in these rules.
-    testParseFailure("do label: function f(){} while (0)", "Unexpected token function");
-    testParseFailure("do label: function f(){} while (0);", "Unexpected token function");
-    testParseFailure("while(0) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(;;) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(var a;;) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(const a = 0;;) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(let a;;) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(a in b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(var a in b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(let a in b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(const a in b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(a of b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(var a of b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(let a of b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(const a of b) label: function f(){}", "Unexpected token function");
-    testParseFailure("for(;;) labelA: labelB: labelC: function f(){}", "Unexpected token function");
+    testParseFailure("do label: function f(){} while (0)", "Unexpected token \"function\"");
+    testParseFailure("do label: function f(){} while (0);", "Unexpected token \"function\"");
+    testParseFailure("while(0) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(;;) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(var a;;) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(const a = 0;;) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(let a;;) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(a in b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(var a in b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(let a in b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(const a in b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(a of b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(var a of b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(let a of b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(const a of b) label: function f(){}", "Unexpected token \"function\"");
+    testParseFailure("for(;;) labelA: labelB: labelC: function f(){}", "Unexpected token \"function\"");
 
     // 13.6.3.1
     // It is a Syntax Error if any element of the BoundNames of LexicalDeclaration also occurs in the VarDeclaredNames of Statement.
-    testParseFailure("for(let a;;) { var a; }", "Duplicate binding 'a'");
-    testParseFailure("for(const a = 0;;) { var a; }", "Duplicate binding 'a'");
+    testParseFailure("for(let a;;) { var a; }", "Duplicate binding \"a\"");
+    testParseFailure("for(const a = 0;;) { var a; }", "Duplicate binding \"a\"");
 
     // 13.6.4.1
     // It is a Syntax Error if LeftHandSideExpression is either an ObjectLiteral or an ArrayLiteral and if the lexical token sequence matched by LeftHandSideExpression cannot be parsed with no tokens left over using AssignmentPattern as the goal symbol.
@@ -268,20 +267,20 @@ suite("Parser", function () {
     testParseFailure("for((0) in 0);", "Invalid left-hand side in for-in");
     testParseFailure("for((0) of 0);", "Invalid left-hand side in for-of");
     // It is a Syntax Error if the BoundNames of ForDeclaration contains "let".
-    testParseFailure("for(let let in 0);", "Invalid lexical binding name 'let'");
-    testParseFailure("for(const let in 0);", "Invalid lexical binding name 'let'");
-    testParseFailure("for(let let of 0);", "Invalid lexical binding name 'let'");
-    testParseFailure("for(const let of 0);", "Invalid lexical binding name 'let'");
+    testParseFailure("for(let let in 0);", "Invalid lexical binding name \"let\"");
+    testParseFailure("for(const let in 0);", "Invalid lexical binding name \"let\"");
+    testParseFailure("for(let let of 0);", "Invalid lexical binding name \"let\"");
+    testParseFailure("for(const let of 0);", "Invalid lexical binding name \"let\"");
     // It is a Syntax Error if any element of the BoundNames of ForDeclaration also occurs in the VarDeclaredNames of Statement.
-    testParseFailure("for(let a in 0) { var a; }", "Duplicate binding 'a'");
-    testParseFailure("for(const a in 0) { var a; }", "Duplicate binding 'a'");
-    testParseFailure("for(let a of 0) { var a; }", "Duplicate binding 'a'");
-    testParseFailure("for(const a of 0) { var a; }", "Duplicate binding 'a'");
+    testParseFailure("for(let a in 0) { var a; }", "Duplicate binding \"a\"");
+    testParseFailure("for(const a in 0) { var a; }", "Duplicate binding \"a\"");
+    testParseFailure("for(let a of 0) { var a; }", "Duplicate binding \"a\"");
+    testParseFailure("for(const a of 0) { var a; }", "Duplicate binding \"a\"");
     // It is a Syntax Error if the BoundNames of ForDeclaration contains any duplicate entries.
-    testParseFailure("for(let {a, a} in 0);", "Duplicate binding 'a'");
-    testParseFailure("for(const {a, a} in 0);", "Duplicate binding 'a'");
-    testParseFailure("for(let {a, a} of 0);", "Duplicate binding 'a'");
-    testParseFailure("for(const {a, a} of 0);", "Duplicate binding 'a'");
+    testParseFailure("for(let {a, a} in 0);", "Duplicate binding \"a\"");
+    testParseFailure("for(const {a, a} in 0);", "Duplicate binding \"a\"");
+    testParseFailure("for(let {a, a} of 0);", "Duplicate binding \"a\"");
+    testParseFailure("for(const {a, a} of 0);", "Duplicate binding \"a\"");
 
     // 13.7.1
     // It is a Syntax Error if this production is not nested, directly or indirectly (but not crossing function boundaries), within an IterationStatement.
@@ -293,8 +292,8 @@ suite("Parser", function () {
     testParseFailure("label: continue label;", "Illegal continue statement");
     testParseFailure("label: { continue label; }", "Illegal continue statement");
     testParseFailure("label: if(0) continue label;", "Illegal continue statement");
-    testParseFailure("label: while(0) !function(){ continue label; };", "Undefined label 'label'");
-    testParseFailure("label: while(0) { function f(){ continue label; } }", "Undefined label 'label'");
+    testParseFailure("label: while(0) !function(){ continue label; };", "Undefined label \"label\"");
+    testParseFailure("label: while(0) { function f(){ continue label; } }", "Undefined label \"label\"");
 
     // 13.8.1
     // It is a Syntax Error if this production is not nested, directly or indirectly (but not crossing function boundaries), within an IterationStatement or a SwitchStatement.
@@ -310,33 +309,33 @@ suite("Parser", function () {
 
     // 13.10.1
     // It is a Syntax Error if the code that matches this production is contained in strict code.
-    testParseFailure("\"use strict\"; with(0);", "Strict mode code may not include a with statement");
+    testParseFailure("'use strict'; with(0);", "Strict mode code may not include a with statement");
     // It is a Syntax Error if IsLabelledFunction(Statement) is true.
-    testParseFailure("with(0) label: function f(){}", "Unexpected token function");
+    testParseFailure("with(0) label: function f(){}", "Unexpected token \"function\"");
 
     // 13.11.1
     // It is a Syntax Error if the LexicallyDeclaredNames of CaseClauses contains any duplicate entries.
-    testParseFailure("switch(0) { case 0: let a; case 1: let a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: let a; case 1: function a(){} }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: let a; default: let a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: let a; case 0: let a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: let a; case 0: function a(){} }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: function a(){} case 0: let a  }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: function a(){} case 0: let a  }", "Duplicate binding 'a'");
+    testParseFailure("switch(0) { case 0: let a; case 1: let a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: let a; case 1: function a(){} }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: let a; default: let a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: let a; case 0: let a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: let a; case 0: function a(){} }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: function a(){} case 0: let a  }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: function a(){} case 0: let a  }", "Duplicate binding \"a\"");
 
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of CaseClauses also occurs in the VarDeclaredNames of CaseClauses.
-    testParseFailure("switch(0) { case 0: let a; case 1: var a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: var a; case 1: let a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: let a; default: var a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: var a; default: let a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: let a; case 0: var a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: var a; case 0: let a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: const a = 0; case 1: var a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: var a; case 1: const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: const a = 0; default: var a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { case 0: var a; default: const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: const a = 0; case 0: var a; }", "Duplicate binding 'a'");
-    testParseFailure("switch(0) { default: var a; case 0: const a = 0; }", "Duplicate binding 'a'");
+    testParseFailure("switch(0) { case 0: let a; case 1: var a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: var a; case 1: let a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: let a; default: var a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: var a; default: let a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: let a; case 0: var a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: var a; case 0: let a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: const a = 0; case 1: var a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: var a; case 1: const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: const a = 0; default: var a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { case 0: var a; default: const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: const a = 0; case 0: var a; }", "Duplicate binding \"a\"");
+    testParseFailure("switch(0) { default: var a; case 0: const a = 0; }", "Duplicate binding \"a\"");
 
     // 13.12.1
     // It is a Syntax Error if any source text matches this rule.
@@ -344,10 +343,10 @@ suite("Parser", function () {
 
     // 13.14.1
     // It is a Syntax Error if BoundNames of CatchParameter contains any duplicate elements.
-    testParseFailure("try {} catch ([e, e]) {}", "Duplicate binding 'e'");
-    testParseFailure("try {} catch ({e, e}) {}", "Duplicate binding 'e'");
-    testParseFailure("try {} catch ({a: e, b: e}) {}", "Duplicate binding 'e'");
-    testParseFailure("try {} catch ({e = 0, a: e}) {}", "Duplicate binding 'e'");
+    testParseFailure("try {} catch ([e, e]) {}", "Duplicate binding \"e\"");
+    testParseFailure("try {} catch ({e, e}) {}", "Duplicate binding \"e\"");
+    testParseFailure("try {} catch ({a: e, b: e}) {}", "Duplicate binding \"e\"");
+    testParseFailure("try {} catch ({e = 0, a: e}) {}", "Duplicate binding \"e\"");
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the LexicallyDeclaredNames of Block.
     //  (see Annex B 3.5)
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the VarDeclaredNames of Block.
@@ -355,24 +354,24 @@ suite("Parser", function () {
 
     // 14.1.2
     // If the source code matching this production is strict code, the Early Error rules for StrictFormalParameters : FormalParameters are applied.
-    testParseFailure("\"use strict\"; function f(a, a){}", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("\"use strict\"; function f([a, a]){}", "Duplicate binding 'a'");
+    testParseFailure("'use strict'; function f(a, a){}", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("'use strict'; function f([a, a]){}", "Duplicate binding \"a\"");
     testParseModuleFailure("export default function(a, a){}", "Strict mode function may not have duplicate parameter names");
-    testParseModuleFailure("export default function([a, a]){}", "Duplicate binding 'a'");
-    testParseFailure("\"use strict\"; !function(a, a){}", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("\"use strict\"; !function([a, a]){}", "Duplicate binding 'a'");
+    testParseModuleFailure("export default function([a, a]){}", "Duplicate binding \"a\"");
+    testParseFailure("'use strict'; !function(a, a){}", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("'use strict'; !function([a, a]){}", "Duplicate binding \"a\"");
     // If the source code matching this production is strict code, it is a Syntax Error if BindingIdentifier is the IdentifierName eval or the IdentifierName arguments.
-    testParseFailure("\"use strict\"; function eval(){}", "Function name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; function arguments(){}", "Function name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; !function eval(){}", "Function name may not be eval or arguments in strict mode");
-    testParseFailure("\"use strict\"; !function arguments(){}", "Function name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; function eval(){}", "Function name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; function arguments(){}", "Function name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; !function eval(){}", "Function name may not be eval or arguments in strict mode");
+    testParseFailure("'use strict'; !function arguments(){}", "Function name may not be eval or arguments in strict mode");
     // It is a Syntax Error if any element of the BoundNames of FormalParameters also occurs in the LexicallyDeclaredNames of FunctionBody.
-    testParseFailure("function f(a){ let a; }", "Duplicate binding 'a'");
-    testParseFailure("function f(a){ const a = 0; }", "Duplicate binding 'a'");
-    testParseModuleFailure("export default function(a){ let a; }", "Duplicate binding 'a'");
-    testParseModuleFailure("export default function(a){ const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("!function(a){ let a; }", "Duplicate binding 'a'");
-    testParseFailure("!function(a){ const a = 0; }", "Duplicate binding 'a'");
+    testParseFailure("function f(a){ let a; }", "Duplicate binding \"a\"");
+    testParseFailure("function f(a){ const a = 0; }", "Duplicate binding \"a\"");
+    testParseModuleFailure("export default function(a){ let a; }", "Duplicate binding \"a\"");
+    testParseModuleFailure("export default function(a){ const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("!function(a){ let a; }", "Duplicate binding \"a\"");
+    testParseFailure("!function(a){ const a = 0; }", "Duplicate binding \"a\"");
     // It is a Syntax Error if FormalParameters Contains SuperProperty is true.
     testParseFailure("function f(a = super.b){}", "Unexpected super property");
     testParseModuleFailure("export default function(a = super.b){}", "Unexpected super property");
@@ -403,14 +402,14 @@ suite("Parser", function () {
     testParseFailure("class A extends B { constructor() { !function(){ super(); } } }", "Unexpected super call");
     // It is a Syntax Error if BoundNames of FormalParameters contains any duplicate elements.
     testParseFailure("!{ f(a, a){} };", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("!{ f([a, a]){} };", "Duplicate binding 'a'");
-    testParseFailure("!{ f({a, a}){} };", "Duplicate binding 'a'");
+    testParseFailure("!{ f([a, a]){} };", "Duplicate binding \"a\"");
+    testParseFailure("!{ f({a, a}){} };", "Duplicate binding \"a\"");
     testParseFailure("!{ *g(a, a){} };", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("!{ *g([a, a]){} };", "Duplicate binding 'a'");
-    testParseFailure("!{ *g({a, a}){} };", "Duplicate binding 'a'");
+    testParseFailure("!{ *g([a, a]){} };", "Duplicate binding \"a\"");
+    testParseFailure("!{ *g({a, a}){} };", "Duplicate binding \"a\"");
     testParseFailure("class A { static f(a, a){} }", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("class A { static f([a, a]){} }", "Duplicate binding 'a'");
-    testParseFailure("class A { static f({a, a}){} }", "Duplicate binding 'a'");
+    testParseFailure("class A { static f([a, a]){} }", "Duplicate binding \"a\"");
+    testParseFailure("class A { static f({a, a}){} }", "Duplicate binding \"a\"");
     testParseFailure("(a, a) => 0;", "Strict mode function may not have duplicate parameter names");
     testParseFailure("([a, a]) => 0;", "Strict mode function may not have duplicate parameter names");
     testParseFailure("({a, a}) => 0;", "Strict mode function may not have duplicate parameter names");
@@ -419,52 +418,52 @@ suite("Parser", function () {
     testParseFailure("([a],...a)=>0", "Strict mode function may not have duplicate parameter names");
     // It is a Syntax Error if IsSimpleParameterList of FormalParameterList is false and BoundNames of FormalParameterList contains any duplicate elements.
     testParseFailure("function f(a, [a]){}", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("(function([a, a]){})", "Duplicate binding 'a'");
-    testParseFailure("(function({a: x, b: x}){})", "Duplicate binding 'x'");
+    testParseFailure("(function([a, a]){})", "Duplicate binding \"a\"");
+    testParseFailure("(function({a: x, b: x}){})", "Duplicate binding \"x\"");
     testParseFailure("(function({a: x}, {b: x}){})", "Strict mode function may not have duplicate parameter names");
     // It is a Syntax Error if the LexicallyDeclaredNames of FunctionStatementList contains any duplicate entries.
-    testParseFailure("function f(){ let a; let a; }", "Duplicate binding 'a'");
-    testParseFailure("function f(){ let a; const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("function f(){ const a = 0; let a; }", "Duplicate binding 'a'");
-    testParseFailure("function f(){ const a = 0; const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("!function f(){ let a; let a; }", "Duplicate binding 'a'");
-    testParseFailure("!{ f(){ let a; let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ *g(){ let a; let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ get f(){ let a; let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ set f(b){ let a; let a; } };", "Duplicate binding 'a'");
-    testParseFailure("class A { static f(){ let a; let a; } }", "Duplicate binding 'a'");
-    testParseFailure("() => { let a; let a; }", "Duplicate binding 'a'");
+    testParseFailure("function f(){ let a; let a; }", "Duplicate binding \"a\"");
+    testParseFailure("function f(){ let a; const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("function f(){ const a = 0; let a; }", "Duplicate binding \"a\"");
+    testParseFailure("function f(){ const a = 0; const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("!function f(){ let a; let a; }", "Duplicate binding \"a\"");
+    testParseFailure("!{ f(){ let a; let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ *g(){ let a; let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ get f(){ let a; let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ set f(b){ let a; let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("class A { static f(){ let a; let a; } }", "Duplicate binding \"a\"");
+    testParseFailure("() => { let a; let a; }", "Duplicate binding \"a\"");
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of FunctionStatementList also occurs in the VarDeclaredNames of FunctionStatementList.
-    testParseFailure("function f(){ let a; var a; }", "Duplicate binding 'a'");
-    testParseFailure("function f(){ var a; let a; }", "Duplicate binding 'a'");
-    testParseFailure("function f(){ const a = 0; var a; }", "Duplicate binding 'a'");
-    testParseFailure("function f(){ var a; const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("!function f(){ let a; var a; }", "Duplicate binding 'a'");
-    testParseFailure("!{ f(){ let a; var a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ *g(){ let a; var a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ get f(){ let a; var a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ set f(b){ let a; var a; } };", "Duplicate binding 'a'");
-    testParseFailure("class A { static f(){ let a; var a; } }", "Duplicate binding 'a'");
-    testParseFailure("() => { let a; var a; }", "Duplicate binding 'a'");
+    testParseFailure("function f(){ let a; var a; }", "Duplicate binding \"a\"");
+    testParseFailure("function f(){ var a; let a; }", "Duplicate binding \"a\"");
+    testParseFailure("function f(){ const a = 0; var a; }", "Duplicate binding \"a\"");
+    testParseFailure("function f(){ var a; const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("!function f(){ let a; var a; }", "Duplicate binding \"a\"");
+    testParseFailure("!{ f(){ let a; var a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ *g(){ let a; var a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ get f(){ let a; var a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ set f(b){ let a; var a; } };", "Duplicate binding \"a\"");
+    testParseFailure("class A { static f(){ let a; var a; } }", "Duplicate binding \"a\"");
+    testParseFailure("() => { let a; var a; }", "Duplicate binding \"a\"");
     // It is a Syntax Error if ContainsDuplicateLabels of FunctionStatementList with argument « » is true.
-    testParseFailure("function f(){ label: label: ; }", "Label 'label' has already been declared");
-    testParseFailure("function f(){ label: { label: ; } }", "Label 'label' has already been declared");
-    testParseFailure("function f(){ label: if(0) label: ; }", "Label 'label' has already been declared");
+    testParseFailure("function f(){ label: label: ; }", "Label \"label\" has already been declared");
+    testParseFailure("function f(){ label: { label: ; } }", "Label \"label\" has already been declared");
+    testParseFailure("function f(){ label: if(0) label: ; }", "Label \"label\" has already been declared");
     // It is a Syntax Error if ContainsUndefinedBreakTarget of FunctionStatementList with argument « » is true.
-    testParseFailure("function f(){ break label; }", "Undefined label 'label'");
-    testParseFailure("function f(){ labelA: break labelB; }", "Undefined label 'labelB'");
+    testParseFailure("function f(){ break label; }", "Undefined label \"label\"");
+    testParseFailure("function f(){ labelA: break labelB; }", "Undefined label \"labelB\"");
     // It is a Syntax Error if ContainsUndefinedContinueTarget of FunctionStatementList with arguments « » and « » is true.
-    testParseFailure("function f(){ while(0) continue label; }", "Undefined label 'label'");
-    testParseFailure("function f(){ labelA: while(0) continue labelB; }", "Undefined label 'labelB'");
+    testParseFailure("function f(){ while(0) continue label; }", "Undefined label \"label\"");
+    testParseFailure("function f(){ labelA: while(0) continue labelB; }", "Undefined label \"labelB\"");
 
     // 14.2.1
     // It is a Syntax Error if any element of the BoundNames of ArrowParameters also occurs in the LexicallyDeclaredNames of ConciseBody.
-    testParseFailure("(a) => { let a; }", "Duplicate binding 'a'");
-    testParseFailure("([a]) => { let a; }", "Duplicate binding 'a'");
-    testParseFailure("({a}) => { let a; }", "Duplicate binding 'a'");
-    testParseFailure("(a) => { const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("([a]) => { const a = 0; }", "Duplicate binding 'a'");
-    testParseFailure("({a}) => { const a = 0; }", "Duplicate binding 'a'");
+    testParseFailure("(a) => { let a; }", "Duplicate binding \"a\"");
+    testParseFailure("([a]) => { let a; }", "Duplicate binding \"a\"");
+    testParseFailure("({a}) => { let a; }", "Duplicate binding \"a\"");
+    testParseFailure("(a) => { const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("([a]) => { const a = 0; }", "Duplicate binding \"a\"");
+    testParseFailure("({a}) => { const a = 0; }", "Duplicate binding \"a\"");
     // If the [Yield] grammar parameter is present on ArrowParameters, it is a Syntax Error if the lexical token sequence matched by CoverParenthesizedExpressionAndArrowParameterList[?Yield] cannot be parsed with no tokens left over using ArrowFormalParameters[Yield, GeneratorParameter] as the goal symbol.
     // TODO
     // If the [Yield] grammar parameter is not present on ArrowParameters, it is a Syntax Error if the lexical token sequence matched by CoverParenthesizedExpressionAndArrowParameterList[?Yield] cannot be parsed with no tokens left over using ArrowFormalParameters as the goal symbol.
@@ -474,25 +473,25 @@ suite("Parser", function () {
 
     // 14.3.1
     // It is a Syntax Error if any element of the BoundNames of StrictFormalParameters also occurs in the LexicallyDeclaredNames of FunctionBody.
-    testParseFailure("!{ f(a) { let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ f([a]){ let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ f({a}){ let a; } };", "Duplicate binding 'a'");
+    testParseFailure("!{ f(a) { let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ f([a]){ let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ f({a}){ let a; } };", "Duplicate binding \"a\"");
     // It is a Syntax Error if BoundNames of PropertySetParameterList contains any duplicate elements.
-    testParseFailure("!{ set f({a, a}){} };", "Duplicate binding 'a'");
-    testParseFailure("!{ set f([a, a]){} };", "Duplicate binding 'a'");
+    testParseFailure("!{ set f({a, a}){} };", "Duplicate binding \"a\"");
+    testParseFailure("!{ set f([a, a]){} };", "Duplicate binding \"a\"");
     // It is a Syntax Error if any element of the BoundNames of PropertySetParameterList also occurs in the LexicallyDeclaredNames of FunctionBody.
-    testParseFailure("!{ set f(a) { let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ set f([a]){ let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ set f({a}){ let a; } };", "Duplicate binding 'a'");
+    testParseFailure("!{ set f(a) { let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ set f([a]){ let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ set f({a}){ let a; } };", "Duplicate binding \"a\"");
 
     // 14.4.1
     // It is a Syntax Error if HasDirectSuper of GeneratorMethod is true .
     testParseFailure("!{ *f(a = super()){} };", "Unexpected super call");
     testParseFailure("!{ *f(a) { super() } };", "Unexpected super call");
     // It is a Syntax Error if any element of the BoundNames of StrictFormalParameters also occurs in the LexicallyDeclaredNames of GeneratorBody.
-    testParseFailure("!{ *f(a) { let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ *f([a]){ let a; } };", "Duplicate binding 'a'");
-    testParseFailure("!{ *f({a}){ let a; } };", "Duplicate binding 'a'");
+    testParseFailure("!{ *f(a) { let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ *f([a]){ let a; } };", "Duplicate binding \"a\"");
+    testParseFailure("!{ *f({a}){ let a; } };", "Duplicate binding \"a\"");
     // It is a Syntax Error if HasDirectSuper of GeneratorDeclaration is true .
     testParseFailure("function* f(a = super()){}", "Unexpected super call");
     testParseFailure("function* f(a){ super() }", "Unexpected super call");
@@ -501,17 +500,17 @@ suite("Parser", function () {
     testParseFailure("!function* f(a = super()){}", "Unexpected super call");
     testParseFailure("!function* f(a) { super() }", "Unexpected super call");
     // If the source code matching this production is strict code, the Early Error rules for StrictFormalParameters : FormalParameters are applied.
-    testParseFailure("\"use strict\"; function* f(a, a){}", "Strict mode function may not have duplicate parameter names");
-    testParseFailure("\"use strict\"; !function*(a, a){}", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("'use strict'; function* f(a, a){}", "Strict mode function may not have duplicate parameter names");
+    testParseFailure("'use strict'; !function*(a, a){}", "Strict mode function may not have duplicate parameter names");
     // If the source code matching this production is strict code, it is a Syntax Error if BindingIdentifier is the IdentifierName eval or the IdentifierName arguments.
     testParseFailure("function* eval(){}", "Function name may not be eval or arguments in strict mode");
     testParseFailure("function* arguments(){}", "Function name may not be eval or arguments in strict mode");
     testParseFailure("!function* eval(){}", "Function name may not be eval or arguments in strict mode");
     testParseFailure("!function* arguments(){}", "Function name may not be eval or arguments in strict mode");
     // It is a Syntax Error if any element of the BoundNames of FormalParameters also occurs in the LexicallyDeclaredNames of GeneratorBody.
-    testParseFailure("function* f(a) { let a; }", "Duplicate binding 'a'");
-    testParseFailure("function* f([a]){ let a; }", "Duplicate binding 'a'");
-    testParseFailure("function* f({a}){ let a; }", "Duplicate binding 'a'");
+    testParseFailure("function* f(a) { let a; }", "Duplicate binding \"a\"");
+    testParseFailure("function* f([a]){ let a; }", "Duplicate binding \"a\"");
+    testParseFailure("function* f({a}){ let a; }", "Duplicate binding \"a\"");
     // It is a Syntax Error if FormalParameters Contains SuperProperty is true.
     testParseFailure("function* f(a = super.b){}", "Unexpected super property");
     testParseFailure("!function* (a = super.b){}", "Unexpected super property");
@@ -546,91 +545,91 @@ suite("Parser", function () {
     // It is a Syntax Error if HasDirectSuper of MethodDefinition is true.
     testParseFailure("class A extends B { static f() { super(); } }", "Unexpected super call");
     // It is a Syntax Error if PropName of MethodDefinition is "prototype".
-    testParseFailure("class A extends B { static prototype(){} }", "Static class methods cannot be named 'prototype'");
-    testParseFailure("class A extends B { static *prototype(){} }", "Static class methods cannot be named 'prototype'");
-    testParseFailure("class A extends B { static get prototype(){} }", "Static class methods cannot be named 'prototype'");
-    testParseFailure("class A extends B { static set prototype(a) {} }", "Static class methods cannot be named 'prototype'");
+    testParseFailure("class A extends B { static prototype(){} }", "Static class methods cannot be named \"prototype\"");
+    testParseFailure("class A extends B { static *prototype(){} }", "Static class methods cannot be named \"prototype\"");
+    testParseFailure("class A extends B { static get prototype(){} }", "Static class methods cannot be named \"prototype\"");
+    testParseFailure("class A extends B { static set prototype(a) {} }", "Static class methods cannot be named \"prototype\"");
 
     // 15.1.1
     // It is a Syntax Error if the LexicallyDeclaredNames of StatementList contains any duplicate entries.
-    testParseFailure("let a; let a;", "Duplicate binding 'a'");
-    testParseFailure("let a; const a = 0;", "Duplicate binding 'a'");
-    testParseFailure("const a = 0; let a;", "Duplicate binding 'a'");
-    testParseFailure("const a = 0; const a = 0;", "Duplicate binding 'a'");
+    testParseFailure("let a; let a;", "Duplicate binding \"a\"");
+    testParseFailure("let a; const a = 0;", "Duplicate binding \"a\"");
+    testParseFailure("const a = 0; let a;", "Duplicate binding \"a\"");
+    testParseFailure("const a = 0; const a = 0;", "Duplicate binding \"a\"");
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of StatementList also occurs in the VarDeclaredNames of StatementList.
-    testParseFailure("let a; var a;", "Duplicate binding 'a'");
-    testParseFailure("var a; let a;", "Duplicate binding 'a'");
-    testParseFailure("const a = 0; var a;", "Duplicate binding 'a'");
-    testParseFailure("var a; const a = 0;", "Duplicate binding 'a'");
+    testParseFailure("let a; var a;", "Duplicate binding \"a\"");
+    testParseFailure("var a; let a;", "Duplicate binding \"a\"");
+    testParseFailure("const a = 0; var a;", "Duplicate binding \"a\"");
+    testParseFailure("var a; const a = 0;", "Duplicate binding \"a\"");
     // It is a Syntax Error if StatementList Contains super unless the source code containing super is eval code that is being processed by a direct eval that is contained in function code. However, such function code does not include ArrowFunction function code.
     testParseFailure("super()", "Unexpected super call");
     testParseFailure("super.a", "Unexpected super property");
     // It is a Syntax Error if StatementList Contains NewTarget unless the source code containing NewTarget is eval code that is being processed by a direct eval that is contained in function code. However, such function code does not include ArrowFunction function code.
     testParseFailure("new.target", "Unexpected new . target");
     // It is a Syntax Error if ContainsDuplicateLabels of StatementList with argument « » is true.
-    testParseFailure("label: label: ;", "Label 'label' has already been declared");
+    testParseFailure("label: label: ;", "Label \"label\" has already been declared");
     // It is a Syntax Error if ContainsUndefinedBreakTarget of StatementList with argument « » is true.
-    testParseFailure("break label;", "Undefined label 'label'");
-    testParseFailure("labelA: break labelB;", "Undefined label 'labelB'");
+    testParseFailure("break label;", "Undefined label \"label\"");
+    testParseFailure("labelA: break labelB;", "Undefined label \"labelB\"");
     // It is a Syntax Error if ContainsUndefinedContinueTarget of StatementList with arguments « » and « » is true.
-    testParseFailure("while(0) continue label;", "Undefined label 'label'");
-    testParseFailure("labelA: while(0) continue labelB;", "Undefined label 'labelB'");
+    testParseFailure("while(0) continue label;", "Undefined label \"label\"");
+    testParseFailure("labelA: while(0) continue labelB;", "Undefined label \"labelB\"");
 
     // 15.2.1.1
     // It is a Syntax Error if the LexicallyDeclaredNames of ModuleItemList contains any duplicate entries.
-    testParseModuleFailure("let a; let a;", "Duplicate binding 'a'");
-    testParseModuleFailure("let a; const a = 0;", "Duplicate binding 'a'");
-    testParseModuleFailure("const a = 0; let a;", "Duplicate binding 'a'");
-    testParseModuleFailure("const a = 0; const a = 0;", "Duplicate binding 'a'");
-    testParseModuleFailure("let a; export class a {};", "Duplicate binding 'a'");
-    testParseModuleFailure("let a; export function a(){};", "Duplicate binding 'a'");
-    testParseModuleFailure("let a; export let a;", "Duplicate binding 'a'");
-    testParseModuleFailure("let a; export const a = 0;", "Duplicate binding 'a'");
-    testParseModuleFailure("const a = 0; export class a {};", "Duplicate binding 'a'");
-    testParseModuleFailure("const a = 0; export function a(){};", "Duplicate binding 'a'");
-    testParseModuleFailure("const a = 0; export let a;", "Duplicate binding 'a'");
-    testParseModuleFailure("const a = 0; export const a = 1;", "Duplicate binding 'a'");
+    testParseModuleFailure("let a; let a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("let a; const a = 0;", "Duplicate binding \"a\"");
+    testParseModuleFailure("const a = 0; let a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("const a = 0; const a = 0;", "Duplicate binding \"a\"");
+    testParseModuleFailure("let a; export class a {};", "Duplicate binding \"a\"");
+    testParseModuleFailure("let a; export function a(){};", "Duplicate binding \"a\"");
+    testParseModuleFailure("let a; export let a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("let a; export const a = 0;", "Duplicate binding \"a\"");
+    testParseModuleFailure("const a = 0; export class a {};", "Duplicate binding \"a\"");
+    testParseModuleFailure("const a = 0; export function a(){};", "Duplicate binding \"a\"");
+    testParseModuleFailure("const a = 0; export let a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("const a = 0; export const a = 1;", "Duplicate binding \"a\"");
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of ModuleItemList also occurs in the VarDeclaredNames of ModuleItemList.
-    testParseModuleFailure("let a; var a;", "Duplicate binding 'a'");
-    testParseModuleFailure("var a; let a;", "Duplicate binding 'a'");
-    testParseModuleFailure("const a = 0; var a;", "Duplicate binding 'a'");
-    testParseModuleFailure("var a; const a = 0;", "Duplicate binding 'a'");
-    testParseModuleFailure("var a; export class a {};", "Duplicate binding 'a'");
-    testParseModuleFailure("var a; export function a(){};", "Duplicate binding 'a'");
-    testParseModuleFailure("var a; export let a;", "Duplicate binding 'a'");
-    testParseModuleFailure("var a; export const a = 0;", "Duplicate binding 'a'");
+    testParseModuleFailure("let a; var a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("var a; let a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("const a = 0; var a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("var a; const a = 0;", "Duplicate binding \"a\"");
+    testParseModuleFailure("var a; export class a {};", "Duplicate binding \"a\"");
+    testParseModuleFailure("var a; export function a(){};", "Duplicate binding \"a\"");
+    testParseModuleFailure("var a; export let a;", "Duplicate binding \"a\"");
+    testParseModuleFailure("var a; export const a = 0;", "Duplicate binding \"a\"");
     // It is a Syntax Error if the ExportedNames of ModuleItemList contains any duplicate entries.
-    testParseModuleFailure("export var a; export var a;", "Duplicate export of 'a'");
-    testParseModuleFailure("export {a, a};", "Duplicate export of 'a'");
-    testParseModuleFailure("export {a, b as a};", "Duplicate export of 'a'");
-    testParseModuleFailure("export {a, a as a};", "Duplicate export of 'a'");
-    testParseModuleFailure("export {a}; export class a{};", "Duplicate export of 'a'");
-    testParseModuleFailure("export {a}; export function a(){};", "Duplicate export of 'a'");
-    testParseModuleFailure("export let a; export let a;", "Duplicate export of 'a'");
-    testParseModuleFailure("export const a = 0; export const a = 0;", "Duplicate export of 'a'");
-    testParseModuleFailure("export let a; export let a;", "Duplicate export of 'a'");
-    testParseModuleFailure("export default 0; export default 0;", "Duplicate export of 'default'");
-    testParseModuleFailure("export default 0; export default function f(){};", "Duplicate export of 'default'");
-    testParseModuleFailure("export default 0; export default class a {};", "Duplicate export of 'default'");
+    testParseModuleFailure("export var a; export var a;", "Duplicate export of \"a\"");
+    testParseModuleFailure("export {a, a};", "Duplicate export of \"a\"");
+    testParseModuleFailure("export {a, b as a};", "Duplicate export of \"a\"");
+    testParseModuleFailure("export {a, a as a};", "Duplicate export of \"a\"");
+    testParseModuleFailure("export {a}; export class a{};", "Duplicate export of \"a\"");
+    testParseModuleFailure("export {a}; export function a(){};", "Duplicate export of \"a\"");
+    testParseModuleFailure("export let a; export let a;", "Duplicate export of \"a\"");
+    testParseModuleFailure("export const a = 0; export const a = 0;", "Duplicate export of \"a\"");
+    testParseModuleFailure("export let a; export let a;", "Duplicate export of \"a\"");
+    testParseModuleFailure("export default 0; export default 0;", "Duplicate export of \"default\"");
+    testParseModuleFailure("export default 0; export default function f(){};", "Duplicate export of \"default\"");
+    testParseModuleFailure("export default 0; export default class a {};", "Duplicate export of \"default\"");
     // It is a Syntax Error if any element of the ExportedBindings of ModuleItemList does not also occur in either the VarDeclaredNames of ModuleItemList, or the LexicallyDeclaredNames of ModuleItemList.
-    testParseModuleFailure("export {a};", "Export 'a' is not defined in module");
-    testParseModuleFailure("var a; export {b as a};", "Export 'b' is not defined in module");
-    testParseModuleFailure("export {a as b}; var b;", "Export 'a' is not defined in module");
-    testParseModuleFailure("let a; export {b as a};", "Export 'b' is not defined in module");
-    testParseModuleFailure("export {a as b}; let b;", "Export 'a' is not defined in module");
+    testParseModuleFailure("export {a};", "Export \"a\" is not defined in module");
+    testParseModuleFailure("var a; export {b as a};", "Export \"b\" is not defined in module");
+    testParseModuleFailure("export {a as b}; var b;", "Export \"a\" is not defined in module");
+    testParseModuleFailure("let a; export {b as a};", "Export \"b\" is not defined in module");
+    testParseModuleFailure("export {a as b}; let b;", "Export \"a\" is not defined in module");
     // It is a Syntax Error if ModuleItemList Contains super.
     testParseModuleFailure("super()", "Unexpected super call");
     testParseModuleFailure("super.a", "Unexpected super property");
     // It is a Syntax Error if ModuleItemList Contains NewTarget
     testParseModuleFailure("new.target", "Unexpected new . target");
     // It is a Syntax Error if ContainsDuplicateLabels of ModuleItemList with argument « » is true.
-    testParseModuleFailure("label: label: ;", "Label 'label' has already been declared");
+    testParseModuleFailure("label: label: ;", "Label \"label\" has already been declared");
     // It is a Syntax Error if ContainsUndefinedBreakTarget of ModuleItemList with argument « » is true.
-    testParseModuleFailure("break label;", "Undefined label 'label'");
-    testParseModuleFailure("labelA: break labelB;", "Undefined label 'labelB'");
+    testParseModuleFailure("break label;", "Undefined label \"label\"");
+    testParseModuleFailure("labelA: break labelB;", "Undefined label \"labelB\"");
     // It is a Syntax Error if ContainsUndefinedContinueTarget of ModuleItemList with arguments « » and « » is true.
-    testParseModuleFailure("while(0) continue label;", "Undefined label 'label'");
-    testParseModuleFailure("labelA: while(0) continue labelB;", "Undefined label 'labelB'");
+    testParseModuleFailure("while(0) continue label;", "Undefined label \"label\"");
+    testParseModuleFailure("labelA: while(0) continue labelB;", "Undefined label \"labelB\"");
 
     // 15.2.2.1
     // It is a Syntax Error if the BoundNames of ImportDeclaration contains any duplicate entries.
@@ -653,16 +652,16 @@ suite("Parser", function () {
 
     // Annex B 3.2 (13.12.1)
     // It is a Syntax Error if any strict mode source code matches this rule.
-    testParseFailure("'use strict'; label: function f(){}", "Unexpected token function");
+    testParseFailure("'use strict'; label: function f(){}", "Unexpected token \"function\"");
 
     // Annex B 3.5 (13.14.1)
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the LexicallyDeclaredNames of Block.
-    testParseFailure("try {} catch(e) { let e; }", "Duplicate binding 'e'");
-    testParseFailure("try {} catch(e) { function e(){} }", "Duplicate binding 'e'");
+    testParseFailure("try {} catch(e) { let e; }", "Duplicate binding \"e\"");
+    testParseFailure("try {} catch(e) { function e(){} }", "Duplicate binding \"e\"");
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the VarDeclaredNames of Block,
     // unless that element is only bound by a VariableStatement or the VariableDeclarationList of a for statement,
     // or the ForBinding of a for-in statement.
-    testParseFailure("try {} catch(e) { for(var e of 0); }", "Catch parameter \'e\' redeclared as var in for-of loop");
+    testParseFailure("try {} catch(e) { for(var e of 0); }", "Catch parameter \"e\" redeclared as var in for-of loop");
 
   });
 });

@@ -101,10 +101,10 @@ suite("Parser", function () {
       elements: [{ type: "TemplateElement", rawValue: "" }]
     });
 
-    testParseFailure("`", "Unexpected token ILLEGAL");
-    testParseFailure("`${a", "Unexpected token ILLEGAL");
-    testParseFailure("`${a}a${b}", "Unexpected token ILLEGAL");
-    testParseFailure("`\\37`", "Unexpected token ILLEGAL");
+    testParseFailure("`", "Unexpected end of input");
+    testParseFailure("`${a", "Unexpected end of input");
+    testParseFailure("`${a}a${b}", "Unexpected end of input");
+    testParseFailure("`\\37`", "Unexpected \"`\"");
   });
 
   suite("tagged template expressions", function () {

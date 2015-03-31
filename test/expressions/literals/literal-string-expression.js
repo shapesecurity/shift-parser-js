@@ -49,16 +49,16 @@ suite("Parser", function () {
     testParse("('\\u{10FFFF}')", expr, { type: "LiteralStringExpression", value: "\uDBFF\uDFFF" });
     testParse("('\\u{0000000000F8}')", expr, { type: "LiteralStringExpression", value: "\xF8" });
 
-    testParseFailure("(')", "Unexpected token ILLEGAL");
-    testParseFailure("('\n')", "Unexpected token ILLEGAL");
-    testParseFailure("('\\x')", "Unexpected token ILLEGAL");
-    testParseFailure("('\\u')", "Unexpected token ILLEGAL");
-    testParseFailure("('\\8')", "Unexpected token ILLEGAL");
-    testParseFailure("('\\9')", "Unexpected token ILLEGAL");
-    testParseFailure("('\\x0')", "Unexpected token ILLEGAL");
-    testParseFailure("('\u2028')", "Unexpected token ILLEGAL");
-    testParseFailure("('\u2029')", "Unexpected token ILLEGAL");
-    testParseFailure("('\\u{2028')", "Unexpected token ILLEGAL");
+    testParseFailure("(')", "Unexpected end of input");
+    testParseFailure("('\n')", "Unexpected \"\\n\"");
+    testParseFailure("('\\x')", "Unexpected \"'\"");
+    testParseFailure("('\\u')", "Unexpected \"'\"");
+    testParseFailure("('\\8')", "Unexpected \"8\"");
+    testParseFailure("('\\9')", "Unexpected \"9\"");
+    testParseFailure("('\\x0')", "Unexpected \"0\"");
+    testParseFailure("('\u2028')", "Unexpected \"\u2028\"");
+    testParseFailure("('\u2029')", "Unexpected \"\u2029\"");
+    testParseFailure("('\\u{2028')", "Unexpected \"{\"");
     testParseFailure("'use strict'; ('\\1')", "Octal literals are not allowed in strict mode.");
     testParseFailure("'use strict'; ('\\01')", "Octal literals are not allowed in strict mode.");
     testParseFailure("'use strict'; ('\\000')", "Octal literals are not allowed in strict mode.");

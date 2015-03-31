@@ -113,8 +113,8 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("f(..a)", "Unexpected token .");
-    testParseFailure("f(....a)", "Unexpected token .");
-    testParseFailure("f(... ... a)", "Unexpected token ...");
+    testParseFailure("f(..a)", "Unexpected token \".\"");
+    testParseFailure("f(....a)", "Unexpected token \".\"");
+    testParseFailure("f(... ... a)", "Unexpected token \"...\"");
   });
 });

@@ -43,7 +43,7 @@ suite("Parser", function () {
       { type: "StaticMemberExpression", object: { type: "LiteralNumericExpression", value: 1 }, property: "toString" }
     );
 
-    testParseFailure("0.toString", "Unexpected token ILLEGAL");
+    testParseFailure("0.toString", "Unexpected \"t\"");
 
     // LeftHandSideExpressions
 

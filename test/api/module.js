@@ -25,6 +25,6 @@ suite("Parser", function () {
   suite("module", function () {
     testParseModule("", id, { type: "Module", items: [] });
 
-    testParseModuleFailure("/*", "Unexpected token ILLEGAL");
+    testParseModuleFailure("/*", "Unexpected end of input");
   });
 });

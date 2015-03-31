@@ -51,7 +51,7 @@ suite("Parser", function () {
         }
       });
 
-    // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token let");
+    // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token \"let\"");
     testParse("while(true) var a", stmt,
       {
         type: "WhileStatement",
@@ -67,9 +67,9 @@ suite("Parser", function () {
       });
 
     testParseFailure("while(true) let a", "Unexpected identifier");
-    testParseFailure("while(true) const a", "Unexpected token const");
+    testParseFailure("while(true) const a", "Unexpected token \"const\"");
     testParseFailure("with(true) let a", "Unexpected identifier");
-    testParseFailure("with(true) class a {}", "Unexpected token class");
+    testParseFailure("with(true) class a {}", "Unexpected token \"class\"");
 
     testParseFailure("a: let a", "Unexpected identifier");
 

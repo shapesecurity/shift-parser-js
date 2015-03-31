@@ -2593,7 +2593,7 @@ export class Parser extends Tokenizer {
             }
           } else {
             if (key.type === "StaticPropertyName" && key.value === "prototype") {
-              throw this.createErrorWithLocation(methodToken, "Static class methods cannot be named 'prototype'");
+              throw this.createErrorWithLocation(methodToken, "Static class methods cannot be named \"prototype\"");
             }
           }
           elements.push(copyLocation(methodOrKey, { type: "ClassElement", isStatic, method: methodOrKey }));

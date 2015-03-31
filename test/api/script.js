@@ -25,6 +25,6 @@ suite("Parser", function () {
   suite("script", function () {
     testParse("", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
     testParse(" ", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
-    testParseFailure("/*", "Unexpected token ILLEGAL");
+    testParseFailure("/*", "Unexpected end of input");
   });
 });

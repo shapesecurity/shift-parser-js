@@ -80,8 +80,8 @@ suite("Parser", function() {
         }
       });
 
-    testParseFailure("'use strict'; var let", "Unexpected token let");
-    testParseFailure("var const", "Unexpected token const");
+    testParseFailure("'use strict'; var let", "Unexpected token \"let\"");
+    testParseFailure("var const", "Unexpected token \"const\"");
 
     // ES5: invalid program
     // ES6: function declaration within a block
@@ -234,13 +234,13 @@ suite("Parser", function() {
     testParse("<!--", stmt, undefined);
     testParse("-->", stmt, undefined);
     testParseFailure("a -->", "Unexpected end of input");
-    testParseFailure(";/**/-->", "Unexpected token >");
+    testParseFailure(";/**/-->", "Unexpected token \">\"");
     testParse("\n  -->", stmt, undefined);
     testParse("/*\n*/-->", stmt, undefined);
     testParse("a<!--b", expr, { type: "IdentifierExpression", name: "a" });
 
-    testParseModuleFailure("<!--", "Unexpected token <");
-    testParseModuleFailure("-->", "Unexpected token >");
+    testParseModuleFailure("<!--", "Unexpected token \"<\"");
+    testParseModuleFailure("-->", "Unexpected token \">\"");
 
     testParseModule("a<!--b", moduleExpr,
       {

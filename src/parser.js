@@ -85,6 +85,7 @@ export class Parser extends Tokenizer {
   constructor(source) {
     super(source);
     this.allowIn = true;
+    this.inFunctionBody = false;
     this.inGeneratorParameter = false;
     this.inParameter = false;
     this.inGeneratorBody = false;
@@ -178,8 +179,10 @@ export class Parser extends Tokenizer {
   parseFunctionBody() {
     let startLocation = this.getLocation();
 
+    let oldInFunctionBody = this.inFunctionBody;
     let oldModule = this.module;
 
+    this.inFunctionBody = true;
     this.module = false;
 
     this.expect(TokenType.LBRACE);
@@ -188,6 +191,7 @@ export class Parser extends Tokenizer {
 
     body = this.markLocation(body, startLocation);
 
+    this.inFunctionBody = oldInFunctionBody;
     this.module = oldModule;
     return body;
   }
@@ -757,6 +761,9 @@ export class Parser extends Tokenizer {
     let expression = null;
 
     this.expect(TokenType.RETURN);
+    if (!this.inFunctionBody) {
+      throw this.createError(ErrorMessages.ILLEGAL_RETURN);
+    }
 
     if (this.hasLineTerminatorBeforeNext) {
       return { type: "ReturnStatement", expression };
@@ -1603,7 +1610,7 @@ export class Parser extends Tokenizer {
         this.lookahead = this.scanRegExp(this.match(TokenType.DIV) ? "/" : "/=");
         let token = this.lex();
         let lastSlash = token.value.lastIndexOf("/");
-        let pattern = token.value.slice(1, lastSlash).replace("\\/", "/");
+        let pattern = token.value.slice(1, lastSlash);
         let flags = token.value.slice(lastSlash + 1);
         return this.markLocation({ type: "LiteralRegExpExpression", pattern, flags }, startLocation);
       case TokenType.CLASS:

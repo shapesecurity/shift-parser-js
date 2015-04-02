@@ -9,10 +9,10 @@ exports.testParse = function testParse(program, accessor, expected) {
   var args = arguments.length;
   test(program, function () {
     expect(args).to.be(testParse.length);
-    var tree = parse(program, { loc: true });
+    var tree = parse(program, { loc: true, earlyErrors: true });
     schemaCheck(tree, SHIFT_SPEC.Script);
     locationSanityCheck(tree);
-    expect(accessor(parse(program))).to.eql(expected);
+    expect(accessor(parse(program, { earlyErrors: false }))).to.eql(expected);
   });
 };
 
@@ -20,10 +20,10 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
   var args = arguments.length;
   test(program, function () {
     expect(args).to.be(testParseModule.length);
-    var tree = parseModule(program, { loc: true });
+    var tree = parseModule(program, { loc: true, earlyErrors: true });
     schemaCheck(tree, SHIFT_SPEC.Module);
     locationSanityCheck(tree);
-    expect(accessor(parseModule(program))).to.eql(expected);
+    expect(accessor(parseModule(program, { earlyErrors: false }))).to.eql(expected);
   });
 };
 
@@ -32,7 +32,7 @@ exports.testParseFailure = function testParseFailure(source, message) {
   test("Expect failure in Script: " + source, function () {
     expect(args).to.be(testParseFailure.length);
     try {
-      parse(source);
+      parse(source, {earlyErrors: true});
     } catch (e) {
       expect(e.description).to.be(message);
       return;
@@ -46,7 +46,7 @@ exports.testParseModuleFailure = function testParseModuleFailure(source, message
   test("Expect failure in Module: " + source, function () {
     expect(args).to.be(testParseModuleFailure.length);
     try {
-      parseModule(source);
+      parseModule(source, {earlyErrors: true});
     } catch (e) {
       expect(e.description).to.be(message);
       return;

@@ -21,20 +21,39 @@ suite("Parser", function () {
   suite("literal regexp expression", function () {
     // Regular Expression Literals
     testParse("/a/", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "" });
+    testParse("/\\0/", expr, { type: "LiteralRegExpExpression", pattern: "\\0", flags: "" });
+    testParse("/\\1/u", expr, { type: "LiteralRegExpExpression", pattern: "\\1", flags: "u" });
     testParse("/a/;", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "" });
     testParse("/a/i", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "i" });
     testParse("/a/i;", expr, { type: "LiteralRegExpExpression", pattern: "a", flags: "i" });
+    testParse("/[--]/", expr, { type: "LiteralRegExpExpression", pattern: "[--]", flags: "" });
     testParse("/[a-z]/i", expr, { type: "LiteralRegExpExpression", pattern: "[a-z]", flags: "i" });
     testParse("/[x-z]/i", expr, { type: "LiteralRegExpExpression", pattern: "[x-z]", flags: "i" });
     testParse("/[a-c]/i", expr, { type: "LiteralRegExpExpression", pattern: "[a-c]", flags: "i" });
     testParse("/[P QR]/i", expr, { type: "LiteralRegExpExpression", pattern: "[P QR]", flags: "i" });
     testParse("/[\\]/]/", expr, { type: "LiteralRegExpExpression", pattern: "[\\]/]", flags: "" });
-    testParse("/foo\\/bar/", expr, { type: "LiteralRegExpExpression", pattern: "foo/bar", flags: "" });
+    testParse("/foo\\/bar/", expr, { type: "LiteralRegExpExpression", pattern: "foo\\/bar", flags: "" });
     testParse("/=([^=\\s])+/g", expr, { type: "LiteralRegExpExpression", pattern: "=([^=\\s])+", flags: "g" });
     testParse("/0/g.test", expr, {
       type: "StaticMemberExpression",
       object: { type: "LiteralRegExpExpression", pattern: "0", flags: "g" },
       property: "test"
     });
+    testParse("/(()(?:\\2)((\\4)))/;", expr, { type: "LiteralRegExpExpression", pattern: "(()(?:\\2)((\\4)))", flags: "" });
+    testParse("/((((((((((((.))))))))))))\\12/;", expr, { type: "LiteralRegExpExpression", pattern: "((((((((((((.))))))))))))\\12", flags: "" });
+
+    // valid only if Annex B.1.4 is implemented
+    testParse("/{/;", expr, { type: "LiteralRegExpExpression", pattern: "{", flags: "" });
+    testParse("/}/;", expr, { type: "LiteralRegExpExpression", pattern: "}", flags: "" });
+    testParse("/}?/u;", expr, { type: "LiteralRegExpExpression", pattern: "}?", flags: "u" });
+    testParse("/{*/u;", expr, { type: "LiteralRegExpExpression", pattern: "{*", flags: "u" });
+    testParse("/{}/;", expr, { type: "LiteralRegExpExpression", pattern: "{}", flags: "" });
+    testParse("/.{.}/;", expr, { type: "LiteralRegExpExpression", pattern: ".{.}", flags: "" });
+    testParse("/[\\w-\\s]/;", expr, { type: "LiteralRegExpExpression", pattern: "[\\w-\\s]", flags: "" });
+    testParse("/[\\s-\\w]/;", expr, { type: "LiteralRegExpExpression", pattern: "[\\s-\\w]", flags: "" });
+    testParse("/(?=.)*/;", expr, { type: "LiteralRegExpExpression", pattern: "(?=.)*", flags: "" });
+    testParse("/(?!.){0,}?/;", expr, { type: "LiteralRegExpExpression", pattern: "(?!.){0,}?", flags: "" });
+    // NOTE: The {0,} here is not a quantifier! It is just a regular atom.
+    testParse("/(?!.){0,}?/u", expr, { type: "LiteralRegExpExpression", pattern: "(?!.){0,}?", flags: "u" });
   });
 });

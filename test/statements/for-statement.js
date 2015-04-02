@@ -248,6 +248,18 @@ suite("Parser", function () {
         update: null }
     );
 
+    testParse("for(let a;;); let a;", stmt,
+      { type: "ForStatement",
+        body: { type: "EmptyStatement" },
+        init: {
+          type: "VariableDeclaration",
+          kind: "let",
+          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+        },
+        test: null,
+        update: null }
+    );
+
     testParseFailure("for({a=0};;);", "Illegal property initializer");
   });
 });

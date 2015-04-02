@@ -31,6 +31,7 @@ export const ErrorMessages = {
   INVALID_LHS_IN_FOR_OF: "Invalid left-hand side in for-of",
   MULTIPLE_DEFAULTS_IN_SWITCH: "More than one default clause in switch statement",
   NO_CATCH_OR_FINALLY: "Missing catch or finally after try",
+  ILLEGAL_RETURN: "Illegal return statement",
   ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list",
   INVALID_VAR_INIT_FOR_IN: "Invalid variable declaration in for-in statement",
   INVALID_VAR_INIT_FOR_OF: "Invalid variable declaration in for-of statement",

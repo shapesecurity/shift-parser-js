@@ -231,6 +231,13 @@ suite("Parser", function () {
       }
     );
 
+    testParse("eval => 'use strict'", expr,
+      { type: "ArrowExpression",
+        params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "eval" }], rest: null },
+        body: { type: "LiteralStringExpression", value: "use strict" }
+      }
+    );
+
     testParse("'use strict';(x)=>0", expr,
       { type: "ArrowExpression",
         params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "x" }], rest: null },

@@ -16,15 +16,22 @@
 
 import {keyword, code} from "esutils";
 
+const { isReservedWordES6, isRestrictedWord } = keyword;
 const { isIdentifierStartES6, isIdentifierPartES6, isWhiteSpace, isLineTerminator, isDecimalDigit } = code;
 
 export {
+  isRestrictedWord,
   isIdentifierStartES6 as isIdentifierStart,
   isIdentifierPartES6 as isIdentifierPart,
   isWhiteSpace,
   isLineTerminator,
   isDecimalDigit,
 };
+
+
+export function isStrictModeReservedWord(id) {
+  return isReservedWordES6(id, true);
+}
 
 export function getHexValue(rune) {
   if ("0" <= rune && rune <= "9") {

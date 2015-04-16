@@ -94,6 +94,91 @@ function copyLocation(from, to) {
   return to;
 }
 
+function isValidSimpleAssignmentTarget(node) {
+  switch (node.type) {
+    case "IdentifierExpression":
+    case "ComputedMemberExpression":
+    case "StaticMemberExpression":
+      return true;
+  }
+  return false;
+}
+
+function transformDestructuring(node) {
+  switch (node.type) {
+    case "ObjectExpression":
+      return copyLocation(node, {
+        type: "ObjectBinding",
+        properties: node.properties.map(transformDestructuring) });
+    case "DataProperty":
+      return copyLocation(node, {
+        type: "BindingPropertyProperty",
+        name: node.name,
+        binding: transformDestructuring(node.expression) });
+    case "ShorthandProperty":
+      return copyLocation(node, {
+        type: "BindingPropertyIdentifier",
+        binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
+        init: null });
+    case "ArrayExpression":
+      var last = node.elements[node.elements.length - 1];
+      if (last != null && last.type === "SpreadElement") {
+        return copyLocation(node, {
+          type: "ArrayBinding",
+          elements: node.elements.slice(0, -1).map(function (e) {
+            return e && transformDestructuring(e);
+          }),
+          restElement: copyLocation(last.expression, transformDestructuring(last.expression)) });
+      } else {
+        return copyLocation(node, {
+          type: "ArrayBinding",
+          elements: node.elements.map(function (e) {
+            return e && transformDestructuring(e);
+          }),
+          restElement: null });
+      }
+      /* istanbul ignore next */
+      break;
+    case "AssignmentExpression":
+      return copyLocation(node, {
+        type: "BindingWithDefault",
+        binding: transformDestructuring(node.binding),
+        init: node.expression });
+    case "IdentifierExpression":
+      return copyLocation(node, { type: "BindingIdentifier", name: node.name });
+    case "StaticPropertyName":
+      return copyLocation(node, { type: "BindingIdentifier", name: node.value });
+    case "ComputedMemberExpression":
+    case "StaticMemberExpression":
+    case "ArrayBinding":
+    case "BindingIdentifier":
+    case "BindingPropertyIdentifier":
+    case "BindingPropertyProperty":
+    case "BindingWithDefault":
+    case "ObjectBinding":
+      return node;
+    // istanbul ignore next
+    default:
+      throw new Error("Not reached");
+  }
+}
+
+function isPrefixOperator(type) {
+  switch (type) {
+    case _Tokenizer$TokenClass$TokenType.TokenType.INC:
+    case _Tokenizer$TokenClass$TokenType.TokenType.DEC:
+    case _Tokenizer$TokenClass$TokenType.TokenType.ADD:
+    case _Tokenizer$TokenClass$TokenType.TokenType.SUB:
+    case _Tokenizer$TokenClass$TokenType.TokenType.BIT_NOT:
+    case _Tokenizer$TokenClass$TokenType.TokenType.NOT:
+    case _Tokenizer$TokenClass$TokenType.TokenType.DELETE:
+    case _Tokenizer$TokenClass$TokenType.TokenType.VOID:
+    case _Tokenizer$TokenClass$TokenType.TokenType.TYPEOF:
+      return true;
+  }
+  return false;
+}
+
 var Parser = (function (_Tokenizer) {
   function Parser(source) {
     _classCallCheck(this, Parser);
@@ -116,6 +201,11 @@ var Parser = (function (_Tokenizer) {
   _inherits(Parser, _Tokenizer);
 
   _createClass(Parser, [{
+    key: "match",
+    value: function match(subType) {
+      return this.lookahead.type === subType;
+    }
+  }, {
     key: "eat",
     value: function eat(tokenType) {
       if (this.lookahead.type === tokenType) {
@@ -138,7 +228,7 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "expectContextualKeyword",
     value: function expectContextualKeyword(keyword) {
-      if (this.matchContextualKeyword(keyword)) {
+      if (this.lookahead.type === _Tokenizer$TokenClass$TokenType.TokenType.IDENTIFIER && this.lookahead.value === keyword) {
         return this.lex();
       } else {
         throw this.createUnexpected(this.lookahead);
@@ -147,27 +237,18 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "eatContextualKeyword",
     value: function eatContextualKeyword(keyword) {
-      if (this.matchContextualKeyword(keyword)) {
+      if (this.lookahead.type === _Tokenizer$TokenClass$TokenType.TokenType.IDENTIFIER && this.lookahead.value === keyword) {
         return this.lex();
       }
-    }
-  }, {
-    key: "match",
-    value: function match(subType) {
-      return this.lookahead.type === subType;
     }
   }, {
     key: "consumeSemicolon",
     value: function consumeSemicolon() {
       if (this.hasLineTerminatorBeforeNext) {
         return;
-      }
-
-      if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON)) {
+      }if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON)) {
         return;
-      }
-
-      if (!this.eof() && !this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) {
+      }if (!this.eof() && !this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) {
         throw this.createUnexpected(this.lookahead);
       }
     }
@@ -182,27 +263,26 @@ var Parser = (function (_Tokenizer) {
     key: "parseModule",
     value: function parseModule() {
       this.module = true;
-
       this.lookahead = this.advance();
-      var location = this.getLocation();
+
+      var startLocation = this.getLocation();
       var items = [];
       while (!this.eof()) {
         items.push(this.parseModuleItem());
       }
-      return this.markLocation({ type: "Module", items: items }, location);
+      return this.markLocation({ type: "Module", items: items }, startLocation);
     }
   }, {
     key: "parseScript",
     value: function parseScript() {
       this.lookahead = this.advance();
 
-      var location = this.getLocation();
-
+      var startLocation = this.getLocation();
       var body = this.parseBody();
       if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.EOS)) {
         throw this.createUnexpected(this.lookahead);
       }
-      return this.markLocation({ type: "Script", body: body }, location);
+      return this.markLocation({ type: "Script", body: body }, startLocation);
     }
   }, {
     key: "parseFunctionBody",
@@ -211,37 +291,34 @@ var Parser = (function (_Tokenizer) {
 
       var oldInFunctionBody = this.inFunctionBody;
       var oldModule = this.module;
-
       this.inFunctionBody = true;
       this.module = false;
 
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LBRACE);
-      var body = this.parseBody();
+      var body = this.markLocation(this.parseBody(), startLocation);
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE);
-
-      body = this.markLocation(body, startLocation);
 
       this.inFunctionBody = oldInFunctionBody;
       this.module = oldModule;
+
       return body;
     }
   }, {
     key: "parseBody",
     value: function parseBody() {
-      var location = this.getLocation();
-      var directives = [];
-      var statements = [];
-      var parsingDirectives = true;
+      var startLocation = this.getLocation();
+
+      var directives = [],
+          statements = [],
+          parsingDirectives = true;
 
       while (true) {
-        if (this.eof() || this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) {
-          break;
-        }
+        if (this.eof() || this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) break;
         var token = this.lookahead;
         var text = token.slice.text;
         var isStringLiteral = token.type === _Tokenizer$TokenClass$TokenType.TokenType.STRING;
         var directiveLocation = this.getLocation();
-        var stmt = this.parseStatementListItem({ isTopLevel: true });
+        var stmt = this.parseStatementListItem();
         if (parsingDirectives) {
           if (isStringLiteral && stmt.type === "ExpressionStatement" && stmt.expression.type === "LiteralStringExpression") {
             directives.push(this.markLocation({ type: "Directive", rawValue: text.slice(1, -1) }, directiveLocation));
@@ -254,7 +331,7 @@ var Parser = (function (_Tokenizer) {
         }
       }
 
-      return this.markLocation({ type: "FunctionBody", directives: directives, statements: statements }, location);
+      return this.markLocation({ type: "FunctionBody", directives: directives, statements: statements }, startLocation);
     }
   }, {
     key: "parseImportSpecifier",
@@ -274,21 +351,14 @@ var Parser = (function (_Tokenizer) {
         this.expectContextualKeyword("as");
       }
 
-      var location = this.getLocation();
-      var boundName = this.parseIdentifier();
-      return this.markLocation({
-        type: "ImportSpecifier",
-        name: name,
-        binding: this.markLocation({ type: "BindingIdentifier", name: boundName }, location) }, startLocation);
+      return this.markLocation({ type: "ImportSpecifier", name: name, binding: this.parseBindingIdentifier() }, startLocation);
     }
   }, {
     key: "parseNameSpaceBinding",
     value: function parseNameSpaceBinding() {
-      var startLocation = this.getLocation();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.MUL);
       this.expectContextualKeyword("as");
-      var identifier = this.parseIdentifier();
-      return this.markLocation({ type: "BindingIdentifier", name: identifier }, startLocation);
+      return this.parseBindingIdentifier();
     }
   }, {
     key: "parseNamedImports",
@@ -363,8 +433,8 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseExportClause",
     value: function parseExportClause() {
-      var result = [];
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LBRACE);
+      var result = [];
       while (!this.eat(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) {
         result.push(this.parseExportSpecifier());
         if (!this.eat(_Tokenizer$TokenClass$TokenType.TokenType.COMMA)) {
@@ -398,11 +468,11 @@ var Parser = (function (_Tokenizer) {
           break;
         case _Tokenizer$TokenClass$TokenType.TokenType.CLASS:
           // export ClassDeclaration
-          decl = { type: "Export", declaration: this.parseClass({ isExpr: false }) };
+          decl = { type: "Export", declaration: this.parseClass({ isExpr: false, inDefault: false }) };
           break;
         case _Tokenizer$TokenClass$TokenType.TokenType.FUNCTION:
           // export HoistableDeclaration
-          decl = { type: "Export", declaration: this.parseFunction({ isExpr: false }) };
+          decl = { type: "Export", declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true }) };
           break;
         case _Tokenizer$TokenClass$TokenType.TokenType.DEFAULT:
           this.lex();
@@ -411,7 +481,7 @@ var Parser = (function (_Tokenizer) {
               // export default HoistableDeclaration[Default]
               decl = {
                 type: "ExportDefault",
-                body: this.parseFunction({ isExpr: false, inDefault: true }) };
+                body: this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: true }) };
               break;
             case _Tokenizer$TokenClass$TokenType.TokenType.CLASS:
               // export default ClassDeclaration[Default]
@@ -429,7 +499,7 @@ var Parser = (function (_Tokenizer) {
         case _Tokenizer$TokenClass$TokenType.TokenType.LET:
         case _Tokenizer$TokenClass$TokenType.TokenType.CONST:
           // export LexicalDeclaration
-          decl = { type: "Export", declaration: this.parseVariableDeclaration() };
+          decl = { type: "Export", declaration: this.parseVariableDeclaration(true) };
           this.consumeSemicolon();
           break;
         default:
@@ -467,53 +537,32 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseStatementListItem",
     value: function parseStatementListItem() {
-      var _ref = arguments[0] === undefined ? {} : arguments[0];
+      if (this.eof()) throw this.createUnexpected(this.lookahead);
 
-      var _ref$isTopLevel = _ref.isTopLevel;
-      var isTopLevel = _ref$isTopLevel === undefined ? false : _ref$isTopLevel;
-
-      var startLocation = this.getLocation();
-      if (this.eof()) {
-        throw this.createUnexpected(this.lookahead);
-      }
-
-      var decl = undefined;
       switch (this.lookahead.type) {
         case _Tokenizer$TokenClass$TokenType.TokenType.FUNCTION:
-          decl = this.parseFunction({ isExpr: false });
-          break;
+          return this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true });
         case _Tokenizer$TokenClass$TokenType.TokenType.CLASS:
-          decl = this.parseClass({ isExpr: false });
-          break;
+          return this.parseClass({ isExpr: false, inDefault: false });
         default:
           if (this.lookaheadLexicalDeclaration()) {
-            decl = this.parseVariableDeclarationStatement();
+            var startLocation = this.getLocation();
+            return this.markLocation(this.parseVariableDeclarationStatement(), startLocation);
           } else {
-            decl = this.parseStatement({ isTopLevel: isTopLevel });
+            return this.parseStatement();
           }
       }
-
-      return this.markLocation(decl, startLocation);
     }
   }, {
     key: "parseStatement",
     value: function parseStatement() {
-      var _this = this;
-
-      var _ref2 = arguments[0] === undefined ? {} : arguments[0];
-
-      var _ref2$isTopLevel = _ref2.isTopLevel;
-      var isTopLevel = _ref2$isTopLevel === undefined ? false : _ref2$isTopLevel;
-
       var startLocation = this.getLocation();
-      var stmt = this.isolateCoverGrammar(function () {
-        return _this.parseStatementHelper(isTopLevel);
-      });
+      var stmt = this.isolateCoverGrammar(this.parseStatementHelper);
       return this.markLocation(stmt, startLocation);
     }
   }, {
     key: "parseStatementHelper",
-    value: function parseStatementHelper(isTopLevel) {
+    value: function parseStatementHelper() {
       if (this.eof()) {
         throw this.createUnexpected(this.lookahead);
       }
@@ -563,7 +612,7 @@ var Parser = (function (_Tokenizer) {
             var expr = this.parseExpression();
             // 12.12 Labelled Statements;
             if (expr.type === "IdentifierExpression" && this.eat(_Tokenizer$TokenClass$TokenType.TokenType.COLON)) {
-              var labeledBody = this.match(_Tokenizer$TokenClass$TokenType.TokenType.FUNCTION) ? this.parseFunction({ isExpr: false, allowGenerator: false }) : this.parseStatement({ isTopLevel: isTopLevel });
+              var labeledBody = this.match(_Tokenizer$TokenClass$TokenType.TokenType.FUNCTION) ? this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false }) : this.parseStatement();
               return { type: "LabeledStatement", label: expr.name, body: labeledBody };
             } else {
               this.consumeSemicolon();
@@ -575,7 +624,7 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseEmptyStatement",
     value: function parseEmptyStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON);
+      this.lex();
       return { type: "EmptyStatement" };
     }
   }, {
@@ -593,14 +642,10 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseBreakStatement",
     value: function parseBreakStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.BREAK);
+      this.lex();
 
       // Catch the very common case first: immediately a semicolon (U+003B).
-      if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON)) {
-        return { type: "BreakStatement", label: null };
-      }
-
-      if (this.hasLineTerminatorBeforeNext) {
+      if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON) || this.hasLineTerminatorBeforeNext) {
         return { type: "BreakStatement", label: null };
       }
 
@@ -616,14 +661,10 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseContinueStatement",
     value: function parseContinueStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.CONTINUE);
+      this.lex();
 
       // Catch the very common case first: immediately a semicolon (U+003B).
-      if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON)) {
-        return { type: "ContinueStatement", label: null };
-      }
-
-      if (this.hasLineTerminatorBeforeNext) {
+      if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON) || this.hasLineTerminatorBeforeNext) {
         return { type: "ContinueStatement", label: null };
       }
 
@@ -639,28 +680,26 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseDebuggerStatement",
     value: function parseDebuggerStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.DEBUGGER);
+      this.lex();
       this.consumeSemicolon();
       return { type: "DebuggerStatement" };
     }
   }, {
     key: "parseDoWhileStatement",
     value: function parseDoWhileStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.DO);
+      this.lex();
       var body = this.parseStatement();
-
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.WHILE);
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
       var test = this.parseExpression();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
       this.eat(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON);
-
       return { type: "DoWhileStatement", body: body, test: test };
     }
   }, {
     key: "parseForStatement",
     value: function parseForStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.FOR);
+      this.lex();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
       var test = null;
       var right = null;
@@ -731,7 +770,7 @@ var Parser = (function (_Tokenizer) {
             this.lex();
             right = this.parseExpression();
 
-            return { type: type, left: Parser.transformDestructuring(expr), right: right, body: this.getIteratorStatementEpilogue() };
+            return { type: type, left: transformDestructuring(expr), right: right, body: this.getIteratorStatementEpilogue() };
           } else {
             if (this.firstExprError) {
               throw this.firstExprError;
@@ -769,10 +808,9 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseIfStatement",
     value: function parseIfStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.IF);
+      this.lex();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
       var test = this.parseExpression();
-
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
       var consequent = this.parseStatement();
       var alternate = null;
@@ -784,17 +822,17 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseReturnStatement",
     value: function parseReturnStatement() {
-      var expression = null;
-
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RETURN);
       if (!this.inFunctionBody) {
         throw this.createError(_ErrorMessages.ErrorMessages.ILLEGAL_RETURN);
       }
 
+      this.lex();
+
       if (this.hasLineTerminatorBeforeNext) {
-        return { type: "ReturnStatement", expression: expression };
+        return { type: "ReturnStatement", expression: null };
       }
 
+      var expression = null;
       if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.SEMICOLON)) {
         if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE) && !this.eof()) {
           expression = this.parseExpression();
@@ -805,20 +843,9 @@ var Parser = (function (_Tokenizer) {
       return { type: "ReturnStatement", expression: expression };
     }
   }, {
-    key: "parseWithStatement",
-    value: function parseWithStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.WITH);
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
-      var object = this.parseExpression();
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
-      var body = this.parseStatement();
-
-      return { type: "WithStatement", object: object, body: body };
-    }
-  }, {
     key: "parseSwitchStatement",
     value: function parseSwitchStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.SWITCH);
+      this.lex();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
       var discriminant = this.parseExpression();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
@@ -891,22 +918,18 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseThrowStatement",
     value: function parseThrowStatement() {
-      var token = this.expect(_Tokenizer$TokenClass$TokenType.TokenType.THROW);
-
+      var token = this.lex();
       if (this.hasLineTerminatorBeforeNext) {
         throw this.createErrorWithLocation(token, _ErrorMessages.ErrorMessages.NEWLINE_AFTER_THROW);
       }
-
       var expression = this.parseExpression();
-
       this.consumeSemicolon();
-
       return { type: "ThrowStatement", expression: expression };
     }
   }, {
     key: "parseTryStatement",
     value: function parseTryStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.TRY);
+      this.lex();
       var body = this.parseBlock();
 
       if (this.match(_Tokenizer$TokenClass$TokenType.TokenType.CATCH)) {
@@ -928,33 +951,41 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseVariableDeclarationStatement",
     value: function parseVariableDeclarationStatement() {
-      var declaration = this.parseVariableDeclaration();
+      var declaration = this.parseVariableDeclaration(true);
       this.consumeSemicolon();
       return { type: "VariableDeclarationStatement", declaration: declaration };
     }
   }, {
     key: "parseWhileStatement",
     value: function parseWhileStatement() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.WHILE);
+      this.lex();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
-      return { type: "WhileStatement", test: this.parseExpression(), body: this.getIteratorStatementEpilogue() };
+      var test = this.parseExpression();
+      var body = this.getIteratorStatementEpilogue();
+      return { type: "WhileStatement", test: test, body: body };
+    }
+  }, {
+    key: "parseWithStatement",
+    value: function parseWithStatement() {
+      this.lex();
+      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
+      var object = this.parseExpression();
+      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
+      var body = this.parseStatement();
+      return { type: "WithStatement", object: object, body: body };
     }
   }, {
     key: "parseCatchClause",
     value: function parseCatchClause() {
       var startLocation = this.getLocation();
 
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.CATCH);
+      this.lex();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
-      var token = this.lookahead;
       if (this.match(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN) || this.match(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN)) {
-        throw this.createUnexpected(token);
+        throw this.createUnexpected(this.lookahead);
       }
-
       var binding = this.parseBindingTarget();
-
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
-
       var body = this.parseBlock();
 
       return this.markLocation({ type: "CatchClause", binding: binding, body: body }, startLocation);
@@ -964,7 +995,6 @@ var Parser = (function (_Tokenizer) {
     value: function parseBlock() {
       var startLocation = this.getLocation();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LBRACE);
-
       var body = [];
       while (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) {
         body.push(this.parseStatementListItem());
@@ -974,13 +1004,11 @@ var Parser = (function (_Tokenizer) {
     }
   }, {
     key: "parseVariableDeclaration",
-    value: function parseVariableDeclaration() {
-      var bindingPatternsMustHaveInit = arguments[0] === undefined ? true : arguments[0];
-
+    value: function parseVariableDeclaration(bindingPatternsMustHaveInit) {
       var startLocation = this.getLocation();
       var token = this.lex();
 
-      // Preceded by this.match(TokenSubType.VAR) || this.match(TokenSubType.LET);
+      // preceded by this.match(TokenSubType.VAR) || this.match(TokenSubType.LET);
       var kind = token.type === _Tokenizer$TokenClass$TokenType.TokenType.VAR ? "var" : token.type === _Tokenizer$TokenClass$TokenType.TokenType.CONST ? "const" : "let";
       var declarators = this.parseVariableDeclaratorList(bindingPatternsMustHaveInit);
       return this.markLocation({ type: "VariableDeclaration", kind: kind, declarators: declarators }, startLocation);
@@ -1022,8 +1050,7 @@ var Parser = (function (_Tokenizer) {
           oldIsAssignmentTarget = this.isAssignmentTarget,
           oldFirstExprError = this.firstExprError,
           result;
-      this.isBindingElement = true;
-      this.isAssignmentTarget = true;
+      this.isBindingElement = this.isAssignmentTarget = true;
       this.firstExprError = null;
       result = parser.call(this);
       if (this.firstExprError !== null) {
@@ -1041,8 +1068,7 @@ var Parser = (function (_Tokenizer) {
           oldIsAssignmentTarget = this.isAssignmentTarget,
           oldFirstExprError = this.firstExprError,
           result;
-      this.isBindingElement = true;
-      this.isAssignmentTarget = true;
+      this.isBindingElement = this.isAssignmentTarget = true;
       this.firstExprError = null;
       result = parser.call(this);
       this.isBindingElement = this.isBindingElement && oldIsBindingElement;
@@ -1055,18 +1081,16 @@ var Parser = (function (_Tokenizer) {
     value: function parseExpression() {
       var startLocation = this.getLocation();
 
-      var group = this.parseAssignmentExpression();
+      var left = this.parseAssignmentExpression();
       if (this.match(_Tokenizer$TokenClass$TokenType.TokenType.COMMA)) {
         while (!this.eof()) {
-          if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.COMMA)) {
-            break;
-          }
+          if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.COMMA)) break;
           this.lex();
-          var expr = this.parseAssignmentExpression();
-          group = this.markLocation({ type: "BinaryExpression", left: group, operator: ",", right: expr }, startLocation);
+          var right = this.parseAssignmentExpression();
+          left = this.markLocation({ type: "BinaryExpression", left: left, operator: ",", right: right }, startLocation);
         }
       }
-      return group;
+      return left;
     }
   }, {
     key: "parseArrowExpressionTail",
@@ -1081,7 +1105,7 @@ var Parser = (function (_Tokenizer) {
 
       if (head.type !== ARROW_EXPRESSION_PARAMS) {
         if (head.type === "IdentifierExpression") {
-          params = [Parser.transformDestructuring(head)];
+          params = [transformDestructuring(head)];
         } else {
           throw this.createUnexpected(arrow);
         }
@@ -1141,15 +1165,15 @@ var Parser = (function (_Tokenizer) {
           break;
       }
       if (isAssignmentOperator) {
-        if (!this.isAssignmentTarget || !Parser.isValidSimpleAssignmentTarget(expr)) {
+        if (!this.isAssignmentTarget || !isValidSimpleAssignmentTarget(expr)) {
           throw this.createError(_ErrorMessages.ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
         }
-        expr = Parser.transformDestructuring(expr);
+        expr = transformDestructuring(expr);
       } else if (operator.type === _Tokenizer$TokenClass$TokenType.TokenType.ASSIGN) {
         if (!this.isAssignmentTarget) {
           throw this.createError(_ErrorMessages.ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
         }
-        expr = Parser.transformDestructuring(expr);
+        expr = transformDestructuring(expr);
       } else {
         return expr;
       }
@@ -1223,8 +1247,7 @@ var Parser = (function (_Tokenizer) {
       var test = this.parseBinaryExpression();
       if (this.firstExprError) {
         return test;
-      }
-      if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.CONDITIONAL)) {
+      }if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.CONDITIONAL)) {
         var previousAllowIn = this.allowIn;
         this.allowIn = true;
         var consequent = this.isolateCoverGrammar(this.parseAssignmentExpression);
@@ -1233,7 +1256,6 @@ var Parser = (function (_Tokenizer) {
         var alternate = this.isolateCoverGrammar(this.parseAssignmentExpression);
         return this.markLocation({ type: "ConditionalExpression", test: test, consequent: consequent, alternate: alternate }, startLocation);
       }
-
       return test;
     }
   }, {
@@ -1272,9 +1294,9 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseBinaryExpression",
     value: function parseBinaryExpression() {
-      var _this2 = this;
+      var _this = this;
 
-      var location = this.getLocation();
+      var startLocation = this.getLocation();
       var left = this.parseUnaryExpression();
       if (this.firstExprError) {
         return left;
@@ -1282,21 +1304,17 @@ var Parser = (function (_Tokenizer) {
 
       var operator = this.lookahead.type;
 
-      var isBinaryOperator = this.isBinaryOperator(operator);
-      if (!isBinaryOperator) {
+      if (!this.isBinaryOperator(operator)) {
         return left;
-      }
-
-      this.isBindingElement = this.isAssignmentTarget = false;
+      }this.isBindingElement = this.isAssignmentTarget = false;
 
       this.lex();
       var stack = [];
-      stack.push({ location: location, left: left, operator: operator, precedence: BinaryPrecedence[operator.name] });
-      location = this.getLocation();
+      stack.push({ startLocation: startLocation, left: left, operator: operator, precedence: BinaryPrecedence[operator.name] });
+      startLocation = this.getLocation();
       var right = this.isolateCoverGrammar(this.parseUnaryExpression);
       operator = this.lookahead.type;
-      isBinaryOperator = this.isBinaryOperator(this.lookahead.type);
-      while (isBinaryOperator) {
+      while (this.isBinaryOperator(operator)) {
         var precedence = BinaryPrecedence[operator.name];
         // Reduce: make a binary expression from the three topmost entries.
         while (stack.length && precedence <= stack[stack.length - 1].precedence) {
@@ -1304,27 +1322,25 @@ var Parser = (function (_Tokenizer) {
           var stackOperator = stackItem.operator;
           left = stackItem.left;
           stack.pop();
-          location = stackItem.location;
-          right = this.markLocation({ type: "BinaryExpression", left: left, operator: stackOperator.name, right: right }, location);
+          startLocation = stackItem.startLocation;
+          right = this.markLocation({ type: "BinaryExpression", left: left, operator: stackOperator.name, right: right }, startLocation);
         }
 
         this.lex();
-        stack.push({ location: location, left: right, operator: operator, precedence: precedence });
-        location = this.getLocation();
+        stack.push({ startLocation: startLocation, left: right, operator: operator, precedence: precedence });
 
+        startLocation = this.getLocation();
         right = this.isolateCoverGrammar(this.parseUnaryExpression);
-
         operator = this.lookahead.type;
-        isBinaryOperator = this.isBinaryOperator(operator);
       }
 
       // Final reduce to clean-up the stack.
       return stack.reduceRight(function (expr, stackItem) {
-        return _this2.markLocation({
+        return _this.markLocation({
           type: "BinaryExpression",
           left: stackItem.left,
           operator: stackItem.operator.name,
-          right: expr }, stackItem.location);
+          right: expr }, stackItem.startLocation);
       }, right);
     }
   }, {
@@ -1335,7 +1351,7 @@ var Parser = (function (_Tokenizer) {
       }
       var startLocation = this.getLocation();
       var operator = this.lookahead;
-      if (!Parser.isPrefixOperator(operator.type)) {
+      if (!isPrefixOperator(operator.type)) {
         return this.parsePostfixExpression();
       }
 
@@ -1351,25 +1367,19 @@ var Parser = (function (_Tokenizer) {
       var startLocation = this.getLocation();
 
       var operand = this.parseLeftHandSideExpression({ allowCall: true });
-      if (this.firstExprError) {
+      if (this.firstExprError || this.hasLineTerminatorBeforeNext) {
         return operand;
-      }if (this.hasLineTerminatorBeforeNext) {
-        return operand;
-      }
-
-      var operator = this.lookahead;
+      }var operator = this.lookahead;
       if (operator.type !== _Tokenizer$TokenClass$TokenType.TokenType.INC && operator.type !== _Tokenizer$TokenClass$TokenType.TokenType.DEC) {
         return operand;
-      }
-
-      this.lex();
+      }this.lex();
 
       return this.markLocation({ type: "PostfixExpression", operand: operand, operator: operator.value }, startLocation);
     }
   }, {
     key: "parseLeftHandSideExpression",
-    value: function parseLeftHandSideExpression(_ref3) {
-      var allowCall = _ref3.allowCall;
+    value: function parseLeftHandSideExpression(_ref) {
+      var allowCall = _ref.allowCall;
 
       var startLocation = this.getLocation();
       var previousAllowIn = this.allowIn;
@@ -1401,7 +1411,7 @@ var Parser = (function (_Tokenizer) {
           expr = this.markLocation({
             type: "StaticMemberExpression",
             object: expr,
-            property: this.parseNonComputedMember() }, startLocation);
+            property: this.parseStaticMember() }, startLocation);
           this.isAssignmentTarget = true;
         } else {
           throw this.createUnexpected(token);
@@ -1418,8 +1428,7 @@ var Parser = (function (_Tokenizer) {
 
       while (true) {
         if (allowCall && this.match(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN)) {
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           expr = this.markLocation({
             type: "CallExpression",
             callee: expr,
@@ -1437,10 +1446,9 @@ var Parser = (function (_Tokenizer) {
           expr = this.markLocation({
             type: "StaticMemberExpression",
             object: expr,
-            property: this.parseNonComputedMember() }, startLocation);
+            property: this.parseStaticMember() }, startLocation);
         } else if (this.match(_Tokenizer$TokenClass$TokenType.TokenType.TEMPLATE)) {
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           expr = this.markLocation({
             type: "TemplateExpression",
             tag: expr,
@@ -1484,9 +1492,9 @@ var Parser = (function (_Tokenizer) {
       }
     }
   }, {
-    key: "parseNonComputedMember",
-    value: function parseNonComputedMember() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.PERIOD);
+    key: "parseStaticMember",
+    value: function parseStaticMember() {
+      this.lex();
       if (!this.lookahead.type.klass.isIdentifierName) {
         throw this.createUnexpected(this.lookahead);
       } else {
@@ -1496,7 +1504,7 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseComputedMember",
     value: function parseComputedMember() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LBRACK);
+      this.lex();
       var expr = this.parseExpression();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RBRACK);
       return expr;
@@ -1504,10 +1512,10 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseNewExpression",
     value: function parseNewExpression() {
-      var _this3 = this;
+      var _this2 = this;
 
       var startLocation = this.getLocation();
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.NEW);
+      this.lex();
       if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.PERIOD)) {
         var ident = this.expect(_Tokenizer$TokenClass$TokenType.TokenType.IDENTIFIER);
         if (ident.value !== "target") {
@@ -1516,7 +1524,7 @@ var Parser = (function (_Tokenizer) {
         return this.markLocation({ type: "NewTargetExpression" }, startLocation);
       }
       var callee = this.isolateCoverGrammar(function () {
-        return _this3.parseLeftHandSideExpression({ allowCall: false });
+        return _this2.parseLeftHandSideExpression({ allowCall: false });
       });
       return this.markLocation({
         type: "NewExpression",
@@ -1538,52 +1546,40 @@ var Parser = (function (_Tokenizer) {
         case _Tokenizer$TokenClass$TokenType.TokenType.LET:
           return this.markLocation({ type: "IdentifierExpression", name: this.parseIdentifier() }, startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.STRING:
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           return this.parseStringLiteral();
         case _Tokenizer$TokenClass$TokenType.TokenType.NUMBER:
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           return this.parseNumericLiteral();
         case _Tokenizer$TokenClass$TokenType.TokenType.THIS:
           this.lex();
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           return this.markLocation({ type: "ThisExpression" }, startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.FUNCTION:
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
-          return this.markLocation(this.parseFunction({ isExpr: true }), startLocation);
+          this.isBindingElement = this.isAssignmentTarget = false;
+          return this.markLocation(this.parseFunction({ isExpr: true, inDefault: false, allowGenerator: true }), startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.TRUE:
           this.lex();
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           return this.markLocation({ type: "LiteralBooleanExpression", value: true }, startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.FALSE:
           this.lex();
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           return this.markLocation({ type: "LiteralBooleanExpression", value: false }, startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.NULL:
           this.lex();
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           return this.markLocation({ type: "LiteralNullExpression" }, startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.LBRACK:
           return this.parseArrayExpression();
         case _Tokenizer$TokenClass$TokenType.TokenType.LBRACE:
           return this.parseObjectExpression();
         case _Tokenizer$TokenClass$TokenType.TokenType.TEMPLATE:
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
-          return this.markLocation({
-            type: "TemplateExpression",
-            tag: null,
-            elements: this.parseTemplateElements() }, startLocation);
+          this.isBindingElement = this.isAssignmentTarget = false;
+          return this.markLocation({ type: "TemplateExpression", tag: null, elements: this.parseTemplateElements() }, startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.DIV:
         case _Tokenizer$TokenClass$TokenType.TokenType.ASSIGN_DIV:
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
+          this.isBindingElement = this.isAssignmentTarget = false;
           this.lookahead = this.scanRegExp(this.match(_Tokenizer$TokenClass$TokenType.TokenType.DIV) ? "/" : "/=");
           var token = this.lex();
           var lastSlash = token.value.lastIndexOf("/");
@@ -1591,27 +1587,25 @@ var Parser = (function (_Tokenizer) {
           var flags = token.value.slice(lastSlash + 1);
           return this.markLocation({ type: "LiteralRegExpExpression", pattern: pattern, flags: flags }, startLocation);
         case _Tokenizer$TokenClass$TokenType.TokenType.CLASS:
-          this.isBindingElement = false;
-          this.isAssignmentTarget = false;
-          return this.parseClass({ isExpr: true });
+          this.isBindingElement = this.isAssignmentTarget = false;
+          return this.parseClass({ isExpr: true, inDefault: false });
         default:
-          throw this.createUnexpected(this.lex());
+          throw this.createUnexpected(this.lookahead);
       }
     }
   }, {
     key: "parseNumericLiteral",
     value: function parseNumericLiteral() {
       var startLocation = this.getLocation();
-      var token2 = this.lex();
-      var node = token2.value === 1 / 0 ? { type: "LiteralInfinityExpression" } : { type: "LiteralNumericExpression", value: token2.value };
+      var token = this.lex();
+      var node = token.value === 1 / 0 ? { type: "LiteralInfinityExpression" } : { type: "LiteralNumericExpression", value: token.value };
       return this.markLocation(node, startLocation);
     }
   }, {
     key: "parseStringLiteral",
     value: function parseStringLiteral() {
       var startLocation = this.getLocation();
-      var token2 = this.lex();
-      return this.markLocation({ type: "LiteralStringExpression", value: token2.str }, startLocation);
+      return this.markLocation({ type: "LiteralStringExpression", value: this.lex().str }, startLocation);
     }
   }, {
     key: "parseIdentifierName",
@@ -1640,7 +1634,7 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseArgumentList",
     value: function parseArgumentList() {
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
+      this.lex();
       var args = this.parseArguments();
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
       return args;
@@ -1653,17 +1647,15 @@ var Parser = (function (_Tokenizer) {
         if (this.match(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN) || this.eof()) {
           return result;
         }
-        var startLocation = this.getLocation();
         var arg = undefined;
         if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.ELLIPSIS)) {
+          var startLocation = this.getLocation();
           arg = this.markLocation({ type: "SpreadElement", expression: this.parseAssignmentExpression() }, startLocation);
         } else {
           arg = this.parseAssignmentExpression();
         }
         result.push(arg);
-        if (!this.eat(_Tokenizer$TokenClass$TokenType.TokenType.COMMA)) {
-          break;
-        }
+        if (!this.eat(_Tokenizer$TokenClass$TokenType.TokenType.COMMA)) break;
       }
       return result;
     }
@@ -1691,8 +1683,7 @@ var Parser = (function (_Tokenizer) {
       var start = this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
       if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN)) {
         this.ensureArrow();
-        this.isBindingElement = false;
-        this.isAssignmentTarget = false;
+        this.isBindingElement = this.isAssignmentTarget = false;
         return {
           type: ARROW_EXPRESSION_PARAMS,
           params: [],
@@ -1701,8 +1692,7 @@ var Parser = (function (_Tokenizer) {
         rest = this.parseBindingIdentifier();
         this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
         this.ensureArrow();
-        this.isBindingElement = false;
-        this.isAssignmentTarget = false;
+        this.isBindingElement = this.isAssignmentTarget = false;
         return {
           type: ARROW_EXPRESSION_PARAMS,
           params: [],
@@ -1757,7 +1747,7 @@ var Parser = (function (_Tokenizer) {
           throw this.createErrorWithLocation(start, _ErrorMessages.ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
         }
 
-        params = params.map(Parser.transformDestructuring);
+        params = params.map(transformDestructuring);
 
         this.isBindingElement = false;
         return { type: ARROW_EXPRESSION_PARAMS, params: params, rest: rest };
@@ -1775,7 +1765,7 @@ var Parser = (function (_Tokenizer) {
     value: function parseArrayExpression() {
       var startLocation = this.getLocation();
 
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LBRACK);
+      this.lex();
 
       var exprs = [];
 
@@ -1796,7 +1786,7 @@ var Parser = (function (_Tokenizer) {
             }
             expr = this.markLocation({ type: "SpreadElement", expression: expr }, elementLocation);
             if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACK)) {
-              this.isAssignmentTarget = this.isBindingElement = false;
+              this.isBindingElement = this.isAssignmentTarget = false;
             }
           } else {
             expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
@@ -1819,18 +1809,13 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseObjectExpression",
     value: function parseObjectExpression() {
-      var _this4 = this;
-
       var startLocation = this.getLocation();
 
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LBRACE);
+      this.lex();
 
       var properties = [];
-      var parsePropertyDefinition = function parsePropertyDefinition() {
-        return _this4.parsePropertyDefinition();
-      };
       while (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) {
-        var property = this.inheritCoverGrammar(parsePropertyDefinition);
+        var property = this.inheritCoverGrammar(this.parsePropertyDefinition);
         properties.push(property);
         if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.RBRACE)) {
           this.expect(_Tokenizer$TokenClass$TokenType.TokenType.COMMA);
@@ -1862,7 +1847,7 @@ var Parser = (function (_Tokenizer) {
             this.firstExprError = this.createErrorWithLocation(startLocation, _ErrorMessages.ErrorMessages.ILLEGAL_PROPERTY);
             return this.markLocation({
               type: "BindingPropertyIdentifier",
-              binding: Parser.transformDestructuring(methodOrKey),
+              binding: transformDestructuring(methodOrKey),
               init: init }, startLocation);
           } else if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.COLON)) {
             if (token.type !== _Tokenizer$TokenClass$TokenType.TokenType.IDENTIFIER && token.type !== _Tokenizer$TokenClass$TokenType.TokenType.YIELD && token.type !== _Tokenizer$TokenClass$TokenType.TokenType.LET) {
@@ -1908,7 +1893,7 @@ var Parser = (function (_Tokenizer) {
           if (this.inGeneratorParameter) {
             this.allowYieldExpression = false;
           }
-          this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LBRACK);
+          this.lex();
           var expr = this.parseAssignmentExpression();
           this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RBRACK);
           this.allowYieldExpression = previousYield;
@@ -1947,7 +1932,7 @@ var Parser = (function (_Tokenizer) {
      *  * `IdentifierReference`
      *  * `CoverInitializedName` (`IdentifierReference "=" AssignmentExpression`)
      *  * `PropertyName : AssignmentExpression`
-     * The the parser will stop at the end of the leading `Identifier` or `PropertyName` and return it.
+     * The parser will stop at the end of the leading `Identifier` or `PropertyName` and return it.
      *
      * @returns {{methodOrKey: (Method|PropertyName), kind: string}}
      */
@@ -2020,6 +2005,10 @@ var Parser = (function (_Tokenizer) {
           kind: "method" };
       }
 
+      if (isGenerator && this.match(_Tokenizer$TokenClass$TokenType.TokenType.COLON)) {
+        throw this.createUnexpected(this.lookahead);
+      }
+
       return {
         methodOrKey: name,
         kind: token.type.klass.isIdentifierName ? "identifier" : "property",
@@ -2027,15 +2016,15 @@ var Parser = (function (_Tokenizer) {
     }
   }, {
     key: "parseClass",
-    value: function parseClass(_ref4) {
-      var _this5 = this;
+    value: function parseClass(_ref2) {
+      var _this3 = this;
 
-      var isExpr = _ref4.isExpr;
-      var _ref4$inDefault = _ref4.inDefault;
-      var inDefault = _ref4$inDefault === undefined ? false : _ref4$inDefault;
+      var isExpr = _ref2.isExpr;
+      var inDefault = _ref2.inDefault;
 
-      var location = this.getLocation();
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.CLASS);
+      var startLocation = this.getLocation();
+
+      this.lex();
       var name = null;
       var heritage = null;
 
@@ -2043,7 +2032,7 @@ var Parser = (function (_Tokenizer) {
         name = this.parseBindingIdentifier();
       } else if (!isExpr) {
         if (inDefault) {
-          name = this.markLocation({ type: "BindingIdentifier", name: "*default*" }, location);
+          name = this.markLocation({ type: "BindingIdentifier", name: "*default*" }, startLocation);
         } else {
           throw this.createUnexpected(this.lookahead);
         }
@@ -2057,7 +2046,7 @@ var Parser = (function (_Tokenizer) {
       }
       if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.EXTENDS)) {
         heritage = this.isolateCoverGrammar(function () {
-          return _this5.parseLeftHandSideExpression({ allowCall: true });
+          return _this3.parseLeftHandSideExpression({ allowCall: true });
         });
       }
 
@@ -2082,30 +2071,26 @@ var Parser = (function (_Tokenizer) {
           methodOrKey = _parseMethodDefinition3.methodOrKey;
           kind = _parseMethodDefinition3.kind;
         }
-        switch (kind) {
-          case "method":
-            elements.push(copyLocation(methodOrKey, { type: "ClassElement", isStatic: isStatic, method: methodOrKey }));
-            break;
-          default:
-            throw this.createError("Only methods are allowed in classes");
+        if (kind === "method") {
+          elements.push(copyLocation(methodOrKey, { type: "ClassElement", isStatic: isStatic, method: methodOrKey }));
+        } else {
+          throw this.createError("Only methods are allowed in classes");
         }
       }
       this.allowYieldExpression = previousParamYield;
       this.inGeneratorParameter = previousInGeneratorParameter;
-      return this.markLocation({ type: isExpr ? "ClassExpression" : "ClassDeclaration", name: name, "super": heritage, elements: elements }, location);
+      return this.markLocation({ type: isExpr ? "ClassExpression" : "ClassDeclaration", name: name, "super": heritage, elements: elements }, startLocation);
     }
   }, {
     key: "parseFunction",
-    value: function parseFunction(_ref5) {
-      var isExpr = _ref5.isExpr;
-      var _ref5$inDefault = _ref5.inDefault;
-      var inDefault = _ref5$inDefault === undefined ? false : _ref5$inDefault;
-      var _ref5$allowGenerator = _ref5.allowGenerator;
-      var allowGenerator = _ref5$allowGenerator === undefined ? true : _ref5$allowGenerator;
+    value: function parseFunction(_ref3) {
+      var isExpr = _ref3.isExpr;
+      var inDefault = _ref3.inDefault;
+      var allowGenerator = _ref3.allowGenerator;
 
       var startLocation = this.getLocation();
 
-      this.expect(_Tokenizer$TokenClass$TokenType.TokenType.FUNCTION);
+      this.lex();
 
       var name = null;
       var isGenerator = allowGenerator && !!this.eat(_Tokenizer$TokenClass$TokenType.TokenType.MUL);
@@ -2114,9 +2099,7 @@ var Parser = (function (_Tokenizer) {
       var previousInGeneratorBody = this.inGeneratorBody;
 
       if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN)) {
-        var identifierLocation = this.getLocation();
-        name = this.parseIdentifier();
-        name = this.markLocation({ type: "BindingIdentifier", name: name }, identifierLocation);
+        name = this.parseBindingIdentifier();
       } else if (!isExpr) {
         if (inDefault) {
           name = this.markLocation({ type: "BindingIdentifier", name: "*default*" }, startLocation);
@@ -2129,9 +2112,9 @@ var Parser = (function (_Tokenizer) {
       this.allowYieldExpression = isGenerator;
       var params = this.parseParams();
       this.inGeneratorParameter = previousGeneratorParameter;
-      this.allowYieldExpression = previousYield;
 
       this.allowYieldExpression = isGenerator;
+
       if (isGenerator) {
         this.inGeneratorBody = true;
       }
@@ -2140,7 +2123,8 @@ var Parser = (function (_Tokenizer) {
       this.inGeneratorBody = previousInGeneratorBody;
       this.allowYieldExpression = previousYield;
 
-      return this.markLocation({ type: isExpr ? "FunctionExpression" : "FunctionDeclaration", isGenerator: isGenerator, name: name, params: params, body: body }, startLocation);
+      var type = isExpr ? "FunctionExpression" : "FunctionDeclaration";
+      return this.markLocation({ type: type, isGenerator: isGenerator, name: name, params: params, body: body }, startLocation);
     }
   }, {
     key: "parseArrayBinding",
@@ -2268,10 +2252,10 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseParam",
     value: function parseParam() {
-      var originalInParameter = this.inParameter;
+      var previousInParameter = this.inParameter;
       this.inParameter = true;
       var param = this.parseBindingElement();
-      this.inParameter = originalInParameter;
+      this.inParameter = previousInParameter;
       return param;
     }
   }, {
@@ -2279,30 +2263,18 @@ var Parser = (function (_Tokenizer) {
     value: function parseParams() {
       var paramsLocation = this.getLocation();
 
-      var items = [],
-          rest = null;
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.LPAREN);
 
+      var items = [],
+          rest = null;
       if (!this.match(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN)) {
-        var seenRest = false;
-
         while (!this.eof()) {
-          var param = undefined;
           if (this.eat(_Tokenizer$TokenClass$TokenType.TokenType.ELLIPSIS)) {
-            param = this.parseBindingIdentifier();
-            seenRest = true;
-          } else {
-            param = this.parseParam();
-          }
-
-          if (seenRest) {
-            rest = param;
+            rest = this.parseBindingIdentifier();
             break;
           }
-          items.push(param);
-          if (this.match(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN)) {
-            break;
-          }
+          items.push(this.parseParam());
+          if (this.match(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN)) break;
           this.expect(_Tokenizer$TokenClass$TokenType.TokenType.COMMA);
         }
       }
@@ -2310,94 +2282,6 @@ var Parser = (function (_Tokenizer) {
       this.expect(_Tokenizer$TokenClass$TokenType.TokenType.RPAREN);
 
       return this.markLocation({ type: "FormalParameters", items: items, rest: rest }, paramsLocation);
-    }
-  }], [{
-    key: "isValidSimpleAssignmentTarget",
-    value: function isValidSimpleAssignmentTarget(node) {
-      switch (node.type) {
-        case "IdentifierExpression":
-        case "ComputedMemberExpression":
-        case "StaticMemberExpression":
-          return true;
-      }
-      return false;
-    }
-  }, {
-    key: "transformDestructuring",
-    value: function transformDestructuring(node) {
-      switch (node.type) {
-        case "ObjectExpression":
-          return copyLocation(node, {
-            type: "ObjectBinding",
-            properties: node.properties.map(Parser.transformDestructuring) });
-        case "DataProperty":
-          return copyLocation(node, {
-            type: "BindingPropertyProperty",
-            name: node.name,
-            binding: Parser.transformDestructuring(node.expression) });
-        case "ShorthandProperty":
-          return copyLocation(node, {
-            type: "BindingPropertyIdentifier",
-            binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
-            init: null });
-        case "ArrayExpression":
-          var last = node.elements[node.elements.length - 1];
-          if (last != null && last.type === "SpreadElement") {
-            return copyLocation(node, {
-              type: "ArrayBinding",
-              elements: node.elements.slice(0, -1).map(function (e) {
-                return e && Parser.transformDestructuring(e);
-              }),
-              restElement: copyLocation(last.expression, Parser.transformDestructuring(last.expression)) });
-          } else {
-            return copyLocation(node, {
-              type: "ArrayBinding",
-              elements: node.elements.map(function (e) {
-                return e && Parser.transformDestructuring(e);
-              }),
-              restElement: null });
-          }
-          /* istanbul ignore next */
-          break;
-        case "AssignmentExpression":
-          return copyLocation(node, {
-            type: "BindingWithDefault",
-            binding: Parser.transformDestructuring(node.binding),
-            init: node.expression });
-        case "IdentifierExpression":
-          return copyLocation(node, { type: "BindingIdentifier", name: node.name });
-        case "StaticPropertyName":
-          return copyLocation(node, { type: "BindingIdentifier", name: node.value });
-        case "ComputedMemberExpression":
-        case "StaticMemberExpression":
-        case "ArrayBinding":
-        case "BindingIdentifier":
-        case "BindingPropertyIdentifier":
-        case "BindingPropertyProperty":
-        case "BindingWithDefault":
-        case "ObjectBinding":
-          return node;
-        // istanbul ignore next
-        default:
-          throw new Error("Not reached");
-      }
-    }
-  }, {
-    key: "isPrefixOperator",
-    value: function isPrefixOperator(type) {
-      switch (type) {
-        case _Tokenizer$TokenClass$TokenType.TokenType.INC:
-        case _Tokenizer$TokenClass$TokenType.TokenType.DEC:
-        case _Tokenizer$TokenClass$TokenType.TokenType.ADD:
-        case _Tokenizer$TokenClass$TokenType.TokenType.SUB:
-        case _Tokenizer$TokenClass$TokenType.TokenType.BIT_NOT:
-        case _Tokenizer$TokenClass$TokenType.TokenType.NOT:
-        case _Tokenizer$TokenClass$TokenType.TokenType.DELETE:
-        case _Tokenizer$TokenClass$TokenType.TokenType.VOID:
-        case _Tokenizer$TokenClass$TokenType.TokenType.TYPEOF:
-          return true;
-      }
-      return false;
     }
   }]);
 

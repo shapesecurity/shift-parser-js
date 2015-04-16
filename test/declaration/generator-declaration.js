@@ -187,5 +187,7 @@ suite("Parser", function () {
       }
     );
 
+    testParseFailure("label: function* a(){}", "Unexpected token \"*\"");
+
   });
 });

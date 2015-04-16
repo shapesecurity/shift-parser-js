@@ -252,5 +252,8 @@ suite("Parser", function () {
     );
 
     testParseFailure("({[1,2]:3})", "Unexpected token \",\"");
+    testParseFailure("({ *a })", "Unexpected token \"}\"");
+    testParseFailure("({ *a: 0 })", "Unexpected token \":\"");
+    testParseFailure("({ *[0]: 0 })", "Unexpected token \":\"");
   });
 });

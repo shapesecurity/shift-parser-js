@@ -34,13 +34,22 @@ suite("Parser", function () {
     testParse("/[\\]/]/", expr, { type: "LiteralRegExpExpression", pattern: "[\\]/]", flags: "" });
     testParse("/foo\\/bar/", expr, { type: "LiteralRegExpExpression", pattern: "foo\\/bar", flags: "" });
     testParse("/=([^=\\s])+/g", expr, { type: "LiteralRegExpExpression", pattern: "=([^=\\s])+", flags: "g" });
+    testParse("/(()(?:\\2)((\\4)))/;", expr, { type: "LiteralRegExpExpression", pattern: "(()(?:\\2)((\\4)))", flags: "" });
+    testParse("/((((((((((((.))))))))))))\\12/;", expr, { type: "LiteralRegExpExpression", pattern: "((((((((((((.))))))))))))\\12", flags: "" });
+    testParse("/\\.\\/\\\\/u", expr, { type: "LiteralRegExpExpression", pattern: "\\.\\/\\\\", flags: "u" });
+    testParse("/\\uD834\\uDF06\\u{1d306}/u", expr, { type: "LiteralRegExpExpression", pattern: "\\uD834\\uDF06\\u{1d306}", flags: "u" });
+    testParse("/\\uD834/u", expr, { type: "LiteralRegExpExpression", pattern: "\\uD834", flags: "u" });
+    testParse("/\\uDF06/u", expr, { type: "LiteralRegExpExpression", pattern: "\\uDF06", flags: "u" });
+    testParse("/[-a-]/", expr, { type: "LiteralRegExpExpression", pattern: "[-a-]", flags: "" });
+    testParse("/[-\\-]/u", expr, { type: "LiteralRegExpExpression", pattern: "[-\\-]", flags: "u" });
+    testParse("/[-a-b-]/", expr, { type: "LiteralRegExpExpression", pattern: "[-a-b-]", flags: "" });
+    testParse("/[]/", expr, { type: "LiteralRegExpExpression", pattern: "[]", flags: "" });
+
     testParse("/0/g.test", expr, {
       type: "StaticMemberExpression",
       object: { type: "LiteralRegExpExpression", pattern: "0", flags: "g" },
       property: "test"
     });
-    testParse("/(()(?:\\2)((\\4)))/;", expr, { type: "LiteralRegExpExpression", pattern: "(()(?:\\2)((\\4)))", flags: "" });
-    testParse("/((((((((((((.))))))))))))\\12/;", expr, { type: "LiteralRegExpExpression", pattern: "((((((((((((.))))))))))))\\12", flags: "" });
 
     // valid only if Annex B.1.4 is implemented
     testParse("/{/;", expr, { type: "LiteralRegExpExpression", pattern: "{", flags: "" });

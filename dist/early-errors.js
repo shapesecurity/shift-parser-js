@@ -1,19 +1,19 @@
 // istanbul ignore next
 "use strict";
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-// istanbul ignore next
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-// istanbul ignore next
-
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 // istanbul ignore next
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+// istanbul ignore next
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+// istanbul ignore next
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 /**
  * Copyright 2014 Shape Security, Inc.
@@ -37,6 +37,8 @@ var _isRestrictedWord$isStrictModeReservedWord = require("./utils");
 
 var _EarlyErrorState$EarlyError = require("./early-error-state");
 
+var _PatternAcceptor = require("./pattern-acceptor");
+
 function isStrictFunctionBody(_ref) {
   var directives = _ref.directives;
 
@@ -57,23 +59,6 @@ function containsDuplicates(list) {
   return false;
 }
 
-/*
-function duplicates(list) {
-  let duplicates = [];
-  let uniqs = [];
-  for (let i = 0, l = list.length; i < l; ++i) {
-    let item = list[i];
-    if (uniqs.indexOf(item) >= 0) {
-      if (duplicates.indexOf(item) < 0) {
-        duplicates.push(item);
-      }
-    }
-    uniqs.push(item);
-  }
-  return duplicates;
-}
-*/
-
 function isValidSimpleAssignmentTarget(node) {
   switch (node.type) {
     case "IdentifierExpression":
@@ -84,14 +69,14 @@ function isValidSimpleAssignmentTarget(node) {
   return false;
 }
 
-function isLabelledFunction(_x3) {
+function isLabelledFunction(_x) {
   var _left;
 
   var _again = true;
 
   _function: while (_again) {
     _again = false;
-    var node = _x3;
+    var node = _x;
 
     if (!(_left = node.type === "LabeledStatement")) {
       return _left;
@@ -101,22 +86,22 @@ function isLabelledFunction(_x3) {
       return _left;
     }
 
-    _x3 = node.body;
+    _x = node.body;
     _again = true;
     continue _function;
   }
 }
 
-function isIterationStatement(_x4) {
+function isIterationStatement(_x2) {
   var _again2 = true;
 
   _function2: while (_again2) {
     _again2 = false;
-    var node = _x4;
+    var node = _x2;
 
     switch (node.type) {
       case "LabeledStatement":
-        _x4 = node.body;
+        _x2 = node.body;
         _again2 = true;
         continue _function2;
 
@@ -145,331 +130,6 @@ function isSpecialMethod(methodDefinition) {
   throw new Error("not reached");
 }
 
-var PatternAcceptor = (function () {
-  function PatternAcceptor(pattern) {
-    var u = arguments[1] === undefined ? false : arguments[1];
-
-    _classCallCheck(this, PatternAcceptor);
-
-    this.index = 0;
-    this.nCapturingParens = 0;
-    // constants
-    this.length = pattern.length;
-    this.pattern = pattern;
-    this.u = u;
-  }
-
-  _createClass(PatternAcceptor, [{
-    key: "eat",
-    value: function eat(ch) {
-      if (this.index >= this.length || this.pattern[this.index] !== ch) {
-        return false;
-      }++this.index;
-      return true;
-    }
-  }, {
-    key: "eatRegExp",
-    value: function eatRegExp(r) {
-      if (this.index >= this.length || !r.test(this.pattern[this.index])) {
-        return false;
-      }++this.index;
-      return true;
-    }
-  }, {
-    key: "eatN",
-    value: function eatN(n, r) {
-      if (this.index + n <= this.length && r.test(this.pattern.slice(this.index, this.index + n))) {
-        this.index += n;
-        return true;
-      }
-      return false;
-    }
-  }, {
-    key: "match",
-    value: function match(ch) {
-      return this.index < this.length && this.pattern[this.index] === ch;
-    }
-  }, {
-    key: "matchRegExp",
-    value: function matchRegExp(r) {
-      return this.index < this.length && r.test(this.pattern[this.index]);
-    }
-  }, {
-    key: "trackback",
-    value: function trackback(start, result) {
-      if (result) {
-        return true;
-      }this.index = start;
-      return false;
-    }
-  }, {
-    key: "readDisjunction",
-    value: function readDisjunction() {
-      return this.readAlternative() && (this.eat("|") ? this.readDisjunction() : true);
-    }
-  }, {
-    key: "readAlternative",
-    value: function readAlternative() {
-      var savedIndex = this.index;
-      while (this.readTerm()) {
-        savedIndex = this.index;
-      }
-      this.index = savedIndex;
-      return true;
-    }
-  }, {
-    key: "readTerm",
-    value: function readTerm() {
-      if (!this.u) {
-        return this.readExtendedTerm();
-      }return this.readAssertion() || this.readQuantifiableAssertion() || this.readAtom() && (this.readQuantifier(), true);
-    }
-  }, {
-    key: "readExtendedTerm",
-    value: function readExtendedTerm() {
-      return this.readQuantifiableAssertion() && (this.readQuantifier(), true) || this.readAssertion() || this.readAtomNoBrace() && (this.readQuantifier(), true) || this.readAtom();
-    }
-  }, {
-    key: "readAssertion",
-    value: function readAssertion() {
-      return this.eat("^") || this.eat("$") || this.eatN(2, /^\\[bB]$/);
-    }
-  }, {
-    key: "readQuantifiableAssertion",
-    value: function readQuantifiableAssertion() {
-      var start = this.index;
-      return this.eatN(3, /^\(\?[=!]$/) && this.trackback(start, this.readDisjunction() && this.eat(")"));
-    }
-  }, {
-    key: "readQuantifier",
-    value: function readQuantifier() {
-      return this.readQuantifierPrefix() && (this.eat("?"), true);
-    }
-  }, {
-    key: "readQuantifierPrefix",
-    value: function readQuantifierPrefix() {
-      if (this.eat("*") || this.eat("+") || this.eat("?")) {
-        return true;
-      }if (this.eat("{") && this.readDecimalDigits()) {
-        if (this.eat(",")) this.readDecimalDigits();
-        return this.eat("}");
-      }
-      return false;
-    }
-  }, {
-    key: "readDecimalDigits",
-    value: function readDecimalDigits() {
-      var start = this.index;
-      while (this.eatRegExp(/^\d$/));
-      return this.index > start;
-    }
-  }, {
-    key: "readAtomNoBrace",
-    value: function readAtomNoBrace() {
-      var start = this.index;
-      var startingParens = this.nCapturingParens;
-      if (this.readPatternCharacterNoBrace() || this.eat(".")) {
-        return true;
-      }if (this.eat("\\")) {
-        return this.trackback(start, this.readAtomEscape());
-      }if (this.readCharacterClass()) {
-        return true;
-      }if (this.eat("(")) {
-        if (!this.eatN(2, /^\?:$/)) ++this.nCapturingParens;
-        if (this.readDisjunction() && this.eat(")")) {
-          return true;
-        }this.nCapturingParens = startingParens;
-        this.index = start;
-        return false;
-      }
-      return false;
-    }
-  }, {
-    key: "readAtom",
-    value: function readAtom() {
-      return this.readAtomNoBrace() || this.eat("{") || this.eat("}");
-    }
-  }, {
-    key: "readSyntaxCharacter",
-    value: function readSyntaxCharacter() {
-      return this.eatRegExp(/^[\^$\\.*+?()[\]{}|]$/);
-    }
-  }, {
-    key: "readPatternCharacter",
-    value: function readPatternCharacter() {
-      return this.eatRegExp(/^[^\^$\\.*+?()[\]|]$/);
-    }
-  }, {
-    key: "readPatternCharacterNoBrace",
-    value: function readPatternCharacterNoBrace() {
-      return this.eatRegExp(/^[^\^$\\.*+?()[\]{}|]$/);
-    }
-  }, {
-    key: "readAtomEscape",
-    value: function readAtomEscape() {
-      return this.readDecimalEscape() || this.readCharacterEscape() || this.readCharacterClassEscape();
-    }
-  }, {
-    key: "readCharacterEscape",
-    value: function readCharacterEscape() {
-      return this.readControlEscape() || this.eat("c") && this.readControlLetter() || this.readHexEscapeSequence() || this.readRegExpUnicodeEscapeSequence() || this.readIdentityEscape();
-    }
-  }, {
-    key: "readControlEscape",
-    value: function readControlEscape() {
-      return this.eatRegExp(/^[fnrtv]$/);
-    }
-  }, {
-    key: "readControlLetter",
-    value: function readControlLetter() {
-      return this.eatRegExp(/^[a-zA-Z]$/);
-    }
-  }, {
-    key: "readHexEscapeSequence",
-    value: function readHexEscapeSequence() {
-      return this.eat("x") && this.readHexDigit() && this.readHexDigit();
-    }
-  }, {
-    key: "readHexDigit",
-    value: function readHexDigit() {
-      return this.eatRegExp(/^[a-fA-F0-9]$/);
-    }
-  }, {
-    key: "readRegExpUnicodeEscapeSequence",
-    value: function readRegExpUnicodeEscapeSequence() {
-      if (!this.eat("u")) {
-        return false;
-      }if (this.u) {
-        if (this.eatN(4, /^D[abAB89][a-fA-F0-9]{2}$/)) {
-          this.eatN(6, /^\\u[dD][c-fC-F0-9][a-fA-F0-9]{2}$/);
-          return true;
-        }
-        return this.readHex4Digits() || this.eat("{") && this.readHexDigits() && this.eat("}");
-      } else {
-        return this.readHex4Digits();
-      }
-    }
-  }, {
-    key: "readHex4Digits",
-    value: function readHex4Digits() {
-      var k = 4;
-      while (k > 0) {
-        --k;
-        if (!this.readHexDigit()) {
-          return false;
-        }
-      }
-      return true;
-    }
-  }, {
-    key: "readHexDigits",
-    value: function readHexDigits() {
-      var start = this.index;
-      while (this.readHexDigit());
-      return this.index > start;
-    }
-  }, {
-    key: "readIdentityEscape",
-    value: function readIdentityEscape() {
-      if (this.u) {
-        return this.readSyntaxCharacter() || this.eat("/");
-      } else {
-        return this.eatRegExp(/^[^a-zA-Z0-9_]$/); // TODO: SourceCharacter but not UnicodeIDContinue
-      }
-    }
-  }, {
-    key: "readDecimalEscape",
-    value: function readDecimalEscape() {
-      if (this.eat("0")) {
-        if (!this.matchRegExp(/^\d$/)) {
-          return true;
-        }--this.index;
-        return false;
-      }
-      var start = this.index;
-      while (this.eatRegExp(/^\d$/));
-      return this.trackback(start, this.index > start && (this.u || +this.pattern.slice(start, this.index) <= this.nCapturingParens));
-    }
-  }, {
-    key: "readCharacterClassEscape",
-    value: function readCharacterClassEscape() {
-      return this.eatRegExp(/^[dDsSwW]$/);
-    }
-  }, {
-    key: "readCharacterClass",
-    value: function readCharacterClass() {
-      var start = this.index;
-      return this.eat("[") && this.trackback(start, (this.eat("^"), true) && this.readClassRanges() && this.eat("]"));
-    }
-  }, {
-    key: "readClassRanges",
-    value: function readClassRanges() {
-      var start = this.index;
-      if (!this.readNonemptyClassRanges()) {
-        this.index = start;
-      }
-      return true;
-    }
-  }, {
-    key: "readNonemptyClassRanges",
-    value: function readNonemptyClassRanges() {
-      if (this.readClassAtom()) {
-        if (this.match("]")) {
-          return true;
-        }if (this.eat("-")) {
-          if (this.match("]")) {
-            return true;
-          }return this.readClassAtom() && this.readClassRanges();
-        }
-        return this.readNonemptyClassRangesNoDash();
-      }
-      return false;
-    }
-  }, {
-    key: "readNonemptyClassRangesNoDash",
-    value: function readNonemptyClassRangesNoDash() {
-      if (this.eat("-")) {
-        return true;
-      }if (this.readClassAtomNoDash()) {
-        if (this.match("]")) {
-          return true;
-        }if (this.eat("-")) {
-          if (this.match("]")) {
-            return true;
-          }return this.readClassAtom() && this.readClassRanges();
-        }
-        return this.readNonemptyClassRangesNoDash();
-      }
-      return false;
-    }
-  }, {
-    key: "readClassAtom",
-    value: function readClassAtom() {
-      return this.eat("-") || this.readClassAtomNoDash();
-    }
-  }, {
-    key: "readClassAtomNoDash",
-    value: function readClassAtomNoDash() {
-      return this.eatRegExp(/^[^\\\]-]$/) || this.eat("\\") && this.readClassEscape();
-    }
-  }, {
-    key: "readClassEscape",
-    value: function readClassEscape() {
-      return this.readDecimalEscape() || this.eat("b") || this.u && this.eat("-") || this.readCharacterEscape() || this.readCharacterClassEscape();
-    }
-  }], [{
-    key: "test",
-    value: function test(pattern) {
-      var u = arguments[1] === undefined ? false : arguments[1];
-
-      var acceptor = new PatternAcceptor(pattern, u);
-      return acceptor.readDisjunction() && acceptor.index === acceptor.length;
-    }
-  }]);
-
-  return PatternAcceptor;
-})();
-
 var SUPERCALL_ERROR = function SUPERCALL_ERROR(node) {
   return new _EarlyErrorState$EarlyError.EarlyError(node, "Calls to super must be in the \"constructor\" method of a class expression or class declaration that has a superclass");
 };
@@ -489,7 +149,6 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
   _createClass(EarlyErrorChecker, [{
     key: "reduceAssignmentExpression",
     value: function reduceAssignmentExpression() {
-      return _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceAssignmentExpression", this).apply(this, arguments).clearBoundNames();
       return _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceAssignmentExpression", this).apply(this, arguments).clearBoundNames();
     }
   }, {
@@ -530,20 +189,6 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(name) + " must not be in binding position in strict mode"));
       }
       return s.bindName(name, node);
-    }
-  }, {
-    key: "reduceBindingPropertyIdentifier",
-    value: function reduceBindingPropertyIdentifier(node) {
-      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceBindingPropertyIdentifier", this).apply(this, arguments);
-      var name = node.binding.name;
-
-      if (_isRestrictedWord$isStrictModeReservedWord.isRestrictedWord(name) || _isRestrictedWord$isStrictModeReservedWord.isStrictModeReservedWord(name)) {
-        s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(name) + " must not be in binding position in strict mode"));
-      }
-      if (name === "yield") {
-        s = s.observeYieldIdentifierExpression(node);
-      }
-      return s;
     }
   }, {
     key: "reduceBlock",
@@ -731,17 +376,6 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceFormalParameters",
     value: function reduceFormalParameters(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceFormalParameters", this).apply(this, arguments).observeLexicalDeclaration();
-      var isSimpleParameterList = node.rest == null && node.items.every(function (i) {
-        return i.type === "BindingIdentifier";
-      });
-      var addError = s[isSimpleParameterList ? "addStrictError" : "addError"];
-      s.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
-        if (nodes.length > 1) {
-          nodes.slice(1).forEach(function (dupeNode) {
-            s = addError.call(s, new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
-          });
-        }
-      });
       return s;
     }
   }, {
@@ -754,6 +388,11 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
 
       if (init != null) {
         init.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+          if (nodes.length > 1) {
+            nodes.slice(1).forEach(function (dupeNode) {
+              init = init.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            });
+          }
           if (body.varDeclaredNames.has(name)) {
             nodes.forEach(function (node) {
               init = init.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Duplicate binding " + JSON.stringify(name)));
@@ -862,16 +501,17 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var params = _ref9.params;
       var body = _ref9.body;
 
-      if (node.isGenerator) {
-        if (params.lexicallyDeclaredNames.has("yield")) {
-          params.lexicallyDeclaredNames.get("yield").forEach(function (yieldDecl) {
-            return params = params.addError(new _EarlyErrorState$EarlyError.EarlyError(yieldDecl, "Generator functions must not have parameters named \"yield\""));
+      var isSimpleParameterList = node.params.rest == null && node.params.items.every(function (i) {
+        return i.type === "BindingIdentifier";
+      });
+      var addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
+      params.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+        if (nodes.length > 1) {
+          nodes.slice(1).forEach(function (dupeNode) {
+            params = params[addError](new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
           });
         }
-        body = body.enforceYieldIdentifierExpression(function (node) {
-          return new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in expression position in generator bodies");
-        });
-      }
+      });
       body.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
         if (params.lexicallyDeclaredNames.has(name)) {
           nodes.forEach(function (dupeNode) {
@@ -895,16 +535,17 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var params = _ref10.params;
       var body = _ref10.body;
 
-      if (node.isGenerator) {
-        if (params.lexicallyDeclaredNames.has("yield")) {
-          params.lexicallyDeclaredNames.get("yield").forEach(function (yieldDecl) {
-            return params = params.addError(new _EarlyErrorState$EarlyError.EarlyError(yieldDecl, "Generator functions must not have parameters named \"yield\""));
+      var isSimpleParameterList = node.params.rest == null && node.params.items.every(function (i) {
+        return i.type === "BindingIdentifier";
+      });
+      var addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
+      params.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+        if (nodes.length > 1) {
+          nodes.slice(1).forEach(function (dupeNode) {
+            params = params[addError](new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
           });
         }
-        body = body.enforceYieldIdentifierExpression(function (node) {
-          return new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in expression position in generator bodies");
-        });
-      }
+      });
       body.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
         if (params.lexicallyDeclaredNames.has(name)) {
           nodes.forEach(function (dupeNode) {
@@ -942,9 +583,6 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
 
       if (_isRestrictedWord$isStrictModeReservedWord.isStrictModeReservedWord(name)) {
         s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(name) + " must not be in expression position in strict mode"));
-      }
-      if (name === "yield") {
-        s = s.observeYieldIdentifierExpression(node);
       }
       return s;
     }
@@ -995,7 +633,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var pattern = node.pattern;
       var flags = node.flags;
 
-      if (!PatternAcceptor.test(pattern, flags.indexOf("u") >= 0)) {
+      if (!_PatternAcceptor.PatternAcceptor.test(pattern, flags.indexOf("u") >= 0)) {
         s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Invalid regular expression pattern"));
       }
       if (!/^[igmyu]*$/.test(flags) || containsDuplicates(flags)) {
@@ -1024,16 +662,6 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
           });
         }
       });
-      if (node.isGenerator) {
-        if (params.lexicallyDeclaredNames.has("yield")) {
-          params.lexicallyDeclaredNames.get("yield").forEach(function (yieldDecl) {
-            return params = params.addError(new _EarlyErrorState$EarlyError.EarlyError(yieldDecl, "Generator methods must not have parameters named \"yield\""));
-          });
-        }
-        body = body.enforceYieldIdentifierExpression(function (node) {
-          return new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in expression position in generator method bodies");
-        });
-      }
       if (node.name.type === "StaticPropertyName" && node.name.value === "constructor") {
         body = body.observeConstructorMethod();
         params = params.observeConstructorMethod();
@@ -1259,18 +887,18 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         case "let":
           {
             s = s.observeLexicalDeclaration();
-            s.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
-              if (nodes.length > 1) {
-                nodes.slice(1).forEach(function (dupeNode) {
-                  s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
-                });
-              }
-              if (name === "let") {
-                nodes.forEach(function (node) {
-                  s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Lexical declarations must not have a binding named \"let\""));
-                });
-              }
-            });
+            //s.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+            //  if (nodes.length > 1) {
+            //    nodes.slice(1).forEach(dupeNode => {
+            //      s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+            //    });
+            //  }
+            //});
+            if (s.lexicallyDeclaredNames.has("let")) {
+              s.lexicallyDeclaredNames.get("let").forEach(function (node) {
+                s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Lexical declarations must not have a binding named \"let\""));
+              });
+            }
             break;
           }
         case "var":

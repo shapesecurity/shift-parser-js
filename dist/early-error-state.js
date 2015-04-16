@@ -84,9 +84,6 @@ var proto = {
   // Locally declared names that are referenced in export declarations
   exportedBindings: new MultiMap(),
 
-  // IdentifierExpressions with name "yield"
-  yieldIdentifierExpressions: [],
-
   // CallExpressions with Super callee
   superCallExpressions: [],
   // SuperCall expressions in the context of a Method named "constructor"
@@ -355,19 +352,6 @@ var EarlyErrorState = (function () {
         exportedBindings: newExportedBindings });
     }
   }, {
-    key: "observeYieldIdentifierExpression",
-    value: function observeYieldIdentifierExpression(node) {
-      return this.clone({
-        yieldIdentifierExpressions: this.yieldIdentifierExpressions.concat([node]) });
-    }
-  }, {
-    key: "enforceYieldIdentifierExpression",
-    value: function enforceYieldIdentifierExpression(createError) {
-      return this.clone({
-        errors: this.errors.concat(this.yieldIdentifierExpressions.map(createError)),
-        yieldIdentifierExpressions: [] });
-    }
-  }, {
     key: "addError",
     value: function addError(e) {
       return this.clone({
@@ -409,7 +393,6 @@ var EarlyErrorState = (function () {
         forOfVarDeclaredNames: this.forOfVarDeclaredNames.concat(s.forOfVarDeclaredNames),
         exportedNames: new MultiMap().addEach(this.exportedNames).addEach(s.exportedNames),
         exportedBindings: new MultiMap().addEach(this.exportedBindings).addEach(s.exportedBindings),
-        yieldIdentifierExpressions: this.yieldIdentifierExpressions.concat(s.yieldIdentifierExpressions),
         superCallExpressions: this.superCallExpressions.concat(s.superCallExpressions),
         superCallExpressionsInConstructorMethod: this.superCallExpressionsInConstructorMethod.concat(s.superCallExpressionsInConstructorMethod),
         superPropertyExpressions: this.superPropertyExpressions.concat(s.superPropertyExpressions) });

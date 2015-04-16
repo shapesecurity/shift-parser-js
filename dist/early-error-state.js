@@ -255,7 +255,7 @@ var EarlyErrorState = (function () {
     }
   }, {
     key: "clearNewTargetExpressions",
-    value: function clearNewTargetExpressions(node) {
+    value: function clearNewTargetExpressions() {
       return this.clone({
         newTargetExpressions: [] });
     }
@@ -313,7 +313,7 @@ var EarlyErrorState = (function () {
     key: "recordForOfVars",
     value: function recordForOfVars() {
       var newForOfVarDeclaredNames = this.forOfVarDeclaredNames.slice();
-      this.varDeclaredNames.forEach(function (bindingIdentifier, name) {
+      this.varDeclaredNames.forEach(function (bindingIdentifier) {
         newForOfVarDeclaredNames.push(bindingIdentifier);
       });
       return this.clone({

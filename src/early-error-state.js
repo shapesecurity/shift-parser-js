@@ -23,7 +23,7 @@ MultiMap.prototype.addEach = function(otherMap) {
     this.set.apply(this, [k].concat(v));
   });
   return this;
-}
+};
 
 
 const proto = {
@@ -236,7 +236,7 @@ export class EarlyErrorState {
     });
   }
 
-  clearNewTargetExpressions(node) {
+  clearNewTargetExpressions() {
     return this.clone({
       newTargetExpressions: [],
     });
@@ -295,7 +295,7 @@ export class EarlyErrorState {
 
   recordForOfVars() {
     let newForOfVarDeclaredNames = this.forOfVarDeclaredNames.slice();
-    this.varDeclaredNames.forEach((bindingIdentifier, name) => {
+    this.varDeclaredNames.forEach((bindingIdentifier) => {
       newForOfVarDeclaredNames.push(bindingIdentifier);
     });
     return this.clone({

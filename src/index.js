@@ -26,7 +26,7 @@ function markLocation(node, location) {
       column: this.lastIndex - this.lastLineStart,
       offset: this.lastIndex,
     },
-    source: null
+    source: null,
   };
   return node;
 }
@@ -51,7 +51,7 @@ function generateInterface(parsingFunctionName) {
       }
     }
     return ast;
-  }
+  };
 }
 
 export const parseModule = generateInterface("parseModule");

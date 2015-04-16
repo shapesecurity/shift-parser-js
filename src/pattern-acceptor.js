@@ -253,7 +253,7 @@ export class PatternAcceptor {
     // NOTE: it is impossible to reach this next line with a value matched by RegularExpressionLiteral;
     // the pattern "[-a" would reach here if it could get past RegularExpressionLiteral
     /* istanbul ignore next */
-    if (!this.readClassAtomNoDash()) return false
+    if (!this.readClassAtomNoDash()) return false;
     if (this.match("]")) return true;
     if (this.eat("-")) {
       if (this.match("]")) return true;

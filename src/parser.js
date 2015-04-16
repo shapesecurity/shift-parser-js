@@ -43,7 +43,7 @@ const Precedence = {
   New: 16,
   TaggedTemplate: 17,
   Member: 18,
-  Primary: 19
+  Primary: 19,
 };
 
 const BinaryPrecedence = {
@@ -71,8 +71,6 @@ const BinaryPrecedence = {
   "%": Precedence.Multiplicative,
   "/": Precedence.Multiplicative,
 };
-
-const FOR_OF_VAR = {};
 
 function copyLocation(from, to) {
   if ("loc" in from) {
@@ -148,7 +146,7 @@ export class Parser extends Tokenizer {
   }
 
   // this is a no-op, reserved for future use
-  markLocation(node, startLocation) {
+  markLocation(node/*, startLocation*/) {
     return node;
   }
 
@@ -213,7 +211,7 @@ export class Parser extends Tokenizer {
       let stmt = this.parseStatementListItem({isTopLevel: true});
       if (parsingDirectives) {
         if (isStringLiteral && stmt.type === "ExpressionStatement" && stmt.expression.type === "LiteralStringExpression") {
-          directives.push(this.markLocation({ type: "Directive", rawValue:text.slice(1, -1)}, directiveLocation));
+          directives.push(this.markLocation({ type: "Directive", rawValue: text.slice(1, -1)}, directiveLocation));
         } else {
           parsingDirectives = false;
           statements.push(stmt);
@@ -235,7 +233,7 @@ export class Parser extends Tokenizer {
           {
             type: "ImportSpecifier",
             name: null,
-            binding: this.markLocation({ type: "BindingIdentifier", name: name }, startLocation)
+            binding: this.markLocation({ type: "BindingIdentifier", name: name }, startLocation),
           }, startLocation);
       }
     } else if (this.lookahead.type.klass.isIdentifierName) {
@@ -257,7 +255,6 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     this.expect(TokenType.MUL);
     this.expectContextualKeyword("as");
-    let identifierLocation = this.getLocation();
     let identifier = this.parseIdentifier();
     return this.markLocation({ type: "BindingIdentifier", name: identifier }, startLocation);
   }
@@ -304,13 +301,15 @@ export class Parser extends Tokenizer {
         type: "ImportNamespace",
         defaultBinding,
         namespaceBinding: this.parseNameSpaceBinding(),
-        moduleSpecifier: this.parseFromClause() }, startLocation);
+        moduleSpecifier: this.parseFromClause(),
+      }, startLocation);
     } else if (this.match(TokenType.LBRACE)) {
       return this.markLocation({
         type: "Import",
         defaultBinding,
         namedImports: this.parseNamedImports(),
-        moduleSpecifier: this.parseFromClause() }, startLocation);
+        moduleSpecifier: this.parseFromClause(),
+      }, startLocation);
     } else {
       throw this.createUnexpected(this.lookahead);
     }
@@ -342,7 +341,6 @@ export class Parser extends Tokenizer {
   parseExportDeclaration() {
     let startLocation = this.getLocation(), decl;
     this.expect(TokenType.EXPORT);
-    let isVar = false, key;
     switch (this.lookahead.type) {
       case TokenType.MUL:
         this.lex();
@@ -365,7 +363,7 @@ export class Parser extends Tokenizer {
         break;
       case TokenType.FUNCTION:
         // export HoistableDeclaration
-        decl = { type: "Export", declaration: this.parseFunction({isExpr: false, isTopLevel: true}) };
+        decl = { type: "Export", declaration: this.parseFunction({isExpr: false}) };
         break;
       case TokenType.DEFAULT:
         this.lex();
@@ -374,14 +372,12 @@ export class Parser extends Tokenizer {
             // export default HoistableDeclaration[Default]
             decl = {
               type: "ExportDefault",
-              body: this.parseFunction({ isExpr: false, inDefault: true, isTopLevel: true })
+              body: this.parseFunction({isExpr: false, inDefault: true}),
             };
-            key = decl.body.name.name;
             break;
           case TokenType.CLASS:
             // export default ClassDeclaration[Default]
             decl = { type: "ExportDefault", body: this.parseClass({ isExpr: false, inDefault: true }) };
-            key = decl.body.name.name;
             break;
           default:
           {
@@ -392,8 +388,6 @@ export class Parser extends Tokenizer {
         }
         break;
       case TokenType.VAR:
-        isVar = true;
-        // falls through
       case TokenType.LET:
       case TokenType.CONST:
         // export LexicalDeclaration
@@ -446,7 +440,7 @@ export class Parser extends Tokenizer {
     let decl;
     switch (this.lookahead.type) {
       case TokenType.FUNCTION:
-        decl = this.parseFunction({isExpr: false, isTopLevel});
+        decl = this.parseFunction({isExpr: false});
         break;
       case TokenType.CLASS:
         decl = this.parseClass({isExpr: false});
@@ -517,13 +511,9 @@ export class Parser extends Tokenizer {
         let expr = this.parseExpression();
         // 12.12 Labelled Statements;
         if (expr.type === "IdentifierExpression" && this.eat(TokenType.COLON)) {
-          let key = "$" + expr.name;
-          let labeledBody;
-          if (this.match(TokenType.FUNCTION)) {
-            labeledBody = this.parseFunction({isExpr: false, allowGenerator: false, isTopLevel});
-          } else {
-            labeledBody = this.parseStatement({isTopLevel});
-          }
+          let labeledBody = this.match(TokenType.FUNCTION)
+            ? this.parseFunction({isExpr: false, allowGenerator: false})
+            : this.parseStatement({isTopLevel});
           return { type: "LabeledStatement", label: expr.name, body: labeledBody };
         } else {
           this.consumeSemicolon();
@@ -549,7 +539,6 @@ export class Parser extends Tokenizer {
   }
 
   parseBreakStatement() {
-    let token = this.lookahead;
     this.expect(TokenType.BREAK);
 
     // Catch the very common case first: immediately a semicolon (U+003B).
@@ -572,7 +561,6 @@ export class Parser extends Tokenizer {
   }
 
   parseContinueStatement() {
-    let token = this.lookahead;
     this.expect(TokenType.CONTINUE);
 
     // Catch the very common case first: immediately a semicolon (U+003B).
@@ -637,13 +625,7 @@ export class Parser extends Tokenizer {
       if (!this.match(TokenType.RPAREN)) {
         right = this.parseExpression();
       }
-      return {
-        type: "ForStatement",
-        init: null,
-        test,
-        update: right,
-        body: this.getIteratorStatementEpilogue()
-      };
+      return { type: "ForStatement", init: null, test, update: right, body: this.getIteratorStatementEpilogue() };
     } else {
       let startsWithLet = this.match(TokenType.LET);
       let isForDecl = this.lookaheadLexicalDeclaration();
@@ -685,13 +667,7 @@ export class Parser extends Tokenizer {
           if (!this.match(TokenType.RPAREN)) {
             right = this.parseExpression();
           }
-          return {
-            type: "ForStatement",
-            init,
-            test,
-            update: right,
-            body: this.getIteratorStatementEpilogue()
-          };
+          return { type: "ForStatement", init, test, update: right, body: this.getIteratorStatementEpilogue() };
         }
       } else {
         let previousAllowIn = this.allowIn;
@@ -813,7 +789,7 @@ export class Parser extends Tokenizer {
         discriminant,
         preDefaultCases: cases,
         defaultCase,
-        postDefaultCases
+        postDefaultCases,
       };
     } else {
       this.expect(TokenType.RBRACE);
@@ -835,7 +811,7 @@ export class Parser extends Tokenizer {
     return this.markLocation({
       type: "SwitchCase",
       test: this.parseExpression(),
-      consequent: this.parseSwitchCaseBody()
+      consequent: this.parseSwitchCaseBody(),
     }, startLocation);
   }
 
@@ -956,14 +932,13 @@ export class Parser extends Tokenizer {
 
   parseVariableDeclarator(bindingPatternsMustHaveInit) {
     let startLocation = this.getLocation();
-    let token = this.lookahead;
 
     if (this.match(TokenType.LPAREN)) {
       throw this.createUnexpected(this.lookahead);
     }
 
     let binding = this.parseBindingTarget();
-    if (bindingPatternsMustHaveInit && binding.type !== 'BindingIdentifier' && !this.match(TokenType.ASSIGN)) {
+    if (bindingPatternsMustHaveInit && binding.type !== "BindingIdentifier" && !this.match(TokenType.ASSIGN)) {
       this.expect(TokenType.ASSIGN);
     }
 
@@ -1013,13 +988,13 @@ export class Parser extends Tokenizer {
       case "ObjectExpression":
         return copyLocation(node, {
           type: "ObjectBinding",
-          properties: node.properties.map(Parser.transformDestructuring)
+          properties: node.properties.map(Parser.transformDestructuring),
         });
       case "DataProperty":
         return copyLocation(node, {
           type: "BindingPropertyProperty",
           name: node.name,
-          binding: Parser.transformDestructuring(node.expression)
+          binding: Parser.transformDestructuring(node.expression),
         });
       case "ShorthandProperty":
         return copyLocation(node, {
@@ -1033,20 +1008,22 @@ export class Parser extends Tokenizer {
           return copyLocation(node, {
             type: "ArrayBinding",
             elements: node.elements.slice(0, -1).map(e => e && Parser.transformDestructuring(e)),
-            restElement: copyLocation(last.expression, Parser.transformDestructuring(last.expression))
+            restElement: copyLocation(last.expression, Parser.transformDestructuring(last.expression)),
           });
         } else {
           return copyLocation(node, {
             type: "ArrayBinding",
             elements: node.elements.map(e => e && Parser.transformDestructuring(e)),
-            restElement: null
+            restElement: null,
           });
         }
+        /* istanbul ignore next */
+        break;
       case "AssignmentExpression":
         return copyLocation(node, {
           type: "BindingWithDefault",
           binding: Parser.transformDestructuring(node.binding),
-          init: node.expression
+          init: node.expression,
         });
       case "IdentifierExpression":
         return copyLocation(node, { type: "BindingIdentifier", name: node.name });
@@ -1092,7 +1069,6 @@ export class Parser extends Tokenizer {
     let {params = null, rest = null} = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
       if (head.type === "IdentifierExpression") {
-        let name = head.name;
         params = [Parser.transformDestructuring(head)];
       } else {
         throw this.createUnexpected(arrow);
@@ -1118,7 +1094,6 @@ export class Parser extends Tokenizer {
   }
 
   parseAssignmentExpressionOrBindingElement() {
-    let token = this.lookahead;
     let startLocation = this.getLocation();
 
     if (this.allowYieldExpression && !this.inGeneratorParameter && this.match(TokenType.YIELD)) {
@@ -1176,7 +1151,7 @@ export class Parser extends Tokenizer {
         type: "AssignmentExpression",
         binding: expr,
         operator: operator.type.name,
-        expression: rhs
+        expression: rhs,
     }, startLocation);
   }
 
@@ -1240,12 +1215,7 @@ export class Parser extends Tokenizer {
       this.allowIn = previousAllowIn;
       this.expect(TokenType.COLON);
       let alternate = this.isolateCoverGrammar(this.parseAssignmentExpression);
-      return this.markLocation({
-          type: "ConditionalExpression",
-        test,
-          consequent,
-          alternate
-      }, startLocation);
+      return this.markLocation({ type: "ConditionalExpression", test, consequent, alternate }, startLocation);
     }
 
     return test;
@@ -1334,7 +1304,7 @@ export class Parser extends Tokenizer {
           type: "BinaryExpression",
           left: stackItem.left,
           operator: stackItem.operator.name,
-          right: expr
+          right: expr,
         }, stackItem.location),
       right);
   }
@@ -1408,7 +1378,7 @@ export class Parser extends Tokenizer {
           expr = this.markLocation({
             type: "CallExpression",
             callee: expr,
-            arguments: this.parseArgumentList()
+            arguments: this.parseArgumentList(),
           }, startLocation);
         } else {
           throw this.createUnexpected(token);
@@ -1417,14 +1387,14 @@ export class Parser extends Tokenizer {
         expr = this.markLocation({
           type: "ComputedMemberExpression",
           object: expr,
-          expression: this.parseComputedMember()
+          expression: this.parseComputedMember(),
         }, startLocation);
         this.isAssignmentTarget = true;
       } else if (this.match(TokenType.PERIOD)) {
         expr = this.markLocation({
           type: "StaticMemberExpression",
           object: expr,
-          property: this.parseNonComputedMember()
+          property: this.parseNonComputedMember(),
         }, startLocation);
         this.isAssignmentTarget = true;
       } else {
@@ -1447,7 +1417,7 @@ export class Parser extends Tokenizer {
         expr = this.markLocation({
           type: "CallExpression",
           callee: expr,
-          arguments: this.parseArgumentList()
+          arguments: this.parseArgumentList(),
         }, startLocation);
       } else if (this.match(TokenType.LBRACK)) {
         this.isBindingElement = false;
@@ -1455,7 +1425,7 @@ export class Parser extends Tokenizer {
         expr = this.markLocation({
           type: "ComputedMemberExpression",
           object: expr,
-          expression: this.parseComputedMember()
+          expression: this.parseComputedMember(),
         }, startLocation);
       } else if (this.match(TokenType.PERIOD)) {
         this.isBindingElement = false;
@@ -1463,7 +1433,7 @@ export class Parser extends Tokenizer {
         expr = this.markLocation({
           type: "StaticMemberExpression",
           object: expr,
-          property: this.parseNonComputedMember()
+          property: this.parseNonComputedMember(),
         }, startLocation);
       } else if (this.match(TokenType.TEMPLATE)) {
         this.isBindingElement = false;
@@ -1471,7 +1441,7 @@ export class Parser extends Tokenizer {
         expr = this.markLocation({
           type: "TemplateExpression",
           tag: expr,
-          elements: this.parseTemplateElements()
+          elements: this.parseTemplateElements(),
         }, startLocation);
       } else {
         break;
@@ -1491,7 +1461,7 @@ export class Parser extends Tokenizer {
       return [this.markLocation({ type: "TemplateElement", rawValue: token.slice.text.slice(1, -1) }, startLocation)];
     }
     let result = [
-      this.markLocation({ type: "TemplateElement", rawValue: this.lex().slice.text.slice(1, -2) }, startLocation)
+      this.markLocation({ type: "TemplateElement", rawValue: this.lex().slice.text.slice(1, -2) }, startLocation),
     ];
     while (true) {
       result.push(this.parseExpression());
@@ -1543,7 +1513,7 @@ export class Parser extends Tokenizer {
     return this.markLocation({
       type: "NewExpression",
       callee,
-      arguments: this.match(TokenType.LPAREN) ? this.parseArgumentList() : []
+      arguments: this.match(TokenType.LPAREN) ? this.parseArgumentList() : [],
     }, startLocation);
   }
 
@@ -1575,7 +1545,7 @@ export class Parser extends Tokenizer {
       case TokenType.FUNCTION:
         this.isBindingElement = false;
         this.isAssignmentTarget = false;
-        return this.markLocation(this.parseFunction({ isExpr: true }), startLocation);
+        return this.markLocation(this.parseFunction({isExpr: true}), startLocation);
       case TokenType.TRUE:
         this.lex();
         this.isBindingElement = false;
@@ -1601,7 +1571,7 @@ export class Parser extends Tokenizer {
         return this.markLocation({
           type: "TemplateExpression",
           tag: null,
-          elements: this.parseTemplateElements()
+          elements: this.parseTemplateElements(),
         }, startLocation);
       case TokenType.DIV:
       case TokenType.ASSIGN_DIV:
@@ -1625,12 +1595,9 @@ export class Parser extends Tokenizer {
   parseNumericLiteral() {
     let startLocation = this.getLocation();
     let token2 = this.lex();
-    let node = token2.value === 1 / 0 ? {
-      type: "LiteralInfinityExpression"
-    } : {
-      type: "LiteralNumericExpression",
-      value: token2.value
-    };
+    let node = token2.value === 1 / 0
+      ? { type: "LiteralInfinityExpression" }
+      : { type: "LiteralNumericExpression", value: token2.value };
     return this.markLocation(node, startLocation);
   }
 
@@ -1718,7 +1685,7 @@ export class Parser extends Tokenizer {
       return {
           type: ARROW_EXPRESSION_PARAMS,
           params: [],
-          rest: null
+          rest: null,
       };
     } else if (this.eat(TokenType.ELLIPSIS)) {
       rest = this.parseBindingIdentifier();
@@ -1729,7 +1696,7 @@ export class Parser extends Tokenizer {
       return {
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
-        rest: rest
+        rest: rest,
       };
     }
 
@@ -1755,7 +1722,6 @@ export class Parser extends Tokenizer {
         let binding = this.parseBindingElement();
         params.push(binding);
       } else {
-        let nextLocation = this.getLocation();
         // Can be either binding element or assignment target.
         let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
         if (!this.isBindingElement) {
@@ -1771,7 +1737,7 @@ export class Parser extends Tokenizer {
             type: "BinaryExpression",
             left: group,
             operator: ",",
-            right: expr
+            right: expr,
           }, startLocation);
         }
       }
@@ -1849,8 +1815,9 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.LBRACE);
 
     let properties = [];
+    let parsePropertyDefinition = () => this.parsePropertyDefinition();
     while (!this.match(TokenType.RBRACE)) {
-      let property = this.inheritCoverGrammar(() => this.parsePropertyDefinition());
+      let property = this.inheritCoverGrammar(parsePropertyDefinition);
       properties.push(property);
       if (!this.match(TokenType.RBRACE)) {
         this.expect(TokenType.COMMA);
@@ -1864,7 +1831,7 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     let token = this.lookahead;
 
-    let {methodOrKey, kind} = this.parseMethodDefinition(false);
+    let {methodOrKey, kind} = this.parseMethodDefinition();
     switch (kind) {
       case "method":
         this.isBindingElement = this.isAssignmentTarget = false;
@@ -1877,7 +1844,7 @@ export class Parser extends Tokenizer {
           return this.markLocation({
             type: "BindingPropertyIdentifier",
             binding: Parser.transformDestructuring(methodOrKey),
-            init
+            init,
           }, startLocation);
         } else if (!this.match(TokenType.COLON)) {
           if (token.type !== TokenType.IDENTIFIER && token.type !== TokenType.YIELD && token.type !== TokenType.LET) {
@@ -1908,18 +1875,18 @@ export class Parser extends Tokenizer {
         return {
           name: this.markLocation({
             type: "StaticPropertyName",
-            value: this.parseStringLiteral().value
+            value: this.parseStringLiteral().value,
           }, startLocation),
-          binding: null
+          binding: null,
         };
       case TokenType.NUMBER:
         let numLiteral = this.parseNumericLiteral();
         return {
           name: this.markLocation({
             type: "StaticPropertyName",
-            value: "" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value)
+            value: `${numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value}`,
           }, startLocation),
-          binding: null
+          binding: null,
         };
       case TokenType.LBRACK:
         let previousYield = this.allowYieldExpression;
@@ -1937,7 +1904,7 @@ export class Parser extends Tokenizer {
     return {
       name: this.markLocation({ type: "StaticPropertyName", value: name }, startLocation),
       binding: this.markLocation({ type: "BindingIdentifier", name }, startLocation),
-    }
+    };
   }
 
   /**
@@ -1966,7 +1933,7 @@ export class Parser extends Tokenizer {
    *
    * @returns {{methodOrKey: (Method|PropertyName), kind: string}}
    */
-  parseMethodDefinition(isClassProtoMethod) {
+  parseMethodDefinition() {
     let token = this.lookahead;
     let startLocation = this.getLocation();
 
@@ -1985,7 +1952,7 @@ export class Parser extends Tokenizer {
           let body = this.parseFunctionBody();
           return {
             methodOrKey: this.markLocation({ type: "Getter", name, body }, startLocation),
-            kind: "method"
+            kind: "method",
           };
         } else if (name === "set" && this.lookaheadPropertyName()) {
           ({name} = this.parsePropertyName());
@@ -1998,7 +1965,7 @@ export class Parser extends Tokenizer {
           this.allowYieldExpression = previousYield;
           return {
             methodOrKey: this.markLocation({ type: "Setter", name, param, body }, startLocation),
-            kind: "method"
+            kind: "method",
           };
         }
       }
@@ -2025,14 +1992,14 @@ export class Parser extends Tokenizer {
 
       return {
         methodOrKey: this.markLocation({ type: "Method", isGenerator, name, params, body }, startLocation),
-        kind: "method"
+        kind: "method",
       };
     }
 
     return {
       methodOrKey: name,
       kind: token.type.klass.isIdentifierName ? "identifier" : "property",
-      binding: binding
+      binding: binding,
     };
   }
 
@@ -2043,7 +2010,6 @@ export class Parser extends Tokenizer {
     let heritage = null;
 
     if (this.match(TokenType.IDENTIFIER)) {
-      let idLocation = this.getLocation();
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {
@@ -2069,16 +2035,14 @@ export class Parser extends Tokenizer {
       if (this.eat(TokenType.SEMICOLON)) {
         continue;
       }
-      let methodToken = this.lookahead;
       let isStatic = false;
-      let {methodOrKey, kind} = this.parseMethodDefinition(true);
+      let {methodOrKey, kind} = this.parseMethodDefinition();
       if (kind === "identifier" && methodOrKey.value === "static") {
         isStatic = true;
-        ({methodOrKey, kind} = this.parseMethodDefinition(false));
+        ({methodOrKey, kind} = this.parseMethodDefinition());
       }
       switch (kind) {
         case "method":
-          let key = methodOrKey.name;
           elements.push(copyLocation(methodOrKey, { type: "ClassElement", isStatic, method: methodOrKey }));
           break;
         default:
@@ -2090,20 +2054,18 @@ export class Parser extends Tokenizer {
     return this.markLocation({ type: isExpr ? "ClassExpression" : "ClassDeclaration", name, super: heritage, elements }, location);
   }
 
-  parseFunction({isExpr, isTopLevel, inDefault = false, allowGenerator = true}) {
+  parseFunction({isExpr, inDefault = false, allowGenerator = true}) {
     let startLocation = this.getLocation();
 
     this.expect(TokenType.FUNCTION);
 
     let name = null;
-    let message = null;
     let isGenerator = allowGenerator && !!this.eat(TokenType.MUL);
     let previousGeneratorParameter = this.inGeneratorParameter;
     let previousYield = this.allowYieldExpression;
     let previousInGeneratorBody = this.inGeneratorBody;
 
     if (!this.match(TokenType.LPAREN)) {
-      let token = this.lookahead;
       let identifierLocation = this.getLocation();
       name = this.parseIdentifier();
       name = this.markLocation({ type: "BindingIdentifier", name }, identifierLocation);
@@ -2172,7 +2134,7 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     let token = this.lookahead;
     let {name, binding} = this.parsePropertyName();
-    if ((token.type === TokenType.IDENTIFIER || token.type === TokenType.YIELD) && name.type === 'StaticPropertyName') {
+    if ((token.type === TokenType.IDENTIFIER || token.type === TokenType.YIELD) && name.type === "StaticPropertyName") {
       if (!this.match(TokenType.COLON)) {
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {
@@ -2187,7 +2149,7 @@ export class Parser extends Tokenizer {
         return this.markLocation({
           type: "BindingPropertyIdentifier",
           binding: binding,
-          init: defaultValue
+          init: defaultValue,
         }, startLocation);
       }
     }
@@ -2265,10 +2227,8 @@ export class Parser extends Tokenizer {
       let seenRest = false;
 
       while (!this.eof()) {
-        let token = this.lookahead;
         let param;
         if (this.eat(TokenType.ELLIPSIS)) {
-          token = this.lookahead;
           param = this.parseBindingIdentifier();
           seenRest = true;
         } else {

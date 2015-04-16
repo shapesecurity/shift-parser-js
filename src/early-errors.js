@@ -66,8 +66,9 @@ function isIterationStatement(node) {
 }
 
 function isSpecialMethod(methodDefinition) {
-  if (methodDefinition.name.type !== "StaticPropertyName" || methodDefinition.name.value !== "constructor")
+  if (methodDefinition.name.type !== "StaticPropertyName" || methodDefinition.name.value !== "constructor") {
     return false;
+  }
   switch (methodDefinition.type) {
     case "Getter":
     case "Setter":
@@ -93,18 +94,18 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceArrowExpression(node, {params, body}) {
-    params.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    params.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          params = params.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          params = params.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
     if (node.body.type === "FunctionBody") {
-      body.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
-        if (params.lexicallyDeclaredNames.has(name)) {
+      body.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
+        if (params.lexicallyDeclaredNames.has(bindingName)) {
           nodes.forEach(dupeNode => {
-            body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+            body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
           });
         }
       });
@@ -119,25 +120,24 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceBindingIdentifier(node) {
     let s = this.identity;
-    let {name} = node;
-    if (isRestrictedWord(name) || isStrictModeReservedWord(name)) {
-      s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(name)} must not be in binding position in strict mode`));
+    if (isRestrictedWord(node.name) || isStrictModeReservedWord(node.name)) {
+      s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(node.name)} must not be in binding position in strict mode`));
     }
-    return s.bindName(name, node);
+    return s.bindName(node.name, node);
   }
 
   reduceBlock() {
     let s = super.reduceBlock(...arguments)
       .functionDeclarationNamesAreLexical();
-    s.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    s.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (s.varDeclaredNames.has(name)) {
+      if (s.varDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -162,21 +162,21 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceCatchClause(node, {binding, body}) {
     binding = binding.observeLexicalDeclaration();
-    binding.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    binding.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          binding = binding.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          binding = binding.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (body.previousLexicallyDeclaredNames.has(name)) {
+      if (body.previousLexicallyDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          binding = binding.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          binding = binding.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (body.varDeclaredNames.has(name)) {
-        body.varDeclaredNames.get(name).forEach(dupeNode => {
+      if (body.varDeclaredNames.has(bindingName)) {
+        body.varDeclaredNames.get(bindingName).forEach(dupeNode => {
           if (body.forOfVarDeclaredNames.indexOf(dupeNode) >= 0) {
-            binding = binding.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+            binding = binding.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
           }
         });
       }
@@ -290,23 +290,21 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceFormalParameters(node) {
-    let s = super.reduceFormalParameters(...arguments)
-      .observeLexicalDeclaration();
-    return s;
+  reduceFormalParameters() {
+    return super.reduceFormalParameters(...arguments).observeLexicalDeclaration();
   }
 
   reduceForStatement(node, {init, test, update, body}) {
     if (init != null) {
-      init.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+      init.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(dupeNode => {
-            init = init.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+            init = init.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
           });
         }
-        if (body.varDeclaredNames.has(name)) {
-          nodes.forEach(node => {
-            init = init.addError(new EarlyError(node, `Duplicate binding ${JSON.stringify(name)}`));
+        if (body.varDeclaredNames.has(bindingName)) {
+          nodes.forEach(n => {
+            init = init.addError(new EarlyError(n, `Duplicate binding ${JSON.stringify(bindingName)}`));
           });
         }
       });
@@ -320,15 +318,15 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceForInStatement(node, {left, right, body}) {
-    left.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    left.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          left = left.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          left = left.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (body.varDeclaredNames.has(name)) {
-        nodes.forEach(node => {
-          left = left.addError(new EarlyError(node, `Duplicate binding ${JSON.stringify(name)}`));
+      if (body.varDeclaredNames.has(bindingName)) {
+        nodes.forEach(n => {
+          left = left.addError(new EarlyError(n, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -342,15 +340,15 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceForOfStatement(node, {left, right, body}) {
     left = left.recordForOfVars();
-    left.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    left.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          left = left.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          left = left.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (body.varDeclaredNames.has(name)) {
-        nodes.forEach(node => {
-          left = left.addError(new EarlyError(node, `Duplicate binding ${JSON.stringify(name)}`));
+      if (body.varDeclaredNames.has(bindingName)) {
+        nodes.forEach(n => {
+          left = left.addError(new EarlyError(n, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -364,22 +362,22 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceFunctionBody(node) {
     let s = super.reduceFunctionBody(...arguments);
-    s.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    s.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (s.varDeclaredNames.has(name)) {
+      if (s.varDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
-    s = s.enforceFreeContinueStatementErrors(node => new EarlyError(node, "Continue statement must be nested within an iteration statement"));
-    s = s.enforceFreeLabeledContinueStatementErrors(node => new EarlyError(node, `Continue statement must be nested within an iteration statement with label ${JSON.stringify(node.label)}`));
-    s = s.enforceFreeBreakStatementErrors(node => new EarlyError(node, "Break statement must be nested within an iteration statement or a switch statement"));
-    s = s.enforceFreeLabeledBreakStatementErrors(node => new EarlyError(node, `Break statement must be nested within a statement with label ${JSON.stringify(node.label)}`));
+    s = s.enforceFreeContinueStatementErrors(n => new EarlyError(n, "Continue statement must be nested within an iteration statement"));
+    s = s.enforceFreeLabeledContinueStatementErrors(n => new EarlyError(n, `Continue statement must be nested within an iteration statement with label ${JSON.stringify(n.label)}`));
+    s = s.enforceFreeBreakStatementErrors(n => new EarlyError(n, "Break statement must be nested within an iteration statement or a switch statement"));
+    s = s.enforceFreeLabeledBreakStatementErrors(n => new EarlyError(n, `Break statement must be nested within a statement with label ${JSON.stringify(n.label)}`));
     s = s.clearUsedLabelNames();
     if (isStrictFunctionBody(node)) {
       s = s.enforceStrictErrors();
@@ -390,17 +388,17 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceFunctionDeclaration(node, {name, params, body}) {
     let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
     let addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
-    params.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    params.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          params = params[addError](new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          params = params[addError](new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
-    body.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
-      if (params.lexicallyDeclaredNames.has(name)) {
+    body.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
+      if (params.lexicallyDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -418,17 +416,17 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceFunctionExpression(node, {name, params, body}) {
     let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
     let addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
-    params.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    params.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          params = params[addError](new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          params = params[addError](new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
-    body.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
-      if (params.lexicallyDeclaredNames.has(name)) {
+    body.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
+      if (params.lexicallyDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -513,17 +511,17 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceMethod(node, {name, params, body}) {
-    params.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    params.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          params = params.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          params = params.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
-    body.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
-      if (params.lexicallyDeclaredNames.has(name)) {
+    body.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
+      if (params.lexicallyDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -547,29 +545,29 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceModule() {
     let s = super.reduceModule(...arguments);
-    s.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    s.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (s.varDeclaredNames.has(name)) {
+      if (s.varDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
-    s.exportedNames.forEachEntry((nodes, name) => {
+    s.exportedNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          s = s.addError(new EarlyError(dupeNode, `Duplicate export ${JSON.stringify(name)}`));
+          s = s.addError(new EarlyError(dupeNode, `Duplicate export ${JSON.stringify(bindingName)}`));
         });
       }
     });
-    s.exportedBindings.forEachEntry((nodes, name) => {
-      if (name !== "*default*" && !s.lexicallyDeclaredNames.has(name) && !s.varDeclaredNames.has(name)) {
+    s.exportedBindings.forEachEntry((nodes, bindingName) => {
+      if (bindingName !== "*default*" && !s.lexicallyDeclaredNames.has(bindingName) && !s.varDeclaredNames.has(bindingName)) {
         nodes.forEach(undeclaredNode => {
-          s = s.addError(new EarlyError(undeclaredNode, `Exported binding ${JSON.stringify(name)} is not declared`));
+          s = s.addError(new EarlyError(undeclaredNode, `Exported binding ${JSON.stringify(bindingName)} is not declared`));
         });
       }
     });
@@ -580,7 +578,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     s = s.enforceFreeLabeledContinueStatementErrors(node => new EarlyError(node, `Continue statement must be nested within an iteration statement with label ${JSON.stringify(node.label)}`));
     s = s.enforceFreeBreakStatementErrors(node => new EarlyError(node, "Break statement must be nested within an iteration statement or a switch statement"));
     s = s.enforceFreeLabeledBreakStatementErrors(node => new EarlyError(node, `Break statement must be nested within a statement with label ${JSON.stringify(node.label)}`));
-    s = s.enforceSuperCallExpressions(SUPERCALL_ERROR)
+    s = s.enforceSuperCallExpressions(SUPERCALL_ERROR);
     s = s.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
     s = s.enforceStrictErrors();
     return s;
@@ -594,8 +592,8 @@ export class EarlyErrorChecker extends MonoidalReducer {
     let s = super.reduceObjectExpression(...arguments);
     s = s.enforceSuperCallExpressionsInConstructorMethod(SUPERCALL_ERROR);
     let protos = node.properties.filter(p => p.type === "DataProperty" && p.name.type === "StaticPropertyName" && p.name.value === "__proto__");
-    protos.slice(1).forEach(node => {
-      s = s.addError(new EarlyError(node, "Duplicate __proto__ property in object literal not allowed"));
+    protos.slice(1).forEach(n => {
+      s = s.addError(new EarlyError(n, "Duplicate __proto__ property in object literal not allowed"));
     });
     return s;
   }
@@ -643,17 +641,17 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceSetter(node, {name, param, body}) {
     param = param.observeLexicalDeclaration();
-    param.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    param.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          param = param.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          param = param.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
-    body.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
-      if (param.lexicallyDeclaredNames.has(name)) {
+    body.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
+      if (param.lexicallyDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          body = body.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -679,15 +677,15 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceSwitchStatement(node, {discriminant, cases}) {
     let sCases = this.fold(cases)
       .functionDeclarationNamesAreLexical();
-    sCases.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    sCases.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (sCases.varDeclaredNames.has(name)) {
+      if (sCases.varDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -700,15 +698,15 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceSwitchStatementWithDefault(node, {discriminant, preDefaultCases, defaultCase, postDefaultCases}) {
     let sCases = this.append(defaultCase, this.append(this.fold(preDefaultCases), this.fold(postDefaultCases)))
       .functionDeclarationNamesAreLexical();
-    sCases.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
+    sCases.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
-          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
-      if (sCases.varDeclaredNames.has(name)) {
+      if (sCases.varDeclaredNames.has(bindingName)) {
         nodes.forEach(dupeNode => {
-          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
+          sCases = sCases.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(bindingName)}`));
         });
       }
     });
@@ -724,16 +722,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       case "const":
       case "let": {
         s = s.observeLexicalDeclaration();
-        //s.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
-        //  if (nodes.length > 1) {
-        //    nodes.slice(1).forEach(dupeNode => {
-        //      s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
-        //    });
-        //  }
-        //});
         if (s.lexicallyDeclaredNames.has("let")) {
-          s.lexicallyDeclaredNames.get("let").forEach(node => {
-            s = s.addError(new EarlyError(node, "Lexical declarations must not have a binding named \"let\""));
+          s.lexicallyDeclaredNames.get("let").forEach(n => {
+            s = s.addError(new EarlyError(n, "Lexical declarations must not have a binding named \"let\""));
           });
         }
         break;

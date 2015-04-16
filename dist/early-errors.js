@@ -119,7 +119,8 @@ function isIterationStatement(_x2) {
 function isSpecialMethod(methodDefinition) {
   if (methodDefinition.name.type !== "StaticPropertyName" || methodDefinition.name.value !== "constructor") {
     return false;
-  }switch (methodDefinition.type) {
+  }
+  switch (methodDefinition.type) {
     case "Getter":
     case "Setter":
       return true;
@@ -157,18 +158,18 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var params = _ref2.params;
       var body = _ref2.body;
 
-      params.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      params.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            params = params.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            params = params.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
       if (node.body.type === "FunctionBody") {
-        body.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
-          if (params.lexicallyDeclaredNames.has(name)) {
+        body.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
+          if (params.lexicallyDeclaredNames.has(bindingName)) {
             nodes.forEach(function (dupeNode) {
-              body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+              body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
             });
           }
         });
@@ -183,26 +184,24 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceBindingIdentifier",
     value: function reduceBindingIdentifier(node) {
       var s = this.identity;
-      var name = node.name;
-
-      if (_isRestrictedWord$isStrictModeReservedWord.isRestrictedWord(name) || _isRestrictedWord$isStrictModeReservedWord.isStrictModeReservedWord(name)) {
-        s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(name) + " must not be in binding position in strict mode"));
+      if (_isRestrictedWord$isStrictModeReservedWord.isRestrictedWord(node.name) || _isRestrictedWord$isStrictModeReservedWord.isStrictModeReservedWord(node.name)) {
+        s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in binding position in strict mode"));
       }
-      return s.bindName(name, node);
+      return s.bindName(node.name, node);
     }
   }, {
     key: "reduceBlock",
     value: function reduceBlock() {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceBlock", this).apply(this, arguments).functionDeclarationNamesAreLexical();
-      s.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      s.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (s.varDeclaredNames.has(name)) {
+        if (s.varDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -231,21 +230,21 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var body = _ref3.body;
 
       binding = binding.observeLexicalDeclaration();
-      binding.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      binding.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            binding = binding.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            binding = binding.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (body.previousLexicallyDeclaredNames.has(name)) {
+        if (body.previousLexicallyDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            binding = binding.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            binding = binding.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (body.varDeclaredNames.has(name)) {
-          body.varDeclaredNames.get(name).forEach(function (dupeNode) {
+        if (body.varDeclaredNames.has(bindingName)) {
+          body.varDeclaredNames.get(bindingName).forEach(function (dupeNode) {
             if (body.forOfVarDeclaredNames.indexOf(dupeNode) >= 0) {
-              binding = binding.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+              binding = binding.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
             }
           });
         }
@@ -374,9 +373,8 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     }
   }, {
     key: "reduceFormalParameters",
-    value: function reduceFormalParameters(node) {
-      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceFormalParameters", this).apply(this, arguments).observeLexicalDeclaration();
-      return s;
+    value: function reduceFormalParameters() {
+      return _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceFormalParameters", this).apply(this, arguments).observeLexicalDeclaration();
     }
   }, {
     key: "reduceForStatement",
@@ -387,15 +385,15 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var body = _ref6.body;
 
       if (init != null) {
-        init.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+        init.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
           if (nodes.length > 1) {
             nodes.slice(1).forEach(function (dupeNode) {
-              init = init.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+              init = init.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
             });
           }
-          if (body.varDeclaredNames.has(name)) {
-            nodes.forEach(function (node) {
-              init = init.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Duplicate binding " + JSON.stringify(name)));
+          if (body.varDeclaredNames.has(bindingName)) {
+            nodes.forEach(function (n) {
+              init = init.addError(new _EarlyErrorState$EarlyError.EarlyError(n, "Duplicate binding " + JSON.stringify(bindingName)));
             });
           }
         });
@@ -414,15 +412,15 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var right = _ref7.right;
       var body = _ref7.body;
 
-      left.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      left.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (body.varDeclaredNames.has(name)) {
-          nodes.forEach(function (node) {
-            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Duplicate binding " + JSON.stringify(name)));
+        if (body.varDeclaredNames.has(bindingName)) {
+          nodes.forEach(function (n) {
+            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(n, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -441,15 +439,15 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var body = _ref8.body;
 
       left = left.recordForOfVars();
-      left.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      left.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (body.varDeclaredNames.has(name)) {
-          nodes.forEach(function (node) {
-            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Duplicate binding " + JSON.stringify(name)));
+        if (body.varDeclaredNames.has(bindingName)) {
+          nodes.forEach(function (n) {
+            left = left.addError(new _EarlyErrorState$EarlyError.EarlyError(n, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -464,29 +462,29 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceFunctionBody",
     value: function reduceFunctionBody(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceFunctionBody", this).apply(this, arguments);
-      s.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      s.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (s.varDeclaredNames.has(name)) {
+        if (s.varDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
-      s = s.enforceFreeContinueStatementErrors(function (node) {
-        return new _EarlyErrorState$EarlyError.EarlyError(node, "Continue statement must be nested within an iteration statement");
+      s = s.enforceFreeContinueStatementErrors(function (n) {
+        return new _EarlyErrorState$EarlyError.EarlyError(n, "Continue statement must be nested within an iteration statement");
       });
-      s = s.enforceFreeLabeledContinueStatementErrors(function (node) {
-        return new _EarlyErrorState$EarlyError.EarlyError(node, "Continue statement must be nested within an iteration statement with label " + JSON.stringify(node.label));
+      s = s.enforceFreeLabeledContinueStatementErrors(function (n) {
+        return new _EarlyErrorState$EarlyError.EarlyError(n, "Continue statement must be nested within an iteration statement with label " + JSON.stringify(n.label));
       });
-      s = s.enforceFreeBreakStatementErrors(function (node) {
-        return new _EarlyErrorState$EarlyError.EarlyError(node, "Break statement must be nested within an iteration statement or a switch statement");
+      s = s.enforceFreeBreakStatementErrors(function (n) {
+        return new _EarlyErrorState$EarlyError.EarlyError(n, "Break statement must be nested within an iteration statement or a switch statement");
       });
-      s = s.enforceFreeLabeledBreakStatementErrors(function (node) {
-        return new _EarlyErrorState$EarlyError.EarlyError(node, "Break statement must be nested within a statement with label " + JSON.stringify(node.label));
+      s = s.enforceFreeLabeledBreakStatementErrors(function (n) {
+        return new _EarlyErrorState$EarlyError.EarlyError(n, "Break statement must be nested within a statement with label " + JSON.stringify(n.label));
       });
       s = s.clearUsedLabelNames();
       if (isStrictFunctionBody(node)) {
@@ -505,17 +503,17 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         return i.type === "BindingIdentifier";
       });
       var addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
-      params.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      params.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            params = params[addError](new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            params = params[addError](new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
-      body.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
-        if (params.lexicallyDeclaredNames.has(name)) {
+      body.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
+        if (params.lexicallyDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -539,17 +537,17 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         return i.type === "BindingIdentifier";
       });
       var addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
-      params.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      params.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            params = params[addError](new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            params = params[addError](new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
-      body.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
-        if (params.lexicallyDeclaredNames.has(name)) {
+      body.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
+        if (params.lexicallyDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -648,17 +646,17 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var params = _ref12.params;
       var body = _ref12.body;
 
-      params.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      params.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            params = params.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            params = params.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
-      body.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
-        if (params.lexicallyDeclaredNames.has(name)) {
+      body.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
+        if (params.lexicallyDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -682,29 +680,29 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceModule",
     value: function reduceModule() {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceModule", this).apply(this, arguments);
-      s.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      s.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (s.varDeclaredNames.has(name)) {
+        if (s.varDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
-      s.exportedNames.forEachEntry(function (nodes, name) {
+      s.exportedNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate export " + JSON.stringify(name)));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate export " + JSON.stringify(bindingName)));
           });
         }
       });
-      s.exportedBindings.forEachEntry(function (nodes, name) {
-        if (name !== "*default*" && !s.lexicallyDeclaredNames.has(name) && !s.varDeclaredNames.has(name)) {
+      s.exportedBindings.forEachEntry(function (nodes, bindingName) {
+        if (bindingName !== "*default*" && !s.lexicallyDeclaredNames.has(bindingName) && !s.varDeclaredNames.has(bindingName)) {
           nodes.forEach(function (undeclaredNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(undeclaredNode, "Exported binding " + JSON.stringify(name) + " is not declared"));
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(undeclaredNode, "Exported binding " + JSON.stringify(bindingName) + " is not declared"));
           });
         }
       });
@@ -741,8 +739,8 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var protos = node.properties.filter(function (p) {
         return p.type === "DataProperty" && p.name.type === "StaticPropertyName" && p.name.value === "__proto__";
       });
-      protos.slice(1).forEach(function (node) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Duplicate __proto__ property in object literal not allowed"));
+      protos.slice(1).forEach(function (n) {
+        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(n, "Duplicate __proto__ property in object literal not allowed"));
       });
       return s;
     }
@@ -796,17 +794,17 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var body = _ref13.body;
 
       param = param.observeLexicalDeclaration();
-      param.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      param.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            param = param.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            param = param.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
-      body.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
-        if (param.lexicallyDeclaredNames.has(name)) {
+      body.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
+        if (param.lexicallyDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            body = body.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -835,15 +833,15 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var cases = _ref14.cases;
 
       var sCases = this.fold(cases).functionDeclarationNamesAreLexical();
-      sCases.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      sCases.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (sCases.varDeclaredNames.has(name)) {
+        if (sCases.varDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -861,15 +859,15 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var postDefaultCases = _ref15.postDefaultCases;
 
       var sCases = this.append(defaultCase, this.append(this.fold(preDefaultCases), this.fold(postDefaultCases))).functionDeclarationNamesAreLexical();
-      sCases.lexicallyDeclaredNames.forEachEntry(function (nodes, name) {
+      sCases.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
-        if (sCases.varDeclaredNames.has(name)) {
+        if (sCases.varDeclaredNames.has(bindingName)) {
           nodes.forEach(function (dupeNode) {
-            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(name)));
+            sCases = sCases.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -887,16 +885,9 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         case "let":
           {
             s = s.observeLexicalDeclaration();
-            //s.lexicallyDeclaredNames.forEachEntry((nodes, name) => {
-            //  if (nodes.length > 1) {
-            //    nodes.slice(1).forEach(dupeNode => {
-            //      s = s.addError(new EarlyError(dupeNode, `Duplicate binding ${JSON.stringify(name)}`));
-            //    });
-            //  }
-            //});
             if (s.lexicallyDeclaredNames.has("let")) {
-              s.lexicallyDeclaredNames.get("let").forEach(function (node) {
-                s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Lexical declarations must not have a binding named \"let\""));
+              s.lexicallyDeclaredNames.get("let").forEach(function (n) {
+                s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(n, "Lexical declarations must not have a binding named \"let\""));
               });
             }
             break;

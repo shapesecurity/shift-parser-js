@@ -46,8 +46,7 @@ var TokenClass = {
   RegularExpression: { name: "RegularExpression" },
   LineComment: { name: "Line" },
   BlockComment: { name: "Block" },
-  Illegal: { name: "Illegal" }
-};
+  Illegal: { name: "Illegal" } };
 
 exports.TokenClass = TokenClass;
 var TokenType = {
@@ -144,8 +143,7 @@ var TokenType = {
   IDENTIFIER: { klass: TokenClass.Ident, name: "" },
   CONST: { klass: TokenClass.Keyword, name: "const" },
   TEMPLATE: { klass: TokenClass.TemplateElement, name: "" },
-  ILLEGAL: { klass: TokenClass.Illegal, name: "" }
-};
+  ILLEGAL: { klass: TokenClass.Illegal, name: "" } };
 
 exports.TokenType = TokenType;
 var TT = TokenType;
@@ -226,8 +224,7 @@ var Tokenizer = (function () {
         lastLineStart: this.lastLineStart,
         lookahead: this.lookahead,
         hasLineTerminatorBeforeNext: this.hasLineTerminatorBeforeNext,
-        tokenIndex: this.tokenIndex
-      };
+        tokenIndex: this.tokenIndex };
     }
   }, {
     key: "restoreLexerState",
@@ -607,8 +604,7 @@ var Tokenizer = (function () {
       return {
         line: this.startLine + 1,
         column: this.startIndex - this.startLineStart,
-        offset: this.startIndex
-      };
+        offset: this.startIndex };
     }
   }, {
     key: "getSlice",
@@ -794,8 +790,7 @@ var Tokenizer = (function () {
         type: TokenType.NUMBER,
         value: parseInt(this.getSlice(start, startLocation).text.substr(offset), 2),
         slice: this.getSlice(start, startLocation),
-        octal: false
-      };
+        octal: false };
     }
   }, {
     key: "scanOctalLiteral",
@@ -819,8 +814,7 @@ var Tokenizer = (function () {
         type: TokenType.NUMBER,
         value: parseInt(this.getSlice(start, startLocation).text.substr(2), 8),
         slice: this.getSlice(start, startLocation),
-        octal: false
-      };
+        octal: false };
     }
   }, {
     key: "scanLegacyOctalLiteral",
@@ -845,8 +839,7 @@ var Tokenizer = (function () {
         type: TokenType.NUMBER,
         slice: this.getSlice(start, startLocation),
         value: parseInt(this.getSlice(start, startLocation).text.substr(1), isOctal ? 8 : 10),
-        octal: true
-      };
+        octal: true };
     }
   }, {
     key: "scanNumericLiteral",
@@ -873,13 +866,12 @@ var Tokenizer = (function () {
             return this.scanLegacyOctalLiteral(start, startLocation);
           }
         } else {
-          var slice = this.getSlice(start, startLocation);
+          var _slice = this.getSlice(start, startLocation);
           return {
             type: TokenType.NUMBER,
-            value: +slice.text,
-            slice: slice,
-            octal: false
-          };
+            value: +_slice.text,
+            slice: _slice,
+            octal: false };
         }
       } else if (ch !== ".") {
         // Must be "1".."9"
@@ -887,13 +879,12 @@ var Tokenizer = (function () {
         while ("0" <= ch && ch <= "9") {
           this.index++;
           if (this.index === this.source.length) {
-            var slice = this.getSlice(start, startLocation);
+            var _slice2 = this.getSlice(start, startLocation);
             return {
               type: TokenType.NUMBER,
-              value: +slice.text,
-              slice: slice,
-              octal: false
-            };
+              value: +_slice2.text,
+              slice: _slice2,
+              octal: false };
           }
           ch = this.source.charAt(this.index);
         }
@@ -903,13 +894,12 @@ var Tokenizer = (function () {
       if (ch === ".") {
         this.index++;
         if (this.index === this.source.length) {
-          var slice = this.getSlice(start, startLocation);
+          var _slice3 = this.getSlice(start, startLocation);
           return {
             type: TokenType.NUMBER,
-            value: +slice.text,
-            slice: slice,
-            octal: false
-          };
+            value: +_slice3.text,
+            slice: _slice3,
+            octal: false };
         }
 
         ch = this.source.charAt(this.index);
@@ -917,13 +907,12 @@ var Tokenizer = (function () {
           e++;
           this.index++;
           if (this.index === this.source.length) {
-            var slice = this.getSlice(start, startLocation);
+            var _slice4 = this.getSlice(start, startLocation);
             return {
               type: TokenType.NUMBER,
-              value: +slice.text,
-              slice: slice,
-              octal: false
-            };
+              value: +_slice4.text,
+              slice: _slice4,
+              octal: false };
           }
           ch = this.source.charAt(this.index);
         }
@@ -968,15 +957,12 @@ var Tokenizer = (function () {
         throw this.createILLEGAL();
       }
 
-      {
-        var slice = this.getSlice(start, startLocation);
-        return {
-          type: TokenType.NUMBER,
-          value: +slice.text,
-          slice: slice,
-          octal: false
-        };
-      }
+      var slice = this.getSlice(start, startLocation);
+      return {
+        type: TokenType.NUMBER,
+        value: +slice.text,
+        slice: slice,
+        octal: false };
     }
   }, {
     key: "scanStringEscape",
@@ -1002,7 +988,6 @@ var Tokenizer = (function () {
             break;
           case "u":
           case "x":
-            var restore = this.index;
             var unescaped = undefined;
             this.index++;
             if (this.index >= this.source.length) {
@@ -1128,7 +1113,6 @@ var Tokenizer = (function () {
           case 92:
             // \\
             {
-              var _location = this.getLocation();
               var octal = this.scanStringEscape("", false)[1];
               if (octal) {
                 throw this.createILLEGAL();
@@ -1216,7 +1200,7 @@ var Tokenizer = (function () {
       this.startLine = this.line;
       this.startLineStart = this.lineStart;
 
-      if (this.lastIndex == 0) {
+      if (this.lastIndex === 0) {
         this.lastIndex = this.index;
         this.lastLine = this.line;
         this.lastLineStart = this.lineStart;

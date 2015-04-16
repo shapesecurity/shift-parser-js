@@ -29,8 +29,7 @@ function markLocation(node, location) {
       line: this.lastLine + 1,
       column: this.lastIndex - this.lastLineStart,
       offset: this.lastIndex },
-    source: null
-  };
+    source: null };
   return node;
 }
 

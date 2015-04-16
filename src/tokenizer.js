@@ -29,7 +29,7 @@ export const TokenClass = {
   RegularExpression: {name: "RegularExpression"},
   LineComment: {name: "Line"},
   BlockComment: {name: "Block"},
-  Illegal: {name: "Illegal"}
+  Illegal: {name: "Illegal"},
 };
 
 export const TokenType = {
@@ -126,7 +126,7 @@ export const TokenType = {
   IDENTIFIER: {klass: TokenClass.Ident, name: ""},
   CONST: {klass: TokenClass.Keyword, name: "const"},
   TEMPLATE: {klass: TokenClass.TemplateElement, name: ""},
-  ILLEGAL: {klass: TokenClass.Illegal, name: ""}
+  ILLEGAL: {klass: TokenClass.Illegal, name: ""},
 };
 
 const TT = TokenType;
@@ -139,13 +139,15 @@ const ONE_CHAR_PUNCTUATOR = [
   TT.MOD, TT.BIT_AND, I, TT.LPAREN, TT.RPAREN, TT.MUL, TT.ADD, TT.COMMA, TT.SUB, TT.PERIOD, TT.DIV, I, I, I, I, I, I, I,
   I, I, I, TT.COLON, TT.SEMICOLON, TT.LT, TT.ASSIGN, TT.GT, TT.CONDITIONAL, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
   I, I, I, I, I, I, I, I, I, I, I, I, TT.LBRACK, I, TT.RBRACK, TT.BIT_XOR, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
-  I, I, I, I, I, I, I, I, I, I, I, I, I, TT.LBRACE, TT.BIT_OR, TT.RBRACE, TT.BIT_NOT];
+  I, I, I, I, I, I, I, I, I, I, I, I, I, TT.LBRACE, TT.BIT_OR, TT.RBRACE, TT.BIT_NOT,
+];
 
 const PUNCTUATOR_START = [
   F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, T, F, F, F, T, T,
   F, T, T, T, T, T, T, F, T, F, F, F, F, F, F, F, F, F, F, T, T, T, T, T, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
   F, F, F, F, F, F, F, F, F, F, F, F, F, T, F, T, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-  F, F, F, F, F, F, T, T, T, T, F];
+  F, F, F, F, F, F, T, T, T, T, F,
+];
 
 export class JsError extends Error {
   constructor(index, line, column, msg) {
@@ -199,7 +201,7 @@ export default class Tokenizer {
       lastLineStart: this.lastLineStart,
       lookahead: this.lookahead,
       hasLineTerminatorBeforeNext: this.hasLineTerminatorBeforeNext,
-      tokenIndex: this.tokenIndex
+      tokenIndex: this.tokenIndex,
     };
   }
 
@@ -796,7 +798,7 @@ export default class Tokenizer {
     return {
       line: this.startLine + 1,
       column: this.startIndex - this.startLineStart,
-      offset: this.startIndex
+      offset: this.startIndex,
     };
   }
 
@@ -976,7 +978,7 @@ export default class Tokenizer {
       type: TokenType.NUMBER,
       value: parseInt(this.getSlice(start, startLocation).text.substr(offset), 2),
       slice: this.getSlice(start, startLocation),
-      octal: false
+      octal: false,
     };
   }
 
@@ -1000,7 +1002,7 @@ export default class Tokenizer {
       type: TokenType.NUMBER,
       value: parseInt(this.getSlice(start, startLocation).text.substr(2), 8),
       slice: this.getSlice(start, startLocation),
-      octal: false
+      octal: false,
     };
   }
 
@@ -1025,7 +1027,7 @@ export default class Tokenizer {
       type: TokenType.NUMBER,
       slice: this.getSlice(start, startLocation),
       value: parseInt(this.getSlice(start, startLocation).text.substr(1), isOctal ? 8 : 10),
-      octal: true
+      octal: true,
     };
   }
 
@@ -1057,7 +1059,7 @@ export default class Tokenizer {
           type: TokenType.NUMBER,
           value: +slice.text,
           slice,
-          octal: false
+          octal: false,
         };
       }
     } else if (ch !== ".") {
@@ -1071,7 +1073,7 @@ export default class Tokenizer {
             type: TokenType.NUMBER,
             value: +slice.text,
             slice,
-            octal: false
+            octal: false,
           };
         }
         ch = this.source.charAt(this.index);
@@ -1087,7 +1089,7 @@ export default class Tokenizer {
           type: TokenType.NUMBER,
           value: +slice.text,
           slice,
-          octal: false
+          octal: false,
         };
       }
 
@@ -1101,7 +1103,7 @@ export default class Tokenizer {
             type: TokenType.NUMBER,
             value: +slice.text,
             slice,
-            octal: false
+            octal: false,
           };
         }
         ch = this.source.charAt(this.index);
@@ -1147,15 +1149,13 @@ export default class Tokenizer {
       throw this.createILLEGAL();
     }
 
-    {
-      let slice = this.getSlice(start, startLocation);
-      return {
-        type: TokenType.NUMBER,
-        value: +slice.text,
-        slice,
-        octal: false
-      };
-    }
+    let slice = this.getSlice(start, startLocation);
+    return {
+      type: TokenType.NUMBER,
+      value: +slice.text,
+      slice,
+      octal: false,
+    };
   }
 
   scanStringEscape(str, octal) {
@@ -1180,7 +1180,6 @@ export default class Tokenizer {
           break;
         case "u":
         case "x":
-          let restore = this.index;
           let unescaped;
           this.index++;
           if (this.index >= this.source.length) {
@@ -1293,7 +1292,6 @@ export default class Tokenizer {
           break;
         case 0x5C:  // \\
         {
-          let location = this.getLocation();
           let octal = this.scanStringEscape("", false)[1];
           if (octal) {
             throw this.createILLEGAL();
@@ -1379,7 +1377,7 @@ export default class Tokenizer {
     this.startLine = this.line;
     this.startLineStart = this.lineStart;
 
-    if (this.lastIndex == 0) {
+    if (this.lastIndex === 0) {
       this.lastIndex = this.index;
       this.lastLine = this.line;
       this.lastLineStart = this.lineStart;

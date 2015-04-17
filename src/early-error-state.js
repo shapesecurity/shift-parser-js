@@ -272,6 +272,30 @@ export class EarlyErrorState {
     });
   }
 
+  enforceDuplicateLexicallyDeclaredNames(createError) {
+    let s = this;
+    this.lexicallyDeclaredNames.forEachEntry((nodes/*, bindingName*/) => {
+      if (nodes.length > 1) {
+        nodes.slice(1).forEach(dupeNode => {
+          s = s.addError(createError(dupeNode));
+        });
+      }
+    });
+    return s;
+  }
+
+  enforceConflictingLexicallyDeclaredNames(otherNames, createError) {
+    let s = this;
+    this.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
+      if (otherNames.has(bindingName)) {
+        nodes.forEach(conflictingNode => {
+          s = s.addError(createError(conflictingNode));
+        });
+      }
+    });
+    return s;
+  }
+
   observeFunctionDeclaration() {
     return this.observeVarBoundary().clone({
       boundNames: new MultiMap,

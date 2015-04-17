@@ -30,7 +30,7 @@ export class PatternAcceptor {
   }
 
   eat(ch) {
-    if(this.index >= this.length || this.pattern[this.index] !== ch) return false;
+    if (this.index >= this.length || this.pattern[this.index] !== ch) return false;
     ++this.index;
     return true;
   }

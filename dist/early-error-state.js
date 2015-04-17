@@ -289,6 +289,32 @@ var EarlyErrorState = (function () {
         previousLexicallyDeclaredNames: this.lexicallyDeclaredNames });
     }
   }, {
+    key: "enforceDuplicateLexicallyDeclaredNames",
+    value: function enforceDuplicateLexicallyDeclaredNames(createError) {
+      var s = this;
+      this.lexicallyDeclaredNames.forEachEntry(function (nodes /*, bindingName*/) {
+        if (nodes.length > 1) {
+          nodes.slice(1).forEach(function (dupeNode) {
+            s = s.addError(createError(dupeNode));
+          });
+        }
+      });
+      return s;
+    }
+  }, {
+    key: "enforceConflictingLexicallyDeclaredNames",
+    value: function enforceConflictingLexicallyDeclaredNames(otherNames, createError) {
+      var s = this;
+      this.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
+        if (otherNames.has(bindingName)) {
+          nodes.forEach(function (conflictingNode) {
+            s = s.addError(createError(conflictingNode));
+          });
+        }
+      });
+      return s;
+    }
+  }, {
     key: "observeFunctionDeclaration",
     value: function observeFunctionDeclaration() {
       return this.observeVarBoundary().clone({

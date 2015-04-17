@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {} from "es6-map/implement";
 import * as objectAssign from "object-assign";
 import * as MultiMap from "multimap";
 

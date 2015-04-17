@@ -23,6 +23,7 @@
     "cjsify": "npm run build && cjsify dist/index.js --no-node --export Shift --output dist/shift.js"
   },
   "dependencies": {
+    "es6-map": "^0.1.1",
     "esutils": "^2.0.2",
     "multimap": "^0.1.1",
     "object-assign": "^2.0.0",

@@ -27,6 +27,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
  * limitations under the License.
  */
 
+require("es6-map/implement");
+
 var _import = require("object-assign");
 
 var objectAssign = _import;

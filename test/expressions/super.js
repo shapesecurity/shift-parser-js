@@ -456,8 +456,6 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("super.a", "Unexpected super property");
-    testParseFailure("super[0]()", "Unexpected super property");
     testParseFailure("({ a() { (super).b(); } });", "Unexpected token \"super\"");
     testParseFailure("class A extends B { constructor() { (super).a(); } }", "Unexpected token \"super\"");
 

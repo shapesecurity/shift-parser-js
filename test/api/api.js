@@ -36,7 +36,7 @@ suite("API", function () {
   }
 
   test("for location information", function () {
-    expect(ShiftParser.default("0", {loc: true})).to.eql(
+    expect(ShiftParser.default("0", {loc: true, earlyErrors: true})).to.eql(
       withLoc({
         type: "Script",
         body: withLoc({
@@ -52,7 +52,7 @@ suite("API", function () {
   });
 
   test("for location information", function () {
-    expect(ShiftParser.parseModule("0", {loc: true})).to.eql(
+    expect(ShiftParser.parseModule("0", {loc: true, earlyErrors: true})).to.eql(
       withLoc({
           type: "Module",
           items: [withLoc({
@@ -65,12 +65,12 @@ suite("API", function () {
 
   function parseModule(name) {
     var source = require("fs").readFileSync(require.resolve(name), "utf-8");
-    var tree = ShiftParser.parseModule(source, {loc: true});
+    var tree = ShiftParser.parseModule(source, {loc: true, earlyErrors: true});
   }
 
   function parseScript(name) {
     var source = require("fs").readFileSync(require.resolve(name), "utf-8");
-    var tree = ShiftParser.parseScript(source, {loc: true});
+    var tree = ShiftParser.parseScript(source, {loc: true, earlyErrors: true});
   }
 
   test("location sanity test", function () {

@@ -26,6 +26,7 @@ function moduleExpr(m) {
 }
 
 suite("Parser", function() {
+
   // programs that parse according to ES3 but either fail or parse differently according to ES5
   suite("ES5 backward incompatibilities", function() {
     // ES3: zero-width non-breaking space is allowed in an identifier
@@ -36,6 +37,7 @@ suite("Parser", function() {
     // ES5: a slash is allowed within a regexp character class
     testParseFailure("[/[/]", "Invalid regular expression: missing /");
   });
+
 
   // programs where we choose to diverge from the ES5 specification
   suite("ES5 divergences", function() {
@@ -55,6 +57,7 @@ suite("Parser", function() {
         }
       }
     );
+
     testParse("const[a] = b;", stmt,
       {
         type: "VariableDeclarationStatement",
@@ -69,19 +72,6 @@ suite("Parser", function() {
         }
       }
     );
-
-    testParse("var let", stmt,
-      {
-        type: "VariableDeclarationStatement",
-        declaration: {
-          type: "VariableDeclaration",
-          kind: "var",
-          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "let" }, init: null }]
-        }
-      });
-
-    testParseFailure("'use strict'; var let", "Unexpected token \"let\"");
-    testParseFailure("var const", "Unexpected token \"const\"");
 
     // ES5: invalid program
     // ES6: function declaration within a block
@@ -101,6 +91,7 @@ suite("Parser", function() {
       }
     );
   });
+
 
   // programs that parse according to ES5 but either fail or parse differently according to ES6
   suite("ES6 backward incompatibilities", function() {
@@ -157,14 +148,15 @@ suite("Parser", function() {
 
     // ES5: allows any LeftHandSideExpression on the left of an assignment
     // ES6: allows only valid bindings on the left of an assignment
-    testParseFailure("a+b=c", "Invalid left-hand side in assignment");
-    testParseFailure("+i = 0", "Invalid left-hand side in assignment");
-    testParseFailure("new a=b", "Invalid left-hand side in assignment");
-    testParseFailure("(a+b)=c", "Invalid left-hand side in assignment");
-    testParseFailure("f()++", "Invalid left-hand side in assignment");
-    testParseFailure("--f()", "Invalid left-hand side in assignment");
+    // NOTE: this is disabled due to separation of early errors in two-phase parsing
+    //testParseFailure("a+b=c", "Invalid left-hand side in assignment");
+    //testParseFailure("+i = 0", "Invalid left-hand side in assignment");
+    //testParseFailure("new a=b", "Invalid left-hand side in assignment");
+    //testParseFailure("(a+b)=c", "Invalid left-hand side in assignment");
+    //testParseFailure("f()++", "Invalid left-hand side in assignment");
+    //testParseFailure("--f()", "Invalid left-hand side in assignment");
 
-    // ES5: allows initializers in for-in and for-of head
+    // ES5: allows initializers in for-in head
     // ES6: disallows initializers in for-in and for-of head
     testParseFailure("for(var x=1 in [1,2,3]) 0", "Invalid variable declaration in for-in statement");
     testParseFailure("for(let x=1 in [1,2,3]) 0", "Invalid variable declaration in for-in statement");
@@ -226,8 +218,8 @@ suite("Parser", function() {
 
     // ES5: allows unicode escape sequences in regular expression flags
     // ES6: disallowes unicode escape sequences in regular expression flags
-    testParseFailure("/a/\\u0000", "Invalid regular expression");
-
+    // NOTE: this is disabled due to separation of early errors in two-phase parsing
+    //testParseFailure("/a/\\u0000", "Invalid regular expression");
 
     // ES5: disallow HTML-like comment
     // ES6: allowed in Script.
@@ -256,4 +248,5 @@ suite("Parser", function() {
     );
 
   });
+
 });

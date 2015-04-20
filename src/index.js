@@ -15,6 +15,8 @@
  */
 
 import {Parser} from "./parser";
+import {JsError} from "./tokenizer";
+import {EarlyErrorChecker} from "./early-errors";
 
 function markLocation(node, location) {
   node.loc = {
@@ -24,25 +26,34 @@ function markLocation(node, location) {
       column: this.lastIndex - this.lastLineStart,
       offset: this.lastIndex,
     },
-    source: null
+    source: null,
   };
   return node;
 }
 
-export function parseModule(code, {loc = false} = {}) {
-  let parser = new Parser(code);
-  if (loc) {
-    parser.markLocation = markLocation;
-  }
-  return parser.parseModule();
+function generateInterface(parsingFunctionName) {
+  return function parse(code, {loc = false, earlyErrors = true} = {}) {
+    let parser = new Parser(code);
+    if (loc) {
+      parser.markLocation = markLocation;
+    }
+    let ast = parser[parsingFunctionName]();
+    if (earlyErrors) {
+      let errors = EarlyErrorChecker.check(ast);
+      // for now, just throw the first error; we will handle multiple errors later
+      if (errors.length > 0) {
+        let {node, message} = errors[0];
+        let offset = 0, line = 1, column = 0;
+        if (node.loc != null) {
+          ({offset, line, column} = node.loc.start);
+        }
+        throw new JsError(offset, line, column, message);
+      }
+    }
+    return ast;
+  };
 }
 
-export function parseScript(code, {loc = false} = {}) {
-  let parser = new Parser(code);
-  if (loc) {
-    parser.markLocation = markLocation;
-  }
-  return parser.parseScript();
-}
-
+export const parseModule = generateInterface("parseModule");
+export const parseScript = generateInterface("parseScript");
 export default parseScript;

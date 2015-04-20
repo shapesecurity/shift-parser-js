@@ -371,6 +371,7 @@ suite("Parser", function () {
         });
 
       testParseFailure("({a = 0});", "Illegal property initializer");
+      testParseFailure("({a} += 0);", "Invalid left-hand side in assignment");
       testParseFailure("({a,,} = 0)", "Unexpected token \",\"");
       testParseFailure("({,a,} = 0)", "Unexpected token \",\"");
       testParseFailure("({a,,a} = 0)", "Unexpected token \",\"");
@@ -381,9 +382,6 @@ suite("Parser", function () {
       testParseFailure("({var} = 0)", "Unexpected token \"var\"");
       testParseFailure("({a.b} = 0)", "Unexpected token \".\"");
       testParseFailure("({0} = 0)", "Unexpected token \"}\"");
-      testParseFailure("'use strict'; ({yield} = 0);", "Unexpected token \"yield\"");
-      testParseFailure("'use strict'; ({yield = 0} = 0);", "Unexpected token \"yield\"");
-      testParseFailure("'use strict'; ({a: yield = 0} = 0);", "Unexpected token \"yield\"");
     });
   });
 });

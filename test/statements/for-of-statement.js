@@ -100,8 +100,29 @@ suite("Parser", function () {
       }
     );
 
+    testParse("for(const a of b);", stmt,
+      {
+        type: "ForOfStatement",
+        left: {
+          type: "VariableDeclaration",
+          kind: "const",
+          declarators: [{
+            type: "VariableDeclarator",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: null
+          }]
+        },
+        right: { type: "IdentifierExpression", name: "b" },
+        body: { type: "EmptyStatement" }
+      }
+    );
+
     testParseFailure("for(let of 0);", "Unexpected number");
     testParseFailure("for(this of 0);", "Invalid left-hand side in for-of");
-    testParseFailure("for(let.let of 0);", "Invalid left-hand-side expression in for-of statement");
+
+    testParseFailure("for(var a = 0 of b);", "Invalid variable declaration in for-of statement");
+    testParseFailure("for(let a = 0 of b);", "Invalid variable declaration in for-of statement");
+    testParseFailure("for(const a = 0 of b);", "Invalid variable declaration in for-of statement");
+
   });
 });

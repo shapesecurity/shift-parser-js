@@ -28,6 +28,7 @@ export {
   isDecimalDigit,
 };
 
+
 export function isStrictModeReservedWord(id) {
   return isReservedWordES6(id, true);
 }

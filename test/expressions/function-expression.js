@@ -260,6 +260,5 @@ suite("Parser", function () {
 
     testParseFailure("(function(...a, b){})", "Unexpected token \",\"");
     testParseFailure("(function((a)){})", "Unexpected token \"(\"");
-    testParseFailure("(function(package){'use strict';})", "Use of future reserved word in strict mode");
   });
 });

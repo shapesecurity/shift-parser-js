@@ -15,6 +15,7 @@
  */
 
 var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
@@ -66,5 +67,27 @@ suite("Parser", function () {
         ] }
       }
     );
+
+    testParse("_ => { return 0; }", expr,
+      { type: "ArrowExpression",
+        params:
+          { type: "FormalParameters",
+            items: [{ type: "BindingIdentifier", name: "_"}],
+            rest: null
+          },
+        body:
+          { type: "FunctionBody",
+            directives: [],
+            statements: [
+              { type: "ReturnStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
+            ]
+          }
+      }
+    );
+
+    testParseFailure("return;", "Illegal return statement");
+    testParseFailure("{ return; }", "Illegal return statement");
+    testParseFailure("if (false) { return; }", "Illegal return statement");
+
   });
 });

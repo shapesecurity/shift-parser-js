@@ -58,8 +58,5 @@ suite("Parser", function () {
         operator: "--" }
     );
 
-    testParseFailure("[x]--", "Invalid left-hand side in assignment");
-    testParseFailure("this--", "Invalid left-hand side in assignment");
-
   });
 });

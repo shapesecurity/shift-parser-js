@@ -268,7 +268,8 @@ suite("Parser", function () {
     });
 
     testParseFailure("export * from \"a\"", "Unexpected token \"export\"");
-    testParseModuleFailure("{export default 3}", "Unexpected token \"export\"");
+    testParseModuleFailure("{export default 3;}", "Unexpected token \"export\"");
+    testParseModuleFailure("{export {a};}", "Unexpected token \"export\"");
     testParseModuleFailure("while (1) export default 3", "Unexpected token \"export\"");
     testParseModuleFailure("export", "Unexpected end of input");
     testParseModuleFailure("export ", "Unexpected end of input");
@@ -290,6 +291,5 @@ suite("Parser", function () {
     testParseModuleFailure("export function () {}", "Unexpected token \"(\"");
     testParseModuleFailure("export default default", "Unexpected token \"default\"");
     testParseModuleFailure("export default function", "Unexpected end of input");
-    testParseModuleFailure("export default let", "Unexpected token \"let\"");
   });
 });

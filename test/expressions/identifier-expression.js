@@ -30,101 +30,105 @@ suite("Parser", function () {
       { type: "IdentifierExpression", name: "x" }
     );
 
-  });
+    suite("let used as identifier expression", function () {
 
-  suite("let used as identifier expression", function () {
+      testParse("let", expr,
+        { type: "IdentifierExpression", name: "let" }
+      );
 
-    testParse("let", expr,
-      { type: "IdentifierExpression", name: "let" }
-    );
+      testParse("let()", expr,
+        { type: "CallExpression", callee: { type: "IdentifierExpression", name: "let" }, arguments: [] }
+      );
 
-    testParse("let()", expr,
-      { type: "CallExpression", callee: { type: "IdentifierExpression", name: "let" }, arguments: [] }
-    );
+      testParse("(let[let])", expr,
+        { type: "ComputedMemberExpression", object: { type: "IdentifierExpression", name: "let" }, expression: { type: "IdentifierExpression", name: "let" } }
+      );
 
-    testParse("(let[let])", expr,
-      { type: "ComputedMemberExpression", object: { type: "IdentifierExpression", name: "let" }, expression: { type: "IdentifierExpression", name: "let" } }
-    );
+      testParse("let.let", expr,
+        { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" }
+      );
 
-    testParse("let.let", expr,
-      { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" }
-    );
+      testParse("for(let;;);", stmt,
+        { type: "ForStatement",
+          init: { type: "IdentifierExpression", name: "let" },
+          test: null,
+          update: null,
+          body: { type: "EmptyStatement"}
+        }
+      );
 
-    testParse("for(let;;);", stmt,
-      { type: "ForStatement",
-        init: { type: "IdentifierExpression", name: "let" },
-        test: null,
-        update: null,
-        body: { type: "EmptyStatement"}
-      }
-    );
+      testParse("for(let();;);", stmt,
+        { type: "ForStatement",
+          init: { type: "CallExpression", callee: { type: "IdentifierExpression", name: "let" }, arguments: [] },
+          test: null,
+          update: null,
+          body: { type: "EmptyStatement"}
+        }
+      );
 
-    testParse("for(let();;);", stmt,
-      { type: "ForStatement",
-        init: { type: "CallExpression", callee: { type: "IdentifierExpression", name: "let" }, arguments: [] },
-        test: null,
-        update: null,
-        body: { type: "EmptyStatement"}
-      }
-    );
+      testParse("for(let yield in 0);", stmt,
+        { type: "ForInStatement",
+          left: {
+            type: "VariableDeclaration",
+            kind: "let",
+            declarators: [ {
+              type: "VariableDeclarator",
+              binding: { name: "yield", type: "BindingIdentifier" },
+              init: null
+            } ] },
+          right: { type: "LiteralNumericExpression", value: 0},
+          body: { type: "EmptyStatement"}
+        }
+      );
 
-    testParse("for(let yield in 0);", stmt,
-      { type: "ForInStatement",
-        left: {
-          type: "VariableDeclaration",
-          kind: "let",
-          declarators: [ {
-            type: "VariableDeclarator",
-            binding: { name: "yield", type: "BindingIdentifier" },
-            init: null
-          } ] },
-        right: { type: "LiteralNumericExpression", value: 0},
-        body: { type: "EmptyStatement"}
-      }
-    );
+      testParse("for(let.let in 0);", stmt,
+        { type: "ForInStatement",
+          left: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" },
+          right: { type: "LiteralNumericExpression", value: 0},
+          body: { type: "EmptyStatement"}
+        }
+      );
 
-    testParse("for(let.let in 0);", stmt,
-      { type: "ForInStatement",
-        left: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" },
-        right: { type: "LiteralNumericExpression", value: 0},
-        body: { type: "EmptyStatement"}
-      }
-    );
-  });
+      testParseFailure("for(let[a].b of 0);", "Unexpected token \".\"");
+      testParseFailure("for(let[a]().b of 0);", "Unexpected token \"(\"");
+      testParseFailure("for(let.a of 0);", "Invalid left-hand side in for-of");
+    });
 
-  suite("unicode identifier", function () {
-    // Unicode
-    testParse("日本語", expr,
-      { type: "IdentifierExpression", name: "日本語" }
-    );
+    suite("unicode identifier", function () {
+      // Unicode
+      testParse("日本語", expr,
+        { type: "IdentifierExpression", name: "日本語" }
+      );
 
-    testParse("\uD800\uDC00", expr,
-      { type: "IdentifierExpression", name: "\uD800\uDC00" }
-    );
+      testParse("\uD800\uDC00", expr,
+        { type: "IdentifierExpression", name: "\uD800\uDC00" }
+      );
 
-    testParse("\\uD800\\uDC00", expr,
-      { type: "IdentifierExpression", name: "\uD800\uDC00" }
-    );
+      testParse("\\uD800\\uDC00", expr,
+        { type: "IdentifierExpression", name: "\uD800\uDC00" }
+      );
 
-    testParse("T\u203F", expr,
-      { type: "IdentifierExpression", name: "T\u203F" }
-    );
+      testParse("T\u203F", expr,
+        { type: "IdentifierExpression", name: "T\u203F" }
+      );
 
-    testParse("T\u200C", expr,
-      { type: "IdentifierExpression", name: "T\u200C" }
-    );
+      testParse("T\u200C", expr,
+        { type: "IdentifierExpression", name: "T\u200C" }
+      );
 
-    testParse("T\u200D", expr,
-      { type: "IdentifierExpression", name: "T\u200D" }
-    );
+      testParse("T\u200D", expr,
+        { type: "IdentifierExpression", name: "T\u200D" }
+      );
 
-    testParse("\u2163\u2161", expr,
-      { type: "IdentifierExpression", name: "\u2163\u2161" }
-    );
+      testParse("\u2163\u2161", expr,
+        { type: "IdentifierExpression", name: "\u2163\u2161" }
+      );
 
-    testParse("\u2163\u2161\u200A", expr,
-      { type: "IdentifierExpression", name: "\u2163\u2161" }
-    );
+      testParse("\u2163\u2161\u200A", expr,
+        { type: "IdentifierExpression", name: "\u2163\u2161" }
+      );
+
+    });
 
   });
 });

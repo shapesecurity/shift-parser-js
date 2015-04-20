@@ -163,6 +163,7 @@ suite("Parser", function () {
       });
 
     testParseFailure("import 'a'", "Unexpected token \"import\"");
+    testParseModuleFailure("{import a from 'b';}", "Unexpected token \"import\"");
     testParseModuleFailure("import", "Unexpected end of input");
     testParseModuleFailure("import;", "Unexpected token \";\"");
     testParseModuleFailure("import {}", "Unexpected end of input");

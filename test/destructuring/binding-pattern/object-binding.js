@@ -166,8 +166,6 @@ suite("Parser", function () {
         }
       );
 
-      testParseFailure("let {a, x: {y: a}} = 0;", "Duplicate binding \"a\"");
-      testParseFailure("let a, {x: {y: a}} = 0;", "Duplicate binding \"a\"");
       testParseFailure("var {a: b.c} = 0;", "Unexpected token \".\"");
     });
 
@@ -196,8 +194,6 @@ suite("Parser", function () {
       testParseFailure("({a({e: a.b}){}})", "Unexpected token \".\"");
       testParseFailure("({*a({e: a.b}){}})", "Unexpected token \".\"");
       testParseFailure("({set a({e: a.b}){}})", "Unexpected token \".\"");
-      testParseFailure("(function*({yield}){}})", "Unexpected token \"yield\"");
-      testParseFailure("(function*(){(function*({a=function({yield}){}}){})})", "Unexpected token \"yield\"");
 
     });
 

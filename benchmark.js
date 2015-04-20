@@ -15,23 +15,44 @@
  */
 
 "use strict";
-var Benchmark = require('benchmark');
-var parse = function (t, o) {
-  return require('./').parseScript(t, o);
-};
-var fs = require('fs');
+var Benchmark = require("benchmark");
+
+global.fs = require("fs");
+global.parse = require("./").parseScript;
+global.esprima = require("esprima");
+global.babel = require("babel-core");
+global.traceur = require("traceur");
+
+// Poor man's error reporter for Traceur.
+console.reportError = console.error;
 
 function benchmarkParsing(fileName) {
-  var source = fs.readFileSync(require.resolve(fileName), 'utf-8');
-  var bm = new Benchmark("angular", {
-    fn: function () {
-      parse(source, { loc: true });
-    },
-    onComplete: function () {
-      console.log(this.toString());
-      console.log("Mean = " + (this.stats.mean * 1000).toFixed(2) + "ms.");
-    }
-  }).run();
+  var source = global.source = fs.readFileSync(require.resolve(fileName), "utf-8");
+  console.log(fileName + " (" + (source.length / 1000).toFixed(2) + "KB)");
+  var suite = new Benchmark.Suite;
+  suite.add("shift", function () {
+    parse(source, { loc: true, earlyErrors: false });
+  });
+  suite.add("esprima", function() {
+    esprima.parse(source, { loc: true, sourceType: "script" });
+  });
+  suite.add("babel", function() {
+    babel.parse(source, { loc: true, sourceType: "script" });
+  });
+  suite.add("traceur", function() {
+    var file, parser, tree;
+    file = new traceur.syntax.SourceFile('name', source);
+    parser = new traceur.syntax.Parser(file, console);
+    tree = parser.parseScript();
+  });
+  suite.on("complete", function() {
+    [].forEach.call(this, function(results) {
+      console.log("  " + results.name + ": " + (results.stats.mean * 1000).toFixed(2) + "ms");
+    });
+  });
+  suite.run({ "async": false });
 }
 
-benchmarkParsing('angular/angular');
+benchmarkParsing("angular/angular");
+benchmarkParsing("esprima/esprima");
+benchmarkParsing("./dist/parser");

@@ -18,7 +18,7 @@
     "watch": "babel --auxiliary-comment 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src --watch",
     "benchmark": "node benchmark",
     "profile": "node --prof profile.js && node-tick-processor",
-    "generate-coverage": "istanbul cover _mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
+    "generate-coverage": "istanbul cover -x dist/pattern-acceptor.js _mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
     "check-coverage": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100",
     "cjsify": "npm run build && cjsify dist/index.js --no-node --export Shift --output dist/shift.js"
   },

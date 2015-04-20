@@ -584,9 +584,10 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceLiteralRegExpExpression",
     value: function reduceLiteralRegExpExpression(node) {
       var s = this.identity;
-      if (!_PatternAcceptor.PatternAcceptor.test(node.pattern, node.flags.indexOf("u") >= 0)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Invalid regular expression pattern"));
-      }
+      // NOTE: the RegExp pattern acceptor is disabled until we have more confidence in its correctness (more tests)
+      //if (!PatternAcceptor.test(node.pattern, node.flags.indexOf("u") >= 0)) {
+      //  s = s.addError(new EarlyError(node, "Invalid regular expression pattern"));
+      //}
       if (!/^[igmyu]*$/.test(node.flags) || containsDuplicates(node.flags)) {
         s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Invalid regular expression flags"));
       }

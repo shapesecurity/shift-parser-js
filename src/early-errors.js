@@ -453,9 +453,10 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceLiteralRegExpExpression(node) {
     let s = this.identity;
-    if (!PatternAcceptor.test(node.pattern, node.flags.indexOf("u") >= 0)) {
-      s = s.addError(new EarlyError(node, "Invalid regular expression pattern"));
-    }
+    // NOTE: the RegExp pattern acceptor is disabled until we have more confidence in its correctness (more tests)
+    //if (!PatternAcceptor.test(node.pattern, node.flags.indexOf("u") >= 0)) {
+    //  s = s.addError(new EarlyError(node, "Invalid regular expression pattern"));
+    //}
     if (!/^[igmyu]*$/.test(node.flags) || containsDuplicates(node.flags)) {
       s = s.addError(new EarlyError(node, "Invalid regular expression flags"));
     }

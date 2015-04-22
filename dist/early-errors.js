@@ -387,6 +387,13 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         init = init.enforceConflictingLexicallyDeclaredNames(body.varDeclaredNames, DUPLICATE_BINDING);
       }
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceForStatement", this).call(this, node, { init: init, test: test, update: update, body: body });
+      if (node.init != null && node.init.type === "VariableDeclaration" && node.init.kind === "const") {
+        node.init.declarators.forEach(function (declarator) {
+          if (declarator.init == null) {
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
+          }
+        });
+      }
       if (isLabelledFunction(node.body)) {
         s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.body, "The body of a for statement must not be a labeled function declaration"));
       }
@@ -804,14 +811,12 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceVariableDeclarationStatement",
     value: function reduceVariableDeclarationStatement(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceVariableDeclarationStatement", this).apply(this, arguments);
-      switch (node.declaration.kind) {
-        case "const":
-          node.declaration.declarators.forEach(function (declarator) {
-            if (declarator.init == null) {
-              s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
-            }
-          });
-          break;
+      if (node.declaration.kind === "const") {
+        node.declaration.declarators.forEach(function (declarator) {
+          if (declarator.init == null) {
+            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
+          }
+        });
       }
       return s;
     }

@@ -729,39 +729,43 @@ suite("Parser", function () {
 
   suite("early error locations", function () {
 
-    try {
-      parse("++0", { loc: true, earlyErrors: true });
-      expect().fail();
-    } catch(e) {
-      expect(e.index).to.be(0);
-      expect(e.line).to.be(1);
-      expect(e.column).to.be(0);
-    }
-    try {
-      parse("++0", { loc: false, earlyErrors: true });
-      expect().fail();
-    } catch(e) {
-      expect(e.index).to.be(0);
-      expect(e.line).to.be(1);
-      expect(e.column).to.be(0);
-    }
+    test("location disabled", function () {
+      try {
+        parse("++0", { loc: false, earlyErrors: true });
+        expect().fail();
+      } catch(e) {
+        expect(e.index).to.be(0);
+        expect(e.line).to.be(1);
+        expect(e.column).to.be(0);
+      }
+      try {
+        parse("\n\n  ++0", { loc: false, earlyErrors: true });
+        expect().fail();
+      } catch(e) {
+        expect(e.index).to.be(0);
+        expect(e.line).to.be(1);
+        expect(e.column).to.be(0);
+      }
+    });
 
-    try {
-      parse("\n\n  ++0", { loc: true, earlyErrors: true });
-      expect().fail();
-    } catch(e) {
-      expect(e.index).to.be(4);
-      expect(e.line).to.be(3);
-      expect(e.column).to.be(2);
-    }
-    try {
-      parse("\n\n  ++0", { loc: false, earlyErrors: true });
-      expect().fail();
-    } catch(e) {
-      expect(e.index).to.be(0);
-      expect(e.line).to.be(1);
-      expect(e.column).to.be(0);
-    }
+    test("location enabled", function () {
+      try {
+        parse("++0", { loc: true, earlyErrors: true });
+        expect().fail();
+      } catch(e) {
+        expect(e.index).to.be(0);
+        expect(e.line).to.be(1);
+        expect(e.column).to.be(0);
+      }
+      try {
+        parse("\n\n  ++0", { loc: true, earlyErrors: true });
+        expect().fail();
+      } catch(e) {
+        expect(e.index).to.be(4);
+        expect(e.line).to.be(3);
+        expect(e.column).to.be(2);
+      }
+    });
 
   });
 

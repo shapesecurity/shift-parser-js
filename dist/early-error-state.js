@@ -47,356 +47,346 @@ MultiMap.prototype.addEach = function (otherMap) {
   return this;
 };
 
-var proto = {
-  __proto__: null,
-
-  errors: [],
-  // errors that are only errors in strict mode code
-  strictErrors: [],
-
-  // Label values used in LabeledStatement nodes; cleared at function boundaries
-  usedLabelNames: [],
-
-  // BreakStatement nodes; cleared at iteration, switch, and function boundaries
-  freeBreakStatements: [],
-  // ContinueStatement nodes; cleared at
-  freeContinueStatements: [],
-
-  // labeled BreakStatement nodes; cleared at LabeledStatement with same Label and function boundaries
-  freeLabeledBreakStatements: [],
-  // labeled ContinueStatement nodes; cleared at labeled iteration statement with same Label and function boundaries
-  freeLabeledContinueStatements: [],
-
-  // NewTargetExpression nodes; cleared at function (besides arrow expression) boundaries
-  newTargetExpressions: [],
-
-  // BindingIdentifier nodes; cleared at containing declaration node
-  boundNames: new MultiMap(),
-  // BindingIdentifiers that were found to be in a lexical binding position
-  lexicallyDeclaredNames: new MultiMap(),
-  // BindingIdentifiers that were the name of a FunctionDeclaration
-  functionDeclarationNames: new MultiMap(),
-  // BindingIdentifiers that were found to be in a variable binding position
-  varDeclaredNames: new MultiMap(),
-  // BindingIdentifiers that were found to be in a variable binding position
-  forOfVarDeclaredNames: [],
-
-  // Names that this module exports
-  exportedNames: new MultiMap(),
-  // Locally declared names that are referenced in export declarations
-  exportedBindings: new MultiMap(),
-
-  // CallExpressions with Super callee
-  superCallExpressions: [],
-  // SuperCall expressions in the context of a Method named "constructor"
-  superCallExpressionsInConstructorMethod: [],
-  // MemberExpressions with Super object
-  superPropertyExpressions: [] };
-
 var identity = undefined; // initialised below EarlyErrorState
 
 var EarlyErrorState = (function () {
   function EarlyErrorState() {
     _classCallCheck(this, EarlyErrorState);
+
+    this.errors = [];
+    // errors that are only errors in strict mode code
+    this.strictErrors = [];
+
+    // Label values used in LabeledStatement nodes; cleared at function boundaries
+    this.usedLabelNames = [];
+
+    // BreakStatement nodes; cleared at iteration; switch; and function boundaries
+    this.freeBreakStatements = [];
+    // ContinueStatement nodes; cleared at
+    this.freeContinueStatements = [];
+
+    // labeled BreakStatement nodes; cleared at LabeledStatement with same Label and function boundaries
+    this.freeLabeledBreakStatements = [];
+    // labeled ContinueStatement nodes; cleared at labeled iteration statement with same Label and function boundaries
+    this.freeLabeledContinueStatements = [];
+
+    // NewTargetExpression nodes; cleared at function (besides arrow expression) boundaries
+    this.newTargetExpressions = [];
+
+    // BindingIdentifier nodes; cleared at containing declaration node
+    this.boundNames = new MultiMap();
+    // BindingIdentifiers that were found to be in a lexical binding position
+    this.lexicallyDeclaredNames = new MultiMap();
+    // BindingIdentifiers that were the name of a FunctionDeclaration
+    this.functionDeclarationNames = new MultiMap();
+    // BindingIdentifiers that were found to be in a variable binding position
+    this.varDeclaredNames = new MultiMap();
+    // BindingIdentifiers that were found to be in a variable binding position
+    this.forOfVarDeclaredNames = [];
+
+    // Names that this module exports
+    this.exportedNames = new MultiMap();
+    // Locally declared names that are referenced in export declarations
+    this.exportedBindings = new MultiMap();
+
+    // CallExpressions with Super callee
+    this.superCallExpressions = [];
+    // SuperCall expressions in the context of a Method named "constructor"
+    this.superCallExpressionsInConstructorMethod = [];
+    // MemberExpressions with Super object
+    this.superPropertyExpressions = [];
   }
 
   _createClass(EarlyErrorState, [{
-    key: "clone",
-    value: function clone(additionalProperties) {
-      return objectAssign(objectAssign(new EarlyErrorState(), this), additionalProperties);
-    }
-  }, {
     key: "addFreeBreakStatement",
     value: function addFreeBreakStatement(s) {
-      return this.clone({
-        freeBreakStatements: this.freeBreakStatements.concat([s]) });
+      this.freeBreakStatements.push(s);
+      return this;
     }
   }, {
     key: "addFreeLabeledBreakStatement",
     value: function addFreeLabeledBreakStatement(s) {
-      return this.clone({
-        freeLabeledBreakStatements: this.freeLabeledBreakStatements.concat([s]) });
+      this.freeLabeledBreakStatements.push(s);
+      return this;
     }
   }, {
     key: "clearFreeBreakStatements",
     value: function clearFreeBreakStatements() {
-      return this.clone({
-        freeBreakStatements: [] });
+      this.freeBreakStatements = [];
+      return this;
     }
   }, {
     key: "addFreeContinueStatement",
     value: function addFreeContinueStatement(s) {
-      return this.clone({
-        freeContinueStatements: this.freeContinueStatements.concat([s]) });
+      this.freeContinueStatements.push(s);
+      return this;
     }
   }, {
     key: "addFreeLabeledContinueStatement",
     value: function addFreeLabeledContinueStatement(s) {
-      return this.clone({
-        freeLabeledContinueStatements: this.freeLabeledContinueStatements.concat([s]) });
+      this.freeLabeledContinueStatements.push(s);
+      return this;
     }
   }, {
     key: "clearFreeContinueStatements",
     value: function clearFreeContinueStatements() {
-      return this.clone({
-        freeContinueStatements: [] });
+      this.freeContinueStatements = [];
+      return this;
     }
   }, {
     key: "enforceFreeBreakStatementErrors",
     value: function enforceFreeBreakStatementErrors(createError) {
-      return this.clone({
-        freeBreakStatements: [],
-        errors: this.errors.concat(this.freeBreakStatements.map(createError)) });
+      [].push.apply(this.errors, this.freeBreakStatements.map(createError));
+      this.freeBreakStatements = [];
+      return this;
     }
   }, {
     key: "enforceFreeLabeledBreakStatementErrors",
     value: function enforceFreeLabeledBreakStatementErrors(createError) {
-      return this.clone({
-        freeLabeledBreakStatements: [],
-        errors: this.errors.concat(this.freeLabeledBreakStatements.map(createError)) });
+      [].push.apply(this.errors, this.freeLabeledBreakStatements.map(createError));
+      this.freeLabeledBreakStatements = [];
+      return this;
     }
   }, {
     key: "enforceFreeContinueStatementErrors",
     value: function enforceFreeContinueStatementErrors(createError) {
-      return this.clone({
-        freeContinueStatements: [],
-        errors: this.errors.concat(this.freeContinueStatements.map(createError)) });
+      [].push.apply(this.errors, this.freeContinueStatements.map(createError));
+      this.freeContinueStatements = [];
+      return this;
     }
   }, {
     key: "enforceFreeLabeledContinueStatementErrors",
     value: function enforceFreeLabeledContinueStatementErrors(createError) {
-      return this.clone({
-        freeLabeledContinueStatements: [],
-        errors: this.errors.concat(this.freeLabeledContinueStatements.map(createError)) });
+      [].push.apply(this.errors, this.freeLabeledContinueStatements.map(createError));
+      this.freeLabeledContinueStatements = [];
+      return this;
     }
   }, {
     key: "observeIterationLabel",
     value: function observeIterationLabel(label) {
-      return this.clone({
-        usedLabelNames: this.usedLabelNames.concat([label]),
-        freeLabeledBreakStatements: this.freeLabeledBreakStatements.filter(function (s) {
-          return s.label !== label;
-        }),
-        freeLabeledContinueStatements: this.freeLabeledContinueStatements.filter(function (s) {
-          return s.label !== label;
-        }) });
+      this.usedLabelNames.push(label);
+      this.freeLabeledBreakStatements = this.freeLabeledBreakStatements.filter(function (s) {
+        return s.label !== label;
+      });
+      this.freeLabeledContinueStatements = this.freeLabeledContinueStatements.filter(function (s) {
+        return s.label !== label;
+      });
+      return this;
     }
   }, {
     key: "observeNonIterationLabel",
     value: function observeNonIterationLabel(label) {
-      return this.clone({
-        usedLabelNames: this.usedLabelNames.concat([label]),
-        freeLabeledBreakStatements: this.freeLabeledBreakStatements.filter(function (s) {
-          return s.label !== label;
-        }) });
+      this.usedLabelNames.push(label);
+      this.freeLabeledBreakStatements = this.freeLabeledBreakStatements.filter(function (s) {
+        return s.label !== label;
+      });
+      return this;
     }
   }, {
     key: "clearUsedLabelNames",
     value: function clearUsedLabelNames() {
-      return this.clone({
-        usedLabelNames: [] });
+      this.usedLabelNames = [];
+      return this;
     }
   }, {
     key: "observeSuperCallExpression",
     value: function observeSuperCallExpression(node) {
-      return this.clone({
-        superCallExpressions: this.superCallExpressions.concat([node]) });
+      this.superCallExpressions.push(node);
+      return this;
     }
   }, {
     key: "observeConstructorMethod",
     value: function observeConstructorMethod() {
-      return this.clone({
-        superCallExpressions: [],
-        superCallExpressionsInConstructorMethod: this.superCallExpressions });
+      this.superCallExpressionsInConstructorMethod = this.superCallExpressions;
+      this.superCallExpressions = [];
+      return this;
     }
   }, {
     key: "clearSuperCallExpressionsInConstructorMethod",
     value: function clearSuperCallExpressionsInConstructorMethod() {
-      return this.clone({
-        superCallExpressionsInConstructorMethod: [] });
+      this.superCallExpressionsInConstructorMethod = [];
+      return this;
     }
   }, {
     key: "enforceSuperCallExpressions",
     value: function enforceSuperCallExpressions(createError) {
-      return this.clone({
-        errors: this.errors.concat(this.superCallExpressions.map(createError), this.superCallExpressionsInConstructorMethod.map(createError)),
-        superCallExpressions: [],
-        superCallExpressionsInConstructorMethod: [] });
+      [].push.apply(this.errors, this.superCallExpressions.map(createError));
+      [].push.apply(this.errors, this.superCallExpressionsInConstructorMethod.map(createError));
+      this.superCallExpressions = [];
+      this.superCallExpressionsInConstructorMethod = [];
+      return this;
     }
   }, {
     key: "enforceSuperCallExpressionsInConstructorMethod",
     value: function enforceSuperCallExpressionsInConstructorMethod(createError) {
-      return this.clone({
-        errors: this.errors.concat(this.superCallExpressionsInConstructorMethod.map(createError)),
-        superCallExpressionsInConstructorMethod: [] });
+      [].push.apply(this.errors, this.superCallExpressionsInConstructorMethod.map(createError));
+      this.superCallExpressionsInConstructorMethod = [];
+      return this;
     }
   }, {
     key: "observeSuperPropertyExpression",
     value: function observeSuperPropertyExpression(node) {
-      return this.clone({
-        superPropertyExpressions: this.superPropertyExpressions.concat([node]) });
+      this.superPropertyExpressions.push(node);
+      return this;
     }
   }, {
     key: "clearSuperPropertyExpressions",
     value: function clearSuperPropertyExpressions() {
-      return this.clone({
-        superPropertyExpressions: [] });
+      this.superPropertyExpressions = [];
+      return this;
     }
   }, {
     key: "enforceSuperPropertyExpressions",
     value: function enforceSuperPropertyExpressions(createError) {
-      return this.clone({
-        errors: this.errors.concat(this.superPropertyExpressions.map(createError)),
-        superPropertyExpressions: [] });
+      [].push.apply(this.errors, this.superPropertyExpressions.map(createError));
+      this.superPropertyExpressions = [];
+      return this;
     }
   }, {
     key: "observeNewTargetExpression",
     value: function observeNewTargetExpression(node) {
-      return this.clone({
-        newTargetExpressions: this.newTargetExpressions.concat([node]) });
+      this.newTargetExpressions.push(node);
+      return this;
     }
   }, {
     key: "clearNewTargetExpressions",
     value: function clearNewTargetExpressions() {
-      return this.clone({
-        newTargetExpressions: [] });
+      this.newTargetExpressions = [];
+      return this;
     }
   }, {
     key: "bindName",
     value: function bindName(name, node) {
-      var newBoundNames = new MultiMap().addEach(this.boundNames);
-      newBoundNames.set(name, node);
-      return this.clone({
-        boundNames: newBoundNames });
+      this.boundNames.set(name, node);
+      return this;
     }
   }, {
     key: "clearBoundNames",
     value: function clearBoundNames() {
-      return this.clone({
-        boundNames: new MultiMap() });
+      this.boundNames = new MultiMap();
+      return this;
     }
   }, {
     key: "observeLexicalDeclaration",
     value: function observeLexicalDeclaration() {
-      return this.clone({
-        boundNames: new MultiMap(),
-        lexicallyDeclaredNames: new MultiMap().addEach(this.lexicallyDeclaredNames).addEach(this.boundNames) });
+      this.lexicallyDeclaredNames.addEach(this.boundNames);
+      this.boundNames = new MultiMap();
+      return this;
     }
   }, {
     key: "observeLexicalBoundary",
     value: function observeLexicalBoundary() {
-      return this.clone({
-        lexicallyDeclaredNames: new MultiMap(),
-        functionDeclarationNames: new MultiMap(),
-        previousLexicallyDeclaredNames: this.lexicallyDeclaredNames });
+      this.previousLexicallyDeclaredNames = this.lexicallyDeclaredNames;
+      this.lexicallyDeclaredNames = new MultiMap();
+      this.functionDeclarationNames = new MultiMap();
+      return this;
     }
   }, {
     key: "enforceDuplicateLexicallyDeclaredNames",
     value: function enforceDuplicateLexicallyDeclaredNames(createError) {
-      var s = this;
+      var _this3 = this;
+
       this.lexicallyDeclaredNames.forEachEntry(function (nodes /*, bindingName*/) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            s = s.addError(createError(dupeNode));
+            _this3.addError(createError(dupeNode));
           });
         }
       });
-      return s;
+      return this;
     }
   }, {
     key: "enforceConflictingLexicallyDeclaredNames",
     value: function enforceConflictingLexicallyDeclaredNames(otherNames, createError) {
-      var s = this;
+      var _this4 = this;
+
       this.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (otherNames.has(bindingName)) {
           nodes.forEach(function (conflictingNode) {
-            s = s.addError(createError(conflictingNode));
+            _this4.addError(createError(conflictingNode));
           });
         }
       });
-      return s;
+      return this;
     }
   }, {
     key: "observeFunctionDeclaration",
     value: function observeFunctionDeclaration() {
-      return this.observeVarBoundary().clone({
-        boundNames: new MultiMap(),
-        functionDeclarationNames: new MultiMap().addEach(this.functionDeclarationNames).addEach(this.boundNames) });
+      this.observeVarBoundary();
+      this.functionDeclarationNames.addEach(this.boundNames);
+      this.boundNames = new MultiMap();
+      return this;
     }
   }, {
     key: "functionDeclarationNamesAreLexical",
     value: function functionDeclarationNamesAreLexical() {
-      return this.clone({
-        lexicallyDeclaredNames: new MultiMap().addEach(this.lexicallyDeclaredNames).addEach(this.functionDeclarationNames),
-        functionDeclarationNames: new MultiMap() });
+      this.lexicallyDeclaredNames.addEach(this.functionDeclarationNames);
+      this.functionDeclarationNames = new MultiMap();
+      return this;
     }
   }, {
     key: "observeVarDeclaration",
     value: function observeVarDeclaration() {
-      return this.clone({
-        boundNames: new MultiMap(),
-        varDeclaredNames: new MultiMap().addEach(this.varDeclaredNames).addEach(this.boundNames) });
+      this.varDeclaredNames.addEach(this.boundNames);
+      this.boundNames = new MultiMap();
+      return this;
     }
   }, {
     key: "recordForOfVars",
     value: function recordForOfVars() {
-      var newForOfVarDeclaredNames = this.forOfVarDeclaredNames.slice();
+      var _this5 = this;
+
       this.varDeclaredNames.forEach(function (bindingIdentifier) {
-        newForOfVarDeclaredNames.push(bindingIdentifier);
+        _this5.forOfVarDeclaredNames.push(bindingIdentifier);
       });
-      return this.clone({
-        forOfVarDeclaredNames: newForOfVarDeclaredNames });
+      return this;
     }
   }, {
     key: "observeVarBoundary",
     value: function observeVarBoundary() {
-      return this.clone({
-        lexicallyDeclaredNames: new MultiMap(),
-        functionDeclarationNames: new MultiMap(),
-        varDeclaredNames: new MultiMap(),
-        forOfVarDeclaredNames: [] });
+      this.lexicallyDeclaredNames = new MultiMap();
+      this.functionDeclarationNames = new MultiMap();
+      this.varDeclaredNames = new MultiMap();
+      this.forOfVarDeclaredNames = [];
+      return this;
     }
   }, {
     key: "exportName",
     value: function exportName(name, node) {
-      var newExportedNames = new MultiMap().addEach(this.exportedNames);
-      newExportedNames.set(name, node);
-      return this.clone({
-        exportedNames: newExportedNames });
+      this.exportedNames.set(name, node);
+      return this;
     }
   }, {
     key: "exportDeclaredNames",
     value: function exportDeclaredNames() {
-      return this.clone({
-        exportedNames: new MultiMap().addEach(this.exportedNames).addEach(this.lexicallyDeclaredNames).addEach(this.varDeclaredNames),
-        exportedBindings: new MultiMap().addEach(this.exportedBindings).addEach(this.lexicallyDeclaredNames).addEach(this.varDeclaredNames) });
+      this.exportedNames.addEach(this.lexicallyDeclaredNames).addEach(this.varDeclaredNames);
+      this.exportedBindings.addEach(this.lexicallyDeclaredNames).addEach(this.varDeclaredNames);
+      return this;
     }
   }, {
     key: "exportBinding",
     value: function exportBinding(name, node) {
-      var newExportedBindings = new MultiMap().addEach(this.exportedBindings);
-      newExportedBindings.set(name, node);
-      return this.clone({
-        exportedBindings: newExportedBindings });
+      this.exportedBindings.set(name, node);
+      return this;
     }
   }, {
     key: "addError",
     value: function addError(e) {
-      return this.clone({
-        errors: this.errors.concat([e]) });
+      this.errors.push(e);
+      return this;
     }
   }, {
     key: "addStrictError",
     value: function addStrictError(e) {
-      return this.clone({
-        strictErrors: this.strictErrors.concat([e]) });
+      this.strictErrors.push(e);
+      return this;
     }
   }, {
     key: "enforceStrictErrors",
     value: function enforceStrictErrors() {
-      return this.clone({
-        errors: this.errors.concat(this.strictErrors),
-        strictErrors: [] });
+      [].push.apply(this.errors, this.strictErrors);
+      this.strictErrors = [];
+      return this;
     }
   }, {
     key: "concat",
@@ -405,25 +395,25 @@ var EarlyErrorState = (function () {
         return s;
       }if (s === identity) {
         return this;
-      }return this.clone({
-        errors: this.errors.concat(s.errors),
-        strictErrors: this.strictErrors.concat(s.strictErrors),
-        usedLabelNames: this.usedLabelNames.concat(s.usedLabelNames),
-        freeBreakStatements: this.freeBreakStatements.concat(s.freeBreakStatements),
-        freeContinueStatements: this.freeContinueStatements.concat(s.freeContinueStatements),
-        freeLabeledBreakStatements: this.freeLabeledBreakStatements.concat(s.freeLabeledBreakStatements),
-        freeLabeledContinueStatements: this.freeLabeledContinueStatements.concat(s.freeLabeledContinueStatements),
-        newTargetExpressions: this.newTargetExpressions.concat(s.newTargetExpressions),
-        boundNames: new MultiMap().addEach(this.boundNames).addEach(s.boundNames),
-        lexicallyDeclaredNames: new MultiMap().addEach(this.lexicallyDeclaredNames).addEach(s.lexicallyDeclaredNames),
-        functionDeclarationNames: new MultiMap().addEach(this.functionDeclarationNames).addEach(s.functionDeclarationNames),
-        varDeclaredNames: new MultiMap().addEach(this.varDeclaredNames).addEach(s.varDeclaredNames),
-        forOfVarDeclaredNames: this.forOfVarDeclaredNames.concat(s.forOfVarDeclaredNames),
-        exportedNames: new MultiMap().addEach(this.exportedNames).addEach(s.exportedNames),
-        exportedBindings: new MultiMap().addEach(this.exportedBindings).addEach(s.exportedBindings),
-        superCallExpressions: this.superCallExpressions.concat(s.superCallExpressions),
-        superCallExpressionsInConstructorMethod: this.superCallExpressionsInConstructorMethod.concat(s.superCallExpressionsInConstructorMethod),
-        superPropertyExpressions: this.superPropertyExpressions.concat(s.superPropertyExpressions) });
+      }[].push.apply(this.errors, s.errors);
+      [].push.apply(this.strictErrors, s.strictErrors);
+      [].push.apply(this.usedLabelNames, s.usedLabelNames);
+      [].push.apply(this.freeBreakStatements, s.freeBreakStatements);
+      [].push.apply(this.freeContinueStatements, s.freeContinueStatements);
+      [].push.apply(this.freeLabeledBreakStatements, s.freeLabeledBreakStatements);
+      [].push.apply(this.freeLabeledContinueStatements, s.freeLabeledContinueStatements);
+      [].push.apply(this.newTargetExpressions, s.newTargetExpressions);
+      this.boundNames.addEach(s.boundNames);
+      this.lexicallyDeclaredNames.addEach(s.lexicallyDeclaredNames);
+      this.functionDeclarationNames.addEach(s.functionDeclarationNames);
+      this.varDeclaredNames.addEach(s.varDeclaredNames);
+      [].push.apply(this.forOfVarDeclaredNames, s.forOfVarDeclaredNames);
+      this.exportedNames.addEach(s.exportedNames);
+      this.exportedBindings.addEach(s.exportedBindings);
+      [].push.apply(this.superCallExpressions, s.superCallExpressions);
+      [].push.apply(this.superCallExpressionsInConstructorMethod, s.superCallExpressionsInConstructorMethod);
+      [].push.apply(this.superPropertyExpressions, s.superPropertyExpressions);
+      return this;
     }
   }], [{
     key: "empty",
@@ -441,7 +431,16 @@ var EarlyErrorState = (function () {
 exports.EarlyErrorState = EarlyErrorState;
 
 identity = new EarlyErrorState();
-objectAssign(identity, proto);
+Object.getOwnPropertyNames(EarlyErrorState.prototype).forEach(function (methodName) {
+  if (methodName === "constructor") return;
+  Object.defineProperty(identity, methodName, {
+    value: function value() {
+      return EarlyErrorState.prototype[methodName].apply(new EarlyErrorState(), arguments);
+    },
+    enumerable: false,
+    writable: true,
+    configurable: true });
+});
 
 var EarlyError = (function (_Error) {
   function EarlyError(node, message) {

@@ -758,15 +758,21 @@ export class Parser extends Tokenizer {
     return body;
   }
 
+  parseIfStatementChild() {
+    return this.match(TokenType.FUNCTION)
+      ? this.parseFunction({isExpr: false, inDefault: false, allowGenerator: false})
+      : this.parseStatement();
+  }
+
   parseIfStatement() {
     this.lex();
     this.expect(TokenType.LPAREN);
     let test = this.parseExpression();
     this.expect(TokenType.RPAREN);
-    let consequent = this.parseStatement();
+    let consequent = this.parseIfStatementChild();
     let alternate = null;
     if (this.eat(TokenType.ELSE)) {
-      alternate = this.parseStatement();
+      alternate = this.parseIfStatementChild();
     }
     return { type: "IfStatement", test, consequent, alternate };
   }

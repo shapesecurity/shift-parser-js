@@ -806,16 +806,21 @@ var Parser = (function (_Tokenizer) {
       return body;
     }
   }, {
+    key: "parseIfStatementChild",
+    value: function parseIfStatementChild() {
+      return this.match(_tokenizer.TokenType.FUNCTION) ? this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false }) : this.parseStatement();
+    }
+  }, {
     key: "parseIfStatement",
     value: function parseIfStatement() {
       this.lex();
       this.expect(_tokenizer.TokenType.LPAREN);
       var test = this.parseExpression();
       this.expect(_tokenizer.TokenType.RPAREN);
-      var consequent = this.parseStatement();
+      var consequent = this.parseIfStatementChild();
       var alternate = null;
       if (this.eat(_tokenizer.TokenType.ELSE)) {
-        alternate = this.parseStatement();
+        alternate = this.parseIfStatementChild();
       }
       return { type: "IfStatement", test: test, consequent: consequent, alternate: alternate };
     }

@@ -568,6 +568,12 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       if (node.alternate != null && isLabelledFunction(node.alternate)) {
         s = s.addError(new _earlyErrorState.EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
       }
+      if (node.consequent.type === "FunctionDeclaration") {
+        s = s.addStrictError(new _earlyErrorState.EarlyError(node.consequent, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+      }
+      if (node.alternate != null && node.alternate.type === "FunctionDeclaration") {
+        s = s.addStrictError(new _earlyErrorState.EarlyError(node.alternate, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+      }
       return s;
     }
   }, {

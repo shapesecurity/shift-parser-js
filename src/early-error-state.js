@@ -306,6 +306,11 @@ export class EarlyErrorState {
     return this;
   }
 
+  clearExportedBindings() {
+    this.exportedBindings = new MultiMap;
+    return this;
+  }
+
 
   addError(e) {
     this.errors.push(e);

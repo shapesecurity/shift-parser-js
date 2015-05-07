@@ -376,6 +376,12 @@ var EarlyErrorState = (function () {
       return this;
     }
   }, {
+    key: "clearExportedBindings",
+    value: function clearExportedBindings() {
+      this.exportedBindings = new MultiMap();
+      return this;
+    }
+  }, {
     key: "addError",
     value: function addError(e) {
       this.errors.push(e);

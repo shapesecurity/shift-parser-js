@@ -36,25 +36,25 @@ function testExportDecl(code, tree) {
 suite("Parser", function () {
   suite("export declaration", function () {
 
-    testExportDecl("export * from \"a\"; var a;", { type: "ExportAllFrom", moduleSpecifier: "a" });
+    testExportDecl("export * from \"a\"", { type: "ExportAllFrom", moduleSpecifier: "a" });
 
-    testExportDecl("export * from \"a\"; var a;", { type: "ExportAllFrom", moduleSpecifier: "a" });
+    testExportDecl("export * from \"a\"", { type: "ExportAllFrom", moduleSpecifier: "a" });
 
-    testExportDecl("export {} from \"a\"; var a;", { type: "ExportFrom", namedExports: [], moduleSpecifier: "a" });
+    testExportDecl("export {} from \"a\"", { type: "ExportFrom", namedExports: [], moduleSpecifier: "a" });
 
-    testExportDecl("export {a} from \"a\"; var a;", {
+    testExportDecl("export {a} from \"a\"", {
       type: "ExportFrom",
       namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
       moduleSpecifier: "a"
     });
 
-    testExportDecl("export {a,} from \"a\"; var a;", {
+    testExportDecl("export {a,} from \"a\"", {
       type: "ExportFrom",
       namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
       moduleSpecifier: "a"
     });
 
-    testExportDecl("export {a,b} from \"a\"; var a,b;", {
+    testExportDecl("export {a,b} from \"a\"", {
       type: "ExportFrom",
       namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }, {
         type: "ExportSpecifier",
@@ -64,22 +64,28 @@ suite("Parser", function () {
       moduleSpecifier: "a"
     });
 
-    testExportDecl("export {a as b} from \"a\"; var a;", {
+    testExportDecl("export {a as b} from \"a\"", {
       type: "ExportFrom",
       namedExports: [{ type: "ExportSpecifier", name: "a", exportedName: "b" }],
       moduleSpecifier: "a"
     });
 
-    testExportDecl("export {as as as} from \"as\"; var as;", {
+    testExportDecl("export {as as as} from \"as\"", {
       type: "ExportFrom",
       namedExports: [{ type: "ExportSpecifier", name: "as", exportedName: "as" }],
       moduleSpecifier: "as"
     });
 
-    testExportDecl("export {as as function} from \"as\"; var as;", {
+    testExportDecl("export {as as function} from \"as\"", {
       type: "ExportFrom",
       namedExports: [{ type: "ExportSpecifier", name: "as", exportedName: "function" }],
       moduleSpecifier: "as"
+    });
+
+    testExportDecl("export {a} from \"m\"", {
+      type: "ExportFrom",
+      namedExports: [ { type: "ExportSpecifier", name: null, exportedName: "a" } ],
+      moduleSpecifier: "m"
     });
 
     testExportDecl("export {a}\n var a;", {

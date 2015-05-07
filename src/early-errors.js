@@ -257,6 +257,14 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
+  reduceExportFrom(node) {
+    let s = super.reduceExportFrom(...arguments);
+    if (node.moduleSpecifier != null) {
+      s = s.clearExportedBindings();
+    }
+    return s;
+  }
+
   reduceExportSpecifier(node) {
     let s = super.reduceExportSpecifier(...arguments);
     s = s.exportName(node.exportedName, node);

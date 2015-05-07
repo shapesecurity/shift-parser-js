@@ -348,6 +348,15 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       return s;
     }
   }, {
+    key: "reduceExportFrom",
+    value: function reduceExportFrom(node) {
+      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceExportFrom", this).apply(this, arguments);
+      if (node.moduleSpecifier != null) {
+        s = s.clearExportedBindings();
+      }
+      return s;
+    }
+  }, {
     key: "reduceExportSpecifier",
     value: function reduceExportSpecifier(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceExportSpecifier", this).apply(this, arguments);

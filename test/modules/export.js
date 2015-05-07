@@ -88,6 +88,12 @@ suite("Parser", function () {
       moduleSpecifier: "m"
     });
 
+    testExportDecl("export {if as var} from \"a\";", {
+      type: "ExportFrom",
+      namedExports: [{ type: "ExportSpecifier", name: "if", exportedName: "var" }],
+      moduleSpecifier: "a"
+    });
+
     testExportDecl("export {a}\n var a;", {
       type: "ExportFrom",
       namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
@@ -287,8 +293,6 @@ suite("Parser", function () {
     testParseModuleFailure("export {a,b} from a", "Unexpected identifier");
     testParseModuleFailure("export {a as} from a", "Unexpected token \"}\"");
     testParseModuleFailure("export {as b} from a", "Unexpected identifier");
-    testParseModuleFailure("export {function} from a", "Unexpected token \"function\"");
-    testParseModuleFailure("export {function as a} from a", "Unexpected token \"function\"");
     testParseModuleFailure("export * from a", "Unexpected identifier");
     testParseModuleFailure("export / from a", "Unexpected token \"/\"");
     testParseModuleFailure("export * From \"a\"", "Unexpected identifier");

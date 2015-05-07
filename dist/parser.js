@@ -423,7 +423,7 @@ var Parser = (function (_Tokenizer) {
     key: "parseExportSpecifier",
     value: function parseExportSpecifier() {
       var startLocation = this.getLocation();
-      var name = this.parseIdentifier();
+      var name = this.parseIdentifierName();
       if (this.eatContextualKeyword("as")) {
         var exportedName = this.parseIdentifierName();
         return this.markLocation({ type: "ExportSpecifier", name: name, exportedName: exportedName }, startLocation);

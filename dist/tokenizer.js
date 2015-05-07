@@ -109,6 +109,7 @@ var TokenType = {
   IN: { klass: TokenClass.Keyword, name: "in" },
   NOT: { klass: TokenClass.Punctuator, name: "!" },
   BIT_NOT: { klass: TokenClass.Punctuator, name: "~" },
+  AWAIT: { klass: TokenClass.Keyword, name: "await" },
   DELETE: { klass: TokenClass.Keyword, name: "delete" },
   TYPEOF: { klass: TokenClass.Keyword, name: "typeof" },
   VOID: { klass: TokenClass.Keyword, name: "void" },
@@ -294,6 +295,227 @@ var Tokenizer = (function () {
         location = location.slice.startLocation;
       }
       return new JsError(location.offset, location.line, location.column + 1, msg);
+    }
+  }, {
+    key: "getKeyword",
+    value: function getKeyword(id) {
+      if (id.length === 1 || id.length > 10) {
+        return TokenType.IDENTIFIER;
+      }
+
+      /* istanbul ignore next */
+      switch (id.length) {
+        case 2:
+          switch (id.charAt(0)) {
+            case "i":
+              switch (id.charAt(1)) {
+                case "f":
+                  return TokenType.IF;
+                case "n":
+                  return TokenType.IN;
+                default:
+                  break;
+              }
+              break;
+            case "d":
+              if (id.charAt(1) === "o") {
+                return TokenType.DO;
+              }
+              break;
+          }
+          break;
+        case 3:
+          switch (id.charAt(0)) {
+            case "v":
+              if (Tokenizer.cse2(id, "a", "r")) {
+                return TokenType.VAR;
+              }
+              break;
+            case "f":
+              if (Tokenizer.cse2(id, "o", "r")) {
+                return TokenType.FOR;
+              }
+              break;
+            case "n":
+              if (Tokenizer.cse2(id, "e", "w")) {
+                return TokenType.NEW;
+              }
+              break;
+            case "t":
+              if (Tokenizer.cse2(id, "r", "y")) {
+                return TokenType.TRY;
+              }
+              break;
+            case "l":
+              if (Tokenizer.cse2(id, "e", "t")) {
+                return TokenType.LET;
+              }
+              break;
+          }
+          break;
+        case 4:
+          switch (id.charAt(0)) {
+            case "t":
+              if (Tokenizer.cse3(id, "h", "i", "s")) {
+                return TokenType.THIS;
+              } else if (Tokenizer.cse3(id, "r", "u", "e")) {
+                return TokenType.TRUE;
+              }
+              break;
+            case "n":
+              if (Tokenizer.cse3(id, "u", "l", "l")) {
+                return TokenType.NULL;
+              }
+              break;
+            case "e":
+              if (Tokenizer.cse3(id, "l", "s", "e")) {
+                return TokenType.ELSE;
+              }
+              break;
+            case "c":
+              if (Tokenizer.cse3(id, "a", "s", "e")) {
+                return TokenType.CASE;
+              }
+              break;
+            case "v":
+              if (Tokenizer.cse3(id, "o", "i", "d")) {
+                return TokenType.VOID;
+              }
+              break;
+            case "w":
+              if (Tokenizer.cse3(id, "i", "t", "h")) {
+                return TokenType.WITH;
+              }
+              break;
+          }
+          break;
+        case 5:
+          switch (id.charAt(0)) {
+            case "a":
+              if (this.module && Tokenizer.cse4(id, "w", "a", "i", "t")) {
+                return TokenType.AWAIT;
+              }
+              break;
+            case "w":
+              if (Tokenizer.cse4(id, "h", "i", "l", "e")) {
+                return TokenType.WHILE;
+              }
+              break;
+            case "b":
+              if (Tokenizer.cse4(id, "r", "e", "a", "k")) {
+                return TokenType.BREAK;
+              }
+              break;
+            case "f":
+              if (Tokenizer.cse4(id, "a", "l", "s", "e")) {
+                return TokenType.FALSE;
+              }
+              break;
+            case "c":
+              if (Tokenizer.cse4(id, "a", "t", "c", "h")) {
+                return TokenType.CATCH;
+              } else if (Tokenizer.cse4(id, "o", "n", "s", "t")) {
+                return TokenType.CONST;
+              } else if (Tokenizer.cse4(id, "l", "a", "s", "s")) {
+                return TokenType.CLASS;
+              }
+              break;
+            case "t":
+              if (Tokenizer.cse4(id, "h", "r", "o", "w")) {
+                return TokenType.THROW;
+              }
+              break;
+            case "y":
+              if (Tokenizer.cse4(id, "i", "e", "l", "d")) {
+                return TokenType.YIELD;
+              }
+              break;
+            case "s":
+              if (Tokenizer.cse4(id, "u", "p", "e", "r")) {
+                return TokenType.SUPER;
+              }
+              break;
+          }
+          break;
+        case 6:
+          switch (id.charAt(0)) {
+            case "r":
+              if (Tokenizer.cse5(id, "e", "t", "u", "r", "n")) {
+                return TokenType.RETURN;
+              }
+              break;
+            case "t":
+              if (Tokenizer.cse5(id, "y", "p", "e", "o", "f")) {
+                return TokenType.TYPEOF;
+              }
+              break;
+            case "d":
+              if (Tokenizer.cse5(id, "e", "l", "e", "t", "e")) {
+                return TokenType.DELETE;
+              }
+              break;
+            case "s":
+              if (Tokenizer.cse5(id, "w", "i", "t", "c", "h")) {
+                return TokenType.SWITCH;
+              }
+              break;
+            case "e":
+              if (Tokenizer.cse5(id, "x", "p", "o", "r", "t")) {
+                return TokenType.EXPORT;
+              }
+              break;
+            case "i":
+              if (Tokenizer.cse5(id, "m", "p", "o", "r", "t")) {
+                return TokenType.IMPORT;
+              }
+              break;
+          }
+          break;
+        case 7:
+          switch (id.charAt(0)) {
+            case "d":
+              if (Tokenizer.cse6(id, "e", "f", "a", "u", "l", "t")) {
+                return TokenType.DEFAULT;
+              }
+              break;
+            case "f":
+              if (Tokenizer.cse6(id, "i", "n", "a", "l", "l", "y")) {
+                return TokenType.FINALLY;
+              }
+              break;
+            case "e":
+              if (Tokenizer.cse6(id, "x", "t", "e", "n", "d", "s")) {
+                return TokenType.EXTENDS;
+              }
+              break;
+          }
+          break;
+        case 8:
+          switch (id.charAt(0)) {
+            case "f":
+              if (Tokenizer.cse7(id, "u", "n", "c", "t", "i", "o", "n")) {
+                return TokenType.FUNCTION;
+              }
+              break;
+            case "c":
+              if (Tokenizer.cse7(id, "o", "n", "t", "i", "n", "u", "e")) {
+                return TokenType.CONTINUE;
+              }
+              break;
+            case "d":
+              if (Tokenizer.cse7(id, "e", "b", "u", "g", "g", "e", "r")) {
+                return TokenType.DEBUGGER;
+              }
+              break;
+          }
+          break;
+        case 10:
+          if (id === "instanceof") {
+            return TokenType.INSTANCEOF;
+          }
+          break;
+      }
+      return TokenType.IDENTIFIER;
     }
   }, {
     key: "skipSingleLineComment",
@@ -597,7 +819,7 @@ var Tokenizer = (function () {
       var slice = this.getSlice(start, startLocation);
       slice.text = id;
 
-      return { type: Tokenizer.getKeyword(id), value: id, slice: slice };
+      return { type: this.getKeyword(id), value: id, slice: slice };
     }
   }, {
     key: "getLocation",
@@ -1296,222 +1518,6 @@ var Tokenizer = (function () {
     key: "cse7",
     value: function cse7(id, ch1, ch2, ch3, ch4, ch5, ch6, ch7) {
       return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5) === ch5 && id.charAt(6) === ch6 && id.charAt(7) === ch7;
-    }
-  }, {
-    key: "getKeyword",
-    value: function getKeyword(id) {
-      if (id.length === 1 || id.length > 10) {
-        return TokenType.IDENTIFIER;
-      }
-
-      /* istanbul ignore next */
-      switch (id.length) {
-        case 2:
-          switch (id.charAt(0)) {
-            case "i":
-              switch (id.charAt(1)) {
-                case "f":
-                  return TokenType.IF;
-                case "n":
-                  return TokenType.IN;
-                default:
-                  break;
-              }
-              break;
-            case "d":
-              if (id.charAt(1) === "o") {
-                return TokenType.DO;
-              }
-              break;
-          }
-          break;
-        case 3:
-          switch (id.charAt(0)) {
-            case "v":
-              if (Tokenizer.cse2(id, "a", "r")) {
-                return TokenType.VAR;
-              }
-              break;
-            case "f":
-              if (Tokenizer.cse2(id, "o", "r")) {
-                return TokenType.FOR;
-              }
-              break;
-            case "n":
-              if (Tokenizer.cse2(id, "e", "w")) {
-                return TokenType.NEW;
-              }
-              break;
-            case "t":
-              if (Tokenizer.cse2(id, "r", "y")) {
-                return TokenType.TRY;
-              }
-              break;
-            case "l":
-              if (Tokenizer.cse2(id, "e", "t")) {
-                return TokenType.LET;
-              }
-              break;
-          }
-          break;
-        case 4:
-          switch (id.charAt(0)) {
-            case "t":
-              if (Tokenizer.cse3(id, "h", "i", "s")) {
-                return TokenType.THIS;
-              } else if (Tokenizer.cse3(id, "r", "u", "e")) {
-                return TokenType.TRUE;
-              }
-              break;
-            case "n":
-              if (Tokenizer.cse3(id, "u", "l", "l")) {
-                return TokenType.NULL;
-              }
-              break;
-            case "e":
-              if (Tokenizer.cse3(id, "l", "s", "e")) {
-                return TokenType.ELSE;
-              }
-              break;
-            case "c":
-              if (Tokenizer.cse3(id, "a", "s", "e")) {
-                return TokenType.CASE;
-              }
-              break;
-            case "v":
-              if (Tokenizer.cse3(id, "o", "i", "d")) {
-                return TokenType.VOID;
-              }
-              break;
-            case "w":
-              if (Tokenizer.cse3(id, "i", "t", "h")) {
-                return TokenType.WITH;
-              }
-              break;
-          }
-          break;
-        case 5:
-          switch (id.charAt(0)) {
-            case "w":
-              if (Tokenizer.cse4(id, "h", "i", "l", "e")) {
-                return TokenType.WHILE;
-              }
-              break;
-            case "b":
-              if (Tokenizer.cse4(id, "r", "e", "a", "k")) {
-                return TokenType.BREAK;
-              }
-              break;
-            case "f":
-              if (Tokenizer.cse4(id, "a", "l", "s", "e")) {
-                return TokenType.FALSE;
-              }
-              break;
-            case "c":
-              if (Tokenizer.cse4(id, "a", "t", "c", "h")) {
-                return TokenType.CATCH;
-              } else if (Tokenizer.cse4(id, "o", "n", "s", "t")) {
-                return TokenType.CONST;
-              } else if (Tokenizer.cse4(id, "l", "a", "s", "s")) {
-                return TokenType.CLASS;
-              }
-              break;
-            case "t":
-              if (Tokenizer.cse4(id, "h", "r", "o", "w")) {
-                return TokenType.THROW;
-              }
-              break;
-            case "y":
-              if (Tokenizer.cse4(id, "i", "e", "l", "d")) {
-                return TokenType.YIELD;
-              }
-              break;
-            case "s":
-              if (Tokenizer.cse4(id, "u", "p", "e", "r")) {
-                return TokenType.SUPER;
-              }
-              break;
-          }
-          break;
-        case 6:
-          switch (id.charAt(0)) {
-            case "r":
-              if (Tokenizer.cse5(id, "e", "t", "u", "r", "n")) {
-                return TokenType.RETURN;
-              }
-              break;
-            case "t":
-              if (Tokenizer.cse5(id, "y", "p", "e", "o", "f")) {
-                return TokenType.TYPEOF;
-              }
-              break;
-            case "d":
-              if (Tokenizer.cse5(id, "e", "l", "e", "t", "e")) {
-                return TokenType.DELETE;
-              }
-              break;
-            case "s":
-              if (Tokenizer.cse5(id, "w", "i", "t", "c", "h")) {
-                return TokenType.SWITCH;
-              }
-              break;
-            case "e":
-              if (Tokenizer.cse5(id, "x", "p", "o", "r", "t")) {
-                return TokenType.EXPORT;
-              }
-              break;
-            case "i":
-              if (Tokenizer.cse5(id, "m", "p", "o", "r", "t")) {
-                return TokenType.IMPORT;
-              }
-              break;
-          }
-          break;
-        case 7:
-          switch (id.charAt(0)) {
-            case "d":
-              if (Tokenizer.cse6(id, "e", "f", "a", "u", "l", "t")) {
-                return TokenType.DEFAULT;
-              }
-              break;
-            case "f":
-              if (Tokenizer.cse6(id, "i", "n", "a", "l", "l", "y")) {
-                return TokenType.FINALLY;
-              }
-              break;
-            case "e":
-              if (Tokenizer.cse6(id, "x", "t", "e", "n", "d", "s")) {
-                return TokenType.EXTENDS;
-              }
-              break;
-          }
-          break;
-        case 8:
-          switch (id.charAt(0)) {
-            case "f":
-              if (Tokenizer.cse7(id, "u", "n", "c", "t", "i", "o", "n")) {
-                return TokenType.FUNCTION;
-              }
-              break;
-            case "c":
-              if (Tokenizer.cse7(id, "o", "n", "t", "i", "n", "u", "e")) {
-                return TokenType.CONTINUE;
-              }
-              break;
-            case "d":
-              if (Tokenizer.cse7(id, "e", "b", "u", "g", "g", "e", "r")) {
-                return TokenType.DEBUGGER;
-              }
-              break;
-          }
-          break;
-        case 10:
-          if (id === "instanceof") {
-            return TokenType.INSTANCEOF;
-          }
-          break;
-      }
-      return TokenType.IDENTIFIER;
     }
   }]);
 

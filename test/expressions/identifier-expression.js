@@ -16,6 +16,7 @@
 
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
+var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
 
@@ -29,6 +30,11 @@ suite("Parser", function () {
     testParse("x;", expr,
       { type: "IdentifierExpression", name: "x" }
     );
+
+    testParse("await", expr,
+      { type: "IdentifierExpression", name: "await" }
+    );
+    testParseModuleFailure("await", "Unexpected token \"await\"");
 
     suite("let used as identifier expression", function () {
 

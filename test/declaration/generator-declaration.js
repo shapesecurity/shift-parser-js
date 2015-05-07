@@ -131,14 +131,6 @@ suite("Parser", function () {
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
-    testParse("function *a(a=class extends yield{}){}", function (p) {
-      return p.body.statements[0].params.items[0].init.super;
-    }, { type: "IdentifierExpression", name: "yield" });
-    testParse("function *a({[class extends yield{}]:a}){}", function (p) {
-      return p.body.statements[0].params.items[0].properties[0].name.expression.super;
-    }, { type: "IdentifierExpression", name: "yield" });
-
-
     testParse("function* a() {} function a() {}", id,
       {
         type: "Script",

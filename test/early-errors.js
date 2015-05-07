@@ -147,6 +147,8 @@ suite("Parser", function () {
     testEarlyError("class A { f(eval){} };", "The identifier \"eval\" must not be in binding position in strict mode");
     testEarlyError("class A { *f(eval){} };", "The identifier \"eval\" must not be in binding position in strict mode");
     testEarlyError("class A { set f(eval){} };", "The identifier \"eval\" must not be in binding position in strict mode");
+    testEarlyError("class A extends (eval = null) { };", "The identifier \"eval\" must not be in binding position in strict mode");
+    testEarlyError("!class extends (eval = null) { };", "The identifier \"eval\" must not be in binding position in strict mode");
     // It is a Syntax Error if the code matched by this production is contained in strict code.
     testEarlyError("'use strict'; +yield;", "The identifier \"yield\" must not be in expression position in strict mode");
     testEarlyError("'use strict'; yield:;", "The identifier \"yield\" must not be in label position in strict mode");

@@ -267,6 +267,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var sElements = this.fold(elements);
       sElements = sElements.enforceStrictErrors();
       if (node["super"] != null) {
+        _super = _super.enforceStrictErrors();
         s = this.append(s, _super);
         sElements = sElements.clearSuperCallExpressionsInConstructorMethod();
       }
@@ -300,6 +301,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       var sElements = this.fold(elements);
       sElements = sElements.enforceStrictErrors();
       if (node["super"] != null) {
+        _super = _super.enforceStrictErrors();
         s = this.append(s, _super);
         sElements = sElements.clearSuperCallExpressionsInConstructorMethod();
       }

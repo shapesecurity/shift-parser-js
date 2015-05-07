@@ -86,6 +86,7 @@ export const TokenType = {
   IN: {klass: TokenClass.Keyword, name: "in"},
   NOT: {klass: TokenClass.Punctuator, name: "!"},
   BIT_NOT: {klass: TokenClass.Punctuator, name: "~"},
+  AWAIT: {klass: TokenClass.Keyword, name: "await"},
   DELETE: {klass: TokenClass.Keyword, name: "delete"},
   TYPEOF: {klass: TokenClass.Keyword, name: "typeof"},
   VOID: {klass: TokenClass.Keyword, name: "void"},
@@ -286,7 +287,7 @@ export default class Tokenizer {
     return id.charAt(1) === ch1 && id.charAt(2) === ch2 && id.charAt(3) === ch3 && id.charAt(4) === ch4 && id.charAt(5) === ch5 && id.charAt(6) === ch6 && id.charAt(7) === ch7;
   }
 
-  static getKeyword(id) {
+  getKeyword(id) {
     if (id.length === 1 || id.length > 10) {
       return TokenType.IDENTIFIER;
     }
@@ -379,6 +380,11 @@ export default class Tokenizer {
         break;
       case 5:
         switch (id.charAt(0)) {
+          case "a":
+            if (this.module && Tokenizer.cse4(id, "w", "a", "i", "t")) {
+              return TokenType.AWAIT;
+            }
+            break;
           case "w":
             if (Tokenizer.cse4(id, "h", "i", "l", "e")) {
               return TokenType.WHILE;
@@ -791,7 +797,7 @@ export default class Tokenizer {
     let slice = this.getSlice(start, startLocation);
     slice.text = id;
 
-    return { type: Tokenizer.getKeyword(id), value: id, slice: slice };
+    return { type: this.getKeyword(id), value: id, slice: slice };
   }
 
   getLocation() {

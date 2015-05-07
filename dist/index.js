@@ -16,11 +16,11 @@
 
 "use strict";
 
-var _Parser = require("./parser");
+var _parser = require("./parser");
 
-var _JsError = require("./tokenizer");
+var _tokenizer = require("./tokenizer");
 
-var _EarlyErrorChecker = require("./early-errors");
+var _earlyErrors = require("./early-errors");
 
 function markLocation(node, location) {
   node.loc = {
@@ -42,13 +42,13 @@ function generateInterface(parsingFunctionName) {
     var _ref$earlyErrors = _ref.earlyErrors;
     var earlyErrors = _ref$earlyErrors === undefined ? true : _ref$earlyErrors;
 
-    var parser = new _Parser.Parser(code);
+    var parser = new _parser.Parser(code);
     if (loc) {
       parser.markLocation = markLocation;
     }
     var ast = parser[parsingFunctionName]();
     if (earlyErrors) {
-      var errors = _EarlyErrorChecker.EarlyErrorChecker.check(ast);
+      var errors = _earlyErrors.EarlyErrorChecker.check(ast);
       // for now, just throw the first error; we will handle multiple errors later
       if (errors.length > 0) {
         var _errors$0 = errors[0];
@@ -59,12 +59,13 @@ function generateInterface(parsingFunctionName) {
             line = 1,
             column = 0;
         if (node.loc != null) {
-          var _node$loc$start = node.loc.start;
-          offset = _node$loc$start.offset;
-          line = _node$loc$start.line;
-          column = _node$loc$start.column;
+          var _temp = node.loc.start;
+          offset = _temp.offset;
+          line = _temp.line;
+          column = _temp.column;
+          _temp;
         }
-        throw new _JsError.JsError(offset, line, column, message);
+        throw new _tokenizer.JsError(offset, line, column, message);
       }
     }
     return ast;

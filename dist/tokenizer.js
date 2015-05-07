@@ -1,19 +1,25 @@
 // istanbul ignore next
 "use strict";
 
-var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
-
-// istanbul ignore next
-
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 // istanbul ignore next
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
+    property = _x2,
+    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 // istanbul ignore next
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _slicedToArray(arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 /**
  * Copyright 2014 Shape Security, Inc.
@@ -31,9 +37,9 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
  * limitations under the License.
  */
 
-var _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit = require("./utils");
+var _utils = require("./utils");
 
-var _ErrorMessages = require("./errors");
+var _errors = require("./errors");
 
 var TokenClass = {
   Eof: { name: "<End>" },
@@ -159,16 +165,12 @@ var JsError = (function (_Error) {
   function JsError(index, line, column, msg) {
     _classCallCheck(this, JsError);
 
-    var _this = new _Error(msg);
-
-    _this.__proto__ = JsError.prototype;
-
-    _this.index = index;
-    _this.line = line;
-    _this.column = column;
-    _this.description = msg;
-    _this.message = "[" + line + ":" + column + "]: " + msg;
-    return _this;
+    _get(Object.getPrototypeOf(JsError.prototype), "constructor", this).call(this, msg);
+    this.index = index;
+    this.line = line;
+    this.column = column;
+    this.description = msg;
+    this.message = "[" + line + ":" + column + "]: " + msg;
   }
 
   _inherits(JsError, _Error);
@@ -179,9 +181,8 @@ var JsError = (function (_Error) {
 exports.JsError = JsError;
 
 function fromCodePoint(cp) {
-  if (cp <= 65535) {
-    return String.fromCharCode(cp);
-  }var cu1 = String.fromCharCode(Math.floor((cp - 65536) / 1024) + 55296);
+  if (cp <= 65535) return String.fromCharCode(cp);
+  var cu1 = String.fromCharCode(Math.floor((cp - 65536) / 1024) + 55296);
   var cu2 = String.fromCharCode((cp - 65536) % 1024 + 56320);
   return cu1 + cu2;
 }
@@ -249,45 +250,45 @@ var Tokenizer = (function () {
       this.startIndex = this.index;
       this.startLine = this.line;
       this.startLineStart = this.lineStart;
-      return this.index < this.source.length ? this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, this.source.charAt(this.index)) : this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_EOS);
+      return this.index < this.source.length ? this.createError(_errors.ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, this.source.charAt(this.index)) : this.createError(_errors.ErrorMessages.UNEXPECTED_EOS);
     }
   }, {
     key: "createUnexpected",
     value: function createUnexpected(token) {
       switch (token.type.klass) {
         case TokenClass.Eof:
-          return this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_EOS);
+          return this.createError(_errors.ErrorMessages.UNEXPECTED_EOS);
         case TokenClass.NumericLiteral:
-          return this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_NUMBER);
+          return this.createError(_errors.ErrorMessages.UNEXPECTED_NUMBER);
         case TokenClass.StringLiteral:
-          return this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_STRING);
+          return this.createError(_errors.ErrorMessages.UNEXPECTED_STRING);
         case TokenClass.Ident:
-          return this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_IDENTIFIER);
+          return this.createError(_errors.ErrorMessages.UNEXPECTED_IDENTIFIER);
         case TokenClass.Keyword:
-          return this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
+          return this.createError(_errors.ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
         case TokenClass.Punctuator:
-          return this.createError(_ErrorMessages.ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
+          return this.createError(_errors.ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
       }
     }
   }, {
     key: "createError",
     value: function createError(message) {
-      var _arguments = arguments;
+      var _arguments2 = arguments;
 
       /* istanbul ignore next */
       var msg = message.replace(/\{(\d+)\}/g, function (_, n) {
-        return JSON.stringify(_arguments[+n + 1]);
+        return JSON.stringify(_arguments2[+n + 1]);
       });
       return new JsError(this.startIndex, this.startLine + 1, this.startIndex - this.startLineStart + 1, msg);
     }
   }, {
     key: "createErrorWithLocation",
     value: function createErrorWithLocation(location, message) {
-      var _arguments2 = arguments;
+      var _arguments3 = arguments;
 
       /* istanbul ignore next */
       var msg = message.replace(/\{(\d+)\}/g, function (_, n) {
-        return JSON.stringify(_arguments2[+n + 2]);
+        return JSON.stringify(_arguments3[+n + 2]);
       });
       if (location.slice && location.slice.startLocation) {
         location = location.slice.startLocation;
@@ -304,7 +305,7 @@ var Tokenizer = (function () {
          */
         var chCode = this.source.charCodeAt(this.index);
         this.index++;
-        if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isLineTerminator(chCode)) {
+        if (_utils.isLineTerminator(chCode)) {
           this.hasLineTerminatorBeforeNext = true;
           if (chCode === 13 /* "\r" */ && this.source.charCodeAt(this.index) === 10 /*"\n" */) {
             this.index++;
@@ -378,9 +379,9 @@ var Tokenizer = (function () {
 
       while (this.index < length) {
         var chCode = this.source.charCodeAt(this.index);
-        if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isWhiteSpace(chCode)) {
+        if (_utils.isWhiteSpace(chCode)) {
           this.index++;
-        } else if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isLineTerminator(chCode)) {
+        } else if (_utils.isLineTerminator(chCode)) {
           this.hasLineTerminatorBeforeNext = true;
           this.index++;
           if (chCode === 13 /* "\r" */ && this.source.charAt(this.index) === "\n") {
@@ -430,11 +431,11 @@ var Tokenizer = (function () {
       if (this.index + 2 > this.source.length) {
         return -1;
       }
-      var r1 = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(this.source.charAt(this.index));
+      var r1 = _utils.getHexValue(this.source.charAt(this.index));
       if (r1 === -1) {
         return -1;
       }
-      var r2 = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(this.source.charAt(this.index + 1));
+      var r2 = _utils.getHexValue(this.source.charAt(this.index + 1));
       if (r2 === -1) {
         return -1;
       }
@@ -451,7 +452,7 @@ var Tokenizer = (function () {
             ch = undefined;
         while (i < this.source.length) {
           ch = this.source.charAt(i);
-          var hex = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(ch);
+          var hex = _utils.getHexValue(ch);
           if (hex === -1) {
             break;
           }
@@ -471,19 +472,19 @@ var Tokenizer = (function () {
         if (this.index + 4 > this.source.length) {
           return -1;
         }
-        var r1 = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(this.source.charAt(this.index));
+        var r1 = _utils.getHexValue(this.source.charAt(this.index));
         if (r1 === -1) {
           return -1;
         }
-        var r2 = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(this.source.charAt(this.index + 1));
+        var r2 = _utils.getHexValue(this.source.charAt(this.index + 1));
         if (r2 === -1) {
           return -1;
         }
-        var r3 = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(this.source.charAt(this.index + 2));
+        var r3 = _utils.getHexValue(this.source.charAt(this.index + 2));
         if (r3 === -1) {
           return -1;
         }
-        var r4 = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(this.source.charAt(this.index + 3));
+        var r4 = _utils.getHexValue(this.source.charAt(this.index + 3));
         if (r4 === -1) {
           return -1;
         }
@@ -495,7 +496,7 @@ var Tokenizer = (function () {
     key: "getEscapedIdentifier",
     value: function getEscapedIdentifier() {
       var id = "";
-      var check = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierStart;
+      var check = _utils.isIdentifierStart;
 
       while (this.index < this.source.length) {
         var ch = this.source.charAt(this.index);
@@ -552,7 +553,7 @@ var Tokenizer = (function () {
           this.index = start;
           return id;
         }
-        check = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierPart;
+        check = _utils.isIdentifierPart;
         id += ch;
       }
       return id;
@@ -563,7 +564,7 @@ var Tokenizer = (function () {
       var start = this.index;
       var l = this.source.length;
       var i = this.index;
-      var check = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierStart;
+      var check = _utils.isIdentifierStart;
       while (i < l) {
         var ch = this.source.charAt(i);
         var code = ch.charCodeAt(0);
@@ -577,7 +578,7 @@ var Tokenizer = (function () {
           return this.source.slice(start, i);
         }
         ++i;
-        check = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierPart;
+        check = _utils.isIdentifierPart;
       }
       this.index = i;
       return this.source.slice(start, i);
@@ -620,12 +621,10 @@ var Tokenizer = (function () {
         // Check for most common single-character punctuators.
         case ".":
           var ch2 = this.source.charAt(this.index + 1);
-          if (ch2 !== ".") {
-            return TokenType.PERIOD;
-          }var ch3 = this.source.charAt(this.index + 2);
-          if (ch3 !== ".") {
-            return TokenType.PERIOD;
-          }return TokenType.ELLIPSIS;
+          if (ch2 !== ".") return TokenType.PERIOD;
+          var ch3 = this.source.charAt(this.index + 2);
+          if (ch3 !== ".") return TokenType.PERIOD;
+          return TokenType.ELLIPSIS;
         case "(":
           return TokenType.LPAREN;
         case ")":
@@ -745,7 +744,7 @@ var Tokenizer = (function () {
       var i = this.index;
       while (i < this.source.length) {
         var ch = this.source.charAt(i);
-        var hex = _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.getHexValue(ch);
+        var hex = _utils.getHexValue(ch);
         if (hex === -1) {
           break;
         }
@@ -756,7 +755,7 @@ var Tokenizer = (function () {
         throw this.createILLEGAL();
       }
 
-      if (i < this.source.length && _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierStart(this.source.charCodeAt(i))) {
+      if (i < this.source.length && _utils.isIdentifierStart(this.source.charCodeAt(i))) {
         throw this.createILLEGAL();
       }
 
@@ -782,7 +781,7 @@ var Tokenizer = (function () {
         throw this.createILLEGAL();
       }
 
-      if (this.index < this.source.length && (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierStart(this.source.charCodeAt(this.index)) || _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isDecimalDigit(this.source.charCodeAt(this.index)))) {
+      if (this.index < this.source.length && (_utils.isIdentifierStart(this.source.charCodeAt(this.index)) || _utils.isDecimalDigit(this.source.charCodeAt(this.index)))) {
         throw this.createILLEGAL();
       }
 
@@ -799,7 +798,7 @@ var Tokenizer = (function () {
         var ch = this.source.charAt(this.index);
         if ("0" <= ch && ch <= "7") {
           this.index++;
-        } else if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierPart(ch.charCodeAt(0))) {
+        } else if (_utils.isIdentifierPart(ch.charCodeAt(0))) {
           throw this.createILLEGAL();
         } else {
           break;
@@ -828,7 +827,7 @@ var Tokenizer = (function () {
         } else if (ch === "8" || ch === "9") {
           isOctal = false;
           this.index++;
-        } else if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierPart(ch.charCodeAt(0))) {
+        } else if (_utils.isIdentifierPart(ch.charCodeAt(0))) {
           throw this.createILLEGAL();
         } else {
           break;
@@ -953,7 +952,7 @@ var Tokenizer = (function () {
         e += neg ? f : -f;
       }
 
-      if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierStart(ch.charCodeAt(0))) {
+      if (_utils.isIdentifierStart(ch.charCodeAt(0))) {
         throw this.createILLEGAL();
       }
 
@@ -972,7 +971,7 @@ var Tokenizer = (function () {
         throw this.createILLEGAL();
       }
       var ch = this.source.charAt(this.index);
-      if (!_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isLineTerminator(ch.charCodeAt(0))) {
+      if (!_utils.isLineTerminator(ch.charCodeAt(0))) {
         switch (ch) {
           case "n":
             str += "\n";
@@ -1072,13 +1071,14 @@ var Tokenizer = (function () {
           this.index++;
           return { type: TokenType.STRING, slice: this.getSlice(start, startLocation), str: str, octal: octal };
         } else if (ch === "\\") {
-          var _scanStringEscape = this.scanStringEscape(str, octal);
+          var _temp = this.scanStringEscape(str, octal);
 
-          var _scanStringEscape2 = _slicedToArray(_scanStringEscape, 2);
+          var _temp2 = _slicedToArray(_temp, 2);
 
-          str = _scanStringEscape2[0];
-          octal = _scanStringEscape2[1];
-        } else if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isLineTerminator(ch.charCodeAt(0))) {
+          str = _temp2[0];
+          octal = _temp2[1];
+          _temp;
+        } else if (_utils.isLineTerminator(ch.charCodeAt(0))) {
           throw this.createILLEGAL();
         } else {
           str += ch;
@@ -1141,13 +1141,13 @@ var Tokenizer = (function () {
           this.index++;
           ch = this.source.charAt(this.index);
           // ECMA-262 7.8.5
-          if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isLineTerminator(ch.charCodeAt(0))) {
-            throw this.createError(_ErrorMessages.ErrorMessages.UNTERMINATED_REGEXP);
+          if (_utils.isLineTerminator(ch.charCodeAt(0))) {
+            throw this.createError(_errors.ErrorMessages.UNTERMINATED_REGEXP);
           }
           str += ch;
           this.index++;
-        } else if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isLineTerminator(ch.charCodeAt(0))) {
-          throw this.createError(_ErrorMessages.ErrorMessages.UNTERMINATED_REGEXP);
+        } else if (_utils.isLineTerminator(ch.charCodeAt(0))) {
+          throw this.createError(_errors.ErrorMessages.UNTERMINATED_REGEXP);
         } else {
           if (classMarker) {
             if (ch === "]") {
@@ -1169,15 +1169,15 @@ var Tokenizer = (function () {
       }
 
       if (!terminated) {
-        throw this.createError(_ErrorMessages.ErrorMessages.UNTERMINATED_REGEXP);
+        throw this.createError(_errors.ErrorMessages.UNTERMINATED_REGEXP);
       }
 
       while (this.index < this.source.length) {
         var ch = this.source.charAt(this.index);
         if (ch === "\\") {
-          throw this.createError(_ErrorMessages.ErrorMessages.INVALID_REGEXP_FLAGS);
+          throw this.createError(_errors.ErrorMessages.INVALID_REGEXP_FLAGS);
         }
-        if (!_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierPart(ch.charCodeAt(0))) {
+        if (!_utils.isIdentifierPart(ch.charCodeAt(0))) {
           break;
         }
         this.index++;
@@ -1217,14 +1217,14 @@ var Tokenizer = (function () {
           return this.scanPunctuator();
         }
 
-        if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierStart(charCode) || charCode === 92 /* backslash (\) */) {
+        if (_utils.isIdentifierStart(charCode) || charCode === 92 /* backslash (\) */) {
           return this.scanIdentifier();
         }
 
         // Dot (.) U+002E can also start a floating-polet number, hence the need
         // to check the next character.
         if (charCode === 46) {
-          if (this.index + 1 < this.source.length && _getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isDecimalDigit(this.source.charCodeAt(this.index + 1))) {
+          if (this.index + 1 < this.source.length && _utils.isDecimalDigit(this.source.charCodeAt(this.index + 1))) {
             return this.scanNumericLiteral();
           }
           return this.scanPunctuator();
@@ -1247,7 +1247,7 @@ var Tokenizer = (function () {
         // Slash (/) U+002F can also start a regex.
         throw this.createILLEGAL();
       } else {
-        if (_getHexValue$isLineTerminator$isWhiteSpace$isIdentifierStart$isIdentifierPart$isDecimalDigit.isIdentifierStart(charCode) || 55296 <= charCode && charCode <= 56319) {
+        if (_utils.isIdentifierStart(charCode) || 55296 <= charCode && charCode <= 56319) {
           return this.scanIdentifier();
         }
 

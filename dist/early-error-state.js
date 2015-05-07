@@ -1,15 +1,21 @@
 // istanbul ignore next
 "use strict";
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-// istanbul ignore next
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
+    property = _x2,
+    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 // istanbul ignore next
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
  * Copyright 2014 Shape Security, Inc.
@@ -29,13 +35,13 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 require("es6-map/implement");
 
-var _import = require("object-assign");
+var _objectAssign = require("object-assign");
 
-var objectAssign = _import;
+var objectAssign = _objectAssign;
 
-var _import2 = require("multimap");
+var _multimap = require("multimap");
 
-var MultiMap = _import2;
+var MultiMap = _multimap;
 
 // FIXME: remove this when collections/multi-map is working
 MultiMap.prototype.addEach = function (otherMap) {
@@ -391,11 +397,9 @@ var EarlyErrorState = (function () {
   }, {
     key: "concat",
     value: function concat(s) {
-      if (this === identity) {
-        return s;
-      }if (s === identity) {
-        return this;
-      }[].push.apply(this.errors, s.errors);
+      if (this === identity) return s;
+      if (s === identity) return this;
+      [].push.apply(this.errors, s.errors);
       [].push.apply(this.strictErrors, s.strictErrors);
       [].push.apply(this.usedLabelNames, s.usedLabelNames);
       [].push.apply(this.freeBreakStatements, s.freeBreakStatements);
@@ -446,13 +450,9 @@ var EarlyError = (function (_Error) {
   function EarlyError(node, message) {
     _classCallCheck(this, EarlyError);
 
-    var _this = new _Error(message);
-
-    _this.__proto__ = EarlyError.prototype;
-
-    _this.node = node;
-    _this.message = message;
-    return _this;
+    _get(Object.getPrototypeOf(EarlyError.prototype), "constructor", this).call(this, message);
+    this.node = node;
+    this.message = message;
   }
 
   _inherits(EarlyError, _Error);

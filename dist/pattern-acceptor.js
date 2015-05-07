@@ -1,11 +1,11 @@
 // istanbul ignore next
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 // istanbul ignore next
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
  * Copyright 2014 Shape Security, Inc.
@@ -38,17 +38,15 @@ var PatternAcceptor = (function () {
   _createClass(PatternAcceptor, [{
     key: "eat",
     value: function eat(ch) {
-      if (this.index >= this.length || this.pattern[this.index] !== ch) {
-        return false;
-      }++this.index;
+      if (this.index >= this.length || this.pattern[this.index] !== ch) return false;
+      ++this.index;
       return true;
     }
   }, {
     key: "eatRegExp",
     value: function eatRegExp(r) {
-      if (this.index >= this.length || !r.test(this.pattern[this.index])) {
-        return false;
-      }++this.index;
+      if (this.index >= this.length || !r.test(this.pattern[this.index])) return false;
+      ++this.index;
       return true;
     }
   }, {
@@ -73,9 +71,8 @@ var PatternAcceptor = (function () {
   }, {
     key: "trackback",
     value: function trackback(start, result) {
-      if (result) {
-        return true;
-      }this.index = start;
+      if (result) return true;
+      this.index = start;
       return false;
     }
   }, {
@@ -96,9 +93,8 @@ var PatternAcceptor = (function () {
   }, {
     key: "readTerm",
     value: function readTerm() {
-      if (!this.u) {
-        return this.readExtendedTerm();
-      }return this.readAssertion() || this.readQuantifiableAssertion() || this.readAtom() && (this.readQuantifier(), true);
+      if (!this.u) return this.readExtendedTerm();
+      return this.readAssertion() || this.readQuantifiableAssertion() || this.readAtom() && (this.readQuantifier(), true);
     }
   }, {
     key: "readExtendedTerm",
@@ -124,9 +120,8 @@ var PatternAcceptor = (function () {
   }, {
     key: "readQuantifierPrefix",
     value: function readQuantifierPrefix() {
-      if (this.eat("*") || this.eat("+") || this.eat("?")) {
-        return true;
-      }if (this.eat("{") && this.readDecimalDigits()) {
+      if (this.eat("*") || this.eat("+") || this.eat("?")) return true;
+      if (this.eat("{") && this.readDecimalDigits()) {
         if (this.eat(",")) this.readDecimalDigits();
         return this.eat("}");
       }
@@ -144,17 +139,13 @@ var PatternAcceptor = (function () {
     value: function readAtomNoBrace() {
       var start = this.index;
       var startingParens = this.nCapturingParens;
-      if (this.readPatternCharacterNoBrace() || this.eat(".")) {
-        return true;
-      }if (this.eat("\\")) {
-        return this.trackback(start, this.readAtomEscape());
-      }if (this.readCharacterClass()) {
-        return true;
-      }if (this.eat("(")) {
+      if (this.readPatternCharacterNoBrace() || this.eat(".")) return true;
+      if (this.eat("\\")) return this.trackback(start, this.readAtomEscape());
+      if (this.readCharacterClass()) return true;
+      if (this.eat("(")) {
         if (!this.eatN(2, /^\?:$/)) ++this.nCapturingParens;
-        if (this.readDisjunction() && this.eat(")")) {
-          return true;
-        }this.nCapturingParens = startingParens;
+        if (this.readDisjunction() && this.eat(")")) return true;
+        this.nCapturingParens = startingParens;
         this.index = start;
         return false;
       }
@@ -208,9 +199,8 @@ var PatternAcceptor = (function () {
   }, {
     key: "readRegExpUnicodeEscapeSequence",
     value: function readRegExpUnicodeEscapeSequence() {
-      if (!this.eat("u")) {
-        return false;
-      }if (this.u) {
+      if (!this.eat("u")) return false;
+      if (this.u) {
         if (this.eatN(4, /^D[abAB89][a-fA-F0-9]{2}$/)) {
           this.eatN(6, /^\\u[dD][c-fC-F0-9][a-fA-F0-9]{2}$/);
           return true;
@@ -226,9 +216,7 @@ var PatternAcceptor = (function () {
       var k = 4;
       while (k > 0) {
         --k;
-        if (!this.readHexDigit()) {
-          return false;
-        }
+        if (!this.readHexDigit()) return false;
       }
       return true;
     }
@@ -252,9 +240,8 @@ var PatternAcceptor = (function () {
     key: "readDecimalEscape",
     value: function readDecimalEscape() {
       if (this.eat("0")) {
-        if (!this.matchRegExp(/^\d$/)) {
-          return true;
-        }--this.index;
+        if (!this.matchRegExp(/^\d$/)) return true;
+        --this.index;
         return false;
       }
       var start = this.index;
@@ -284,14 +271,11 @@ var PatternAcceptor = (function () {
   }, {
     key: "readNonemptyClassRanges",
     value: function readNonemptyClassRanges() {
-      if (!this.readClassAtom()) {
-        return false;
-      }if (this.match("]")) {
-        return true;
-      }if (this.eat("-")) {
-        if (this.match("]")) {
-          return true;
-        }return this.readClassAtom() && this.readClassRanges();
+      if (!this.readClassAtom()) return false;
+      if (this.match("]")) return true;
+      if (this.eat("-")) {
+        if (this.match("]")) return true;
+        return this.readClassAtom() && this.readClassRanges();
       }
       return this.readNonemptyClassRangesNoDash();
     }
@@ -301,14 +285,11 @@ var PatternAcceptor = (function () {
       // NOTE: it is impossible to reach this next line with a value matched by RegularExpressionLiteral;
       // the pattern "[-a" would reach here if it could get past RegularExpressionLiteral
       /* istanbul ignore next */
-      if (!this.readClassAtomNoDash()) {
-        return false;
-      }if (this.match("]")) {
-        return true;
-      }if (this.eat("-")) {
-        if (this.match("]")) {
-          return true;
-        }return this.readClassAtom() && this.readClassRanges();
+      if (!this.readClassAtomNoDash()) return false;
+      if (this.match("]")) return true;
+      if (this.eat("-")) {
+        if (this.match("]")) return true;
+        return this.readClassAtom() && this.readClassRanges();
       }
       return this.readNonemptyClassRangesNoDash();
     }

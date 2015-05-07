@@ -101,6 +101,38 @@ suite("Parser", function () {
       }
     );
 
+    testParse("class A extends B { constructor(a = super()){} }", stmt,
+      {
+        type: "ClassDeclaration",
+        name: { type: "BindingIdentifier", name: "A" },
+        super: { type: "IdentifierExpression", name: "B" },
+        elements: [{
+          type: "ClassElement",
+          isStatic: false,
+          method: {
+            type: "Method",
+            isGenerator: false,
+            name: { type: "StaticPropertyName", value: "constructor" },
+            params: {
+              type: "FormalParameters",
+              items: [{
+                type: "BindingWithDefault",
+                binding: { type: "BindingIdentifier", name: "a"},
+                init: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+              }],
+              rest: null
+            },
+            body: {
+              type: "FunctionBody",
+              directives: [],
+              statements: []
+            }
+          }
+        }]
+      }
+    );
+
+
     testParse("class A extends B { constructor() { ({a: super()}); } }", stmt,
       {
         type: "ClassDeclaration",

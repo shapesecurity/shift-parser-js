@@ -383,7 +383,7 @@ export class Parser extends Tokenizer {
 
   parseExportSpecifier() {
     let startLocation = this.getLocation();
-    let name = this.parseIdentifier();
+    let name = this.parseIdentifierName();
     if (this.eatContextualKeyword("as")) {
       let exportedName = this.parseIdentifierName();
       return this.markLocation({ type: "ExportSpecifier", name, exportedName }, startLocation);

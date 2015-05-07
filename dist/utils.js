@@ -18,15 +18,15 @@ exports.getHexValue = getHexValue;
  * limitations under the License.
  */
 
-var _keyword$code = require("esutils");
+var _esutils = require("esutils");
 
-var isReservedWordES6 = _keyword$code.keyword.isReservedWordES6;
-var isRestrictedWord = _keyword$code.keyword.isRestrictedWord;
-var isIdentifierStartES6 = _keyword$code.code.isIdentifierStartES6;
-var isIdentifierPartES6 = _keyword$code.code.isIdentifierPartES6;
-var isWhiteSpace = _keyword$code.code.isWhiteSpace;
-var isLineTerminator = _keyword$code.code.isLineTerminator;
-var isDecimalDigit = _keyword$code.code.isDecimalDigit;
+var isReservedWordES6 = _esutils.keyword.isReservedWordES6;
+var isRestrictedWord = _esutils.keyword.isRestrictedWord;
+var isIdentifierStartES6 = _esutils.code.isIdentifierStartES6;
+var isIdentifierPartES6 = _esutils.code.isIdentifierPartES6;
+var isWhiteSpace = _esutils.code.isWhiteSpace;
+var isLineTerminator = _esutils.code.isLineTerminator;
+var isDecimalDigit = _esutils.code.isDecimalDigit;
 exports.isRestrictedWord = isRestrictedWord;
 exports.isIdentifierStart = isIdentifierStartES6;
 exports.isIdentifierPart = isIdentifierPartES6;

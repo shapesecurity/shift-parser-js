@@ -1,19 +1,21 @@
 // istanbul ignore next
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-// istanbul ignore next
-
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 // istanbul ignore next
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
+    property = _x2,
+    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 // istanbul ignore next
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 /**
  * Copyright 2014 Shape Security, Inc.
@@ -31,13 +33,13 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
  * limitations under the License.
  */
 
-var _reduce$MonoidalReducer = require("shift-reducer");
+var _shiftReducer = require("shift-reducer");
 
-var _isRestrictedWord$isStrictModeReservedWord = require("./utils");
+var _utils = require("./utils");
 
-var _EarlyErrorState$EarlyError = require("./early-error-state");
+var _earlyErrorState = require("./early-error-state");
 
-var _PatternAcceptor = require("./pattern-acceptor");
+var _patternAcceptor = require("./pattern-acceptor");
 
 function isStrictFunctionBody(_ref) {
   var directives = _ref.directives;
@@ -69,14 +71,14 @@ function isValidSimpleAssignmentTarget(node) {
   return false;
 }
 
-function isLabelledFunction(_x) {
+function isLabelledFunction(_x4) {
   var _left;
 
-  var _again = true;
+  var _again2 = true;
 
-  _function: while (_again) {
-    _again = false;
-    var node = _x;
+  _function2: while (_again2) {
+    _again2 = false;
+    var node = _x4;
 
     if (!(_left = node.type === "LabeledStatement")) {
       return _left;
@@ -86,24 +88,24 @@ function isLabelledFunction(_x) {
       return _left;
     }
 
-    _x = node.body;
-    _again = true;
-    continue _function;
+    _x4 = node.body;
+    _again2 = true;
+    continue _function2;
   }
 }
 
-function isIterationStatement(_x2) {
-  var _again2 = true;
+function isIterationStatement(_x5) {
+  var _again3 = true;
 
-  _function2: while (_again2) {
-    _again2 = false;
-    var node = _x2;
+  _function3: while (_again3) {
+    _again3 = false;
+    var node = _x5;
 
     switch (node.type) {
       case "LabeledStatement":
-        _x2 = node.body;
-        _again2 = true;
-        continue _function2;
+        _x5 = node.body;
+        _again3 = true;
+        continue _function3;
 
       case "DoWhileStatement":
       case "ForInStatement":
@@ -137,39 +139,39 @@ function enforceDuplicateConstructorMethods(node, s) {
   });
   if (ctors.length > 1) {
     ctors.slice(1).forEach(function (ctor) {
-      s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(ctor, "Duplicate constructor method in class"));
+      s = s.addError(new _earlyErrorState.EarlyError(ctor, "Duplicate constructor method in class"));
     });
   }
   return s;
 }
 
 var SUPERCALL_ERROR = function SUPERCALL_ERROR(node) {
-  return new _EarlyErrorState$EarlyError.EarlyError(node, "Calls to super must be in the \"constructor\" method of a class expression or class declaration that has a superclass");
+  return new _earlyErrorState.EarlyError(node, "Calls to super must be in the \"constructor\" method of a class expression or class declaration that has a superclass");
 };
 var SUPERPROPERTY_ERROR = function SUPERPROPERTY_ERROR(node) {
-  return new _EarlyErrorState$EarlyError.EarlyError(node, "Member access on super must be in a method");
+  return new _earlyErrorState.EarlyError(node, "Member access on super must be in a method");
 };
 var DUPLICATE_BINDING = function DUPLICATE_BINDING(node) {
-  return new _EarlyErrorState$EarlyError.EarlyError(node, "Duplicate binding " + JSON.stringify(node.name));
+  return new _earlyErrorState.EarlyError(node, "Duplicate binding " + JSON.stringify(node.name));
 };
 var FREE_CONTINUE = function FREE_CONTINUE(node) {
-  return new _EarlyErrorState$EarlyError.EarlyError(node, "Continue statement must be nested within an iteration statement");
+  return new _earlyErrorState.EarlyError(node, "Continue statement must be nested within an iteration statement");
 };
 var UNBOUND_CONTINUE = function UNBOUND_CONTINUE(node) {
-  return new _EarlyErrorState$EarlyError.EarlyError(node, "Continue statement must be nested within an iteration statement with label " + JSON.stringify(node.label));
+  return new _earlyErrorState.EarlyError(node, "Continue statement must be nested within an iteration statement with label " + JSON.stringify(node.label));
 };
 var FREE_BREAK = function FREE_BREAK(node) {
-  return new _EarlyErrorState$EarlyError.EarlyError(node, "Break statement must be nested within an iteration statement or a switch statement");
+  return new _earlyErrorState.EarlyError(node, "Break statement must be nested within an iteration statement or a switch statement");
 };
 var UNBOUND_BREAK = function UNBOUND_BREAK(node) {
-  return new _EarlyErrorState$EarlyError.EarlyError(node, "Break statement must be nested within a statement with label " + JSON.stringify(node.label));
+  return new _earlyErrorState.EarlyError(node, "Break statement must be nested within a statement with label " + JSON.stringify(node.label));
 };
 
 var EarlyErrorChecker = (function (_MonoidalReducer) {
   function EarlyErrorChecker() {
     _classCallCheck(this, EarlyErrorChecker);
 
-    _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "constructor", this).call(this, _EarlyErrorState$EarlyError.EarlyErrorState);
+    _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "constructor", this).call(this, _earlyErrorState.EarlyErrorState);
   }
 
   _inherits(EarlyErrorChecker, _MonoidalReducer);
@@ -201,8 +203,8 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceBindingIdentifier",
     value: function reduceBindingIdentifier(node) {
       var s = this.identity;
-      if (_isRestrictedWord$isStrictModeReservedWord.isRestrictedWord(node.name) || _isRestrictedWord$isStrictModeReservedWord.isStrictModeReservedWord(node.name)) {
-        s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in binding position in strict mode"));
+      if (_utils.isRestrictedWord(node.name) || _utils.isStrictModeReservedWord(node.name)) {
+        s = s.addStrictError(new _earlyErrorState.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in binding position in strict mode"));
       }
       return s.bindName(node.name, node);
     }
@@ -280,10 +282,10 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     value: function reduceClassElement(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceClassElement", this).apply(this, arguments);
       if (!node.isStatic && isSpecialMethod(node.method)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Constructors cannot be generators, getters or setters"));
+        s = s.addError(new _earlyErrorState.EarlyError(node, "Constructors cannot be generators, getters or setters"));
       }
       if (node.isStatic && node.method.name.type === "StaticPropertyName" && node.method.name.value === "prototype") {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Static class methods cannot be named \"prototype\""));
+        s = s.addError(new _earlyErrorState.EarlyError(node, "Static class methods cannot be named \"prototype\""));
       }
       return s;
     }
@@ -329,7 +331,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     value: function reduceDoWhileStatement(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceDoWhileStatement", this).apply(this, arguments);
       if (isLabelledFunction(node.body)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.body, "The body of a do-while statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.body, "The body of a do-while statement must not be a labeled function declaration"));
       }
       s = s.clearFreeContinueStatements();
       s = s.clearFreeBreakStatements();
@@ -390,12 +392,12 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       if (node.init != null && node.init.type === "VariableDeclaration" && node.init.kind === "const") {
         node.init.declarators.forEach(function (declarator) {
           if (declarator.init == null) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
+            s = s.addError(new _earlyErrorState.EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
           }
         });
       }
       if (isLabelledFunction(node.body)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.body, "The body of a for statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.body, "The body of a for statement must not be a labeled function declaration"));
       }
       s = s.clearFreeContinueStatements();
       s = s.clearFreeBreakStatements();
@@ -413,7 +415,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       left = left.enforceConflictingLexicallyDeclaredNames(body.varDeclaredNames, DUPLICATE_BINDING);
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceForInStatement", this).call(this, node, { left: left, right: right, body: body });
       if (isLabelledFunction(node.body)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.body, "The body of a for-in statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.body, "The body of a for-in statement must not be a labeled function declaration"));
       }
       s = s.clearFreeContinueStatements();
       s = s.clearFreeBreakStatements();
@@ -432,7 +434,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       left = left.enforceConflictingLexicallyDeclaredNames(body.varDeclaredNames, DUPLICATE_BINDING);
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceForOfStatement", this).call(this, node, { left: left, right: right, body: body });
       if (isLabelledFunction(node.body)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.body, "The body of a for-of statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.body, "The body of a for-of statement must not be a labeled function declaration"));
       }
       s = s.clearFreeContinueStatements();
       s = s.clearFreeBreakStatements();
@@ -501,7 +503,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       params.lexicallyDeclaredNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            params = params[addError](new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
+            params = params[addError](new _earlyErrorState.EarlyError(dupeNode, "Duplicate binding " + JSON.stringify(bindingName)));
           });
         }
       });
@@ -540,8 +542,8 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceIdentifierExpression",
     value: function reduceIdentifierExpression(node) {
       var s = this.identity;
-      if (_isRestrictedWord$isStrictModeReservedWord.isStrictModeReservedWord(node.name)) {
-        s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in expression position in strict mode"));
+      if (_utils.isStrictModeReservedWord(node.name)) {
+        s = s.addStrictError(new _earlyErrorState.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in expression position in strict mode"));
       }
       return s;
     }
@@ -550,10 +552,10 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     value: function reduceIfStatement(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceIfStatement", this).apply(this, arguments);
       if (isLabelledFunction(node.consequent)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.consequent, "The consequent of an if statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.consequent, "The consequent of an if statement must not be a labeled function declaration"));
       }
       if (node.alternate != null && isLabelledFunction(node.alternate)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
       }
       return s;
     }
@@ -576,13 +578,13 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     value: function reduceLabeledStatement(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceLabeledStatement", this).apply(this, arguments);
       if (node.label === "yield") {
-        s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "The identifier " + JSON.stringify(node.label) + " must not be in label position in strict mode"));
+        s = s.addStrictError(new _earlyErrorState.EarlyError(node, "The identifier " + JSON.stringify(node.label) + " must not be in label position in strict mode"));
       }
       if (s.usedLabelNames.indexOf(node.label) >= 0) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Label " + JSON.stringify(node.label) + " has already been declared"));
+        s = s.addError(new _earlyErrorState.EarlyError(node, "Label " + JSON.stringify(node.label) + " has already been declared"));
       }
       if (node.body.type === "FunctionDeclaration") {
-        s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "Labeled FunctionDeclarations are disallowed in strict mode"));
+        s = s.addStrictError(new _earlyErrorState.EarlyError(node, "Labeled FunctionDeclarations are disallowed in strict mode"));
       }
       s = isIterationStatement(node.body) ? s.observeIterationLabel(node.label) : s.observeNonIterationLabel(node.label);
       return s;
@@ -596,7 +598,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       //  s = s.addError(new EarlyError(node, "Invalid regular expression pattern"));
       //}
       if (!/^[igmyu]*$/.test(node.flags) || containsDuplicates(node.flags)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Invalid regular expression flags"));
+        s = s.addError(new _earlyErrorState.EarlyError(node, "Invalid regular expression flags"));
       }
       return s;
     }
@@ -636,19 +638,19 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       s.exportedNames.forEachEntry(function (nodes, bindingName) {
         if (nodes.length > 1) {
           nodes.slice(1).forEach(function (dupeNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(dupeNode, "Duplicate export " + JSON.stringify(bindingName)));
+            s = s.addError(new _earlyErrorState.EarlyError(dupeNode, "Duplicate export " + JSON.stringify(bindingName)));
           });
         }
       });
       s.exportedBindings.forEachEntry(function (nodes, bindingName) {
         if (bindingName !== "*default*" && !s.lexicallyDeclaredNames.has(bindingName) && !s.varDeclaredNames.has(bindingName)) {
           nodes.forEach(function (undeclaredNode) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(undeclaredNode, "Exported binding " + JSON.stringify(bindingName) + " is not declared"));
+            s = s.addError(new _earlyErrorState.EarlyError(undeclaredNode, "Exported binding " + JSON.stringify(bindingName) + " is not declared"));
           });
         }
       });
       s.newTargetExpressions.forEach(function (node) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "new.target must be within function (but not arrow expression) code"));
+        s = s.addError(new _earlyErrorState.EarlyError(node, "new.target must be within function (but not arrow expression) code"));
       });
       s = s.enforceFreeContinueStatementErrors(FREE_CONTINUE);
       s = s.enforceFreeLabeledContinueStatementErrors(UNBOUND_CONTINUE);
@@ -673,7 +675,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         return p.type === "DataProperty" && p.name.type === "StaticPropertyName" && p.name.value === "__proto__";
       });
       protos.slice(1).forEach(function (n) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(n, "Duplicate __proto__ property in object literal not allowed"));
+        s = s.addError(new _earlyErrorState.EarlyError(n, "Duplicate __proto__ property in object literal not allowed"));
       });
       return s;
     }
@@ -685,7 +687,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         case "++":
         case "--":
           if (!isValidSimpleAssignmentTarget(node.operand)) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
+            s = s.addError(new _earlyErrorState.EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
           }
           break;
       }
@@ -699,12 +701,12 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
         case "++":
         case "--":
           if (!isValidSimpleAssignmentTarget(node.operand)) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
+            s = s.addError(new _earlyErrorState.EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
           }
           break;
         case "delete":
           if (node.operand.type === "IdentifierExpression") {
-            s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "Identifier expressions must not be deleted in strict mode"));
+            s = s.addStrictError(new _earlyErrorState.EarlyError(node, "Identifier expressions must not be deleted in strict mode"));
           }
           break;
       }
@@ -717,7 +719,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       s = s.enforceSuperCallExpressions(SUPERCALL_ERROR);
       s = s.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
       s.newTargetExpressions.forEach(function (node) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node, "new.target must be within function (but not arrow expression) code"));
+        s = s.addError(new _earlyErrorState.EarlyError(node, "new.target must be within function (but not arrow expression) code"));
       });
       return s;
     }
@@ -796,7 +798,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
             s = s.observeLexicalDeclaration();
             if (s.lexicallyDeclaredNames.has("let")) {
               s.lexicallyDeclaredNames.get("let").forEach(function (n) {
-                s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(n, "Lexical declarations must not have a binding named \"let\""));
+                s = s.addError(new _earlyErrorState.EarlyError(n, "Lexical declarations must not have a binding named \"let\""));
               });
             }
             break;
@@ -814,7 +816,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       if (node.declaration.kind === "const") {
         node.declaration.declarators.forEach(function (declarator) {
           if (declarator.init == null) {
-            s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
+            s = s.addError(new _earlyErrorState.EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
           }
         });
       }
@@ -825,7 +827,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     value: function reduceWhileStatement(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceWhileStatement", this).apply(this, arguments);
       if (isLabelledFunction(node.body)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.body, "The body of a while statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.body, "The body of a while statement must not be a labeled function declaration"));
       }
       s = s.clearFreeContinueStatements().clearFreeBreakStatements();
       return s;
@@ -835,19 +837,19 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     value: function reduceWithStatement(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceWithStatement", this).apply(this, arguments);
       if (isLabelledFunction(node.body)) {
-        s = s.addError(new _EarlyErrorState$EarlyError.EarlyError(node.body, "The body of a with statement must not be a labeled function declaration"));
+        s = s.addError(new _earlyErrorState.EarlyError(node.body, "The body of a with statement must not be a labeled function declaration"));
       }
-      s = s.addStrictError(new _EarlyErrorState$EarlyError.EarlyError(node, "Strict mode code must not include a with statement"));
+      s = s.addStrictError(new _earlyErrorState.EarlyError(node, "Strict mode code must not include a with statement"));
       return s;
     }
   }], [{
     key: "check",
     value: function check(node) {
-      return _reduce$MonoidalReducer["default"](new EarlyErrorChecker(), node).errors;
+      return _shiftReducer["default"](new EarlyErrorChecker(), node).errors;
     }
   }]);
 
   return EarlyErrorChecker;
-})(_reduce$MonoidalReducer.MonoidalReducer);
+})(_shiftReducer.MonoidalReducer);
 
 exports.EarlyErrorChecker = EarlyErrorChecker;

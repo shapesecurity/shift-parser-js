@@ -560,21 +560,26 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     }
   }, {
     key: "reduceIfStatement",
-    value: function reduceIfStatement(node) {
-      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceIfStatement", this).apply(this, arguments);
+    value: function reduceIfStatement(node, _ref12) {
+      var test = _ref12.test;
+      var consequent = _ref12.consequent;
+      var alternate = _ref12.alternate;
+
       if (isLabelledFunction(node.consequent)) {
-        s = s.addError(new _earlyErrorState.EarlyError(node.consequent, "The consequent of an if statement must not be a labeled function declaration"));
+        consequent = consequent.addError(new _earlyErrorState.EarlyError(node.consequent, "The consequent of an if statement must not be a labeled function declaration"));
       }
       if (node.alternate != null && isLabelledFunction(node.alternate)) {
-        s = s.addError(new _earlyErrorState.EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
+        alternate = alternate.addError(new _earlyErrorState.EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
       }
       if (node.consequent.type === "FunctionDeclaration") {
-        s = s.addStrictError(new _earlyErrorState.EarlyError(node.consequent, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+        consequent = consequent.addStrictError(new _earlyErrorState.EarlyError(node.consequent, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+        consequent = consequent.observeLexicalBoundary();
       }
       if (node.alternate != null && node.alternate.type === "FunctionDeclaration") {
-        s = s.addStrictError(new _earlyErrorState.EarlyError(node.alternate, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+        alternate = alternate.addStrictError(new _earlyErrorState.EarlyError(node.alternate, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+        alternate = alternate.observeLexicalBoundary();
       }
-      return s;
+      return _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceIfStatement", this).call(this, node, { test: test, consequent: consequent, alternate: alternate });
     }
   }, {
     key: "reduceImport",
@@ -621,10 +626,10 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     }
   }, {
     key: "reduceMethod",
-    value: function reduceMethod(node, _ref12) {
-      var name = _ref12.name;
-      var params = _ref12.params;
-      var body = _ref12.body;
+    value: function reduceMethod(node, _ref13) {
+      var name = _ref13.name;
+      var params = _ref13.params;
+      var body = _ref13.body;
 
       params = params.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
       body = body.enforceConflictingLexicallyDeclaredNames(params.lexicallyDeclaredNames, DUPLICATE_BINDING);
@@ -742,10 +747,10 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     }
   }, {
     key: "reduceSetter",
-    value: function reduceSetter(node, _ref13) {
-      var name = _ref13.name;
-      var param = _ref13.param;
-      var body = _ref13.body;
+    value: function reduceSetter(node, _ref14) {
+      var name = _ref14.name;
+      var param = _ref14.param;
+      var body = _ref14.body;
 
       param = param.observeLexicalDeclaration();
       param = param.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
@@ -774,9 +779,9 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     }
   }, {
     key: "reduceSwitchStatement",
-    value: function reduceSwitchStatement(node, _ref14) {
-      var discriminant = _ref14.discriminant;
-      var cases = _ref14.cases;
+    value: function reduceSwitchStatement(node, _ref15) {
+      var discriminant = _ref15.discriminant;
+      var cases = _ref15.cases;
 
       var sCases = this.fold(cases);
       sCases = sCases.functionDeclarationNamesAreLexical();
@@ -789,11 +794,11 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     }
   }, {
     key: "reduceSwitchStatementWithDefault",
-    value: function reduceSwitchStatementWithDefault(node, _ref15) {
-      var discriminant = _ref15.discriminant;
-      var preDefaultCases = _ref15.preDefaultCases;
-      var defaultCase = _ref15.defaultCase;
-      var postDefaultCases = _ref15.postDefaultCases;
+    value: function reduceSwitchStatementWithDefault(node, _ref16) {
+      var discriminant = _ref16.discriminant;
+      var preDefaultCases = _ref16.preDefaultCases;
+      var defaultCase = _ref16.defaultCase;
+      var postDefaultCases = _ref16.postDefaultCases;
 
       var sCases = this.append(defaultCase, this.append(this.fold(preDefaultCases), this.fold(postDefaultCases)));
       sCases = sCases.functionDeclarationNamesAreLexical();

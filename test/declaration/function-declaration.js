@@ -291,6 +291,32 @@ suite("Parser", function () {
       }
     });
 
+    testParse("try {} catch (e) { if(0) function e(){} }", stmt, {
+      type: "TryCatchStatement",
+      body: { type: "Block", statements: [] },
+      catchClause: {
+        type: "CatchClause",
+        binding: { name: "e", type: "BindingIdentifier" },
+        body: {
+          type: "Block",
+          statements: [
+            {
+              type: "IfStatement",
+              test: { type: "LiteralNumericExpression", value: 0 },
+              consequent: {
+                type: "FunctionDeclaration",
+                isGenerator: false,
+                name: { type: "BindingIdentifier", name: "e" },
+                body: { type: "FunctionBody", directives: [], statements: [] },
+                params: { type: "FormalParameters", items: [], rest: null }
+              },
+              alternate: null
+            }
+          ]
+        }
+      }
+    });
+
     testParseFailure("for(;;) function a(){}", "Unexpected token \"function\"");
     testParseFailure("for(a in b) function c(){}", "Unexpected token \"function\"");
     testParseFailure("for(a of b) function c(){}", "Unexpected token \"function\"");

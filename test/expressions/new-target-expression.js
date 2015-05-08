@@ -15,6 +15,7 @@
  */
 
 var stmt = require("../helpers").stmt;
+var expr = require("../helpers").expr;
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 
@@ -31,6 +32,87 @@ suite("Parser", function () {
           directives: [],
           statements: [{ type: "ExpressionStatement", expression: { type: "NewTargetExpression" } }]
         }
+      }
+    );
+
+    testParse("function f(a = new.target){}", stmt,
+      { type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "f" },
+        params: {
+          type: "FormalParameters",
+          items: [{
+            type: "BindingWithDefault",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "NewTargetExpression" }
+          }],
+          rest: null
+        },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      }
+    );
+
+    testParse("(function f(a = new.target){})", expr,
+      { type: "FunctionExpression",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "f" },
+        params: {
+          type: "FormalParameters",
+          items: [{
+            type: "BindingWithDefault",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "NewTargetExpression" }
+          }],
+          rest: null
+        },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      }
+    );
+
+    testParse("({ set m(a = new.target){} })", expr,
+      { type: "ObjectExpression",
+        properties: [{
+          type: "Setter",
+          name: { type: "StaticPropertyName", value: "m" },
+          param: {
+            type: "BindingWithDefault",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "NewTargetExpression" }
+          },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
+    );
+
+    testParse("({ m(a = new.target){} })", expr,
+      { type: "ObjectExpression",
+        properties: [{
+          type: "Method",
+          isGenerator: false,
+          name: { type: "StaticPropertyName", value: "m" },
+          params: {
+            type: "FormalParameters",
+            items: [{
+              type: "BindingWithDefault",
+              binding: { type: "BindingIdentifier", name: "a" },
+              init: { type: "NewTargetExpression" }
+            }],
+            rest: null
+          },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
+      }
+    );
+
+    testParse("({ get m(){ new.target } })", expr,
+      { type: "ObjectExpression",
+        properties: [{
+          type: "Getter",
+          name: { type: "StaticPropertyName", value: "m" },
+          body: { type: "FunctionBody", directives: [], statements: [{
+            type: "ExpressionStatement", expression: { type: "NewTargetExpression" }
+          }] }
+        }]
       }
     );
 

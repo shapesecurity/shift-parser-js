@@ -491,6 +491,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       body = body.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
       params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
       params = params.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+      params = params.clearNewTargetExpressions();
       body = body.clearNewTargetExpressions();
       if (isStrictFunctionBody(node.body)) {
         params = params.enforceStrictErrors();
@@ -523,6 +524,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       body = body.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
       params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
       params = params.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+      params = params.clearNewTargetExpressions();
       body = body.clearNewTargetExpressions();
       if (isStrictFunctionBody(node.body)) {
         params = params.enforceStrictErrors();
@@ -637,6 +639,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       }
       body = body.clearSuperPropertyExpressions();
       params = params.clearSuperPropertyExpressions();
+      params = params.clearNewTargetExpressions();
       body = body.clearNewTargetExpressions();
       if (isStrictFunctionBody(node.body)) {
         params = params.enforceStrictErrors();
@@ -754,6 +757,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       body = body.enforceSuperCallExpressions(SUPERCALL_ERROR);
       param = param.clearSuperPropertyExpressions();
       body = body.clearSuperPropertyExpressions();
+      param = param.clearNewTargetExpressions();
       body = body.clearNewTargetExpressions();
       if (isStrictFunctionBody(node.body)) {
         param = param.enforceStrictErrors();

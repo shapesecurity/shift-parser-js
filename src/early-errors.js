@@ -430,21 +430,22 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceIfStatement(node) {
-    let s = super.reduceIfStatement(...arguments);
+  reduceIfStatement(node, {test, consequent, alternate}) {
     if (isLabelledFunction(node.consequent)) {
-      s = s.addError(new EarlyError(node.consequent, "The consequent of an if statement must not be a labeled function declaration"));
+      consequent = consequent.addError(new EarlyError(node.consequent, "The consequent of an if statement must not be a labeled function declaration"));
     }
     if (node.alternate != null && isLabelledFunction(node.alternate)) {
-      s = s.addError(new EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
+      alternate = alternate.addError(new EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
     }
     if (node.consequent.type === "FunctionDeclaration") {
-      s = s.addStrictError(new EarlyError(node.consequent, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+      consequent = consequent.addStrictError(new EarlyError(node.consequent, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+      consequent = consequent.observeLexicalBoundary();
     }
     if (node.alternate != null && node.alternate.type === "FunctionDeclaration") {
-      s = s.addStrictError(new EarlyError(node.alternate, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+      alternate = alternate.addStrictError(new EarlyError(node.alternate, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+      alternate = alternate.observeLexicalBoundary();
     }
-    return s;
+    return super.reduceIfStatement(node, {test, consequent, alternate});
   }
 
   reduceImport() {

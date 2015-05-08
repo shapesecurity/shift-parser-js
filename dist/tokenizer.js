@@ -737,24 +737,6 @@ var Tokenizer = (function () {
           if (code < 0) {
             throw this.createILLEGAL();
           }
-          if (55296 <= code && code <= 56319) {
-            if (this.source.charAt(this.index) !== "\\") {
-              throw this.createILLEGAL();
-            }
-            ++this.index;
-            if (this.index >= this.source.length) {
-              throw this.createILLEGAL();
-            }
-            if (this.source.charAt(this.index) !== "u") {
-              throw this.createILLEGAL();
-            }
-            ++this.index;
-            var lowSurrogateCode = this.scanUnicode();
-            if (!(56320 <= lowSurrogateCode && lowSurrogateCode <= 57343)) {
-              throw this.createILLEGAL();
-            }
-            code = decodeUtf16(code, lowSurrogateCode);
-          }
           ch = fromCodePoint(code);
         } else if (55296 <= code && code <= 56319) {
           if (this.index >= this.source.length) {

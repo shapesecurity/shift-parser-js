@@ -46,9 +46,9 @@ suite("Parser", function () {
     testParseFailure("a\\u113", "Unexpected \"1\"");
     testParseFailure("\\uD800", "Unexpected end of input");
     testParseFailure("\\uD800x", "Unexpected \"x\"");
-    testParseFailure("\\uD800\\", "Unexpected end of input");
-    testParseFailure("\\uD800\\u", "Unexpected end of input");
-    testParseFailure("\\uD800\\x62", "Unexpected \"x\"");
+    testParseFailure("\\uD800\\", "Unexpected \"\\\\\"");
+    testParseFailure("\\uD800\\u", "Unexpected \"\\\\\"");
+    testParseFailure("\\uD800\\x62", "Unexpected \"\\\\\"");
     testParseFailure("\uD800", "Unexpected end of input");
     testParseFailure("\uD800x", "Unexpected end of input");
     testParseFailure("\uD800\\", "Unexpected end of input");

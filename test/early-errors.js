@@ -718,6 +718,12 @@ suite("Parser", function () {
     // It is a Syntax Error if any strict mode source code matches this rule.
     testEarlyError("'use strict'; label: function f(){}", "Labeled FunctionDeclarations are disallowed in strict mode");
 
+    // Annex B 3.4
+    // The above rules are only applied when parsing code that is not strict mode code
+    testEarlyError("'use strict'; if (0) function f(){}", "FunctionDeclarations in IfStatements are disallowed in strict mode");
+    testEarlyError("'use strict'; if (0) function f(){} else;", "FunctionDeclarations in IfStatements are disallowed in strict mode");
+    testEarlyError("'use strict'; if (0); else function f(){}", "FunctionDeclarations in IfStatements are disallowed in strict mode");
+
     // Annex B 3.5 (13.14.1)
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the LexicallyDeclaredNames of Block.
     testEarlyError("try {} catch(e) { let e; }", "Duplicate binding \"e\"");

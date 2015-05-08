@@ -229,9 +229,72 @@ suite("Parser", function () {
     );
 
     testParseFailure("a: function* a(){}", "Unexpected token \"*\"");
+  });
 
+  suite("Annex B 3.4: function declarations in if statements", function () {
+
+    testParse("if (0) function a(){}", stmt, {
+      type: "IfStatement",
+      test: { type: "LiteralNumericExpression", value: 0 },
+      consequent: {
+        type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      },
+      alternate: null
+    });
+
+    testParse("if (0) function a(){} else;", stmt, {
+      type: "IfStatement",
+      test: { type: "LiteralNumericExpression", value: 0 },
+      consequent: {
+        type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      },
+      alternate: { type: "EmptyStatement" }
+    });
+
+    testParse("if (0); else function a(){}", stmt, {
+      type: "IfStatement",
+      test: { type: "LiteralNumericExpression", value: 0 },
+      consequent: { type: "EmptyStatement" },
+      alternate: {
+        type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      }
+    });
+
+    testParse("if (0) function a(){} else function b(){}", stmt, {
+      type: "IfStatement",
+      test: { type: "LiteralNumericExpression", value: 0 },
+      consequent: {
+        type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      },
+      alternate: {
+        type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "b" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: { type: "FunctionBody", directives: [], statements: [] }
+      }
+    });
+
+    testParseFailure("for(;;) function a(){}", "Unexpected token \"function\"");
+    testParseFailure("for(a in b) function c(){}", "Unexpected token \"function\"");
+    testParseFailure("for(a of b) function c(){}", "Unexpected token \"function\"");
     testParseFailure("while(true) function a(){}", "Unexpected token \"function\"");
     testParseFailure("with(true) function a(){}", "Unexpected token \"function\"");
-    testParseFailure("a: function* a(){}", "Unexpected token \"*\"");
   });
 });

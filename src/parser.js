@@ -177,6 +177,7 @@ export class Parser extends Tokenizer {
     this.inGeneratorBody = false;
     this.allowYieldExpression = false;
     this.module = false;
+    this.moduleIsTheGoalSymbol = false;
 
     // Cover grammar
     this.isBindingElement = true;
@@ -233,7 +234,7 @@ export class Parser extends Tokenizer {
   }
 
   parseModule() {
-    this.module = true;
+    this.moduleIsTheGoalSymbol = this.module = true;
     this.lookahead = this.advance();
 
     let startLocation = this.getLocation();

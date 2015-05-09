@@ -35,6 +35,7 @@ suite("Parser", function () {
       { type: "IdentifierExpression", name: "await" }
     );
     testParseModuleFailure("await", "Unexpected token \"await\"");
+    testParseModuleFailure("function f() { var await }", "Unexpected token \"await\"");
 
     suite("let used as identifier expression", function () {
 

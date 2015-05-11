@@ -717,24 +717,6 @@ export default class Tokenizer {
         if (code < 0) {
           throw this.createILLEGAL();
         }
-        if (0xD800 <= code && code <= 0xDBFF) {
-          if (this.source.charAt(this.index) !== "\\") {
-            throw this.createILLEGAL();
-          }
-          ++this.index;
-          if (this.index >= this.source.length) {
-            throw this.createILLEGAL();
-          }
-          if (this.source.charAt(this.index) !== "u") {
-            throw this.createILLEGAL();
-          }
-          ++this.index;
-          let lowSurrogateCode = this.scanUnicode();
-          if (!(0xDC00 <= lowSurrogateCode && lowSurrogateCode <= 0xDFFF)) {
-            throw this.createILLEGAL();
-          }
-          code = decodeUtf16(code, lowSurrogateCode);
-        }
         ch = fromCodePoint(code);
       } else if (0xD800 <= code && code <= 0xDBFF) {
         if (this.index >= this.source.length) {

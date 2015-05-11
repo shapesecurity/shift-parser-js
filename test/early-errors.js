@@ -278,7 +278,6 @@ suite("Parser", function () {
     testEarlyError("let \\u0061, \\u{0061};", "Duplicate binding \"a\"");
     testEarlyError("let x\\u{61}, x\\u{0061};", "Duplicate binding \"xa\"");
     testEarlyError("let x\\u{E01D5}, x\uDB40\uDDD5;", "Duplicate binding \"x\uDB40\uDDD5\"");
-    testEarlyError("let x\\u{E01D5}, x\\uDB40\\uDDD5;", "Duplicate binding \"x\uDB40\uDDD5\"");
     testEarlyError("for(let a, a;;);", "Duplicate binding \"a\"");
     testEarlyError("for(let [a, a];;);", "Duplicate binding \"a\"");
     testEarlyError("for(const a = 0, a = 1;;);", "Duplicate binding \"a\"");

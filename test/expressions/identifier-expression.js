@@ -110,10 +110,6 @@ suite("Parser", function () {
         { type: "IdentifierExpression", name: "\uD800\uDC00" }
       );
 
-      testParse("\\uD800\\uDC00", expr,
-        { type: "IdentifierExpression", name: "\uD800\uDC00" }
-      );
-
       testParse("T\u203F", expr,
         { type: "IdentifierExpression", name: "T\u203F" }
       );
@@ -133,6 +129,8 @@ suite("Parser", function () {
       testParse("\u2163\u2161\u200A", expr,
         { type: "IdentifierExpression", name: "\u2163\u2161" }
       );
+
+      testParseFailure("\\uD800\\uDC00", "Unexpected \"\\\\\"");
 
     });
 

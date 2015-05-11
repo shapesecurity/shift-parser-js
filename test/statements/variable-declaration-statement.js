@@ -267,20 +267,6 @@ suite("Parser", function () {
         }
       }
     );
-    testParse("let x, x\\uDB40\\uDDD5;", stmt,
-      {
-        type: "VariableDeclarationStatement",
-        declaration: {
-          type: "VariableDeclaration",
-          kind: "let",
-          declarators: [{
-            type: "VariableDeclarator",
-            binding: { type: "BindingIdentifier", name: "x" },
-            init: null
-          }, { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x\uDB40\uDDD5" }, init: null }]
-        }
-      }
-    );
     testParse("let x, x\uDB40\uDDD5;", stmt,
       {
         type: "VariableDeclarationStatement",

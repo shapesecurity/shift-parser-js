@@ -1252,6 +1252,7 @@ var Parser = (function (_Tokenizer) {
       var test = this.parseBinaryExpression();
       if (this.firstExprError) return test;
       if (this.eat(_tokenizer.TokenType.CONDITIONAL)) {
+        this.isBindingElement = this.isAssignmentTarget = false;
         var previousAllowIn = this.allowIn;
         this.allowIn = true;
         var consequent = this.isolateCoverGrammar(this.parseAssignmentExpression);

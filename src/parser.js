@@ -1177,6 +1177,7 @@ export class Parser extends Tokenizer {
     let test = this.parseBinaryExpression();
     if (this.firstExprError) return test;
     if (this.eat(TokenType.CONDITIONAL)) {
+      this.isBindingElement = this.isAssignmentTarget = false;
       let previousAllowIn = this.allowIn;
       this.allowIn = true;
       let consequent = this.isolateCoverGrammar(this.parseAssignmentExpression);

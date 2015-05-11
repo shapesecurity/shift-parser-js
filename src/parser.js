@@ -446,11 +446,10 @@ export class Parser extends Tokenizer {
             decl = { type: "ExportDefault", body: this.parseClass({ isExpr: false, inDefault: true }) };
             break;
           default:
-          {
             // export default [lookahead ∉ {function, class}] AssignmentExpression[In] ;
             decl = { type: "ExportDefault", body: this.parseAssignmentExpression() };
+            this.consumeSemicolon();
             break;
-          }
         }
         break;
       case TokenType.VAR:

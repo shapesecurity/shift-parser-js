@@ -381,7 +381,7 @@ export default class Tokenizer {
       case 5:
         switch (id.charAt(0)) {
           case "a":
-            if (this.module && Tokenizer.cse4(id, "w", "a", "i", "t")) {
+            if (this.moduleIsTheGoalSymbol && Tokenizer.cse4(id, "w", "a", "i", "t")) {
               return TokenType.AWAIT;
             }
             break;

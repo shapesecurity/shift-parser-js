@@ -193,6 +193,7 @@ var Parser = (function (_Tokenizer) {
     this.inGeneratorBody = false;
     this.allowYieldExpression = false;
     this.module = false;
+    this.moduleIsTheGoalSymbol = false;
 
     // Cover grammar
     this.isBindingElement = true;
@@ -262,7 +263,7 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseModule",
     value: function parseModule() {
-      this.module = true;
+      this.moduleIsTheGoalSymbol = this.module = true;
       this.lookahead = this.advance();
 
       var startLocation = this.getLocation();

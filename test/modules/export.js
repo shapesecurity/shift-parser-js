@@ -33,6 +33,8 @@ function testExportDecl(code, tree) {
   locationSanityTest(code);
 }
 
+function id(x) { return x; }
+
 suite("Parser", function () {
   suite("export declaration", function () {
 
@@ -278,6 +280,43 @@ suite("Parser", function () {
         body: { type: "FunctionBody", directives: [], statements: [] }
       }
     });
+
+    testParseModule("export default 0;0", id,
+      { type: "Module", items: [
+        { type: "ExportDefault", body: { type: "LiteralNumericExpression", value: 0 } },
+        { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
+      ] }
+    );
+
+    testParseModule("export function f(){};0", id,
+      { type: "Module", items: [
+        { type: "Export", declaration:
+          { type: "FunctionDeclaration",
+            isGenerator: false,
+            name: { type: "BindingIdentifier", name: "f" },
+            params: { type: "FormalParameters", items: [], rest: null },
+            body: { type: "FunctionBody", directives: [], statements: [] } } },
+        { type: "EmptyStatement" },
+        { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
+      ] }
+    );
+
+    testParseModule("export class A{};0", id,
+      { type: "Module", items: [
+        { type: "Export", declaration:
+          { type: "ClassDeclaration", name: { type: "BindingIdentifier", name: "A" }, super: null, elements: [] } },
+        { type: "EmptyStatement" },
+        { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
+      ] }
+    );
+
+    testParseModule("export {};0", id,
+      { type: "Module", items: [
+        { type: "ExportFrom", namedExports: [], moduleSpecifier: null },
+        { type: "EmptyStatement" },
+        { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
+      ] }
+    );
 
     testParseFailure("export * from \"a\"", "Unexpected token \"export\"");
     testParseModuleFailure("{export default 3;}", "Unexpected token \"export\"");

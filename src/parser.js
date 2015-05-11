@@ -1135,6 +1135,7 @@ export class Parser extends Tokenizer {
       case TokenType.FALSE:
       case TokenType.FUNCTION:
       case TokenType.IDENTIFIER:
+      case TokenType.INC:
       case TokenType.LET:
       case TokenType.LBRACE:
       case TokenType.LBRACK:
@@ -1162,12 +1163,10 @@ export class Parser extends Tokenizer {
       return this.markLocation({ type: "YieldExpression", expression: null }, startLocation);
     }
     let isGenerator = !!this.eat(TokenType.MUL);
-    let previousYield = this.allowYieldExpression;
     let expr = null;
     if (isGenerator || this.lookaheadAssignmentExpression()) {
       expr = this.parseAssignmentExpression();
     }
-    this.allowYieldExpression = previousYield;
     let type = isGenerator ? "YieldGeneratorExpression" : "YieldExpression";
     return this.markLocation({type, expression: expr}, startLocation);
   }

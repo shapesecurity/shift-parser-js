@@ -1208,6 +1208,7 @@ var Parser = (function (_Tokenizer) {
         case _tokenizer.TokenType.FALSE:
         case _tokenizer.TokenType.FUNCTION:
         case _tokenizer.TokenType.IDENTIFIER:
+        case _tokenizer.TokenType.INC:
         case _tokenizer.TokenType.LET:
         case _tokenizer.TokenType.LBRACE:
         case _tokenizer.TokenType.LBRACK:
@@ -1236,12 +1237,10 @@ var Parser = (function (_Tokenizer) {
         return this.markLocation({ type: "YieldExpression", expression: null }, startLocation);
       }
       var isGenerator = !!this.eat(_tokenizer.TokenType.MUL);
-      var previousYield = this.allowYieldExpression;
       var expr = null;
       if (isGenerator || this.lookaheadAssignmentExpression()) {
         expr = this.parseAssignmentExpression();
       }
-      this.allowYieldExpression = previousYield;
       var type = isGenerator ? "YieldGeneratorExpression" : "YieldExpression";
       return this.markLocation({ type: type, expression: expr }, startLocation);
     }

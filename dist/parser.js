@@ -1,22 +1,3 @@
-// istanbul ignore next
-"use strict";
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-// istanbul ignore next
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
-    property = _x2,
-    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-// istanbul ignore next
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// istanbul ignore next
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
 /**
  * Copyright 2014 Shape Security, Inc.
  *
@@ -32,6 +13,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+"use strict";
+
+// istanbul ignore next
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var _errors = require("./errors");
 
@@ -1298,7 +1297,9 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseBinaryExpression",
     value: function parseBinaryExpression() {
-      var _this2 = this;
+      // istanbul ignore next
+
+      var _this = this;
 
       var startLocation = this.getLocation();
       var left = this.parseUnaryExpression();
@@ -1340,7 +1341,7 @@ var Parser = (function (_Tokenizer) {
 
       // Final reduce to clean-up the stack.
       return stack.reduceRight(function (expr, stackItem) {
-        return _this2.markLocation({
+        return _this.markLocation({
           type: "BinaryExpression",
           left: stackItem.left,
           operator: stackItem.operator.name,
@@ -1515,7 +1516,9 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseNewExpression",
     value: function parseNewExpression() {
-      var _this3 = this;
+      // istanbul ignore next
+
+      var _this2 = this;
 
       var startLocation = this.getLocation();
       this.lex();
@@ -1527,7 +1530,7 @@ var Parser = (function (_Tokenizer) {
         return this.markLocation({ type: "NewTargetExpression" }, startLocation);
       }
       var callee = this.isolateCoverGrammar(function () {
-        return _this3.parseLeftHandSideExpression({ allowCall: false });
+        return _this2.parseLeftHandSideExpression({ allowCall: false });
       });
       return this.markLocation({
         type: "NewExpression",
@@ -2020,7 +2023,9 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseClass",
     value: function parseClass(_ref2) {
-      var _this4 = this;
+      // istanbul ignore next
+
+      var _this3 = this;
 
       var isExpr = _ref2.isExpr;
       var inDefault = _ref2.inDefault;
@@ -2049,7 +2054,7 @@ var Parser = (function (_Tokenizer) {
       }
       if (this.eat(_tokenizer.TokenType.EXTENDS)) {
         heritage = this.isolateCoverGrammar(function () {
-          return _this4.parseLeftHandSideExpression({ allowCall: true });
+          return _this3.parseLeftHandSideExpression({ allowCall: true });
         });
       }
 

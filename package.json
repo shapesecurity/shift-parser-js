@@ -43,7 +43,8 @@
     "mocha": "2.2.1",
     "shift-spec": "2015.1.1",
     "tick": "^0.1.1",
-    "traceur": "0.0.88"
+    "traceur": "0.0.88",
+    "uglifyjs": "^2.4.10"
   },
   "keywords": [
     "Shift",

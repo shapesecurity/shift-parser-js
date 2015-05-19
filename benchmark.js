@@ -22,6 +22,7 @@ global.parse = require("./").parseScript;
 global.esprima = require("esprima");
 global.babel = require("babel-core");
 global.traceur = require("traceur");
+global.uglifyjs = require("uglifyjs");
 
 // Poor man's error reporter for Traceur.
 console.reportError = console.error;
@@ -44,6 +45,9 @@ function benchmarkParsing(fileName) {
     file = new traceur.syntax.SourceFile('name', source);
     parser = new traceur.syntax.Parser(file, console);
     tree = parser.parseScript();
+  });
+  suite.add("uglifyjs", function() {
+    uglifyjs.parse(source);
   });
   suite.on("complete", function() {
     [].forEach.call(this, function(results) {

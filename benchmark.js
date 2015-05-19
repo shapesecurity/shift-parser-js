@@ -20,6 +20,7 @@ var Benchmark = require("benchmark");
 global.fs = require("fs");
 global.parse = require("./").parseScript;
 global.esprima = require("esprima");
+global.acorn = require("acorn");
 global.babel = require("babel-core");
 global.traceur = require("traceur");
 global.uglifyjs = require("uglifyjs");
@@ -33,6 +34,9 @@ function benchmarkParsing(fileName) {
   var suite = new Benchmark.Suite;
   suite.add("shift", function () {
     parse(source, { loc: true, earlyErrors: false });
+  });
+  suite.add("acorn", function() {
+    acorn.parse(source, { loc: true, sourceType: "script" });
   });
   suite.add("esprima", function() {
     esprima.parse(source, { loc: true, sourceType: "script" });

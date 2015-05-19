@@ -54,6 +54,7 @@ function benchmarkParsing(fileName) {
     uglifyjs.parse(source);
   });
   suite.on("complete", function() {
+    this.sort(function(a, b) { return a.stats.mean - b.stats.mean; });
     [].forEach.call(this, function(results) {
       console.log("  " + results.name + ": " + (results.stats.mean * 1000).toFixed(2) + "ms");
     });

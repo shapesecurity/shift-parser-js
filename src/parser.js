@@ -1541,7 +1541,7 @@ export class Parser extends Tokenizer {
   }
 
   parseIdentifier() {
-    if (this.match(TokenType.IDENTIFIER) || this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
+    if (this.match(TokenType.IDENTIFIER) || !this.allowYieldExpression && this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
       return this.lex().value;
     } else {
       throw this.createUnexpected(this.lookahead);

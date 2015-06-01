@@ -1627,7 +1627,7 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseIdentifier",
     value: function parseIdentifier() {
-      if (this.match(_tokenizer.TokenType.IDENTIFIER) || this.match(_tokenizer.TokenType.YIELD) || this.match(_tokenizer.TokenType.LET)) {
+      if (this.match(_tokenizer.TokenType.IDENTIFIER) || !this.allowYieldExpression && this.match(_tokenizer.TokenType.YIELD) || this.match(_tokenizer.TokenType.LET)) {
         return this.lex().value;
       } else {
         throw this.createUnexpected(this.lookahead);

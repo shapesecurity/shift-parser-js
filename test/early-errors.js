@@ -165,7 +165,6 @@ suite("Parser", function () {
     testEarlyError("'use strict'; +yield;", "The identifier \"yield\" must not be in expression position in strict mode");
     testEarlyError("function a(yield){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("function a(){ 'use strict'; function a(a=yield){}}", "The identifier \"yield\" must not be in expression position in strict mode");
-    testEarlyError("function a(){ 'use strict'; function* a(yield){}}", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("function a(){ 'use strict'; function a(yield){}}", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("function a([yield]){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("function a({yield}){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");

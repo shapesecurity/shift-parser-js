@@ -1,3 +1,22 @@
+// istanbul ignore next
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
+    property = _x2,
+    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
 /**
  * Copyright 2014 Shape Security, Inc.
  *
@@ -13,24 +32,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-"use strict";
-
-// istanbul ignore next
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-// istanbul ignore next
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-// istanbul ignore next
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// istanbul ignore next
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var _shiftReducer = require("shift-reducer");
 
@@ -76,8 +77,8 @@ function isLabelledFunction(_x4) {
   var _again2 = true;
 
   _function2: while (_again2) {
-    var node = _x4;
     _again2 = false;
+    var node = _x4;
 
     if (!(_left = node.type === "LabeledStatement")) {
       return _left;
@@ -97,8 +98,8 @@ function isIterationStatement(_x5) {
   var _again3 = true;
 
   _function3: while (_again3) {
-    var node = _x5;
     _again3 = false;
+    var node = _x5;
 
     switch (node.type) {
       case "LabeledStatement":
@@ -202,7 +203,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceBindingIdentifier",
     value: function reduceBindingIdentifier(node) {
       var s = this.identity;
-      if ((0, _utils.isRestrictedWord)(node.name) || (0, _utils.isStrictModeReservedWord)(node.name)) {
+      if (_utils.isRestrictedWord(node.name) || _utils.isStrictModeReservedWord(node.name)) {
         s = s.addStrictError(new _earlyErrorState.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in binding position in strict mode"));
       }
       return s.bindName(node.name, node);
@@ -554,7 +555,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
     key: "reduceIdentifierExpression",
     value: function reduceIdentifierExpression(node) {
       var s = this.identity;
-      if ((0, _utils.isStrictModeReservedWord)(node.name)) {
+      if (_utils.isStrictModeReservedWord(node.name)) {
         s = s.addStrictError(new _earlyErrorState.EarlyError(node, "The identifier " + JSON.stringify(node.name) + " must not be in expression position in strict mode"));
       }
       return s;
@@ -870,7 +871,7 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
   }], [{
     key: "check",
     value: function check(node) {
-      return (0, _shiftReducer["default"])(new EarlyErrorChecker(), node).errors;
+      return _shiftReducer["default"](new EarlyErrorChecker(), node).errors;
     }
   }]);
 

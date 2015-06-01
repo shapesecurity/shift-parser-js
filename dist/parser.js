@@ -190,7 +190,6 @@ var Parser = (function (_Tokenizer) {
     this.inFunctionBody = false;
     this.inGeneratorParameter = false;
     this.inParameter = false;
-    this.inGeneratorBody = false;
     this.allowYieldExpression = false;
     this.module = false;
     this.moduleIsTheGoalSymbol = false;
@@ -1992,16 +1991,10 @@ var Parser = (function (_Tokenizer) {
         var params = this.parseParams();
         this.inGeneratorParameter = previousInGeneratorParameter;
         this.allowYieldExpression = _previousYield3;
-        var previousInGeneratorBody = this.inGeneratorBody;
         this.allowYieldExpression = isGenerator;
-
-        if (isGenerator) {
-          this.inGeneratorBody = true;
-        }
 
         var body = this.parseFunctionBody();
         this.allowYieldExpression = _previousYield3;
-        this.inGeneratorBody = previousInGeneratorBody;
 
         return {
           methodOrKey: this.markLocation({ type: "Method", isGenerator: isGenerator, name: name, params: params, body: body }, startLocation),
@@ -2098,9 +2091,9 @@ var Parser = (function (_Tokenizer) {
 
       var name = null;
       var isGenerator = allowGenerator && !!this.eat(_tokenizer.TokenType.MUL);
+
       var previousGeneratorParameter = this.inGeneratorParameter;
       var previousYield = this.allowYieldExpression;
-      var previousInGeneratorBody = this.inGeneratorBody;
 
       if (!this.match(_tokenizer.TokenType.LPAREN)) {
         name = this.parseBindingIdentifier();
@@ -2114,18 +2107,16 @@ var Parser = (function (_Tokenizer) {
 
       this.inGeneratorParameter = isGenerator;
       this.allowYieldExpression = isGenerator;
-      var params = this.parseParams();
-      this.inGeneratorParameter = previousGeneratorParameter;
 
+      var params = this.parseParams();
+
+      this.inGeneratorParameter = previousGeneratorParameter;
       this.allowYieldExpression = isGenerator;
 
-      if (isGenerator) {
-        this.inGeneratorBody = true;
-      }
-
       var body = this.parseFunctionBody();
-      this.inGeneratorBody = previousInGeneratorBody;
+
       this.allowYieldExpression = previousYield;
+      this.inGeneratorParameter = previousGeneratorParameter;
 
       var type = isExpr ? "FunctionExpression" : "FunctionDeclaration";
       return this.markLocation({ type: type, isGenerator: isGenerator, name: name, params: params, body: body }, startLocation);

@@ -180,9 +180,13 @@ suite("Parser", function () {
     );
 
     testParseFailure("label: function* a(){}", "Unexpected token \"*\"");
-    testParseFailure("function*g(){ var yield; }", "");
-    testParseFailure("function*g(){ function yield(){}; }", "");
-    testParseFailure("function*g(){ (function yield(){}); }", "");
+    testParseFailure("function*g(){ var yield; }", "Unexpected token \"yield\"");
+    testParseFailure("function*g(){ function yield(){}; }", "Unexpected token \"yield\"");
+    testParseFailure("function*g(){ (function yield(){}); }", "Unexpected token \"yield\"");
+
+    testParseFailure("function*g() { var yield; }", "Unexpected token \"yield\"");
+    testParseFailure("function*g() { let yield; }", "Unexpected token \"yield\"");
+    testParseFailure("function*g() { try {} catch (yield) {} }", "Unexpected token \"yield\"");
 
   });
 });

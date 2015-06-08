@@ -38,7 +38,7 @@ function containsDuplicates(list) {
 
 function isValidSimpleAssignmentTarget(node) {
   switch (node.type) {
-    case "IdentifierExpression":
+    case "BindingIdentifier":
     case "ComputedMemberExpression":
     case "StaticMemberExpression":
       return true;
@@ -557,44 +557,39 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reducePostfixExpression(node) {
-    let s = super.reducePostfixExpression(...arguments);
-    switch (node.operator) {
-      case "++":
-      case "--":
-        if (!isValidSimpleAssignmentTarget(node.operand)) {
-          s = s.addError(new EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
-        }
-        break;
+  reduceUpdateExpression(node) {
+    let s = super.reduceUpdateExpression(...arguments);
+    if (!isValidSimpleAssignmentTarget(node.operand)) {
+      s = s.addError(new EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
+    }
+    s = s.clearBoundNames();
+    return s;
+  }
+
+  reduceUnaryExpression(node) {
+    let s = super.reduceUnaryExpression(...arguments);
+    if (node.operator === "delete" && node.operand.type === "IdentifierExpression") {
+      s = s.addStrictError(new EarlyError(node, "Identifier expressions must not be deleted in strict mode"));
     }
     return s;
   }
 
-  reducePrefixExpression(node) {
-    let s = super.reducePrefixExpression(...arguments);
-    switch (node.operator) {
-      case "++":
-      case "--":
-        if (!isValidSimpleAssignmentTarget(node.operand)) {
-          s = s.addError(new EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
-        }
-        break;
-      case "delete":
-        if (node.operand.type === "IdentifierExpression") {
-          s = s.addStrictError(new EarlyError(node, "Identifier expressions must not be deleted in strict mode"));
-        }
-        break;
-    }
-    return s;
-  }
-
-  reduceScript() {
+  reduceScript(node) {
     let s = super.reduceScript(...arguments);
-    s = s.enforceSuperCallExpressions(SUPERCALL_ERROR);
-    s = s.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+    s = s.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
+    s = s.enforceConflictingLexicallyDeclaredNames(s.varDeclaredNames, DUPLICATE_BINDING);
     s.newTargetExpressions.forEach(node => {
       s = s.addError(new EarlyError(node, "new.target must be within function (but not arrow expression) code"));
     });
+    s = s.enforceFreeContinueStatementErrors(FREE_CONTINUE);
+    s = s.enforceFreeLabeledContinueStatementErrors(UNBOUND_CONTINUE);
+    s = s.enforceFreeBreakStatementErrors(FREE_BREAK);
+    s = s.enforceFreeLabeledBreakStatementErrors(UNBOUND_BREAK);
+    s = s.enforceSuperCallExpressions(SUPERCALL_ERROR);
+    s = s.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+    if (isStrictFunctionBody(node)) {
+      s = s.enforceStrictErrors();
+    }
     return s;
   }
 

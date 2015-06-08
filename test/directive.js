@@ -21,7 +21,7 @@ var testParse = require("./assertions").testParse;
 var testParseModule = require("./assertions").testParseModule;
 
 function directives(program) {
-  return program.body.directives;
+  return program.directives;
 }
 
 function id(x) {
@@ -132,11 +132,8 @@ suite("Parser", function () {
 
     testParseModule("\"use strict\";", id,
       { type: "Module",
-        items: [
-          { type: "ExpressionStatement",
-            expression: { type: "LiteralStringExpression", value: "use strict" }
-          }
-        ]
+        directives: [{ type: "Directive", rawValue: "use strict" } ],
+        items: []
       }
     )
 

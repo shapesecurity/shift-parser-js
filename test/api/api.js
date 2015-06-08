@@ -35,26 +35,24 @@ suite("API", function () {
     };
   }
 
-  test("for location information", function () {
+  test("script for location information", function () {
     expect(ShiftParser.default("0", {loc: true, earlyErrors: true})).to.eql(
       withLoc({
         type: "Script",
-        body: withLoc({
-          type: "FunctionBody",
-          directives: [],
-          statements: [withLoc({
-            type: "ExpressionStatement",
-            expression: withLoc({ type: "LiteralNumericExpression", value: 0 }, span(0, 1, 0, 1, 1, 1))
-          }, span(0, 1, 0, 1, 1, 1))]
-        }, span(0, 1, 0, 1, 1, 1))
+        directives: [],
+        statements: [withLoc({
+          type: "ExpressionStatement",
+          expression: withLoc({ type: "LiteralNumericExpression", value: 0 }, span(0, 1, 0, 1, 1, 1))
+        }, span(0, 1, 0, 1, 1, 1))]
       }, span(0, 1, 0, 1, 1, 1))
     );
   });
 
-  test("for location information", function () {
+  test("module for location information", function () {
     expect(ShiftParser.parseModule("0", {loc: true, earlyErrors: true})).to.eql(
       withLoc({
           type: "Module",
+          directives: [],
           items: [withLoc({
             type: "ExpressionStatement",
             expression: withLoc({ type: "LiteralNumericExpression", value: 0 }, span(0, 1, 0, 1, 1, 1))

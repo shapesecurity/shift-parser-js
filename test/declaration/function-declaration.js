@@ -167,23 +167,20 @@ suite("Parser", function () {
     testParse("function a() {} function a() {}", id,
       {
         type: "Script",
-        body: {
-          type: "FunctionBody",
-          directives: [],
-          statements: [{
-            type: "FunctionDeclaration",
-            isGenerator: false,
-            name: { type: "BindingIdentifier", name: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
-          }, {
-            type: "FunctionDeclaration",
-            isGenerator: false,
-            name: { type: "BindingIdentifier", name: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
-          }]
-        }
+        directives: [],
+        statements: [{
+          type: "FunctionDeclaration",
+          isGenerator: false,
+          name: { type: "BindingIdentifier", name: "a" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }, {
+          type: "FunctionDeclaration",
+          isGenerator: false,
+          name: { type: "BindingIdentifier", name: "a" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
       }
     );
 

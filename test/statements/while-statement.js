@@ -46,13 +46,15 @@ suite("Parser", function () {
                 statements:
                   [ { type: "ExpressionStatement",
                       expression:
-                        { type: "PostfixExpression",
-                          operand: { type: "IdentifierExpression", name: "x" },
+                        { type: "UpdateExpression",
+                          isPrefix: false,
+                          operand: { type: "BindingIdentifier", name: "x" },
                           operator: "++" } },
                     { type: "ExpressionStatement",
                       expression:
-                        { type: "PostfixExpression",
-                          operand: { type: "IdentifierExpression", name: "y" },
+                        { type: "UpdateExpression",
+                          isPrefix: false,
+                          operand: { type: "BindingIdentifier", name: "y" },
                           operator: "--" } } ] } },
         test:
           { type: "BinaryExpression",

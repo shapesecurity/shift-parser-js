@@ -18,7 +18,7 @@ var expect = require("expect.js");
 var SHIFT_SPEC = require("shift-spec").default;
 
 function stmt(program) {
-  return program.body.statements[0];
+  return program.statements[0];
 }
 
 function expr(program) {

@@ -282,14 +282,14 @@ suite("Parser", function () {
     });
 
     testParseModule("export default 0;0", id,
-      { type: "Module", items: [
+      { type: "Module", directives: [], items: [
         { type: "ExportDefault", body: { type: "LiteralNumericExpression", value: 0 } },
         { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
       ] }
     );
 
     testParseModule("export function f(){};0", id,
-      { type: "Module", items: [
+      { type: "Module", directives: [], items: [
         { type: "Export", declaration:
           { type: "FunctionDeclaration",
             isGenerator: false,
@@ -302,7 +302,7 @@ suite("Parser", function () {
     );
 
     testParseModule("export class A{};0", id,
-      { type: "Module", items: [
+      { type: "Module", directives: [], items: [
         { type: "Export", declaration:
           { type: "ClassDeclaration", name: { type: "BindingIdentifier", name: "A" }, super: null, elements: [] } },
         { type: "EmptyStatement" },
@@ -311,7 +311,7 @@ suite("Parser", function () {
     );
 
     testParseModule("export {};0", id,
-      { type: "Module", items: [
+      { type: "Module", directives: [], items: [
         { type: "ExportFrom", namedExports: [], moduleSpecifier: null },
         { type: "EmptyStatement" },
         { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },

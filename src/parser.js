@@ -150,8 +150,8 @@ function transformDestructuring(node) {
   }
 }
 
-function isPrefixOperator(type) {
-  switch (type) {
+function isPrefixOperator(token) {
+  switch (token.type) {
     case TokenType.INC:
     case TokenType.DEC:
     case TokenType.ADD:
@@ -166,6 +166,9 @@ function isPrefixOperator(type) {
   return false;
 }
 
+function isUpdateOperator(token) {
+  return token.type === TokenType.INC || token.type === TokenType.DEC;
+}
 
 export class Parser extends Tokenizer {
   constructor(source) {
@@ -237,11 +240,8 @@ export class Parser extends Tokenizer {
     this.lookahead = this.advance();
 
     let startLocation = this.getLocation();
-    let items = [];
-    while (!this.eof()) {
-      items.push(this.parseModuleItem());
-    }
-    return this.markLocation({ type: "Module", items: items }, startLocation);
+    let {directives, statements} = this.parseBody();
+    return this.markLocation({ type: "Module", directives, items: statements }, startLocation);
   }
 
   parseScript() {
@@ -249,10 +249,11 @@ export class Parser extends Tokenizer {
 
     let startLocation = this.getLocation();
     let body = this.parseBody();
+    body.type = "Script";
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
-    return this.markLocation({ type: "Script", body }, startLocation);
+    return this.markLocation(body, startLocation);
   }
 
   parseFunctionBody() {
@@ -274,8 +275,6 @@ export class Parser extends Tokenizer {
   }
 
   parseBody() {
-    let startLocation = this.getLocation();
-
     let directives = [], statements = [], parsingDirectives = true;
 
     while (true) {
@@ -283,8 +282,9 @@ export class Parser extends Tokenizer {
       let token = this.lookahead;
       let text = token.slice.text;
       let isStringLiteral = token.type === TokenType.STRING;
+      let isModule = this.module;
       let directiveLocation = this.getLocation();
-      let stmt = this.parseStatementListItem();
+      let stmt = isModule ? this.parseModuleItem() : this.parseStatementListItem();
       if (parsingDirectives) {
         if (isStringLiteral && stmt.type === "ExpressionStatement" && stmt.expression.type === "LiteralStringExpression") {
           directives.push(this.markLocation({ type: "Directive", rawValue: text.slice(1, -1)}, directiveLocation));
@@ -297,7 +297,7 @@ export class Parser extends Tokenizer {
       }
     }
 
-    return this.markLocation({ type: "FunctionBody", directives, statements }, startLocation);
+    return { type: "FunctionBody", directives, statements };
   }
 
   parseImportSpecifier() {
@@ -1271,32 +1271,45 @@ export class Parser extends Tokenizer {
 
   parseUnaryExpression() {
     if (this.lookahead.type.klass !== TokenClass.Punctuator && this.lookahead.type.klass !== TokenClass.Keyword) {
-      return this.parsePostfixExpression();
+      return this.parseUpdateExpression();
     }
     let startLocation = this.getLocation();
     let operator = this.lookahead;
-    if (!isPrefixOperator(operator.type)) {
-      return this.parsePostfixExpression();
+    if (!isPrefixOperator(operator)) {
+      return this.parseUpdateExpression();
     }
 
     this.lex();
     this.isBindingElement = this.isAssignmentTarget = false;
-    let expr = this.isolateCoverGrammar(this.parseUnaryExpression);
+    let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
 
-    return this.markLocation({ type: "PrefixExpression", operator: operator.value, operand: expr }, startLocation);
+    let node;
+    if (isUpdateOperator(operator)) {
+      if (operand.type === "IdentifierExpression") {
+        operand.type = "BindingIdentifier";
+      }
+      node = { type: "UpdateExpression", isPrefix: true, operator: operator.value, operand: operand };
+    } else {
+      node = { type: "UnaryExpression", operator: operator.value, operand: operand };
+    }
+
+    return this.markLocation(node, startLocation);
   }
 
-  parsePostfixExpression() {
+  parseUpdateExpression() {
     let startLocation = this.getLocation();
 
     let operand = this.parseLeftHandSideExpression({ allowCall: true });
     if (this.firstExprError || this.hasLineTerminatorBeforeNext) return operand;
 
     let operator = this.lookahead;
-    if (operator.type !== TokenType.INC && operator.type !== TokenType.DEC) return operand;
+    if (!isUpdateOperator(operator)) return operand;
     this.lex();
+    if (operand.type === "IdentifierExpression") {
+      operand.type = "BindingIdentifier";
+    }
 
-    return this.markLocation({ type: "PostfixExpression", operand, operator: operator.value }, startLocation);
+    return this.markLocation({ type: "UpdateExpression", isPrefix: false, operator: operator.value, operand }, startLocation);
   }
 
   parseLeftHandSideExpression({allowCall}) {

@@ -128,8 +128,9 @@ suite("Parser", function () {
             left: { type: "IdentifierExpression", name: "x" },
             right: { type: "LiteralNumericExpression", value: 0 } },
         update:
-          { type: "PostfixExpression",
-            operand: { type: "IdentifierExpression", name: "x" },
+          { type: "UpdateExpression",
+            isPrefix: false,
+            operand: { type: "BindingIdentifier", name: "x" },
             operator: "++" } }
     );
 
@@ -148,8 +149,9 @@ suite("Parser", function () {
             left: { type: "IdentifierExpression", name: "x" },
             right: { type: "LiteralNumericExpression", value: 0 } },
         update:
-          { type: "PostfixExpression",
-            operand: { type: "IdentifierExpression", name: "x" },
+          { type: "UpdateExpression",
+            isPrefix: false,
+            operand: { type: "BindingIdentifier", name: "x" },
             operator: "++" } }
     );
 

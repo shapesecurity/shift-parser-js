@@ -31,8 +31,9 @@ suite("Parser", function () {
                   expression: { type: "IdentifierExpression", name: "x" } },
                 { type: "ExpressionStatement",
                   expression:
-                    { type: "PrefixExpression",
-                      operand: { type: "IdentifierExpression", name: "y" },
+                    { type: "UpdateExpression",
+                      isPrefix: true,
+                      operand: { type: "BindingIdentifier", name: "y" },
                       operator: "++" } } ] } }
     );
 
@@ -45,8 +46,9 @@ suite("Parser", function () {
                   expression: { type: "IdentifierExpression", name: "x" } },
                 { type: "ExpressionStatement",
                   expression:
-                    { type: "PrefixExpression",
-                      operand: { type: "IdentifierExpression", name: "y" },
+                    { type: "UpdateExpression",
+                      isPrefix: true,
+                      operand: { type: "BindingIdentifier", name: "y" },
                       operator: "--" } } ] } }
     );
 

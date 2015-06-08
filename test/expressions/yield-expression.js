@@ -15,6 +15,7 @@
  */
 
 var testParse = require("../assertions").testParse;
+var stmt = require("../helpers").stmt;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
@@ -22,13 +23,13 @@ suite("Parser", function () {
 
   suite("yield", function () {
     function yd(p) {
-      return p.body.statements[0].body.statements.map(function (es) {
+      return stmt(p).body.statements.map(function (es) {
         return es.expression;
       });
     }
 
     function yde(p) {
-      return p.body.statements[0].body.statements[0].expression.expression;
+      return stmt(p).body.statements[0].expression.expression;
     }
 
     testParse("function*a(){yield\na}", yd, [{
@@ -55,12 +56,12 @@ suite("Parser", function () {
     testParse("function *a(){yield \"a\"}", yde, { type: "LiteralStringExpression", value: "a" });
     testParse("function *a(){yield a}", yde, { type: "IdentifierExpression", name: "a" });
     testParse("function *a(){yield+0}", yde, {
-      type: "PrefixExpression",
+      type: "UnaryExpression",
       operator: "+",
       operand: { type: "LiteralNumericExpression", value: 0 }
     });
     testParse("function *a(){yield-0}", yde, {
-      type: "PrefixExpression",
+      type: "UnaryExpression",
       operator: "-",
       operand: { type: "LiteralNumericExpression", value: 0 }
     });
@@ -70,12 +71,14 @@ suite("Parser", function () {
     testParse("function *a(){yield/=3/}", yde, { type: "LiteralRegExpExpression", pattern: "=3", flags: "" });
     testParse("function *a(){yield class{}}", yde, { type: "ClassExpression", name: null, super: null, elements: [] });
     testParse("function *a(){yield ++a;}", yde, {
-      type: "PrefixExpression",
-      operand: { type: "IdentifierExpression", name: "a" },
+      type: "UpdateExpression",
+      isPrefix: true,
+      operand: { type: "BindingIdentifier", name: "a" },
       operator: "++" });
     testParse("function *a(){yield --a;}", yde, {
-      type: "PrefixExpression",
-      operand: { type: "IdentifierExpression", name: "a" },
+      type: "UpdateExpression",
+      isPrefix: true,
+      operand: { type: "BindingIdentifier", name: "a" },
       operator: "--" });
   });
 });

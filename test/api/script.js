@@ -23,8 +23,8 @@ function id(x) {
 
 suite("Parser", function () {
   suite("script", function () {
-    testParse("", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
-    testParse(" ", id, { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } });
+    testParse("", id, { type: "Script", directives: [], statements: [] });
+    testParse(" ", id, { type: "Script", directives: [], statements: [] });
     testParseFailure("/*", "Unexpected end of input");
   });
 });

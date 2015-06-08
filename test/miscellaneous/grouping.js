@@ -106,23 +106,23 @@ suite("Parser", function () {
     );
 
     testParse("void (a)", expr,
-      { type: "PrefixExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
+      { type: "UnaryExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
     );
 
     testParse("(void a)", expr,
-      { type: "PrefixExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
+      { type: "UnaryExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
     );
 
     testParse("(a++)", expr,
-      { type: "PostfixExpression", operand: { type: "IdentifierExpression", name: "a" }, operator: "++" }
+      { type: "UpdateExpression", isPrefix: false, operand: { type: "BindingIdentifier", name: "a" }, operator: "++" }
     );
 
     testParse("(a)++", expr,
-      { type: "PostfixExpression", operand: { type: "IdentifierExpression", name: "a" }, operator: "++" }
+      { type: "UpdateExpression", isPrefix: false, operand: { type: "BindingIdentifier", name: "a" }, operator: "++" }
     );
 
     testParse("(a)--", expr,
-      { type: "PostfixExpression", operand: { type: "IdentifierExpression", name: "a" }, operator: "--" }
+      { type: "UpdateExpression", isPrefix: false, operand: { type: "BindingIdentifier", name: "a" }, operator: "--" }
     );
 
     testParse("(a) ? (b) : (c)", expr,

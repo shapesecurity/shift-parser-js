@@ -63,7 +63,7 @@ function containsDuplicates(list) {
 
 function isValidSimpleAssignmentTarget(node) {
   switch (node.type) {
-    case "IdentifierExpression":
+    case "BindingIdentifier":
     case "ComputedMemberExpression":
     case "StaticMemberExpression":
       return true;
@@ -705,47 +705,42 @@ var EarlyErrorChecker = (function (_MonoidalReducer) {
       return s;
     }
   }, {
-    key: "reducePostfixExpression",
-    value: function reducePostfixExpression(node) {
-      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reducePostfixExpression", this).apply(this, arguments);
-      switch (node.operator) {
-        case "++":
-        case "--":
-          if (!isValidSimpleAssignmentTarget(node.operand)) {
-            s = s.addError(new _earlyErrorState.EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
-          }
-          break;
+    key: "reduceUpdateExpression",
+    value: function reduceUpdateExpression(node) {
+      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceUpdateExpression", this).apply(this, arguments);
+      if (!isValidSimpleAssignmentTarget(node.operand)) {
+        s = s.addError(new _earlyErrorState.EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
       }
+      s = s.clearBoundNames();
       return s;
     }
   }, {
-    key: "reducePrefixExpression",
-    value: function reducePrefixExpression(node) {
-      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reducePrefixExpression", this).apply(this, arguments);
-      switch (node.operator) {
-        case "++":
-        case "--":
-          if (!isValidSimpleAssignmentTarget(node.operand)) {
-            s = s.addError(new _earlyErrorState.EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
-          }
-          break;
-        case "delete":
-          if (node.operand.type === "IdentifierExpression") {
-            s = s.addStrictError(new _earlyErrorState.EarlyError(node, "Identifier expressions must not be deleted in strict mode"));
-          }
-          break;
+    key: "reduceUnaryExpression",
+    value: function reduceUnaryExpression(node) {
+      var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceUnaryExpression", this).apply(this, arguments);
+      if (node.operator === "delete" && node.operand.type === "IdentifierExpression") {
+        s = s.addStrictError(new _earlyErrorState.EarlyError(node, "Identifier expressions must not be deleted in strict mode"));
       }
       return s;
     }
   }, {
     key: "reduceScript",
-    value: function reduceScript() {
+    value: function reduceScript(node) {
       var s = _get(Object.getPrototypeOf(EarlyErrorChecker.prototype), "reduceScript", this).apply(this, arguments);
-      s = s.enforceSuperCallExpressions(SUPERCALL_ERROR);
-      s = s.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+      s = s.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
+      s = s.enforceConflictingLexicallyDeclaredNames(s.varDeclaredNames, DUPLICATE_BINDING);
       s.newTargetExpressions.forEach(function (node) {
         s = s.addError(new _earlyErrorState.EarlyError(node, "new.target must be within function (but not arrow expression) code"));
       });
+      s = s.enforceFreeContinueStatementErrors(FREE_CONTINUE);
+      s = s.enforceFreeLabeledContinueStatementErrors(UNBOUND_CONTINUE);
+      s = s.enforceFreeBreakStatementErrors(FREE_BREAK);
+      s = s.enforceFreeLabeledBreakStatementErrors(UNBOUND_BREAK);
+      s = s.enforceSuperCallExpressions(SUPERCALL_ERROR);
+      s = s.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+      if (isStrictFunctionBody(node)) {
+        s = s.enforceStrictErrors();
+      }
       return s;
     }
   }, {

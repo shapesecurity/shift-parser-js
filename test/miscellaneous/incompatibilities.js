@@ -240,9 +240,9 @@ suite("Parser", function() {
         operator: "<",
         left: { type: "IdentifierExpression", name: "a" },
         right: {
-          type: "PrefixExpression",
+          type: "UnaryExpression",
           operator: "!",
-          operand: { type: "PrefixExpression", operator: "--", operand: { type: "IdentifierExpression", name: "b" } }
+          operand: { type: "UpdateExpression", isPrefix: true, operator: "--", operand: { type: "BindingIdentifier", name: "b" } }
         }
       }
     );

@@ -165,8 +165,8 @@ function transformDestructuring(node) {
   }
 }
 
-function isPrefixOperator(type) {
-  switch (type) {
+function isPrefixOperator(token) {
+  switch (token.type) {
     case _tokenizer.TokenType.INC:
     case _tokenizer.TokenType.DEC:
     case _tokenizer.TokenType.ADD:
@@ -179,6 +179,10 @@ function isPrefixOperator(type) {
       return true;
   }
   return false;
+}
+
+function isUpdateOperator(token) {
+  return token.type === _tokenizer.TokenType.INC || token.type === _tokenizer.TokenType.DEC;
 }
 
 var Parser = (function (_Tokenizer) {
@@ -266,11 +270,13 @@ var Parser = (function (_Tokenizer) {
       this.lookahead = this.advance();
 
       var startLocation = this.getLocation();
-      var items = [];
-      while (!this.eof()) {
-        items.push(this.parseModuleItem());
-      }
-      return this.markLocation({ type: "Module", items: items }, startLocation);
+
+      var _parseBody = this.parseBody();
+
+      var directives = _parseBody.directives;
+      var statements = _parseBody.statements;
+
+      return this.markLocation({ type: "Module", directives: directives, items: statements }, startLocation);
     }
   }, {
     key: "parseScript",
@@ -279,10 +285,11 @@ var Parser = (function (_Tokenizer) {
 
       var startLocation = this.getLocation();
       var body = this.parseBody();
+      body.type = "Script";
       if (!this.match(_tokenizer.TokenType.EOS)) {
         throw this.createUnexpected(this.lookahead);
       }
-      return this.markLocation({ type: "Script", body: body }, startLocation);
+      return this.markLocation(body, startLocation);
     }
   }, {
     key: "parseFunctionBody",
@@ -306,8 +313,6 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseBody",
     value: function parseBody() {
-      var startLocation = this.getLocation();
-
       var directives = [],
           statements = [],
           parsingDirectives = true;
@@ -317,8 +322,9 @@ var Parser = (function (_Tokenizer) {
         var _token = this.lookahead;
         var text = _token.slice.text;
         var isStringLiteral = _token.type === _tokenizer.TokenType.STRING;
+        var isModule = this.module;
         var directiveLocation = this.getLocation();
-        var stmt = this.parseStatementListItem();
+        var stmt = isModule ? this.parseModuleItem() : this.parseStatementListItem();
         if (parsingDirectives) {
           if (isStringLiteral && stmt.type === "ExpressionStatement" && stmt.expression.type === "LiteralStringExpression") {
             directives.push(this.markLocation({ type: "Directive", rawValue: text.slice(1, -1) }, directiveLocation));
@@ -331,7 +337,7 @@ var Parser = (function (_Tokenizer) {
         }
       }
 
-      return this.markLocation({ type: "FunctionBody", directives: directives, statements: statements }, startLocation);
+      return { type: "FunctionBody", directives: directives, statements: statements };
     }
   }, {
     key: "parseImportSpecifier",
@@ -1350,33 +1356,46 @@ var Parser = (function (_Tokenizer) {
     key: "parseUnaryExpression",
     value: function parseUnaryExpression() {
       if (this.lookahead.type.klass !== _tokenizer.TokenClass.Punctuator && this.lookahead.type.klass !== _tokenizer.TokenClass.Keyword) {
-        return this.parsePostfixExpression();
+        return this.parseUpdateExpression();
       }
       var startLocation = this.getLocation();
       var operator = this.lookahead;
-      if (!isPrefixOperator(operator.type)) {
-        return this.parsePostfixExpression();
+      if (!isPrefixOperator(operator)) {
+        return this.parseUpdateExpression();
       }
 
       this.lex();
       this.isBindingElement = this.isAssignmentTarget = false;
-      var expr = this.isolateCoverGrammar(this.parseUnaryExpression);
+      var operand = this.isolateCoverGrammar(this.parseUnaryExpression);
 
-      return this.markLocation({ type: "PrefixExpression", operator: operator.value, operand: expr }, startLocation);
+      var node = undefined;
+      if (isUpdateOperator(operator)) {
+        if (operand.type === "IdentifierExpression") {
+          operand.type = "BindingIdentifier";
+        }
+        node = { type: "UpdateExpression", isPrefix: true, operator: operator.value, operand: operand };
+      } else {
+        node = { type: "UnaryExpression", operator: operator.value, operand: operand };
+      }
+
+      return this.markLocation(node, startLocation);
     }
   }, {
-    key: "parsePostfixExpression",
-    value: function parsePostfixExpression() {
+    key: "parseUpdateExpression",
+    value: function parseUpdateExpression() {
       var startLocation = this.getLocation();
 
       var operand = this.parseLeftHandSideExpression({ allowCall: true });
       if (this.firstExprError || this.hasLineTerminatorBeforeNext) return operand;
 
       var operator = this.lookahead;
-      if (operator.type !== _tokenizer.TokenType.INC && operator.type !== _tokenizer.TokenType.DEC) return operand;
+      if (!isUpdateOperator(operator)) return operand;
       this.lex();
+      if (operand.type === "IdentifierExpression") {
+        operand.type = "BindingIdentifier";
+      }
 
-      return this.markLocation({ type: "PostfixExpression", operand: operand, operator: operator.value }, startLocation);
+      return this.markLocation({ type: "UpdateExpression", isPrefix: false, operator: operator.value, operand: operand }, startLocation);
     }
   }, {
     key: "parseLeftHandSideExpression",

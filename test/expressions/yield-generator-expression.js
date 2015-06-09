@@ -17,11 +17,12 @@
 
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("yield", function () {
     function yd(p) {
-      return p.body.statements[0].body.statements.map(function (es) {
+      return stmt(p).body.statements.map(function (es) {
         return es.expression;
       });
     }

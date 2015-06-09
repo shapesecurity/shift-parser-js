@@ -115,7 +115,7 @@ suite("Parser", function () {
     );
 
     testParse("function* a(){({[yield]:a}=0)}", function (p) {
-        return p.body.statements[0].body.statements[0].expression;
+        return stmt(p).body.statements[0].expression;
       },
       {
         type: "AssignmentExpression",
@@ -134,23 +134,20 @@ suite("Parser", function () {
     testParse("function* a() {} function a() {}", id,
       {
         type: "Script",
-        body: {
-          type: "FunctionBody",
-          directives: [],
-          statements: [{
-            type: "FunctionDeclaration",
-            isGenerator: true,
-            name: { type: "BindingIdentifier", name: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
-          }, {
-            type: "FunctionDeclaration",
-            isGenerator: false,
-            name: { type: "BindingIdentifier", name: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
-          }]
-        }
+        directives: [],
+        statements: [{
+          type: "FunctionDeclaration",
+          isGenerator: true,
+          name: { type: "BindingIdentifier", name: "a" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }, {
+          type: "FunctionDeclaration",
+          isGenerator: false,
+          name: { type: "BindingIdentifier", name: "a" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: { type: "FunctionBody", directives: [], statements: [] }
+        }]
       }
     );
 

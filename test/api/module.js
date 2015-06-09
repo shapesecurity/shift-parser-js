@@ -23,7 +23,7 @@ function id(x) {
 
 suite("Parser", function () {
   suite("module", function () {
-    testParseModule("", id, { type: "Module", items: [] });
+    testParseModule("", id, { type: "Module", directives: [], items: [] });
 
     testParseModuleFailure("/*", "Unexpected end of input");
   });

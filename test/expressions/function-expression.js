@@ -227,7 +227,7 @@ suite("Parser", function () {
         body: {
           type: "ExpressionStatement",
           expression: {
-            type: "PrefixExpression",
+            type: "UnaryExpression",
             operator: "!",
             operand: {
               type: "FunctionExpression",

@@ -18,6 +18,7 @@ var ShiftParser = require("../../dist/index.js");
 var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
+var stmt = require("../helpers").stmt;
 
 suite("Parser", function () {
   suite("class expression", function () {
@@ -268,8 +269,8 @@ suite("Parser", function () {
       }
     );
 
-    testParse("var x = class extends (a,b) {};", function stmt(program) {
-        return program.body.statements[0].declaration.declarators[0].init;
+    testParse("var x = class extends (a,b) {};", function (program) {
+        return stmt(program).declaration.declarators[0].init;
       },
       {
         type: "ClassExpression",

@@ -23,13 +23,13 @@ suite("Parser", function () {
     testParse("({})", expr, { type: "ObjectExpression", properties: [] });
 
     testParse("+{}", expr,
-      { type: "PrefixExpression",
+      { type: "UnaryExpression",
         operand: { type: "ObjectExpression", properties: [] },
         operator: "+" }
     );
 
     testParse("+{ }", expr,
-      { type: "PrefixExpression",
+      { type: "UnaryExpression",
         operand: { type: "ObjectExpression", properties: [] },
         operator: "+" }
     );

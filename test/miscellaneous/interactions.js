@@ -224,13 +224,11 @@ suite("Parser", function () {
     // Comments
     testParse("//\n;a;", id,
       { type: "Script",
-        body:
-          { type: "FunctionBody",
-            directives: [],
-            statements:
-              [ { type: "EmptyStatement" },
-                { type: "ExpressionStatement",
-                  expression: { type: "IdentifierExpression", name: "a" } } ] } }
+        directives: [],
+        statements:
+          [ { type: "EmptyStatement" },
+            { type: "ExpressionStatement",
+              expression: { type: "IdentifierExpression", name: "a" } } ] }
     );
 
     testParse("/* block comment */ 0", expr,
@@ -239,11 +237,9 @@ suite("Parser", function () {
 
     testParse("0 /* block comment 1 */ /* block comment 2 */", id,
       { type: "Script",
-        body:
-          { type: "FunctionBody",
-            directives: [],
-            statements:
-              [ { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } } ] } }
+        directives: [],
+        statements:
+          [ { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } } ] }
     );
 
     testParse("(a + /* assignment */b ) * c", expr,
@@ -282,21 +278,21 @@ suite("Parser", function () {
     testParse("// Hello, world!\n0", expr, { type: "LiteralNumericExpression", value: 0 });
 
     testParse("// Hello, world!\n", id,
-      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+      { type: "Script", directives: [], statements: [] }
     );
 
     testParse("// Hallo, world!\n", id,
-      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+      { type: "Script", directives: [], statements: [] }
     );
 
     testParse("//\n0", expr, { type: "LiteralNumericExpression", value: 0 });
 
     testParse("//", id,
-      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+      { type: "Script", directives: [], statements: [] }
     );
 
     testParse("// ", id,
-      { type: "Script", body: { type: "FunctionBody", directives: [], statements: [] } }
+      { type: "Script", directives: [], statements: [] }
     );
 
     testParse("/**/0", expr, { type: "LiteralNumericExpression", value: 0 });
@@ -497,8 +493,9 @@ suite("Parser", function () {
          { type: "BinaryExpression",
            operator: ">",
            left:
-            { type: "PostfixExpression",
-              operand: { type: "IdentifierExpression", name: "i" },
+            { type: "UpdateExpression",
+              isPrefix: false,
+              operand: { type: "BindingIdentifier", name: "i" },
               operator: "--" },
            right: { type: "LiteralNumericExpression", value: 0 } } }
     );
@@ -520,20 +517,19 @@ suite("Parser", function () {
 
     testParse("/* not comment*/; i-->0", id,
       { type: "Script",
-        body:
-          { type: "FunctionBody",
-            directives: [],
-            statements:
-              [ { type: "EmptyStatement" },
-                { type: "ExpressionStatement",
-                  expression:
-                    { type: "BinaryExpression",
-                      operator: ">",
-                      left:
-                        { type: "PostfixExpression",
-                          operand: { type: "IdentifierExpression", name: "i" },
-                          operator: "--" },
-                      right: { type: "LiteralNumericExpression", value: 0 } } } ] } }
+        directives: [],
+        statements:
+          [ { type: "EmptyStatement" },
+            { type: "ExpressionStatement",
+              expression:
+                { type: "BinaryExpression",
+                  operator: ">",
+                  left:
+                    { type: "UpdateExpression",
+                      isPrefix: false,
+                      operand: { type: "BindingIdentifier", name: "i" },
+                      operator: "--" },
+                  right: { type: "LiteralNumericExpression", value: 0 } } } ] }
     );
 
     // super-properties can be the target of destructuring assignment

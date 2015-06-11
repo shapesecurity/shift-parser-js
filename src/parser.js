@@ -93,59 +93,59 @@ function transformDestructuring(node) {
   switch (node.type) {
     case "ObjectExpression":
       return copyLocation(node, {
-      type: "ObjectBinding",
-      properties: node.properties.map(transformDestructuring),
-    });
+        type: "ObjectBinding",
+        properties: node.properties.map(transformDestructuring),
+      });
     case "DataProperty":
       return copyLocation(node, {
-      type: "BindingPropertyProperty",
-      name: node.name,
-      binding: transformDestructuring(node.expression),
-    });
+        type: "BindingPropertyProperty",
+        name: node.name,
+        binding: transformDestructuring(node.expression),
+      });
     case "ShorthandProperty":
       return copyLocation(node, {
-      type: "BindingPropertyIdentifier",
-      binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
-      init: null,
-    });
+        type: "BindingPropertyIdentifier",
+        binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
+        init: null,
+      });
     case "ArrayExpression":
       let last = node.elements[node.elements.length - 1];
-    if (last != null && last.type === "SpreadElement") {
-      return copyLocation(node, {
-        type: "ArrayBinding",
-        elements: node.elements.slice(0, -1).map(e => e && transformDestructuring(e)),
-        restElement: copyLocation(last.expression, transformDestructuring(last.expression)),
-      });
-    } else {
-      return copyLocation(node, {
-        type: "ArrayBinding",
-        elements: node.elements.map(e => e && transformDestructuring(e)),
-        restElement: null,
-      });
-    }
-    /* istanbul ignore next */
-    break;
+      if (last != null && last.type === "SpreadElement") {
+        return copyLocation(node, {
+          type: "ArrayBinding",
+          elements: node.elements.slice(0, -1).map(e => e && transformDestructuring(e)),
+          restElement: copyLocation(last.expression, transformDestructuring(last.expression)),
+        });
+      } else {
+        return copyLocation(node, {
+          type: "ArrayBinding",
+          elements: node.elements.map(e => e && transformDestructuring(e)),
+          restElement: null,
+        });
+      }
+      /* istanbul ignore next */
+      break;
     case "AssignmentExpression":
       return copyLocation(node, {
-      type: "BindingWithDefault",
-      binding: transformDestructuring(node.binding),
-      init: node.expression,
-    });
+        type: "BindingWithDefault",
+        binding: transformDestructuring(node.binding),
+        init: node.expression,
+      });
     case "IdentifierExpression":
       return copyLocation(node, { type: "BindingIdentifier", name: node.name });
     case "StaticPropertyName":
       return copyLocation(node, { type: "BindingIdentifier", name: node.value });
     case "ComputedMemberExpression":
-      case "StaticMemberExpression":
-      case "ArrayBinding":
-      case "BindingIdentifier":
-      case "BindingPropertyIdentifier":
-      case "BindingPropertyProperty":
-      case "BindingWithDefault":
-      case "ObjectBinding":
+    case "StaticMemberExpression":
+    case "ArrayBinding":
+    case "BindingIdentifier":
+    case "BindingPropertyIdentifier":
+    case "BindingPropertyProperty":
+    case "BindingWithDefault":
+    case "ObjectBinding":
       return node;
-    // istanbul ignore next
     default:
+      // istanbul ignore next
       throw new Error("Not reached");
   }
 }

@@ -202,7 +202,6 @@ suite("Parser", function () {
         params: { type: "FormalParameters", items: [], rest: null },
         body: {
           type: "AssignmentExpression",
-          operator: "=",
           binding: { type: "BindingIdentifier", name: "a" },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }

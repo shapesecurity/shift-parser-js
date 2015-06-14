@@ -90,7 +90,6 @@ suite("Parser", function () {
     testParse("(a) = 0", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
@@ -99,7 +98,6 @@ suite("Parser", function () {
     testParse("((a)) = 0", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }

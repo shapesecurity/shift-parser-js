@@ -256,7 +256,6 @@ suite("Parser", function () {
     testParse("/* assignment */\n a = b", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "a" },
         expression: { type: "IdentifierExpression", name: "b" }
       }
@@ -563,7 +562,6 @@ suite("Parser", function () {
                                 ],
                                 restElement: null
                               },
-                            operator: "=",
                             expression: { type: "IdentifierExpression", name: "c" }
                           }
                       }
@@ -607,7 +605,6 @@ suite("Parser", function () {
                                   }
                                 ]
                               },
-                            operator: "=",
                             expression: { type: "IdentifierExpression", name: "d" }
                           }
                       }

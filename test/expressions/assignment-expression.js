@@ -22,7 +22,6 @@ suite("Parser", function () {
     testParse("a=0;", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
@@ -30,7 +29,6 @@ suite("Parser", function () {
     testParse("(a)=(0);", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
@@ -38,7 +36,6 @@ suite("Parser", function () {
     testParse("x = 0", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
@@ -46,7 +43,6 @@ suite("Parser", function () {
     testParse("eval = 0", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "eval" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
@@ -54,14 +50,13 @@ suite("Parser", function () {
     testParse("arguments = 0", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: { type: "BindingIdentifier", name: "arguments" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
     testParse("x *= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "*=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -69,7 +64,7 @@ suite("Parser", function () {
     );
     testParse("x.x *= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "*=",
         binding: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "x" }, property: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -77,7 +72,7 @@ suite("Parser", function () {
     );
     testParse("x /= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "/=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -85,7 +80,7 @@ suite("Parser", function () {
     );
     testParse("x %= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "%=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -93,7 +88,7 @@ suite("Parser", function () {
     );
     testParse("x += 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "+=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -101,7 +96,7 @@ suite("Parser", function () {
     );
     testParse("x -= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "-=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -109,7 +104,7 @@ suite("Parser", function () {
     );
     testParse("x <<= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "<<=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -117,7 +112,7 @@ suite("Parser", function () {
     );
     testParse("x >>= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: ">>=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -125,7 +120,7 @@ suite("Parser", function () {
     );
     testParse("x >>>= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: ">>>=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -133,7 +128,7 @@ suite("Parser", function () {
     );
     testParse("x &= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "&=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -141,7 +136,7 @@ suite("Parser", function () {
     );
     testParse("x ^= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "^=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -149,7 +144,7 @@ suite("Parser", function () {
     );
     testParse("x |= 0", expr,
       {
-        type: "AssignmentExpression",
+        type: "CompoundAssignmentExpression",
         operator: "|=",
         binding: { type: "BindingIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
@@ -159,7 +154,6 @@ suite("Parser", function () {
     testParse("'use strict'; eval[0] = 0", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: {
           type: "ComputedMemberExpression",
           object: { type: "IdentifierExpression", name: "eval" },
@@ -172,7 +166,6 @@ suite("Parser", function () {
     testParse("'use strict'; arguments[0] = 0", expr,
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: {
           type: "ComputedMemberExpression",
           object: { type: "IdentifierExpression", name: "arguments" },
@@ -186,7 +179,6 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: { type: "BindingIdentifier", name: "a" },
-        operator: "=",
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
@@ -194,7 +186,6 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "a" },
-        operator: "=",
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
@@ -211,7 +202,6 @@ suite("Parser", function () {
           },
           property: "length"
         },
-        operator: "=",
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
@@ -228,7 +218,6 @@ suite("Parser", function () {
           },
           property: "length"
         },
-        operator: "=",
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 

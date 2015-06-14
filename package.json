@@ -14,8 +14,8 @@
   ],
   "scripts": {
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
-    "build": "babel --auxiliary-comment 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src",
-    "watch": "babel --auxiliary-comment 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src --watch",
+    "build": "babel --auxiliary-comment-before 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src",
+    "watch": "babel --auxiliary-comment-before 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src --watch",
     "benchmark": "node benchmark",
     "profile": "node --prof profile.js && node-tick-processor",
     "generate-coverage": "istanbul cover -x dist/pattern-acceptor.js _mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "acorn": "^1.1.0",
     "angular": "1.3.14",
-    "babel": "5.2.17",
+    "babel": "5.5.8",
     "babel-core": "^5.1.11",
     "benchmark": "^1.0.0",
     "commonjs-everywhere": "0.9.7",

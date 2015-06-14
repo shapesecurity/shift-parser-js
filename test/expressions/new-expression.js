@@ -80,7 +80,6 @@ suite("Parser", function () {
           type: "SpreadElement",
           expression: {
             type: "AssignmentExpression",
-            operator: "=",
             binding: { type: "BindingIdentifier", name: "a" },
             expression: { type: "IdentifierExpression", name: "b" }
           }

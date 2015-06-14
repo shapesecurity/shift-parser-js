@@ -28,8 +28,10 @@ function markLocation(node, location) {
     end: {
       line: this.lastLine + 1,
       column: this.lastIndex - this.lastLineStart,
-      offset: this.lastIndex },
-    source: null };
+      offset: this.lastIndex
+    },
+    source: null
+  };
   return node;
 }
 
@@ -59,11 +61,10 @@ function generateInterface(parsingFunctionName) {
             line = 1,
             column = 0;
         if (node.loc != null) {
-          var _temp = node.loc.start;
-          offset = _temp.offset;
-          line = _temp.line;
-          column = _temp.column;
-          _temp;
+          var _node$loc$start = node.loc.start;
+          offset = _node$loc$start.offset;
+          line = _node$loc$start.line;
+          column = _node$loc$start.column;
         }
         throw new _tokenizer.JsError(offset, line, column, message);
       }

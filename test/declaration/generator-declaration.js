@@ -119,7 +119,6 @@ suite("Parser", function () {
       },
       {
         type: "AssignmentExpression",
-        operator: "=",
         binding: {
           type: "ObjectBinding",
           properties: [{

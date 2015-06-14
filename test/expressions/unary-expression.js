@@ -32,7 +32,6 @@ suite("Parser", function () {
         operand: {
           type: "AssignmentExpression",
           binding: { type: "BindingIdentifier", name: "a" },
-          operator: "=",
           expression: { type: "IdentifierExpression", name: "b" }
         },
         operator: "!"

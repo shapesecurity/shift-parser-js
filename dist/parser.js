@@ -1,22 +1,3 @@
-// istanbul ignore next
-"use strict";
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-// istanbul ignore next
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
-    property = _x2,
-    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-// istanbul ignore next
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// istanbul ignore next
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
 /**
  * Copyright 2014 Shape Security, Inc.
  *
@@ -32,6 +13,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+"use strict";
+
+// istanbul ignore next
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+// istanbul ignore next
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+// istanbul ignore next
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// istanbul ignore next
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var _errors = require("./errors");
 
@@ -62,7 +61,8 @@ var Precedence = {
   New: 16,
   TaggedTemplate: 17,
   Member: 18,
-  Primary: 19 };
+  Primary: 19
+};
 
 var BinaryPrecedence = {
   "||": Precedence.LogicalOR,
@@ -87,7 +87,8 @@ var BinaryPrecedence = {
   "-": Precedence.Additive,
   "*": Precedence.Multiplicative,
   "%": Precedence.Multiplicative,
-  "/": Precedence.Multiplicative };
+  "/": Precedence.Multiplicative
+};
 
 function copyLocation(from, to) {
   if ("loc" in from) {
@@ -111,17 +112,20 @@ function transformDestructuring(node) {
     case "ObjectExpression":
       return copyLocation(node, {
         type: "ObjectBinding",
-        properties: node.properties.map(transformDestructuring) });
+        properties: node.properties.map(transformDestructuring)
+      });
     case "DataProperty":
       return copyLocation(node, {
         type: "BindingPropertyProperty",
         name: node.name,
-        binding: transformDestructuring(node.expression) });
+        binding: transformDestructuring(node.expression)
+      });
     case "ShorthandProperty":
       return copyLocation(node, {
         type: "BindingPropertyIdentifier",
         binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
-        init: null });
+        init: null
+      });
     case "ArrayExpression":
       var last = node.elements[node.elements.length - 1];
       if (last != null && last.type === "SpreadElement") {
@@ -130,14 +134,16 @@ function transformDestructuring(node) {
           elements: node.elements.slice(0, -1).map(function (e) {
             return e && transformDestructuring(e);
           }),
-          restElement: copyLocation(last.expression, transformDestructuring(last.expression)) });
+          restElement: copyLocation(last.expression, transformDestructuring(last.expression))
+        });
       } else {
         return copyLocation(node, {
           type: "ArrayBinding",
           elements: node.elements.map(function (e) {
             return e && transformDestructuring(e);
           }),
-          restElement: null });
+          restElement: null
+        });
       }
       /* istanbul ignore next */
       break;
@@ -145,7 +151,8 @@ function transformDestructuring(node) {
       return copyLocation(node, {
         type: "BindingWithDefault",
         binding: transformDestructuring(node.binding),
-        init: node.expression });
+        init: node.expression
+      });
     case "IdentifierExpression":
       return copyLocation(node, { type: "BindingIdentifier", name: node.name });
     case "StaticPropertyName":
@@ -319,9 +326,9 @@ var Parser = (function (_Tokenizer) {
 
       while (true) {
         if (this.eof() || this.match(_tokenizer.TokenType.RBRACE)) break;
-        var _token = this.lookahead;
-        var text = _token.slice.text;
-        var isStringLiteral = _token.type === _tokenizer.TokenType.STRING;
+        var token = this.lookahead;
+        var text = token.slice.text;
+        var isStringLiteral = token.type === _tokenizer.TokenType.STRING;
         var isModule = this.module;
         var directiveLocation = this.getLocation();
         var stmt = isModule ? this.parseModuleItem() : this.parseStatementListItem();
@@ -350,7 +357,8 @@ var Parser = (function (_Tokenizer) {
           return this.markLocation({
             type: "ImportSpecifier",
             name: null,
-            binding: this.markLocation({ type: "BindingIdentifier", name: name }, startLocation) }, startLocation);
+            binding: this.markLocation({ type: "BindingIdentifier", name: name }, startLocation)
+          }, startLocation);
         }
       } else if (this.lookahead.type.klass.isIdentifierName) {
         name = this.parseIdentifierName();
@@ -414,13 +422,15 @@ var Parser = (function (_Tokenizer) {
           type: "ImportNamespace",
           defaultBinding: defaultBinding,
           namespaceBinding: this.parseNameSpaceBinding(),
-          moduleSpecifier: this.parseFromClause() }, startLocation);
+          moduleSpecifier: this.parseFromClause()
+        }, startLocation);
       } else if (this.match(_tokenizer.TokenType.LBRACE)) {
         return this.markLocation({
           type: "Import",
           defaultBinding: defaultBinding,
           namedImports: this.parseNamedImports(),
-          moduleSpecifier: this.parseFromClause() }, startLocation);
+          moduleSpecifier: this.parseFromClause()
+        }, startLocation);
       } else {
         throw this.createUnexpected(this.lookahead);
       }
@@ -487,7 +497,8 @@ var Parser = (function (_Tokenizer) {
               // export default HoistableDeclaration[Default]
               decl = {
                 type: "ExportDefault",
-                body: this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: true }) };
+                body: this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: true })
+              };
               break;
             case _tokenizer.TokenType.CLASS:
               // export default ClassDeclaration[Default]
@@ -614,14 +625,14 @@ var Parser = (function (_Tokenizer) {
             if (this.lookaheadLexicalDeclaration()) {
               throw this.createUnexpected(this.lookahead);
             }
-            var _expr = this.parseExpression();
+            var expr = this.parseExpression();
             // 12.12 Labelled Statements;
-            if (_expr.type === "IdentifierExpression" && this.eat(_tokenizer.TokenType.COLON)) {
+            if (expr.type === "IdentifierExpression" && this.eat(_tokenizer.TokenType.COLON)) {
               var labeledBody = this.match(_tokenizer.TokenType.FUNCTION) ? this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false }) : this.parseStatement();
-              return { type: "LabeledStatement", label: _expr.name, body: labeledBody };
+              return { type: "LabeledStatement", label: expr.name, body: labeledBody };
             } else {
               this.consumeSemicolon();
-              return { type: "ExpressionStatement", expression: _expr };
+              return { type: "ExpressionStatement", expression: expr };
             }
           }
       }
@@ -763,10 +774,10 @@ var Parser = (function (_Tokenizer) {
         } else {
           var previousAllowIn = this.allowIn;
           this.allowIn = false;
-          var _expr2 = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+          var expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
           this.allowIn = previousAllowIn;
 
-          if (this.isAssignmentTarget && _expr2.type !== "AssignmentExpression" && (this.match(_tokenizer.TokenType.IN) || this.matchContextualKeyword("of"))) {
+          if (this.isAssignmentTarget && expr.type !== "AssignmentExpression" && (this.match(_tokenizer.TokenType.IN) || this.matchContextualKeyword("of"))) {
             if (startsWithLet && this.matchContextualKeyword("of")) {
               throw this.createError(_errors.ErrorMessages.INVALID_LHS_IN_FOR_OF);
             }
@@ -775,14 +786,14 @@ var Parser = (function (_Tokenizer) {
             this.lex();
             right = this.parseExpression();
 
-            return { type: type, left: transformDestructuring(_expr2), right: right, body: this.getIteratorStatementEpilogue() };
+            return { type: type, left: transformDestructuring(expr), right: right, body: this.getIteratorStatementEpilogue() };
           } else {
             if (this.firstExprError) {
               throw this.firstExprError;
             }
             while (this.eat(_tokenizer.TokenType.COMMA)) {
               var rhs = this.parseAssignmentExpression();
-              _expr2 = this.markLocation({ type: "BinaryExpression", left: _expr2, operator: ",", right: rhs }, leftLocation);
+              expr = this.markLocation({ type: "BinaryExpression", left: expr, operator: ",", right: rhs }, leftLocation);
             }
             if (this.match(_tokenizer.TokenType.IN)) {
               throw this.createError(_errors.ErrorMessages.INVALID_LHS_IN_FOR_IN);
@@ -798,7 +809,7 @@ var Parser = (function (_Tokenizer) {
             if (!this.match(_tokenizer.TokenType.RPAREN)) {
               right = this.parseExpression();
             }
-            return { type: "ForStatement", init: _expr2, test: test, update: right, body: this.getIteratorStatementEpilogue() };
+            return { type: "ForStatement", init: expr, test: test, update: right, body: this.getIteratorStatementEpilogue() };
           }
         }
       }
@@ -878,7 +889,8 @@ var Parser = (function (_Tokenizer) {
           discriminant: discriminant,
           preDefaultCases: cases,
           defaultCase: defaultCase,
-          postDefaultCases: postDefaultCases };
+          postDefaultCases: postDefaultCases
+        };
       } else {
         this.expect(_tokenizer.TokenType.RBRACE);
         return { type: "SwitchStatement", discriminant: discriminant, cases: cases };
@@ -901,7 +913,8 @@ var Parser = (function (_Tokenizer) {
       return this.markLocation({
         type: "SwitchCase",
         test: this.parseExpression(),
-        consequent: this.parseSwitchCaseBody() }, startLocation);
+        consequent: this.parseSwitchCaseBody()
+      }, startLocation);
     }
   }, {
     key: "parseSwitchDefault",
@@ -1124,10 +1137,10 @@ var Parser = (function (_Tokenizer) {
       var paramsNode = this.markLocation({ type: "FormalParameters", items: params, rest: rest }, startLocation);
 
       if (this.match(_tokenizer.TokenType.LBRACE)) {
-        var _previousYield = this.allowYieldExpression;
+        var previousYield = this.allowYieldExpression;
         this.allowYieldExpression = false;
         var body = this.parseFunctionBody();
-        this.allowYieldExpression = _previousYield;
+        this.allowYieldExpression = previousYield;
         return this.markLocation({ type: "ArrowExpression", params: paramsNode, body: body }, startLocation);
       } else {
         var body = this.parseAssignmentExpression();
@@ -1195,11 +1208,7 @@ var Parser = (function (_Tokenizer) {
 
       this.inGeneratorParameter = previousInGeneratorParameter;
       this.firstExprError = null;
-      return this.markLocation({
-        type: "AssignmentExpression",
-        binding: expr,
-        operator: operator.type.name,
-        expression: rhs }, startLocation);
+      return this.markLocation(operator.type === _tokenizer.TokenType.ASSIGN ? { type: "AssignmentExpression", binding: expr, expression: rhs } : { type: "CompoundAssignmentExpression", binding: expr, operator: operator.type.name, expression: rhs }, startLocation);
     }
   }, {
     key: "lookaheadAssignmentExpression",
@@ -1303,7 +1312,9 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseBinaryExpression",
     value: function parseBinaryExpression() {
-      var _this2 = this;
+      // istanbul ignore next
+
+      var _this = this;
 
       var startLocation = this.getLocation();
       var left = this.parseUnaryExpression();
@@ -1345,11 +1356,12 @@ var Parser = (function (_Tokenizer) {
 
       // Final reduce to clean-up the stack.
       return stack.reduceRight(function (expr, stackItem) {
-        return _this2.markLocation({
+        return _this.markLocation({
           type: "BinaryExpression",
           left: stackItem.left,
           operator: stackItem.operator.name,
-          right: expr }, stackItem.startLocation);
+          right: expr
+        }, stackItem.startLocation);
       }, right);
     }
   }, {
@@ -1418,7 +1430,8 @@ var Parser = (function (_Tokenizer) {
             expr = this.markLocation({
               type: "CallExpression",
               callee: expr,
-              arguments: this.parseArgumentList() }, startLocation);
+              arguments: this.parseArgumentList()
+            }, startLocation);
           } else {
             throw this.createUnexpected(token);
           }
@@ -1426,13 +1439,15 @@ var Parser = (function (_Tokenizer) {
           expr = this.markLocation({
             type: "ComputedMemberExpression",
             object: expr,
-            expression: this.parseComputedMember() }, startLocation);
+            expression: this.parseComputedMember()
+          }, startLocation);
           this.isAssignmentTarget = true;
         } else if (this.match(_tokenizer.TokenType.PERIOD)) {
           expr = this.markLocation({
             type: "StaticMemberExpression",
             object: expr,
-            property: this.parseStaticMember() }, startLocation);
+            property: this.parseStaticMember()
+          }, startLocation);
           this.isAssignmentTarget = true;
         } else {
           throw this.createUnexpected(token);
@@ -1453,27 +1468,31 @@ var Parser = (function (_Tokenizer) {
           expr = this.markLocation({
             type: "CallExpression",
             callee: expr,
-            arguments: this.parseArgumentList() }, startLocation);
+            arguments: this.parseArgumentList()
+          }, startLocation);
         } else if (this.match(_tokenizer.TokenType.LBRACK)) {
           this.isBindingElement = false;
           this.isAssignmentTarget = true;
           expr = this.markLocation({
             type: "ComputedMemberExpression",
             object: expr,
-            expression: this.parseComputedMember() }, startLocation);
+            expression: this.parseComputedMember()
+          }, startLocation);
         } else if (this.match(_tokenizer.TokenType.PERIOD)) {
           this.isBindingElement = false;
           this.isAssignmentTarget = true;
           expr = this.markLocation({
             type: "StaticMemberExpression",
             object: expr,
-            property: this.parseStaticMember() }, startLocation);
+            property: this.parseStaticMember()
+          }, startLocation);
         } else if (this.match(_tokenizer.TokenType.TEMPLATE)) {
           this.isBindingElement = this.isAssignmentTarget = false;
           expr = this.markLocation({
             type: "TemplateExpression",
             tag: expr,
-            elements: this.parseTemplateElements() }, startLocation);
+            elements: this.parseTemplateElements()
+          }, startLocation);
         } else {
           break;
         }
@@ -1533,7 +1552,9 @@ var Parser = (function (_Tokenizer) {
   }, {
     key: "parseNewExpression",
     value: function parseNewExpression() {
-      var _this3 = this;
+      // istanbul ignore next
+
+      var _this2 = this;
 
       var startLocation = this.getLocation();
       this.lex();
@@ -1545,12 +1566,13 @@ var Parser = (function (_Tokenizer) {
         return this.markLocation({ type: "NewTargetExpression" }, startLocation);
       }
       var callee = this.isolateCoverGrammar(function () {
-        return _this3.parseLeftHandSideExpression({ allowCall: false });
+        return _this2.parseLeftHandSideExpression({ allowCall: false });
       });
       return this.markLocation({
         type: "NewExpression",
         callee: callee,
-        arguments: this.match(_tokenizer.TokenType.LPAREN) ? this.parseArgumentList() : [] }, startLocation);
+        arguments: this.match(_tokenizer.TokenType.LPAREN) ? this.parseArgumentList() : []
+      }, startLocation);
     }
   }, {
     key: "parsePrimaryExpression",
@@ -1708,7 +1730,8 @@ var Parser = (function (_Tokenizer) {
         return {
           type: ARROW_EXPRESSION_PARAMS,
           params: [],
-          rest: null };
+          rest: null
+        };
       } else if (this.eat(_tokenizer.TokenType.ELLIPSIS)) {
         rest = this.parseBindingIdentifier();
         this.expect(_tokenizer.TokenType.RPAREN);
@@ -1717,7 +1740,8 @@ var Parser = (function (_Tokenizer) {
         return {
           type: ARROW_EXPRESSION_PARAMS,
           params: [],
-          rest: rest };
+          rest: rest
+        };
       }
 
       var startLocation = this.getLocation();
@@ -1742,11 +1766,11 @@ var Parser = (function (_Tokenizer) {
           params.push(binding);
         } else {
           // Can be either binding element or assignment target.
-          var _expr3 = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+          var expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
           if (!this.isBindingElement) {
             params = null;
           } else {
-            params.push(_expr3);
+            params.push(expr);
           }
 
           if (this.firstExprError) {
@@ -1756,7 +1780,8 @@ var Parser = (function (_Tokenizer) {
               type: "BinaryExpression",
               left: group,
               operator: ",",
-              right: _expr3 }, startLocation);
+              right: expr
+            }, startLocation);
           }
         }
       }
@@ -1798,24 +1823,24 @@ var Parser = (function (_Tokenizer) {
           exprs.push(null);
         } else {
           var elementLocation = this.getLocation();
-          var _expr4 = undefined;
+          var expr = undefined;
           if (this.eat(_tokenizer.TokenType.ELLIPSIS)) {
             // Spread/Rest element
-            _expr4 = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+            expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
             if (!this.isAssignmentTarget && this.firstExprError) {
               throw this.firstExprError;
             }
-            _expr4 = this.markLocation({ type: "SpreadElement", expression: _expr4 }, elementLocation);
+            expr = this.markLocation({ type: "SpreadElement", expression: expr }, elementLocation);
             if (!this.match(_tokenizer.TokenType.RBRACK)) {
               this.isBindingElement = this.isAssignmentTarget = false;
             }
           } else {
-            _expr4 = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+            expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
             if (!this.isAssignmentTarget && this.firstExprError) {
               throw this.firstExprError;
             }
           }
-          exprs.push(_expr4);
+          exprs.push(expr);
 
           if (!this.match(_tokenizer.TokenType.RBRACK)) {
             this.expect(_tokenizer.TokenType.COMMA);
@@ -1869,7 +1894,8 @@ var Parser = (function (_Tokenizer) {
             return this.markLocation({
               type: "BindingPropertyIdentifier",
               binding: transformDestructuring(methodOrKey),
-              init: init }, startLocation);
+              init: init
+            }, startLocation);
           } else if (!this.match(_tokenizer.TokenType.COLON)) {
             if (token.type !== _tokenizer.TokenType.IDENTIFIER && token.type !== _tokenizer.TokenType.YIELD && token.type !== _tokenizer.TokenType.LET) {
               throw this.createUnexpected(token);
@@ -1900,15 +1926,19 @@ var Parser = (function (_Tokenizer) {
           return {
             name: this.markLocation({
               type: "StaticPropertyName",
-              value: this.parseStringLiteral().value }, startLocation),
-            binding: null };
+              value: this.parseStringLiteral().value
+            }, startLocation),
+            binding: null
+          };
         case _tokenizer.TokenType.NUMBER:
           var numLiteral = this.parseNumericLiteral();
           return {
             name: this.markLocation({
               type: "StaticPropertyName",
-              value: "" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value) }, startLocation),
-            binding: null };
+              value: "" + (numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value)
+            }, startLocation),
+            binding: null
+          };
         case _tokenizer.TokenType.LBRACK:
           var previousYield = this.allowYieldExpression;
           if (this.inGeneratorParameter) {
@@ -1924,7 +1954,8 @@ var Parser = (function (_Tokenizer) {
       var name = this.parseIdentifierName();
       return {
         name: this.markLocation({ type: "StaticPropertyName", value: name }, startLocation),
-        binding: this.markLocation({ type: "BindingIdentifier", name: name }, startLocation) };
+        binding: this.markLocation({ type: "BindingIdentifier", name: name }, startLocation)
+      };
     }
   }, {
     key: "lookaheadPropertyName",
@@ -1982,7 +2013,8 @@ var Parser = (function (_Tokenizer) {
             var body = this.parseFunctionBody();
             return {
               methodOrKey: this.markLocation({ type: "Getter", name: _name, body: body }, startLocation),
-              kind: "method" };
+              kind: "method"
+            };
           } else if (_name === "set" && this.lookaheadPropertyName()) {
             var _parsePropertyName3 = this.parsePropertyName();
 
@@ -1991,33 +2023,35 @@ var Parser = (function (_Tokenizer) {
             this.expect(_tokenizer.TokenType.LPAREN);
             var param = this.parseBindingElement();
             this.expect(_tokenizer.TokenType.RPAREN);
-            var _previousYield2 = this.allowYieldExpression;
+            var previousYield = this.allowYieldExpression;
             this.allowYieldExpression = false;
             var body = this.parseFunctionBody();
-            this.allowYieldExpression = _previousYield2;
+            this.allowYieldExpression = previousYield;
             return {
               methodOrKey: this.markLocation({ type: "Setter", name: _name, param: param, body: body }, startLocation),
-              kind: "method" };
+              kind: "method"
+            };
           }
         }
       }
 
       if (this.match(_tokenizer.TokenType.LPAREN)) {
-        var _previousYield3 = this.allowYieldExpression;
+        var previousYield = this.allowYieldExpression;
         var previousInGeneratorParameter = this.inGeneratorParameter;
         this.inGeneratorParameter = isGenerator;
         this.allowYieldExpression = isGenerator;
         var params = this.parseParams();
         this.inGeneratorParameter = previousInGeneratorParameter;
-        this.allowYieldExpression = _previousYield3;
+        this.allowYieldExpression = previousYield;
         this.allowYieldExpression = isGenerator;
 
         var body = this.parseFunctionBody();
-        this.allowYieldExpression = _previousYield3;
+        this.allowYieldExpression = previousYield;
 
         return {
           methodOrKey: this.markLocation({ type: "Method", isGenerator: isGenerator, name: name, params: params, body: body }, startLocation),
-          kind: "method" };
+          kind: "method"
+        };
       }
 
       if (isGenerator && this.match(_tokenizer.TokenType.COLON)) {
@@ -2027,12 +2061,15 @@ var Parser = (function (_Tokenizer) {
       return {
         methodOrKey: name,
         kind: token.type.klass.isIdentifierName ? "identifier" : "property",
-        binding: binding };
+        binding: binding
+      };
     }
   }, {
     key: "parseClass",
     value: function parseClass(_ref2) {
-      var _this4 = this;
+      // istanbul ignore next
+
+      var _this3 = this;
 
       var isExpr = _ref2.isExpr;
       var inDefault = _ref2.inDefault;
@@ -2061,7 +2098,7 @@ var Parser = (function (_Tokenizer) {
       }
       if (this.eat(_tokenizer.TokenType.EXTENDS)) {
         heritage = this.isolateCoverGrammar(function () {
-          return _this4.parseLeftHandSideExpression({ allowCall: true });
+          return _this3.parseLeftHandSideExpression({ allowCall: true });
         });
       }
 
@@ -2081,11 +2118,10 @@ var Parser = (function (_Tokenizer) {
         if (kind === "identifier" && methodOrKey.value === "static") {
           isStatic = true;
 
-          var _temp = this.parseMethodDefinition();
+          var _parseMethodDefinition3 = this.parseMethodDefinition();
 
-          methodOrKey = _temp.methodOrKey;
-          kind = _temp.kind;
-          _temp;
+          methodOrKey = _parseMethodDefinition3.methodOrKey;
+          kind = _parseMethodDefinition3.kind;
         }
         if (kind === "method") {
           elements.push(copyLocation(methodOrKey, { type: "ClassElement", isStatic: isStatic, method: methodOrKey }));
@@ -2195,14 +2231,15 @@ var Parser = (function (_Tokenizer) {
             if (this.inGeneratorParameter) {
               this.allowYieldExpression = false;
             }
-            var _expr5 = this.parseAssignmentExpression();
-            defaultValue = _expr5;
+            var expr = this.parseAssignmentExpression();
+            defaultValue = expr;
             this.allowYieldExpression = previousAllowYieldExpression;
           }
           return this.markLocation({
             type: "BindingPropertyIdentifier",
             binding: binding,
-            init: defaultValue }, startLocation);
+            init: defaultValue
+          }, startLocation);
         }
       }
       this.expect(_tokenizer.TokenType.COLON);

@@ -44,7 +44,6 @@ suite("Parser", function () {
           object: { type: "IdentifierExpression", name: "a" },
           expression: { type: "IdentifierExpression", name: "b" }
         },
-        operator: "=",
         expression: { type: "IdentifierExpression", name: "b" }
       });
 
@@ -64,7 +63,6 @@ suite("Parser", function () {
             object: { type: "IdentifierExpression", name: "c" },
             expression: { type: "IdentifierExpression", name: "d" }
           },
-          operator: "=",
           expression: { type: "IdentifierExpression", name: "e" }
         }
       });
@@ -78,7 +76,6 @@ suite("Parser", function () {
         right: {
           type: "AssignmentExpression",
           binding: { type: "BindingIdentifier", name: "b" },
-          operator: "=",
           expression: { type: "IdentifierExpression", name: "c" }
         }
       },
@@ -86,7 +83,6 @@ suite("Parser", function () {
       right: {
         type: "AssignmentExpression",
         binding: { type: "BindingIdentifier", name: "d" },
-        operator: "=",
         expression: { type: "IdentifierExpression", name: "e" }
       }
 

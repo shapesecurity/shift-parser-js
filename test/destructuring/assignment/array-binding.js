@@ -24,7 +24,6 @@ suite("Parser", function () {
       testParse("[x] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "x" }], restElement: null },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -33,7 +32,6 @@ suite("Parser", function () {
       testParse("[x,] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "x" }], restElement: null },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -42,7 +40,6 @@ suite("Parser", function () {
       testParse("[x,,] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [{ type: "BindingIdentifier", name: "x" }, null],
@@ -55,7 +52,6 @@ suite("Parser", function () {
       testParse("[[x]] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [{
@@ -72,7 +68,6 @@ suite("Parser", function () {
       testParse("[x, y, ...z] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [{ type: "BindingIdentifier", name: "x" }, { type: "BindingIdentifier", name: "y" }],
@@ -85,7 +80,6 @@ suite("Parser", function () {
       testParse("[, x,,] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [null, { type: "BindingIdentifier", name: "x" }, null],
@@ -98,7 +92,6 @@ suite("Parser", function () {
       testParse("[...[x]] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [],
@@ -115,7 +108,6 @@ suite("Parser", function () {
       testParse("[x, ...{0: y}] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [{ type: "BindingIdentifier", name: "x" }],
@@ -135,7 +127,6 @@ suite("Parser", function () {
       testParse("[x, x] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [{ type: "BindingIdentifier", name: "x" }, { type: "BindingIdentifier", name: "x" }],
@@ -148,7 +139,6 @@ suite("Parser", function () {
       testParse("[x, ...x] = 0", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ArrayBinding",
             elements: [{ type: "BindingIdentifier", name: "x" }],
@@ -181,7 +171,6 @@ suite("Parser", function () {
           "restElement": null,
           "type": "ArrayBinding",
         },
-        "operator": "=",
         "expression": {
           "type": "IdentifierExpression",
           "name": "b",
@@ -214,7 +203,6 @@ suite("Parser", function () {
           restElement: null,
           type: "ArrayBinding",
         },
-        operator: "=",
         expression: {
           type: "IdentifierExpression",
           name: "b",
@@ -242,7 +230,6 @@ suite("Parser", function () {
             },
           },
         },
-        operator: "=",
         expression: {
           type: "IdentifierExpression",
           name: "b",
@@ -256,7 +243,6 @@ suite("Parser", function () {
           elements: [],
           restElement: null
         },
-        operator: "=",
         expression: {
           type: "LiteralNumericExpression",
           value: 0
@@ -287,7 +273,6 @@ suite("Parser", function () {
           ],
           restElement: null,
         },
-        operator: "=",
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 

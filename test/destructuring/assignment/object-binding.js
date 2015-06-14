@@ -24,7 +24,6 @@ suite("Parser", function () {
       testParse("({x} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -40,7 +39,6 @@ suite("Parser", function () {
       testParse("({x,} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -56,7 +54,6 @@ suite("Parser", function () {
       testParse("({x,y} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -72,7 +69,6 @@ suite("Parser", function () {
       testParse("({x,y,} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -88,7 +84,6 @@ suite("Parser", function () {
       testParse("({[a]: a} = 1)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -104,7 +99,6 @@ suite("Parser", function () {
       testParse("({x = 0} = 1)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -120,7 +114,6 @@ suite("Parser", function () {
       testParse("({x = 0,} = 1)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -137,7 +130,6 @@ suite("Parser", function () {
       testParse("({x: y} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -153,7 +145,6 @@ suite("Parser", function () {
       testParse("({x: y,} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -169,7 +160,6 @@ suite("Parser", function () {
       testParse("({var: x} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -185,7 +175,6 @@ suite("Parser", function () {
       testParse("({\"x\": y} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -201,7 +190,6 @@ suite("Parser", function () {
       testParse("({'x': y} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -217,7 +205,6 @@ suite("Parser", function () {
       testParse("({0: y} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -233,7 +220,6 @@ suite("Parser", function () {
       testParse("({0: x, 1: x} = 0)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -253,7 +239,6 @@ suite("Parser", function () {
       testParse("({x: y = 0} = 1)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -273,7 +258,6 @@ suite("Parser", function () {
       testParse("({x: y = z = 0} = 1)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -284,7 +268,6 @@ suite("Parser", function () {
                 binding: { type: "BindingIdentifier", name: "y" },
                 init: {
                   type: "AssignmentExpression",
-                  operator: "=",
                   binding: { type: "BindingIdentifier", name: "z" },
                   expression: { type: "LiteralNumericExpression", value: 0 }
                 }
@@ -298,7 +281,6 @@ suite("Parser", function () {
       testParse("({x: [y] = 0} = 1)", expr,
         {
           type: "AssignmentExpression",
-          operator: "=",
           binding: {
             type: "ObjectBinding",
             properties: [{
@@ -332,7 +314,6 @@ suite("Parser", function () {
               }
             ]
           },
-          operator: "=",
           expression: { type: "LiteralNumericExpression", value: 0 }
         });
 
@@ -349,7 +330,6 @@ suite("Parser", function () {
               }
             ]
           },
-          operator: "=",
           expression: { type: "LiteralNumericExpression", value: 0 }
         });
 
@@ -366,7 +346,6 @@ suite("Parser", function () {
               }
             ]
           },
-          operator: "=",
           expression: { type: "LiteralNumericExpression", value: 0 }
         });
 

@@ -38,7 +38,6 @@ suite("Parser", function () {
         type: "ForStatement",
         init: {
           type: "AssignmentExpression",
-          operator: "=",
           binding: { type: "BindingIdentifier", name: "x" },
           expression: { type: "LiteralNumericExpression", value: 0 }
         },

@@ -37,5 +37,6 @@ var ErrorMessages = {
   ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list",
   INVALID_VAR_INIT_FOR_IN: "Invalid variable declaration in for-in statement",
   INVALID_VAR_INIT_FOR_OF: "Invalid variable declaration in for-of statement",
-  ILLEGAL_PROPERTY: "Illegal property initializer" };
+  ILLEGAL_PROPERTY: "Illegal property initializer"
+};
 exports.ErrorMessages = ErrorMessages;

@@ -144,8 +144,8 @@ function transformDestructuring(node) {
     case "BindingWithDefault":
     case "ObjectBinding":
       return node;
+    // istanbul ignore next
     default:
-      // istanbul ignore next
       throw new Error("Not reached");
   }
 }
@@ -1116,12 +1116,12 @@ export class Parser extends Tokenizer {
 
     this.inGeneratorParameter = previousInGeneratorParameter;
     this.firstExprError = null;
-    return this.markLocation({
-        type: "AssignmentExpression",
-        binding: expr,
-        operator: operator.type.name,
-        expression: rhs,
-    }, startLocation);
+    return this.markLocation(
+      operator.type === TokenType.ASSIGN
+        ? { type: "AssignmentExpression", binding: expr, expression: rhs }
+        : { type: "CompoundAssignmentExpression", binding: expr, operator: operator.type.name, expression: rhs }
+    , startLocation
+    );
   }
 
   lookaheadAssignmentExpression() {

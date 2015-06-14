@@ -224,6 +224,10 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
+  reduceCompoundAssignmentExpression() {
+    return super.reduceCompoundAssignmentExpression(...arguments).clearBoundNames();
+  }
+
   reduceComputedMemberExpression(node) {
     let s = super.reduceComputedMemberExpression(...arguments);
     if (node.object.type === "Super") {

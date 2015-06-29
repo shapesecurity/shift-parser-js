@@ -2,9 +2,7 @@ sudo: false
 language: node_js
 script:
   - curl https://raw.githubusercontent.com/shapesecurity/CLA/master/cla-travis.sh | bash
-  - export sums="$(md5sum dist/*)"; echo "$sums";
   - npm run build
-  - '[ "$sums" == "$(md5sum dist/*)" ] || md5sum dist/*'
   - npm run generate-coverage
   - npm run check-coverage
 node_js:

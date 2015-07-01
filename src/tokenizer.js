@@ -609,7 +609,7 @@ export default class Tokenizer {
         } else {
           break;
         }
-      } else if (!this.module && isLineStart && chCode === 45 /* "-" */) {
+      } else if (!this.moduleIsTheGoalSymbol && isLineStart && chCode === 45 /* "-" */) {
         if (this.index + 2 >= length) {
           break;
         }
@@ -620,7 +620,7 @@ export default class Tokenizer {
         } else {
           break;
         }
-      } else if (!this.module && chCode === 60 /* "<" */) {
+      } else if (!this.moduleIsTheGoalSymbol && chCode === 60 /* "<" */) {
         if (this.source.slice(this.index + 1, this.index + 4) === "!--") {
           this.skipSingleLineComment(4);
         } else {

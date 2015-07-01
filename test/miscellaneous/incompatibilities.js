@@ -232,7 +232,9 @@ suite("Parser", function() {
     testParse("a<!--b", expr, { type: "IdentifierExpression", name: "a" });
 
     testParseModuleFailure("<!--", "Unexpected token \"<\"");
+    testParseModuleFailure("function a(){\n<!--\n}", "Unexpected token \"<\"");
     testParseModuleFailure("-->", "Unexpected token \">\"");
+    testParseModuleFailure("function a(){\n-->\n}", "Unexpected token \">\"");
 
     testParseModule("a<!--b", moduleExpr,
       {

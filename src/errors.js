@@ -21,6 +21,7 @@ export const ErrorMessages = {
   UNEXPECTED_STRING: "Unexpected string",
   UNEXPECTED_IDENTIFIER: "Unexpected identifier",
   UNEXPECTED_RESERVED_WORD: "Unexpected reserved word",
+  UNEXPECTED_TEMPLATE: "Unexpected template",
   UNEXPECTED_EOS: "Unexpected end of input",
   UNEXPECTED_LINE_TERMINATOR: "Unexpected line terminator",
   NEWLINE_AFTER_THROW: "Illegal newline after throw",

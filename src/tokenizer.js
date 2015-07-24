@@ -27,8 +27,6 @@ export const TokenClass = {
   Punctuator: {name: "Punctuator"},
   StringLiteral: {name: "String"},
   RegularExpression: {name: "RegularExpression"},
-  LineComment: {name: "Line"},
-  BlockComment: {name: "Block"},
   Illegal: {name: "Illegal"},
 };
 
@@ -235,16 +233,19 @@ export default class Tokenizer {
     switch (token.type.klass) {
       case TokenClass.Eof:
         return this.createError(ErrorMessages.UNEXPECTED_EOS);
-      case TokenClass.NumericLiteral:
-        return this.createError(ErrorMessages.UNEXPECTED_NUMBER);
-      case TokenClass.StringLiteral:
-        return this.createError(ErrorMessages.UNEXPECTED_STRING);
       case TokenClass.Ident:
         return this.createError(ErrorMessages.UNEXPECTED_IDENTIFIER);
       case TokenClass.Keyword:
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
+      case TokenClass.NumericLiteral:
+        return this.createError(ErrorMessages.UNEXPECTED_NUMBER);
+      case TokenClass.TemplateElement:
+        return this.createError(ErrorMessages.UNEXPECTED_TEMPLATE);
       case TokenClass.Punctuator:
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
+      case TokenClass.StringLiteral:
+        return this.createError(ErrorMessages.UNEXPECTED_STRING);
+      // the other token classes are TegularExpression and Illegal, but they cannot reach here
     }
   }
 
@@ -1386,7 +1387,7 @@ export default class Tokenizer {
         return this.scanIdentifier();
       }
 
-      // Dot (.) U+002E can also start a floating-polet number, hence the need
+      // Dot (.) U+002E can also start a floating-point number, hence the need
       // to check the next character.
       if (charCode === 0x2E) {
         if (this.index + 1 < this.source.length && isDecimalDigit(this.source.charCodeAt(this.index + 1))) {

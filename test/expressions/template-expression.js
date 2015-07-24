@@ -102,6 +102,7 @@ suite("Parser", function () {
     });
 
     testParseFailure("`", "Unexpected end of input");
+    testParseFailure("a++``", "Unexpected template");
     testParseFailure("`${a", "Unexpected end of input");
     testParseFailure("`${a}a${b}", "Unexpected end of input");
     testParseFailure("`\\37`", "Unexpected \"`\"");

@@ -518,6 +518,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceModule() {
     let s = super.reduceModule(...arguments);
+    s = s.functionDeclarationNamesAreLexical();
     s = s.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     s = s.enforceConflictingLexicallyDeclaredNames(s.varDeclaredNames, DUPLICATE_BINDING);
     s.exportedNames.forEachEntry((nodes, bindingName) => {

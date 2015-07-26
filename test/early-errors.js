@@ -638,6 +638,7 @@ suite("Parser", function () {
     // 15.2.1.1
     // It is a Syntax Error if the LexicallyDeclaredNames of ModuleItemList contains any duplicate entries.
     testModuleEarlyError("let a; let a;", "Duplicate binding \"a\"");
+    testModuleEarlyError("let a; function a(){}", "Duplicate binding \"a\"");
     testModuleEarlyError("let a; const a = 0;", "Duplicate binding \"a\"");
     testModuleEarlyError("const a = 0; let a;", "Duplicate binding \"a\"");
     testModuleEarlyError("const a = 0; const a = 0;", "Duplicate binding \"a\"");
@@ -651,6 +652,7 @@ suite("Parser", function () {
     testModuleEarlyError("const a = 0; export const a = 1;", "Duplicate binding \"a\"");
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of ModuleItemList also occurs in the VarDeclaredNames of ModuleItemList.
     testModuleEarlyError("let a; var a;", "Duplicate binding \"a\"");
+    testModuleEarlyError("var a; function a(){}", "Duplicate binding \"a\"");
     testModuleEarlyError("var a; let a;", "Duplicate binding \"a\"");
     testModuleEarlyError("const a = 0; var a;", "Duplicate binding \"a\"");
     testModuleEarlyError("var a; const a = 0;", "Duplicate binding \"a\"");

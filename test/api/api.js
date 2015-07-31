@@ -19,7 +19,12 @@ var ShiftParser = require("../../");
 
 suite("API", function () {
   test("should exist", function () {
-    expect(typeof ShiftParser.default).be("function");
+    expect(ShiftParser.default).to.be.a("function");
+  });
+
+  test("early error checker exists", function () {
+    expect(ShiftParser.EarlyErrorChecker).to.be.ok();
+    expect(ShiftParser.EarlyErrorChecker.check).to.be.a("function");
   });
 
   function withLoc(x, loc) {

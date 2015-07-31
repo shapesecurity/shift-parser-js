@@ -57,3 +57,4 @@ function generateInterface(parsingFunctionName) {
 export const parseModule = generateInterface("parseModule");
 export const parseScript = generateInterface("parseScript");
 export default parseScript;
+export {EarlyErrorChecker};

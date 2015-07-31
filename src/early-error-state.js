@@ -15,7 +15,6 @@
  */
 
 import {} from "es6-map/implement";
-import * as objectAssign from "object-assign";
 import * as MultiMap from "multimap";
 
 // FIXME: remove this when collections/multi-map is working
@@ -256,7 +255,7 @@ export class EarlyErrorState {
   }
 
   observeFunctionDeclaration() {
-    this.observeVarBoundary()
+    this.observeVarBoundary();
     this.functionDeclarationNames.addEach(this.boundNames);
     this.boundNames = new MultiMap;
     return this;

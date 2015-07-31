@@ -105,6 +105,20 @@ suite("Parser", function () {
         test: { type: "LiteralBooleanExpression", value: true } }
     );
 
+    testParse("while (true) { continue // Comment\r\nthere; }", stmt,
+      { type: "WhileStatement",
+        body:
+          { type: "BlockStatement",
+            block:
+              { type: "Block",
+                statements:
+                  [ { type: "ContinueStatement", label: null },
+                    { type: "ExpressionStatement",
+                      expression:
+                        { type: "IdentifierExpression", name: "there" } } ] } },
+        test: { type: "LiteralBooleanExpression", value: true } }
+    );
+
     testParse("while (true) { continue /* Multiline\nComment */there; }", stmt,
       { type: "WhileStatement",
         body:

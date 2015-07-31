@@ -20,6 +20,7 @@ var ShiftParser = require("../../");
 suite("API", function () {
   test("should exist", function () {
     expect(ShiftParser.default).to.be.a("function");
+    expect(ShiftParser.default("")).to.be.ok();
   });
 
   test("early error checker exists", function () {
@@ -84,7 +85,6 @@ suite("API", function () {
   test("self parsing", function () {
     parseScript(__filename);
     parseModule("../../src/utils");
-    parseModule("../../src/errors");
     parseModule("../../src/parser");
     parseModule("../../src/tokenizer");
     parseModule("../../src/index");

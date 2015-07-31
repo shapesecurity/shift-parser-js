@@ -16,7 +16,6 @@
 
 
 import {getHexValue, isLineTerminator, isWhiteSpace, isIdentifierStart, isIdentifierPart, isDecimalDigit} from "./utils";
-import {ErrorMessages} from "./errors";
 
 export const TokenClass = {
   Eof: {name: "<End>"},
@@ -218,50 +217,6 @@ export default class Tokenizer {
     this.lookahead = state.lookahead;
     this.hasLineTerminatorBeforeNext = state.hasLineTerminatorBeforeNext;
     this.tokenIndex = state.tokenIndex;
-  }
-
-  createILLEGAL() {
-    this.startIndex = this.index;
-    this.startLine = this.line;
-    this.startLineStart = this.lineStart;
-    return this.index < this.source.length
-      ? this.createError(ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, this.source.charAt(this.index))
-      : this.createError(ErrorMessages.UNEXPECTED_EOS);
-  }
-
-  createUnexpected(token) {
-    switch (token.type.klass) {
-      case TokenClass.Eof:
-        return this.createError(ErrorMessages.UNEXPECTED_EOS);
-      case TokenClass.Ident:
-        return this.createError(ErrorMessages.UNEXPECTED_IDENTIFIER);
-      case TokenClass.Keyword:
-        return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
-      case TokenClass.NumericLiteral:
-        return this.createError(ErrorMessages.UNEXPECTED_NUMBER);
-      case TokenClass.TemplateElement:
-        return this.createError(ErrorMessages.UNEXPECTED_TEMPLATE);
-      case TokenClass.Punctuator:
-        return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
-      case TokenClass.StringLiteral:
-        return this.createError(ErrorMessages.UNEXPECTED_STRING);
-      // the other token classes are TegularExpression and Illegal, but they cannot reach here
-    }
-  }
-
-  createError(message) {
-    /* istanbul ignore next */
-    let msg = message.replace(/\{(\d+)\}/g, (_, n) => JSON.stringify(arguments[+n + 1]));
-    return new JsError(this.startIndex, this.startLine + 1, this.startIndex - this.startLineStart + 1, msg);
-  }
-
-  createErrorWithLocation(location, message) {
-    /* istanbul ignore next */
-    let msg = message.replace(/\{(\d+)\}/g, (_, n) => JSON.stringify(arguments[+n + 2]));
-    if (location.slice && location.slice.startLocation) {
-      location = location.slice.startLocation;
-    }
-    return new JsError(location.offset, location.line, location.column + 1, msg);
   }
 
   static cse2(id, ch1, ch2) {
@@ -574,7 +529,6 @@ export default class Tokenizer {
         this.index++;
       }
     }
-    throw this.createILLEGAL();
   }
 
 
@@ -598,9 +552,6 @@ export default class Tokenizer {
         this.line++;
         isLineStart = true;
       } else if (chCode === 47 /* "/" */) {
-        if (this.index + 1 >= length) {
-          break;
-        }
         chCode = this.source.charCodeAt(this.index + 1);
         if (chCode === 47 /* "/" */) {
           this.skipSingleLineComment(2);
@@ -634,18 +585,8 @@ export default class Tokenizer {
   }
 
   scanHexEscape2() {
-    if (this.index + 2 > this.source.length) {
-      return -1;
-    }
-    let r1 = getHexValue(this.source.charAt(this.index));
-    if (r1 === -1) {
-      return -1;
-    }
-    let r2 = getHexValue(this.source.charAt(this.index + 1));
-    if (r2 === -1) {
-      return -1;
-    }
-    this.index += 2;
+    let r1 = getHexValue(this.source.charAt(this.index++));
+    let r2 = getHexValue(this.source.charAt(this.index++));
     return r1 << 4 | r2;
   }
 
@@ -661,38 +602,16 @@ export default class Tokenizer {
           break;
         }
         hexDigits = (hexDigits << 4) | hex;
-        if (hexDigits > 0x10FFFF) {
-          throw this.createILLEGAL();
-        }
         i++;
-      }
-      if (ch !== "}") {
-        throw this.createILLEGAL();
       }
       this.index = i + 1;
       return hexDigits;
     } else {
       //\uHex4Digits
-      if (this.index + 4 > this.source.length) {
-        return -1;
-      }
-      let r1 = getHexValue(this.source.charAt(this.index));
-      if (r1 === -1) {
-        return -1;
-      }
-      let r2 = getHexValue(this.source.charAt(this.index + 1));
-      if (r2 === -1) {
-        return -1;
-      }
-      let r3 = getHexValue(this.source.charAt(this.index + 2));
-      if (r3 === -1) {
-        return -1;
-      }
-      let r4 = getHexValue(this.source.charAt(this.index + 3));
-      if (r4 === -1) {
-        return -1;
-      }
-      this.index += 4;
+      let r1 = getHexValue(this.source.charAt(this.index++));
+      let r2 = getHexValue(this.source.charAt(this.index++));
+      let r3 = getHexValue(this.source.charAt(this.index++));
+      let r4 = getHexValue(this.source.charAt(this.index++));
       return r1 << 12 | r2 << 8 | r3 << 4 | r4;
     }
   }
@@ -707,34 +626,16 @@ export default class Tokenizer {
       let start = this.index;
       ++this.index;
       if (ch === "\\") {
-        if (this.index >= this.source.length) {
-          throw this.createILLEGAL();
-        }
-        if (this.source.charAt(this.index) !== "u") {
-          throw this.createILLEGAL();
-        }
         ++this.index;
         code = this.scanUnicode();
-        if (code < 0) {
-          throw this.createILLEGAL();
-        }
         ch = fromCodePoint(code);
       } else if (0xD800 <= code && code <= 0xDBFF) {
-        if (this.index >= this.source.length) {
-          throw this.createILLEGAL();
-        }
         let lowSurrogateCode = this.source.charCodeAt(this.index);
         ++this.index;
-        if (!(0xDC00 <= lowSurrogateCode && lowSurrogateCode <= 0xDFFF)) {
-          throw this.createILLEGAL();
-        }
         code = decodeUtf16(code, lowSurrogateCode);
         ch = fromCodePoint(code);
       }
       if (!check(code)) {
-        if (id.length < 1) {
-          throw this.createILLEGAL();
-        }
         this.index = start;
         return id;
       }
@@ -803,8 +704,6 @@ export default class Tokenizer {
       case ".":
         let ch2 = this.source.charAt(this.index + 1);
         if (ch2 !== ".") return TokenType.PERIOD;
-        let ch3 = this.source.charAt(this.index + 2);
-        if (ch3 !== ".") return TokenType.PERIOD;
         return TokenType.ELLIPSIS;
       case "(":
         return TokenType.LPAREN;
@@ -862,48 +761,46 @@ export default class Tokenizer {
         }
     }
 
-    if (this.index + 1 < this.source.length) {
-      let ch2 = this.source.charAt(this.index + 1);
-      if (ch1 === ch2) {
-        if (this.index + 2 < this.source.length) {
-          let ch3 = this.source.charAt(this.index + 2);
-          if (ch1 === ">" && ch3 === ">") {
-            // 4-character punctuator: >>>=
-            if (this.index + 3 < this.source.length && this.source.charAt(this.index + 3) === "=") {
-              return TokenType.ASSIGN_SHR_UNSIGNED;
-            }
-            return TokenType.SHR_UNSIGNED;
+    let ch2 = this.source.charAt(this.index + 1);
+    if (ch1 === ch2) {
+      if (this.index + 2 < this.source.length) {
+        let ch3 = this.source.charAt(this.index + 2);
+        if (ch1 === ">" && ch3 === ">") {
+          // 4-character punctuator: >>>=
+          if (this.index + 3 < this.source.length && this.source.charAt(this.index + 3) === "=") {
+            return TokenType.ASSIGN_SHR_UNSIGNED;
           }
-
-          if (ch1 === "<" && ch3 === "=") {
-            return TokenType.ASSIGN_SHL;
-          }
-
-          if (ch1 === ">" && ch3 === "=") {
-            return TokenType.ASSIGN_SHR;
-          }
+          return TokenType.SHR_UNSIGNED;
         }
-        // Other 2-character punctuators: ++ -- << >> && ||
-        switch (ch1) {
-          case "+":
-            return TokenType.INC;
-          case "-":
-            return TokenType.DEC;
-          case "<":
-            return TokenType.SHL;
-          case ">":
-            return TokenType.SHR;
-          case "&":
-            return TokenType.AND;
-          case "|":
-            return TokenType.OR;
-          // istanbul ignore next
-          default:
-            break; //failed
+
+        if (ch1 === "<" && ch3 === "=") {
+          return TokenType.ASSIGN_SHL;
         }
-      } else if (ch1 === "=" && ch2 === ">") {
-        return TokenType.ARROW;
+
+        if (ch1 === ">" && ch3 === "=") {
+          return TokenType.ASSIGN_SHR;
+        }
       }
+      // Other 2-character punctuators: ++ -- << >> && ||
+      switch (ch1) {
+        case "+":
+          return TokenType.INC;
+        case "-":
+          return TokenType.DEC;
+        case "<":
+          return TokenType.SHL;
+        case ">":
+          return TokenType.SHR;
+        case "&":
+          return TokenType.AND;
+        case "|":
+          return TokenType.OR;
+        // istanbul ignore next
+        default:
+          break; //failed
+      }
+    } else if (ch1 === "=" && ch2 === ">") {
+      return TokenType.ARROW;
     }
 
     return ONE_CHAR_PUNCTUATOR[ch1.charCodeAt(0)];
@@ -929,14 +826,6 @@ export default class Tokenizer {
       i++;
     }
 
-    if (this.index === i) {
-      throw this.createILLEGAL();
-    }
-
-    if (i < this.source.length && isIdentifierStart(this.source.charCodeAt(i))) {
-      throw this.createILLEGAL();
-    }
-
     this.index = i;
 
     let slice = this.getSlice(start, startLocation);
@@ -954,15 +843,6 @@ export default class Tokenizer {
       this.index++;
     }
 
-    if (this.index - start <= offset) {
-      throw this.createILLEGAL();
-    }
-
-    if (this.index < this.source.length && (isIdentifierStart(this.source.charCodeAt(this.index))
-        || isDecimalDigit(this.source.charCodeAt(this.index)))) {
-      throw this.createILLEGAL();
-    }
-
     return {
       type: TokenType.NUMBER,
       value: parseInt(this.getSlice(start, startLocation).text.substr(offset), 2),
@@ -976,15 +856,9 @@ export default class Tokenizer {
       let ch = this.source.charAt(this.index);
       if ("0" <= ch && ch <= "7") {
         this.index++;
-      } else if (isIdentifierPart(ch.charCodeAt(0))) {
-        throw this.createILLEGAL();
       } else {
         break;
       }
-    }
-
-    if (this.index - start === 2) {
-      throw this.createILLEGAL();
     }
 
     return {
@@ -1005,8 +879,6 @@ export default class Tokenizer {
       } else if (ch === "8" || ch === "9") {
         isOctal = false;
         this.index++;
-      } else if (isIdentifierPart(ch.charCodeAt(0))) {
-        throw this.createILLEGAL();
       } else {
         break;
       }
@@ -1102,40 +974,26 @@ export default class Tokenizer {
     // EOF not reached here
     if (ch === "e" || ch === "E") {
       this.index++;
-      if (this.index === this.source.length) {
-        throw this.createILLEGAL();
-      }
 
       ch = this.source.charAt(this.index);
       let neg = false;
       if (ch === "+" || ch === "-") {
         neg = ch === "-";
         this.index++;
-        if (this.index === this.source.length) {
-          throw this.createILLEGAL();
-        }
         ch = this.source.charAt(this.index);
       }
 
       let f = 0;
-      if ("0" <= ch && ch <= "9") {
-        while ("0" <= ch && ch <= "9") {
-          f *= 10;
-          f += +ch;
-          this.index++;
-          if (this.index === this.source.length) {
-            break;
-          }
-          ch = this.source.charAt(this.index);
+      while ("0" <= ch && ch <= "9") {
+        f *= 10;
+        f += +ch;
+        this.index++;
+        if (this.index === this.source.length) {
+          break;
         }
-      } else {
-        throw this.createILLEGAL();
+        ch = this.source.charAt(this.index);
       }
       e += neg ? f : -f;
-    }
-
-    if (isIdentifierStart(ch.charCodeAt(0))) {
-      throw this.createILLEGAL();
     }
 
     let slice = this.getSlice(start, startLocation);
@@ -1149,9 +1007,6 @@ export default class Tokenizer {
 
   scanStringEscape(str, octal) {
     this.index++;
-    if (this.index === this.source.length) {
-      throw this.createILLEGAL();
-    }
     let ch = this.source.charAt(this.index);
     if (!isLineTerminator(ch.charCodeAt(0))) {
       switch (ch) {
@@ -1171,13 +1026,7 @@ export default class Tokenizer {
         case "x":
           let unescaped;
           this.index++;
-          if (this.index >= this.source.length) {
-            throw this.createILLEGAL();
-          }
           unescaped = ch === "u" ? this.scanUnicode() : this.scanHexEscape2();
-          if (unescaped < 0) {
-            throw this.createILLEGAL();
-          }
           str += fromCodePoint(unescaped);
           break;
         case "b":
@@ -1209,14 +1058,9 @@ export default class Tokenizer {
               octLen++;
               code += ch - "0";
               this.index++;
-              if (this.index === this.source.length) {
-                throw this.createILLEGAL();
-              }
               ch = this.source.charAt(this.index);
             }
             str += String.fromCharCode(code);
-          } else if (ch === "8" || ch === "9") {
-            throw this.createILLEGAL();
           } else {
             str += ch;
             this.index++;
@@ -1251,15 +1095,11 @@ export default class Tokenizer {
         return { type: TokenType.STRING, slice: this.getSlice(start, startLocation), str, octal };
       } else if (ch === "\\") {
         [str, octal] = this.scanStringEscape(str, octal);
-      } else if (isLineTerminator(ch.charCodeAt(0))) {
-        throw this.createILLEGAL();
       } else {
         str += ch;
         this.index++;
       }
     }
-
-    throw this.createILLEGAL();
   }
 
   scanTemplateElement() {
@@ -1281,18 +1121,13 @@ export default class Tokenizer {
           break;
         case 0x5C:  // \\
         {
-          let octal = this.scanStringEscape("", false)[1];
-          if (octal) {
-            throw this.createILLEGAL();
-          }
+          this.scanStringEscape("", false)[1];
           break;
         }
         default:
           this.index++;
       }
     }
-
-    throw this.createILLEGAL();
   }
 
   scanRegExp(str) {
@@ -1308,13 +1143,8 @@ export default class Tokenizer {
         this.index++;
         ch = this.source.charAt(this.index);
         // ECMA-262 7.8.5
-        if (isLineTerminator(ch.charCodeAt(0))) {
-          throw this.createError(ErrorMessages.UNTERMINATED_REGEXP);
-        }
         str += ch;
         this.index++;
-      } else if (isLineTerminator(ch.charCodeAt(0))) {
-        throw this.createError(ErrorMessages.UNTERMINATED_REGEXP);
       } else {
         if (classMarker) {
           if (ch === "]") {
@@ -1335,15 +1165,8 @@ export default class Tokenizer {
       }
     }
 
-    if (!terminated) {
-      throw this.createError(ErrorMessages.UNTERMINATED_REGEXP);
-    }
-
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if (ch === "\\") {
-        throw this.createError(ErrorMessages.INVALID_REGEXP_FLAGS);
-      }
       if (!isIdentifierPart(ch.charCodeAt(0))) {
         break;
       }
@@ -1406,19 +1229,10 @@ export default class Tokenizer {
         return this.scanTemplateElement();
       }
 
-      if (0x30 /* "0" */ <= charCode && charCode <= 0x39 /* "9" */) {
-        return this.scanNumericLiteral();
-      }
-
-      // Slash (/) U+002F can also start a regex.
-      throw this.createILLEGAL();
-    } else {
-      if (isIdentifierStart(charCode) || 0xD800 <= charCode && charCode <= 0xDBFF) {
-        return this.scanIdentifier();
-      }
-
-      throw this.createILLEGAL();
+      return this.scanNumericLiteral();
     }
+
+    return this.scanIdentifier();
   }
 
   eof() {

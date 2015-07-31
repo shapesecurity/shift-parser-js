@@ -26,7 +26,6 @@
     "es6-map": "^0.1.1",
     "esutils": "^2.0.2",
     "multimap": "^0.1.1",
-    "object-assign": "^3.0.0",
     "shift-reducer": "^2.0.3"
   },
   "devDependencies": {

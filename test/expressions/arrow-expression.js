@@ -347,6 +347,13 @@ suite("Parser", function () {
       body: { type: "LiteralNumericExpression", value: 0 }
     });
 
+    testParse("yield => 0", expr,
+      { type: "ArrowExpression",
+        params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "yield" }], rest: null },
+        body: { type: "LiteralNumericExpression", value: 0 }
+      }
+    );
+
     testParseFailure("[]=>0", "Unexpected token \"=>\"");
     testParseFailure("() + 1", "Unexpected token \"+\"");
     testParseFailure("1 + ()", "Unexpected end of input");

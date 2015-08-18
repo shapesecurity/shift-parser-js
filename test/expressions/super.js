@@ -485,6 +485,32 @@ suite("Parser", function () {
       }
     );
 
+    testParse("({ *f() { yield super.f(); } })", expr,
+      {
+        type: "ObjectExpression",
+        properties: [{
+          type: "Method",
+          isGenerator: true,
+          name: { type: "StaticPropertyName", value: "f" },
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: {
+            type: "FunctionBody",
+            directives: [],
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "YieldExpression",
+                expression: {
+                  type: "CallExpression",
+                  callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "f" },
+                  arguments: [],
+                }
+              }
+            }]
+          }
+        }],
+      });
+
     testParseFailure("({ a() { (super).b(); } });", "Unexpected token \"super\"");
     testParseFailure("class A extends B { constructor() { (super).a(); } }", "Unexpected token \"super\"");
 

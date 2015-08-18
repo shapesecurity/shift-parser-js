@@ -1145,6 +1145,7 @@ export class Parser extends Tokenizer {
       case TokenType.NUMBER:
       case TokenType.STRING:
       case TokenType.SUB:
+      case TokenType.SUPER:
       case TokenType.THIS:
       case TokenType.TRUE:
       case TokenType.YIELD:

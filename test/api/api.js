@@ -20,6 +20,7 @@ var ShiftParser = require("../../");
 suite("API", function () {
   test("should exist", function () {
     expect(ShiftParser.default).to.be.a("function");
+    expect(ShiftParser.default("")).to.be.an("object");
   });
 
   test("early error checker exists", function () {

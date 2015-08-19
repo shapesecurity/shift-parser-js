@@ -34,7 +34,7 @@ exports.testParseFailure = function testParseFailure(source, message) {
   test("Expect failure in Script: " + source, function () {
     expect(args).to.be(testParseFailure.length);
     try {
-      parse(source);
+      parse(source, { earlyErrors: false });
     } catch (e) {
       expect(e.description).to.be(message);
       return;
@@ -48,7 +48,7 @@ exports.testParseModuleFailure = function testParseModuleFailure(source, message
   test("Expect failure in Module: " + source, function () {
     expect(args).to.be(testParseModuleFailure.length);
     try {
-      parseModule(source);
+      parseModule(source, { earlyErrors: false });
     } catch (e) {
       expect(e.description).to.be(message);
       return;

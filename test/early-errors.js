@@ -124,9 +124,9 @@ suite("Parser", function () {
     testEarlyError("'use strict'; var arguments;", "The identifier \"arguments\" must not be in binding position in strict mode");
     testEarlyError("'use strict'; let [eval] = 0;", "The identifier \"eval\" must not be in binding position in strict mode");
     testEarlyError("'use strict'; const {a: eval} = 0;", "The identifier \"eval\" must not be in binding position in strict mode");
-    testParseModuleFailure("var eval;", "The identifier \"eval\" must not be in binding position in strict mode");
+    testModuleEarlyError("var eval;", "The identifier \"eval\" must not be in binding position in strict mode");
 
-    testParseModuleFailure("eval=>0", "The identifier \"eval\" must not be in binding position in strict mode");
+    testModuleEarlyError("eval=>0", "The identifier \"eval\" must not be in binding position in strict mode");
     testEarlyError("'use strict'; eval=>0", "The identifier \"eval\" must not be in binding position in strict mode");
     testEarlyError("'use strict'; arguments=>0", "The identifier \"arguments\" must not be in binding position in strict mode");
     testEarlyError("'use strict'; (eval)=>0", "The identifier \"eval\" must not be in binding position in strict mode");

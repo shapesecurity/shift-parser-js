@@ -564,9 +564,6 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceUpdateExpression(node) {
     let s = super.reduceUpdateExpression(...arguments);
-    if (!isValidSimpleAssignmentTarget(node.operand)) {
-      s = s.addError(new EarlyError(node, "Increment/decrement target must be an identifier or member expression"));
-    }
     s = s.clearBoundNames();
     return s;
   }

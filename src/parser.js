@@ -1282,15 +1282,19 @@ export class Parser extends Tokenizer {
 
     this.lex();
     this.isBindingElement = this.isAssignmentTarget = false;
-    let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
 
     let node;
     if (isUpdateOperator(operator)) {
+      let operandStartLocation = this.getLocation();
+      let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
       if (operand.type === "IdentifierExpression") {
         operand.type = "BindingIdentifier";
+      } else if (!isValidSimpleAssignmentTarget(operand)) {
+        throw this.createErrorWithLocation(operandStartLocation, ErrorMessages.INVALID_UPDATE_OPERAND);
       }
       node = { type: "UpdateExpression", isPrefix: true, operator: operator.value, operand: operand };
     } else {
+      let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
       node = { type: "UnaryExpression", operator: operator.value, operand: operand };
     }
 
@@ -1308,6 +1312,8 @@ export class Parser extends Tokenizer {
     this.lex();
     if (operand.type === "IdentifierExpression") {
       operand.type = "BindingIdentifier";
+    } else if (!isValidSimpleAssignmentTarget(operand)) {
+      throw this.createErrorWithLocation(startLocation, ErrorMessages.INVALID_UPDATE_OPERAND);
     }
 
     return this.markLocation({ type: "UpdateExpression", isPrefix: false, operator: operator.value, operand }, startLocation);

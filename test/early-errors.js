@@ -17,12 +17,12 @@
 var expect = require("expect.js");
 var parse = require("../").default;
 var testParseFailure = require("./assertions").testParseFailure;
-var testParseModuleFailure = require("./assertions").testParseModuleFailure;
 var testEarlyError = require("./assertions").testEarlyError;
 var testModuleEarlyError = require("./assertions").testModuleEarlyError;
 
 suite("Parser", function () {
 
+  // these *would* be early errors, but we have no way to represent them in our AST
   suite("early grammar errors", function () {
 
     // 12.2.5.1
@@ -36,6 +36,16 @@ suite("Parser", function () {
     // All Early Errors rules for ParenthesizedExpression and its derived productions also apply to CoveredParenthesizedExpression of CoverParenthesizedExpressionAndArrowParameterList.
     testParseFailure("(((...a)))", "Unexpected token \")\"");
     testParseFailure("(((a, ...b)))", "Unexpected token \")\"");
+
+    // 12.4.1
+    // It is an early Reference Error if IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.
+    testParseFailure("0++", "Increment/decrement target must be an identifier or member expression");
+    testParseFailure("0--", "Increment/decrement target must be an identifier or member expression");
+
+    // 12.5.1
+    // It is an early Reference Error if IsValidSimpleAssignmentTarget of UnaryExpression is false.
+    testParseFailure("++0", "Increment/decrement target must be an identifier or member expression");
+    testParseFailure("--0", "Increment/decrement target must be an identifier or member expression");
 
     // 12.14.1
     // It is a Syntax Error if LeftHandSideExpression is either an ObjectLiteral or an ArrayLiteral and the lexical token sequence matched by LeftHandSideExpression cannot be parsed with no tokens left over using AssignmentPattern as the goal symbol.
@@ -184,7 +194,7 @@ suite("Parser", function () {
     // TODO: these should fail but will not
     //testEarlyError("(i\\u006E)", "Unexpected token \"in\"");
     //testEarlyError("var i\\u006E;", "Unexpected token \"in\"");
-    //testParseModuleFailure("import {a as i\\u006E} from \"module\";", "Unexpected token \"in\"");
+    //testModuleEarlyError("import {a as i\\u006E} from \"module\";", "Unexpected token \"in\"");
 
     // 12.2.5.1
     // It is a Syntax Error if HasDirectSuper of MethodDefinition is true.
@@ -211,16 +221,6 @@ suite("Parser", function () {
     // It is a Syntax Error if FlagText of RegularExpressionLiteral contains any code points other than "g", "i", "m", "u", or "y", or if it contains the same code point more than once.
     testEarlyError("/./a", "Invalid regular expression flags");
     testEarlyError("/./ii", "Invalid regular expression flags");
-
-    // 12.4.1
-    // It is an early Reference Error if IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.
-    testEarlyError("0++", "Increment/decrement target must be an identifier or member expression");
-    testEarlyError("0--", "Increment/decrement target must be an identifier or member expression");
-
-    // 12.5.1
-    // It is an early Reference Error if IsValidSimpleAssignmentTarget of UnaryExpression is false.
-    testEarlyError("++0", "Increment/decrement target must be an identifier or member expression");
-    testEarlyError("--0", "Increment/decrement target must be an identifier or member expression");
 
     // 12.5.4.1
     // It is a Syntax Error if the UnaryExpression is contained in strict code and the derived UnaryExpression is PrimaryExpression : IdentifierReference.
@@ -739,7 +739,7 @@ suite("Parser", function () {
 
     test("location disabled", function () {
       try {
-        parse("++0", { loc: false, earlyErrors: true });
+        parse("super()", { loc: false, earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(0);
@@ -747,7 +747,7 @@ suite("Parser", function () {
         expect(e.column).to.be(0);
       }
       try {
-        parse("\n\n  ++0", { loc: false, earlyErrors: true });
+        parse("\n\n  super()", { loc: false, earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(0);
@@ -758,7 +758,7 @@ suite("Parser", function () {
 
     test("location enabled", function () {
       try {
-        parse("++0", { loc: true, earlyErrors: true });
+        parse("super()", { loc: true, earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(0);
@@ -766,7 +766,7 @@ suite("Parser", function () {
         expect(e.column).to.be(0);
       }
       try {
-        parse("\n\n  ++0", { loc: true, earlyErrors: true });
+        parse("\n\n  super()", { loc: true, earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(4);

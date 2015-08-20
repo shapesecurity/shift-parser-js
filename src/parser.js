@@ -2058,7 +2058,7 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     let token = this.lookahead;
     let {name, binding} = this.parsePropertyName();
-    if ((token.type === TokenType.IDENTIFIER || token.type === TokenType.YIELD) && name.type === "StaticPropertyName") {
+    if ((token.type === TokenType.IDENTIFIER || token.type === TokenType.LET || token.type === TokenType.YIELD) && name.type === "StaticPropertyName") {
       if (!this.match(TokenType.COLON)) {
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {

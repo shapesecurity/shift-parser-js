@@ -301,6 +301,38 @@ suite("Parser", function () {
         }
       );
 
+      testParse("({a:let} = 0);", expr,
+        {
+          type: "AssignmentExpression",
+          binding: {
+            type: "ObjectBinding",
+            properties: [
+              {
+                type: "BindingPropertyProperty",
+                name: { type: "StaticPropertyName", value: "a" },
+                binding: { type: "BindingIdentifier", name: "let" }
+              }
+            ]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        });
+
+      testParse("({let} = 0);", expr,
+        {
+          type: "AssignmentExpression",
+          binding: {
+            type: "ObjectBinding",
+            properties: [
+              {
+                type: "BindingPropertyIdentifier",
+                binding: { type: "BindingIdentifier", name: "let" },
+                init: null
+              }
+            ]
+          },
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        });
+
       testParse("({a:yield} = 0);", expr,
         {
           type: "AssignmentExpression",

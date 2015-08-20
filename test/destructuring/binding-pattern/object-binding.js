@@ -166,6 +166,35 @@ suite("Parser", function () {
         }
       );
 
+      testParse("var {let, yield} = 0;", stmt,
+        {
+          type: "VariableDeclarationStatement",
+          declaration: {
+            type: "VariableDeclaration",
+            kind: "var",
+            declarators: [{
+              type: "VariableDeclarator",
+              binding: {
+                type: "ObjectBinding",
+                properties: [
+                  {
+                    type: "BindingPropertyIdentifier",
+                    binding: { type: "BindingIdentifier", name: "let" },
+                    init: null
+                  },
+                  {
+                    type: "BindingPropertyIdentifier",
+                    binding: { type: "BindingIdentifier", name: "yield" },
+                    init: null
+                  }
+                ]
+              },
+              init: { type: "LiteralNumericExpression", value: 0 }
+            }]
+          }
+        }
+      );
+
       testParseFailure("var {a: b.c} = 0;", "Unexpected token \".\"");
     });
 

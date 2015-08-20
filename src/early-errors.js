@@ -36,16 +36,6 @@ function containsDuplicates(list) {
   return false;
 }
 
-function isValidSimpleAssignmentTarget(node) {
-  switch (node.type) {
-    case "BindingIdentifier":
-    case "ComputedMemberExpression":
-    case "StaticMemberExpression":
-      return true;
-  }
-  return false;
-}
-
 function isLabelledFunction(node) {
   return node.type === "LabeledStatement" &&
     (node.body.type === "FunctionDeclaration" || isLabelledFunction(node.body));

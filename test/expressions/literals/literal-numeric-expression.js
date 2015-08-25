@@ -48,13 +48,22 @@ suite("Parser", function () {
     testParse("0x100", expr, { type: "LiteralNumericExpression", value: 0x100 });
     testParse("0X04", expr, { type: "LiteralNumericExpression", value: 0x4 });
 
+    // Legacy Octal Integer Literal
     testParse("02", expr, { type: "LiteralNumericExpression", value: 2 });
     testParse("012", expr, { type: "LiteralNumericExpression", value: 10 });
     testParse("0012", expr, { type: "LiteralNumericExpression", value: 10 });
     testParse("\n    0\n\n", expr, { type: "LiteralNumericExpression", value: 0 });
     testParse("0.", expr, { type: "LiteralNumericExpression", value: 0 });
+    
+    testParseFailure("'use strict'; 01", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 0123", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 00", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 07", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 08", "Unexpected noctal integer literal");
+    testParseFailure("'use strict'; 019", "Unexpected noctal integer literal");
+    testParseModuleFailure("01", "Unexpected legacy octal integer literal");
 
-    // Binary Numeric Literal
+    // Binary Integer Literal
     testParse("0b0", expr, { type: "LiteralNumericExpression", value: 0 });
     testParse("0b1", expr, { type: "LiteralNumericExpression", value: 1 });
     testParse("0b10", expr, { type: "LiteralNumericExpression", value: 2 });
@@ -71,15 +80,8 @@ suite("Parser", function () {
     testParseFailure("0B9", "Unexpected \"9\"");
     testParseFailure("0B18", "Unexpected \"8\"");
     testParseFailure("0B12", "Unexpected \"2\"");
-    testParseFailure("'use strict'; 01", "Unexpected legacy octal integer literal");
-    testParseFailure("'use strict'; 0123", "Unexpected legacy octal integer literal");
-    testParseFailure("'use strict'; 00", "Unexpected legacy octal integer literal");
-    testParseFailure("'use strict'; 07", "Unexpected legacy octal integer literal");
-    testParseFailure("'use strict'; 08", "Unexpected noctal integer literal");
-    testParseFailure("'use strict'; 019", "Unexpected noctal integer literal");
-    testParseModuleFailure("01", "Unexpected legacy octal integer literal");
 
-    // Octal Numeric Literal
+    // Octal Integer Literal
     testParse("0o0", expr, { type: "LiteralNumericExpression", value: 0 });
     testParse("(0o0)", expr, { type: "LiteralNumericExpression", value: 0 });
     testParse("0o1", expr, { type: "LiteralNumericExpression", value: 1 });

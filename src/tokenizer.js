@@ -1194,6 +1194,7 @@ export default class Tokenizer {
           break;
         default:
           if ("0" <= ch && ch <= "7") {
+            let octalStart = this.index;
             let octLen = 1;
             // 3 digits are only allowed when string starts
             // with 0, 1, 2, 3
@@ -1202,13 +1203,13 @@ export default class Tokenizer {
             }
             let code = 0;
             while (octLen < 3 && "0" <= ch && ch <= "7") {
+              this.index++;
               if (octLen > 0 || ch !== "0") {
-                octal = true;
+                octal = this.source.slice(octalStart, this.index);
               }
               code *= 8;
-              octLen++;
               code += ch - "0";
-              this.index++;
+              octLen++;
               if (this.index === this.source.length) {
                 throw this.createILLEGAL();
               }
@@ -1243,7 +1244,7 @@ export default class Tokenizer {
     let start = this.index;
     this.index++;
 
-    let octal = false;
+    let octal = null;
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
       if (ch === quote) {
@@ -1281,8 +1282,8 @@ export default class Tokenizer {
           break;
         case 0x5C:  // \\
         {
-          let octal = this.scanStringEscape("", false)[1];
-          if (octal) {
+          let octal = this.scanStringEscape("", null)[1];
+          if (octal != null) {
             throw this.createILLEGAL();
           }
           break;

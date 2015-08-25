@@ -180,6 +180,7 @@ export class Parser extends Tokenizer {
     this.allowYieldExpression = false;
     this.module = false;
     this.moduleIsTheGoalSymbol = false;
+    this.strict = false;
 
     // Cover grammar
     this.isBindingElement = true;
@@ -261,8 +262,10 @@ export class Parser extends Tokenizer {
 
     let oldInFunctionBody = this.inFunctionBody;
     let oldModule = this.module;
+    let oldStrict = this.strict;
     this.inFunctionBody = true;
     this.module = false;
+    this.strict = false;
 
     this.expect(TokenType.LBRACE);
     let body = this.markLocation(this.parseBody(), startLocation);
@@ -270,6 +273,7 @@ export class Parser extends Tokenizer {
 
     this.inFunctionBody = oldInFunctionBody;
     this.module = oldModule;
+    this.strict = oldStrict;
 
     return body;
   }
@@ -287,7 +291,11 @@ export class Parser extends Tokenizer {
       let stmt = isModule ? this.parseModuleItem() : this.parseStatementListItem();
       if (parsingDirectives) {
         if (isStringLiteral && stmt.type === "ExpressionStatement" && stmt.expression.type === "LiteralStringExpression") {
-          directives.push(this.markLocation({ type: "Directive", rawValue: text.slice(1, -1)}, directiveLocation));
+          let rawValue = text.slice(1, -1);
+          if (rawValue === "use strict") {
+            this.strict = true;
+          }
+          directives.push(this.markLocation({ type: "Directive", rawValue }, directiveLocation));
         } else {
           parsingDirectives = false;
           statements.push(stmt);
@@ -1544,7 +1552,11 @@ export class Parser extends Tokenizer {
 
   parseStringLiteral() {
     let startLocation = this.getLocation();
-    return this.markLocation({ type: "LiteralStringExpression", value: this.lex().str }, startLocation);
+    let token = this.lex();
+    if (token.octal != null && this.strict) {
+      throw this.createErrorWithLocation(startLocation, "Unexpected legacy octal escape sequence: \\" + token.octal);
+    }
+    return this.markLocation({ type: "LiteralStringExpression", value: token.str }, startLocation);
   }
 
   parseIdentifierName() {

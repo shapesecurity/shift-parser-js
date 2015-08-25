@@ -17,6 +17,7 @@
 var expr = require("../../helpers").expr;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
+var testParseModuleFailure = require("../../assertions").testParseModuleFailure;
 
 suite("Parser", function () {
   suite("literal string expression", function () {
@@ -70,6 +71,7 @@ suite("Parser", function () {
     testParseFailure("'use strict'; ('\\001')", "Unexpected legacy octal escape sequence: \\001");
     testParseFailure("'use strict'; ('\\000')", "Unexpected legacy octal escape sequence: \\000");
     testParseFailure("'use strict'; ('\\123')", "Unexpected legacy octal escape sequence: \\123");
+    testParseModuleFailure("('\\1')", "Unexpected legacy octal escape sequence: \\1");
 
     // early grammar error: 11.8.4.1
     // It is a Syntax Error if the MV of HexDigits > 1114111.

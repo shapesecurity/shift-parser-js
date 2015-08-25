@@ -237,7 +237,7 @@ export class Parser extends Tokenizer {
   }
 
   parseModule() {
-    this.moduleIsTheGoalSymbol = this.module = true;
+    this.moduleIsTheGoalSymbol = this.module = this.strict = true;
     this.lookahead = this.advance();
 
     let startLocation = this.getLocation();

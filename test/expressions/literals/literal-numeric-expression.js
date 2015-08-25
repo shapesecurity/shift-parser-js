@@ -17,6 +17,7 @@
 var expr = require("../../helpers").expr;
 var testParse = require("../../assertions").testParse;
 var testParseFailure = require("../../assertions").testParseFailure;
+var testParseModuleFailure = require("../../assertions").testParseModuleFailure;
 
 suite("Parser", function () {
   suite("literal numeric expression", function () {
@@ -76,6 +77,7 @@ suite("Parser", function () {
     testParseFailure("'use strict'; 07", "Unexpected legacy octal integer literal");
     testParseFailure("'use strict'; 08", "Unexpected noctal integer literal");
     testParseFailure("'use strict'; 019", "Unexpected noctal integer literal");
+    testParseModuleFailure("01", "Unexpected legacy octal integer literal");
 
     // Octal Numeric Literal
     testParse("0o0", expr, { type: "LiteralNumericExpression", value: 0 });

@@ -245,7 +245,7 @@ export default class Tokenizer {
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.type.name);
       case TokenClass.StringLiteral:
         return this.createError(ErrorMessages.UNEXPECTED_STRING);
-      // the other token classes are TegularExpression and Illegal, but they cannot reach here
+      // the other token classes are RegularExpression and Illegal, but they cannot reach here
     }
   }
 

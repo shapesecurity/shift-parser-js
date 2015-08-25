@@ -1544,6 +1544,13 @@ export class Parser extends Tokenizer {
   parseNumericLiteral() {
     let startLocation = this.getLocation();
     let token = this.lex();
+    if (token.octal && this.strict) {
+      if (token.noctal) {
+        throw this.createErrorWithLocation(startLocation, "Unexpected noctal integer literal");
+      } else {
+        throw this.createErrorWithLocation(startLocation, "Unexpected legacy octal integer literal");
+      }
+    }
     let node = token.value === 1 / 0
       ? { type: "LiteralInfinityExpression" }
       : { type: "LiteralNumericExpression", value: token.value };

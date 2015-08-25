@@ -70,6 +70,12 @@ suite("Parser", function () {
     testParseFailure("0B9", "Unexpected \"9\"");
     testParseFailure("0B18", "Unexpected \"8\"");
     testParseFailure("0B12", "Unexpected \"2\"");
+    testParseFailure("'use strict'; 01", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 0123", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 00", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 07", "Unexpected legacy octal integer literal");
+    testParseFailure("'use strict'; 08", "Unexpected noctal integer literal");
+    testParseFailure("'use strict'; 019", "Unexpected noctal integer literal");
 
     // Octal Numeric Literal
     testParse("0o0", expr, { type: "LiteralNumericExpression", value: 0 });

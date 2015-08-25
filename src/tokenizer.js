@@ -968,6 +968,7 @@ export default class Tokenizer {
       value: parseInt(this.getSlice(start, startLocation).text.substr(offset), 2),
       slice: this.getSlice(start, startLocation),
       octal: false,
+      noctal: false,
     };
   }
 
@@ -992,6 +993,7 @@ export default class Tokenizer {
       value: parseInt(this.getSlice(start, startLocation).text.substr(2), 8),
       slice: this.getSlice(start, startLocation),
       octal: false,
+      noctal: false,
     };
   }
 
@@ -1017,6 +1019,7 @@ export default class Tokenizer {
       slice: this.getSlice(start, startLocation),
       value: parseInt(this.getSlice(start, startLocation).text.substr(1), isOctal ? 8 : 10),
       octal: true,
+      noctal: !isOctal,
     };
   }
 
@@ -1049,6 +1052,7 @@ export default class Tokenizer {
           value: +slice.text,
           slice,
           octal: false,
+          noctal: false,
         };
       }
     } else if (ch !== ".") {
@@ -1063,6 +1067,7 @@ export default class Tokenizer {
             value: +slice.text,
             slice,
             octal: false,
+            noctal: false,
           };
         }
         ch = this.source.charAt(this.index);
@@ -1079,6 +1084,7 @@ export default class Tokenizer {
           value: +slice.text,
           slice,
           octal: false,
+          noctal: false,
         };
       }
 
@@ -1093,6 +1099,7 @@ export default class Tokenizer {
             value: +slice.text,
             slice,
             octal: false,
+            noctal: false,
           };
         }
         ch = this.source.charAt(this.index);
@@ -1144,6 +1151,7 @@ export default class Tokenizer {
       value: +slice.text,
       slice,
       octal: false,
+      noctal: false,
     };
   }
 

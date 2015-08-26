@@ -15,7 +15,7 @@
   "scripts": {
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
     "build": "babel --auxiliary-comment-before 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src",
-    "prepublish": "npm update && npm run build",
+    "prepublish": "rm -rf dist && npm update && npm run build",
     "watch": "babel --auxiliary-comment-before 'istanbul ignore next' --modules commonStrict --source-maps-inline --out-dir dist src --watch",
     "benchmark": "node benchmark",
     "profile": "node --prof profile.js && node-tick-processor",

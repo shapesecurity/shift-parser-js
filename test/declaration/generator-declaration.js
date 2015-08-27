@@ -72,48 +72,6 @@ suite("Parser", function () {
       }
     );
 
-    testParse("function* a(a=yield){}", stmt,
-      { type: "FunctionDeclaration",
-        isGenerator: true,
-        name: { type: "BindingIdentifier", name: "a" },
-        params:
-          { type: "FormalParameters",
-            items:
-              [
-                {
-                  type: "BindingWithDefault",
-                  binding: { type: "BindingIdentifier", name: "a" },
-                  init: { type: "YieldExpression", expression: null }
-                }
-              ],
-            rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [] }
-      }
-    );
-
-    testParse("function* a({[yield]:a}){}", stmt,
-      { type: "FunctionDeclaration",
-        isGenerator: true,
-        name: { type: "BindingIdentifier", name: "a" },
-        params:
-          { type: "FormalParameters",
-            items:
-              [
-                {
-                  type: "ObjectBinding",
-                  properties: [{
-                    type: "BindingPropertyProperty",
-                    name: { type: "ComputedPropertyName", expression: { type: "YieldExpression", expression: null } },
-                    binding: { type: "BindingIdentifier", name: "a" }
-                  }]
-                }
-              ],
-            rest: null
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
-      }
-    );
-
     testParse("function* a(){({[yield]:a}=0)}", function (p) {
         return stmt(p).body.statements[0].expression;
       },
@@ -170,36 +128,6 @@ suite("Parser", function () {
             name: { type: "BindingIdentifier", name: "a" },
             params: { type: "FormalParameters", items: [], rest: null },
             body: { type: "FunctionBody", directives: [], statements: [] }
-          }]
-        }
-      }
-    );
-
-    testParse("function*g() { (function*(x = yield){}); }", stmt,
-      { type: "FunctionDeclaration",
-        isGenerator: true,
-        name: { type: "BindingIdentifier", name: "g" },
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: {
-          type: "FunctionBody",
-          directives: [],
-          statements: [{
-            type: "ExpressionStatement",
-            expression: {
-              type: "FunctionExpression",
-              isGenerator: true,
-              name: null,
-              params: {
-                type: "FormalParameters",
-                items: [{
-                  type: "BindingWithDefault",
-                  binding: { type: "BindingIdentifier", name: "x" },
-                  init: { type: "YieldExpression", expression: null }
-                }],
-                rest: null
-              },
-              body: { type: "FunctionBody", directives: [], statements: [] }
-            }
           }]
         }
       }

@@ -74,6 +74,9 @@ export class EarlyErrorState {
     this.superCallExpressionsInConstructorMethod = [];
     // MemberExpressions with Super object
     this.superPropertyExpressions = [];
+
+    // YieldExpression and YieldGeneratorExpression nodes; cleared at function boundaries
+    this.yieldExpressions = [];
   }
 
 
@@ -312,6 +315,17 @@ export class EarlyErrorState {
   }
 
 
+  observeYieldExpression(node) {
+    this.yieldExpressions.push(node);
+    return this;
+  }
+
+  clearYieldExpressions() {
+    this.yieldExpressions = [];
+    return this;
+  }
+
+
   addError(e) {
     this.errors.push(e);
     return this;
@@ -356,6 +370,7 @@ export class EarlyErrorState {
     [].push.apply(this.superCallExpressions, s.superCallExpressions);
     [].push.apply(this.superCallExpressionsInConstructorMethod, s.superCallExpressionsInConstructorMethod);
     [].push.apply(this.superPropertyExpressions, s.superPropertyExpressions);
+    [].push.apply(this.yieldExpressions, s.yieldExpressions);
     return this;
   }
 

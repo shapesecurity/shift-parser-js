@@ -258,6 +258,52 @@ suite("Parser", function () {
         body: { type: "FunctionBody", directives: [], statements: [] }
       });
 
+    testParse("function* g(){ (function yield(){}); }", stmt,
+      {
+        type: "FunctionDeclaration",
+        isGenerator: true,
+        name: { type: "BindingIdentifier", name: "g" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "FunctionExpression",
+              isGenerator: false,
+              name: { type: "BindingIdentifier", name: "yield" },
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: { type: "FunctionBody", directives: [], statements: [] },
+            }
+          }]
+        }
+      }
+    );
+
+    testParse("(function*(){ (function yield(){}); })", expr,
+      {
+        type: "FunctionExpression",
+        isGenerator: true,
+        name: null,
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "FunctionExpression",
+              isGenerator: false,
+              name: { type: "BindingIdentifier", name: "yield" },
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: { type: "FunctionBody", directives: [], statements: [] },
+            }
+          }]
+        }
+      }
+    );
+
     testParseFailure("(function(...a, b){})", "Unexpected token \",\"");
     testParseFailure("(function((a)){})", "Unexpected token \"(\"");
   });

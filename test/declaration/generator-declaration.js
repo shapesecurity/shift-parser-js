@@ -83,7 +83,7 @@ suite("Parser", function () {
                 {
                   type: "BindingWithDefault",
                   binding: { type: "BindingIdentifier", name: "a" },
-                  init: { type: "IdentifierExpression", name: "yield" }
+                  init: { type: "YieldExpression", expression: null }
                 }
               ],
             rest: null },
@@ -103,7 +103,7 @@ suite("Parser", function () {
                   type: "ObjectBinding",
                   properties: [{
                     type: "BindingPropertyProperty",
-                    name: { type: "ComputedPropertyName", expression: { type: "IdentifierExpression", name: "yield" } },
+                    name: { type: "ComputedPropertyName", expression: { type: "YieldExpression", expression: null } },
                     binding: { type: "BindingIdentifier", name: "a" }
                   }]
                 }
@@ -175,11 +175,41 @@ suite("Parser", function () {
       }
     );
 
+    testParse("function*g() { (function*(x = yield){}); }", stmt,
+      { type: "FunctionDeclaration",
+        isGenerator: true,
+        name: { type: "BindingIdentifier", name: "g" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "FunctionExpression",
+              isGenerator: true,
+              name: null,
+              params: {
+                type: "FormalParameters",
+                items: [{
+                  type: "BindingWithDefault",
+                  binding: { type: "BindingIdentifier", name: "x" },
+                  init: { type: "YieldExpression", expression: null }
+                }],
+                rest: null
+              },
+              body: { type: "FunctionBody", directives: [], statements: [] }
+            }
+          }]
+        }
+      }
+    );
+
     testParseFailure("label: function* a(){}", "Unexpected token \"*\"");
+    testParseFailure("function*g(yield){}", "Unexpected token \"yield\"");
     testParseFailure("function*g(){ var yield; }", "Unexpected token \"yield\"");
     testParseFailure("function*g(){ var yield = 1; }", "Unexpected token \"yield\"");
     testParseFailure("function*g(){ function yield(){}; }", "Unexpected token \"yield\"");
-    testParseFailure("function*g(){ (function yield(){}); }", "Unexpected token \"yield\"");
 
     testParseFailure("function*g() { var yield; }", "Unexpected token \"yield\"");
     testParseFailure("function*g() { let yield; }", "Unexpected token \"yield\"");

@@ -381,6 +381,38 @@ suite("Parser", function () {
           expression: { type: "LiteralNumericExpression", value: 0 }
         });
 
+      testParse("(function*() { [...{ x = yield }] = 0; })", expr,
+        {
+          type: "FunctionExpression",
+          name: null,
+          isGenerator: true,
+          params: { type: "FormalParameters", items: [], rest: null },
+          body: {
+            type: "FunctionBody",
+            directives: [],
+            statements: [{
+              type: "ExpressionStatement",
+              expression: {
+                type: "AssignmentExpression",
+                binding: {
+                  type: "ArrayBinding",
+                  elements: [],
+                  restElement: {
+                    type: "ObjectBinding",
+                    properties: [{
+                      type: "BindingPropertyIdentifier",
+                      binding: { type: "BindingIdentifier", name: "x" },
+                      init: { type: "YieldExpression", expression: null }
+                    }]
+                  }
+                },
+                expression: { type: "LiteralNumericExpression", value: 0 }
+              }
+            }]
+          }
+        }
+      );
+
       testParseFailure("({a = 0});", "Illegal property initializer");
       testParseFailure("({a} += 0);", "Invalid left-hand side in assignment");
       testParseFailure("({a,,} = 0)", "Unexpected token \",\"");

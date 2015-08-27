@@ -175,7 +175,6 @@ export class Parser extends Tokenizer {
     super(source);
     this.allowIn = true;
     this.inFunctionBody = false;
-    this.inGeneratorParameter = false;
     this.inParameter = false;
     this.allowYieldExpression = false;
     this.module = false;
@@ -1073,7 +1072,7 @@ export class Parser extends Tokenizer {
   parseAssignmentExpressionOrBindingElement() {
     let startLocation = this.getLocation();
 
-    if (this.allowYieldExpression && !this.inGeneratorParameter && this.match(TokenType.YIELD)) {
+    if (this.allowYieldExpression && this.match(TokenType.YIELD)) {
       this.isBindingElement = this.isAssignmentTarget = false;
       return this.parseYieldExpression();
     }
@@ -1118,11 +1117,8 @@ export class Parser extends Tokenizer {
     }
 
     this.lex();
-    let previousInGeneratorParameter = this.inGeneratorParameter;
-    this.inGeneratorParameter = false;
     let rhs = this.parseAssignmentExpression();
 
-    this.inGeneratorParameter = previousInGeneratorParameter;
     this.firstExprError = null;
     return this.markLocation(
       operator.type === TokenType.ASSIGN
@@ -1580,11 +1576,11 @@ export class Parser extends Tokenizer {
   }
 
   parseIdentifier() {
-    if (this.match(TokenType.IDENTIFIER) || !this.allowYieldExpression && this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
-      return this.lex().value;
-    } else {
-      throw this.createUnexpected(this.lookahead);
+    let type = this.lookahead.type;
+    if (type === TokenType.IDENTIFIER || type === TokenType.YIELD && !this.allowYieldExpression || type === TokenType.LET) {
+        return this.lex().value;
     }
+    throw this.createUnexpected(this.lookahead);
   }
 
   parseArgumentList() {
@@ -1840,9 +1836,6 @@ export class Parser extends Tokenizer {
         };
       case TokenType.LBRACK:
         let previousYield = this.allowYieldExpression;
-        if (this.inGeneratorParameter) {
-          this.allowYieldExpression = false;
-        }
         this.lex();
         let expr = this.parseAssignmentExpression();
         this.expect(TokenType.RBRACK);
@@ -1923,14 +1916,9 @@ export class Parser extends Tokenizer {
 
     if (this.match(TokenType.LPAREN)) {
       let previousYield = this.allowYieldExpression;
-      let previousInGeneratorParameter = this.inGeneratorParameter;
-      this.inGeneratorParameter = isGenerator;
       this.allowYieldExpression = isGenerator;
       let params = this.parseParams();
-      this.inGeneratorParameter = previousInGeneratorParameter;
-      this.allowYieldExpression = previousYield;
       this.allowYieldExpression = isGenerator;
-
       let body = this.parseFunctionBody();
       this.allowYieldExpression = previousYield;
 
@@ -1968,12 +1956,12 @@ export class Parser extends Tokenizer {
       }
     }
 
-    let previousInGeneratorParameter = this.inGeneratorParameter;
     let previousParamYield = this.allowYieldExpression;
+
     if (isExpr) {
-      this.inGeneratorParameter = false;
       this.allowYieldExpression = false;
     }
+
     if (this.eat(TokenType.EXTENDS)) {
       heritage = this.isolateCoverGrammar(() => this.parseLeftHandSideExpression({ allowCall: true }));
     }
@@ -1997,7 +1985,6 @@ export class Parser extends Tokenizer {
       }
     }
     this.allowYieldExpression = previousParamYield;
-    this.inGeneratorParameter = previousInGeneratorParameter;
     return this.markLocation({ type: isExpr ? "ClassExpression" : "ClassDeclaration", name, super: heritage, elements }, startLocation);
   }
 
@@ -2009,8 +1996,11 @@ export class Parser extends Tokenizer {
     let name = null;
     let isGenerator = allowGenerator && !!this.eat(TokenType.MUL);
 
-    let previousGeneratorParameter = this.inGeneratorParameter;
     let previousYield = this.allowYieldExpression;
+
+    if (isExpr) {
+      this.allowYieldExpression = isGenerator;
+    }
 
     if (!this.match(TokenType.LPAREN)) {
       name = this.parseBindingIdentifier();
@@ -2022,18 +2012,11 @@ export class Parser extends Tokenizer {
       }
     }
 
-    this.inGeneratorParameter = isGenerator;
     this.allowYieldExpression = isGenerator;
-
     let params = this.parseParams();
-
-    this.inGeneratorParameter = previousGeneratorParameter;
     this.allowYieldExpression = isGenerator;
-
     let body = this.parseFunctionBody();
-
     this.allowYieldExpression = previousYield;
-    this.inGeneratorParameter = previousGeneratorParameter;
 
     let type = isExpr ? "FunctionExpression" : "FunctionDeclaration";
     return this.markLocation({ type, isGenerator, name, params, body }, startLocation);
@@ -2056,7 +2039,7 @@ export class Parser extends Tokenizer {
         el = null;
       } else {
         if (this.eat(TokenType.ELLIPSIS)) {
-          restElement = this.parseBindingIdentifier();
+          restElement = this.parseBindingTarget();
           break;
         } else {
           el = this.parseBindingElement();
@@ -2082,9 +2065,6 @@ export class Parser extends Tokenizer {
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {
           let previousAllowYieldExpression = this.allowYieldExpression;
-          if (this.inGeneratorParameter) {
-            this.allowYieldExpression = false;
-          }
           let expr = this.parseAssignmentExpression();
           defaultValue = expr;
           this.allowYieldExpression = previousAllowYieldExpression;
@@ -2138,15 +2118,9 @@ export class Parser extends Tokenizer {
     let binding = this.parseBindingTarget();
 
     if (this.eat(TokenType.ASSIGN)) {
-      let previousInGeneratorParameter = this.inGeneratorParameter;
       let previousYieldExpression = this.allowYieldExpression;
-      if (this.inGeneratorParameter) {
-        this.allowYieldExpression = false;
-      }
-      this.inGeneratorParameter = false;
       let init = this.parseAssignmentExpression();
       binding = this.markLocation({ type: "BindingWithDefault", binding, init }, startLocation);
-      this.inGeneratorParameter = previousInGeneratorParameter;
       this.allowYieldExpression = previousYieldExpression;
     }
     return binding;

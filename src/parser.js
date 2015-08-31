@@ -89,67 +89,6 @@ function isValidSimpleAssignmentTarget(node) {
   return false;
 }
 
-function transformDestructuring(node) {
-  switch (node.type) {
-    case "ObjectExpression":
-      return copyLocation(node, {
-        type: "ObjectBinding",
-        properties: node.properties.map(transformDestructuring),
-      });
-    case "DataProperty":
-      return copyLocation(node, {
-        type: "BindingPropertyProperty",
-        name: node.name,
-        binding: transformDestructuring(node.expression),
-      });
-    case "ShorthandProperty":
-      return copyLocation(node, {
-        type: "BindingPropertyIdentifier",
-        binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
-        init: null,
-      });
-    case "ArrayExpression":
-      let last = node.elements[node.elements.length - 1];
-      if (last != null && last.type === "SpreadElement") {
-        return copyLocation(node, {
-          type: "ArrayBinding",
-          elements: node.elements.slice(0, -1).map(e => e && transformDestructuring(e)),
-          restElement: copyLocation(last.expression, transformDestructuring(last.expression)),
-        });
-      } else {
-        return copyLocation(node, {
-          type: "ArrayBinding",
-          elements: node.elements.map(e => e && transformDestructuring(e)),
-          restElement: null,
-        });
-      }
-      /* istanbul ignore next */
-      break;
-    case "AssignmentExpression":
-      return copyLocation(node, {
-        type: "BindingWithDefault",
-        binding: transformDestructuring(node.binding),
-        init: node.expression,
-      });
-    case "IdentifierExpression":
-      return copyLocation(node, { type: "BindingIdentifier", name: node.name });
-    case "StaticPropertyName":
-      return copyLocation(node, { type: "BindingIdentifier", name: node.value });
-    case "ComputedMemberExpression":
-    case "StaticMemberExpression":
-    case "ArrayBinding":
-    case "BindingIdentifier":
-    case "BindingPropertyIdentifier":
-    case "BindingPropertyProperty":
-    case "BindingWithDefault":
-    case "ObjectBinding":
-      return node;
-    // istanbul ignore next
-    default:
-      throw new Error("Not reached");
-  }
-}
-
 function isPrefixOperator(token) {
   switch (token.type) {
     case TokenType.INC:
@@ -729,7 +668,7 @@ export class Parser extends Tokenizer {
           this.lex();
           right = this.parseExpression();
 
-          return { type, left: transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() };
+          return { type, left: this.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() };
         } else {
           if (this.firstExprError) {
             throw this.firstExprError;
@@ -1045,7 +984,7 @@ export class Parser extends Tokenizer {
     let {params = null, rest = null} = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
       if (head.type === "IdentifierExpression") {
-        params = [transformDestructuring(head)];
+        params = [this.transformDestructuring(head)];
       } else {
         throw this.createUnexpected(arrow);
       }
@@ -1106,12 +1045,12 @@ export class Parser extends Tokenizer {
       if (!this.isAssignmentTarget || !isValidSimpleAssignmentTarget(expr)) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
-      expr = transformDestructuring(expr);
+      expr = this.transformDestructuring(expr);
     } else if (operator.type === TokenType.ASSIGN) {
       if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
-      expr = transformDestructuring(expr);
+      expr = this.transformDestructuring(expr);
     } else {
       return expr;
     }
@@ -1126,6 +1065,79 @@ export class Parser extends Tokenizer {
         : { type: "CompoundAssignmentExpression", binding: expr, operator: operator.type.name, expression: rhs }
     , startLocation
     );
+  }
+
+  transformDestructuring(node) {
+    switch (node.type) {
+
+      case "DataProperty":
+        return copyLocation(node, {
+          type: "BindingPropertyProperty",
+          name: node.name,
+          binding: this.transformDestructuringWithDefault(node.expression),
+        });
+      case "ShorthandProperty":
+        return copyLocation(node, {
+          type: "BindingPropertyIdentifier",
+          binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
+          init: null,
+        });
+
+      case "ObjectExpression":
+        return copyLocation(node, {
+          type: "ObjectBinding",
+          properties: node.properties.map(x => this.transformDestructuring(x)),
+        });
+      case "ArrayExpression":
+        let last = node.elements[node.elements.length - 1];
+        if (last != null && last.type === "SpreadElement") {
+          return copyLocation(node, {
+            type: "ArrayBinding",
+            elements: node.elements.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
+            restElement: copyLocation(last.expression, this.transformDestructuring(last.expression)),
+          });
+        } else {
+          return copyLocation(node, {
+            type: "ArrayBinding",
+            elements: node.elements.map(e => e && this.transformDestructuringWithDefault(e)),
+            restElement: null,
+          });
+        }
+        /* istanbul ignore next */
+        break;
+      case "IdentifierExpression":
+        return copyLocation(node, { type: "BindingIdentifier", name: node.name });
+      case "AssignmentExpression":
+        throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+
+      case "StaticPropertyName":
+        return copyLocation(node, { type: "BindingIdentifier", name: node.value });
+
+      case "ComputedMemberExpression":
+      case "StaticMemberExpression":
+      case "ArrayBinding":
+      case "BindingIdentifier":
+      case "BindingPropertyIdentifier":
+      case "BindingPropertyProperty":
+      case "BindingWithDefault":
+      case "ObjectBinding":
+        return node;
+    }
+
+    // istanbul ignore next
+    throw new Error("Not reached");
+  }
+
+  transformDestructuringWithDefault(node) {
+    switch (node.type) {
+      case "AssignmentExpression":
+        return copyLocation(node, {
+          type: "BindingWithDefault",
+          binding: this.transformDestructuring(node.binding),
+          init: node.expression,
+        });
+    }
+    return this.transformDestructuring(node);
   }
 
   lookaheadAssignmentExpression() {
@@ -1314,6 +1326,7 @@ export class Parser extends Tokenizer {
     let operator = this.lookahead;
     if (!isUpdateOperator(operator)) return operand;
     this.lex();
+    this.isBindingElement = this.isAssignmentTarget = false;
     if (operand.type === "IdentifierExpression") {
       operand.type = "BindingIdentifier";
     } else if (!isValidSimpleAssignmentTarget(operand)) {
@@ -1651,7 +1664,7 @@ export class Parser extends Tokenizer {
     let startLocation = this.getLocation();
     let group = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
 
-    let params = this.isBindingElement ? [group] : null;
+    let params = this.isBindingElement ? [this.transformDestructuringWithDefault(group)] : null;
 
     while (this.eat(TokenType.COMMA)) {
       this.isAssignmentTarget = false;
@@ -1674,7 +1687,7 @@ export class Parser extends Tokenizer {
         if (!this.isBindingElement) {
           params = null;
         } else {
-          params.push(expr);
+          params.push(this.transformDestructuringWithDefault(expr));
         }
 
         if (this.firstExprError) {
@@ -1696,8 +1709,6 @@ export class Parser extends Tokenizer {
       if (!this.isBindingElement) {
         throw this.createErrorWithLocation(start, ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
       }
-
-      params = params.map(transformDestructuring);
 
       this.isBindingElement = false;
       return { type: ARROW_EXPRESSION_PARAMS, params, rest };
@@ -1782,14 +1793,14 @@ export class Parser extends Tokenizer {
       case "method":
         this.isBindingElement = this.isAssignmentTarget = false;
         return methodOrKey;
-      case "identifier": // IdentifierReference,
+      case "identifier":
         if (this.eat(TokenType.ASSIGN)) {
           // CoverInitializedName
           let init = this.isolateCoverGrammar(this.parseAssignmentExpression);
           this.firstExprError = this.createErrorWithLocation(startLocation, ErrorMessages.ILLEGAL_PROPERTY);
           return this.markLocation({
             type: "BindingPropertyIdentifier",
-            binding: transformDestructuring(methodOrKey),
+            binding: this.transformDestructuring(methodOrKey),
             init,
           }, startLocation);
         } else if (!this.match(TokenType.COLON)) {

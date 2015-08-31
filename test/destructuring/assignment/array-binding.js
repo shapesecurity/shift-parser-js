@@ -289,11 +289,10 @@ suite("Parser", function () {
       testParseFailure("[...0,...{a=0}]=0", "Illegal property initializer");
       testParseFailure("[...{a=0},]", "Illegal property initializer");
       testParseFailure("[...{a=0},]=0", "Invalid left-hand side in assignment");
-
-      // new tests
       testParseFailure("[0] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[a, ...b, {c=0}]", "Illegal property initializer");
       testParseFailure("{a = [...b, c]} = 0", "Unexpected token \"=\"");
+      testParseFailure("[a, ...(b = c)] = 0", "Invalid left-hand side in assignment");
     });
   });
 });

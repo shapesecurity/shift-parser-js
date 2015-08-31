@@ -113,7 +113,14 @@ export class EarlyErrorChecker extends MonoidalReducer {
         body = body.enforceStrictErrors();
       }
     }
+    body.yieldExpressions.forEach(function(node) {
+      body = body.addError(new EarlyError(node, "Concise arrow bodies must not contain yield expressions"));
+    });
+    params.yieldExpressions.forEach(function(node) {
+      params = params.addError(new EarlyError(node, "Arrow parameters must not contain yield expressions"));
+    });
     let s = super.reduceArrowExpression(node, {params, body});
+    s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -123,7 +130,8 @@ export class EarlyErrorChecker extends MonoidalReducer {
     if (isRestrictedWord(node.name) || isStrictModeReservedWord(node.name)) {
       s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(node.name)} must not be in binding position in strict mode`));
     }
-    return s.bindName(node.name, node);
+    s = s.bindName(node.name, node);
+    return s;
   }
 
   reduceBlock() {
@@ -345,6 +353,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     s = s.enforceFreeBreakStatementErrors(FREE_BREAK);
     s = s.enforceFreeLabeledBreakStatementErrors(UNBOUND_BREAK);
     s = s.clearUsedLabelNames();
+    s = s.clearYieldExpressions();
     if (isStrictFunctionBody(node)) {
       s = s.enforceStrictErrors();
     }
@@ -366,6 +375,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
     body = body.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
     params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
     params = params.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+    if (node.isGenerator) {
+      params.yieldExpressions.forEach(function(node) {
+        params = params.addError(new EarlyError(node, "Generator parameters must not contain yield expressions"));
+      });
+    }
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
@@ -373,6 +387,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       body = body.enforceStrictErrors();
     }
     let s = super.reduceFunctionDeclaration(node, {name, params, body});
+    s = s.clearYieldExpressions();
     s = s.observeFunctionDeclaration();
     return s;
   }
@@ -392,6 +407,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
     body = body.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
     params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
     params = params.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
+    if (node.isGenerator) {
+      params.yieldExpressions.forEach(function(node) {
+        params = params.addError(new EarlyError(node, "Generator parameters must not contain yield expressions"));
+      });
+    }
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
@@ -400,6 +420,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     }
     let s = super.reduceFunctionExpression(node, {name, params, body});
     s = s.clearBoundNames();
+    s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -493,6 +514,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
       body = body.enforceSuperCallExpressions(SUPERCALL_ERROR);
       params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
     }
+    if (node.isGenerator) {
+      params.yieldExpressions.forEach(function(node) {
+        params = params.addError(new EarlyError(node, "Generator parameters must not contain yield expressions"));
+      });
+    }
     body = body.clearSuperPropertyExpressions();
     params = params.clearSuperPropertyExpressions();
     params = params.clearNewTargetExpressions();
@@ -502,6 +528,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       body = body.enforceStrictErrors();
     }
     let s = super.reduceMethod(node, {name, params, body});
+    s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -681,6 +708,18 @@ export class EarlyErrorChecker extends MonoidalReducer {
       s = s.addError(new EarlyError(node.body, "The body of a with statement must not be a labeled function declaration"));
     }
     s = s.addStrictError(new EarlyError(node, "Strict mode code must not include a with statement"));
+    return s;
+  }
+
+  reduceYieldExpression(node) {
+    let s = super.reduceYieldExpression(...arguments);
+    s = s.observeYieldExpression(node);
+    return s;
+  }
+
+  reduceYieldGeneratorExpression(node) {
+    let s = super.reduceYieldGeneratorExpression(...arguments);
+    s = s.observeYieldExpression(node);
     return s;
   }
 

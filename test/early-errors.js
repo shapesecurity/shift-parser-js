@@ -515,6 +515,20 @@ suite("Parser", function () {
     testEarlyError("function f(){ labelA: while(0) continue labelB; }", "Continue statement must be nested within an iteration statement with label \"labelB\"");
 
     // 14.2.1
+    // It is a Syntax Error if ArrowParameters Contains YieldExpression is true.
+    testEarlyError("function* g(){ (a = yield) => 0; }", "Arrow parameters must not contain yield expressions");
+    testEarlyError("function* g(){ (a = yield b) => 0; }", "Arrow parameters must not contain yield expressions");
+    testEarlyError("function* g(){ (a = yield* b) => 0; }", "Arrow parameters must not contain yield expressions");
+    testEarlyError("function* g(){ (a = x + f(yield)) => 0; }", "Arrow parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({[yield]: a}) => 0; }", "Arrow parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({a = yield}) => 0; }", "Arrow parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ([a = yield]) => 0; }", "Arrow parameters must not contain yield expressions");
+    // TODO: testEarlyError("function* g(){ (...{a = yield}) => 0; }", "Arrow parameters must not contain yield expressions");
+    // It is a Syntax Error if ConciseBody Contains YieldExpression is true.
+    testEarlyError("function* g(){ () => yield; }", "Concise arrow bodies must not contain yield expressions");
+    testEarlyError("function* g(){ () => yield b; }", "Concise arrow bodies must not contain yield expressions");
+    testEarlyError("function* g(){ () => yield* b; }", "Concise arrow bodies must not contain yield expressions");
+    testEarlyError("function* g(){ () => f(x + (yield)); }", "Concise arrow bodies must not contain yield expressions");
     // It is a Syntax Error if any element of the BoundNames of ArrowParameters also occurs in the LexicallyDeclaredNames of ConciseBody.
     testEarlyError("(a) => { let a; }", "Duplicate binding \"a\"");
     testEarlyError("([a]) => { let a; }", "Duplicate binding \"a\"");
@@ -546,6 +560,15 @@ suite("Parser", function () {
     // It is a Syntax Error if HasDirectSuper of GeneratorMethod is true .
     testEarlyError("!{ *f(a = super()){} };", "Calls to super must be in the \"constructor\" method of a class expression or class declaration that has a superclass");
     testEarlyError("!{ *f(a) { super() } };", "Calls to super must be in the \"constructor\" method of a class expression or class declaration that has a superclass");
+    // It is a Syntax Error if StrictFormalParameters Contains YieldExpression is true.
+    testEarlyError("function* g(){ ({ *m(a = yield){} }); }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({ *m(a = yield b){} }); }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({ *m(a = yield* b){} }); }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({ *m(a = x + f(yield)){} }); }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({ *m({[yield]: a}){} }); }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({ *m({a = yield}){} }); }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ ({ *m([a = yield]){} }); }", "Generator parameters must not contain yield expressions");
+    // TODO: testEarlyError("function* g(){ ({ *m(...{a = yield}){} }); }", "Generator parameters must not contain yield expressions");
     // It is a Syntax Error if any element of the BoundNames of StrictFormalParameters also occurs in the LexicallyDeclaredNames of GeneratorBody.
     testEarlyError("!{ *f(a) { let a; } };", "Duplicate binding \"a\"");
     testEarlyError("!{ *f([a]){ let a; } };", "Duplicate binding \"a\"");
@@ -569,6 +592,23 @@ suite("Parser", function () {
     testEarlyError("function* f(a) { let a; }", "Duplicate binding \"a\"");
     testEarlyError("function* f([a]){ let a; }", "Duplicate binding \"a\"");
     testEarlyError("function* f({a}){ let a; }", "Duplicate binding \"a\"");
+    // It is a Syntax Error if FormalParameters Contains YieldExpression is true.
+    testEarlyError("function* g(){ function* f(a = yield){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ function* f(a = yield b){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ function* f(a = yield* b){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ function* f(a = x + f(yield)){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ function* f({[yield]: a}){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ function* f({a = yield}){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ function* f([a = yield]){} }", "Generator parameters must not contain yield expressions");
+    // TODO: testEarlyError("function* g(){ function* f(...{a = yield}){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ !function*(a = yield){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ !function*(a = yield b){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ !function*(a = yield* b){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ !function*(a = x + f(yield)){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ !function*({[yield]: a}){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ !function*({a = yield}){} }", "Generator parameters must not contain yield expressions");
+    testEarlyError("function* g(){ !function*([a = yield]){} }", "Generator parameters must not contain yield expressions");
+    // TODO: testEarlyError("function* g(){ !function*(...{a = yield}){} }", "Generator parameters must not contain yield expressions");
     // It is a Syntax Error if FormalParameters Contains SuperProperty is true.
     testEarlyError("function* f(a = super.b){}", "Member access on super must be in a method");
     testEarlyError("!function* (a = super.b){}", "Member access on super must be in a method");

@@ -236,7 +236,7 @@ suite("Parser", function () {
     testEarlyError("'use strict'; ({arguments} = 0);", "The identifier \"arguments\" must not be in binding position in strict mode");
     testEarlyError("'use strict'; ({arguments = 0} = 0);", "The identifier \"arguments\" must not be in binding position in strict mode");
 
-    // 13.1.1
+    // 13.2.1
     // It is a Syntax Error if the LexicallyDeclaredNames of StatementList contains any duplicate entries.
     testEarlyError("{ let a; let a; }", "Duplicate binding \"a\"");
     testEarlyError("{ let a; const a = 0; }", "Duplicate binding \"a\"");
@@ -253,7 +253,7 @@ suite("Parser", function () {
     testEarlyError("{ const a = 0; var a; }", "Duplicate binding \"a\"");
     testEarlyError("{ var a; const a = 0; }", "Duplicate binding \"a\"");
 
-    // 13.2.1.1
+    // 13.3.1.1
     // It is a Syntax Error if the BoundNames of BindingList contains "let".
     testEarlyError("let let;", "Lexical declarations must not have a binding named \"let\"");
     testEarlyError("let a, let;", "Lexical declarations must not have a binding named \"let\"");
@@ -290,14 +290,14 @@ suite("Parser", function () {
     testEarlyError("for(const a;;);", "Constant lexical declarations must have an initialiser");
     testEarlyError("for(const a = 0, b;;);", "Constant lexical declarations must have an initialiser");
 
-    // 13.5.1
+    // 13.6.1
     // It is a Syntax Error if IsLabelledFunction(Statement) is true for any occurrence of Statement in these rules.
     testEarlyError("if(0) label: function f(){}", "The consequent of an if statement must not be a labeled function declaration");
     testEarlyError("if(0) labelA: labelB: function f(){}", "The consequent of an if statement must not be a labeled function declaration");
     testEarlyError("if(0) label: function f(){} else ;", "The consequent of an if statement must not be a labeled function declaration");
     testEarlyError("if(0) ; else label: function f(){}", "The alternate of an if statement must not be a labeled function declaration");
 
-    // 13.6.0.1
+    // 13.7.1.1
     // It is a Syntax Error if IsLabelledFunction(Statement) is true for any occurrence of Statement in these rules.
     testEarlyError("do label: function f(){} while (0)", "The body of a do-while statement must not be a labeled function declaration");
     testEarlyError("do label: function f(){} while (0);", "The body of a do-while statement must not be a labeled function declaration");
@@ -316,12 +316,12 @@ suite("Parser", function () {
     testEarlyError("for(const a of b) label: function f(){}", "The body of a for-of statement must not be a labeled function declaration");
     testEarlyError("for(;;) labelA: labelB: labelC: function f(){}", "The body of a for statement must not be a labeled function declaration");
 
-    // 13.6.3.1
+    // 13.7.4.1
     // It is a Syntax Error if any element of the BoundNames of LexicalDeclaration also occurs in the VarDeclaredNames of Statement.
     testEarlyError("for(let a;;) { var a; }", "Duplicate binding \"a\"");
     testEarlyError("for(const a = 0;;) { var a; }", "Duplicate binding \"a\"");
 
-    // 13.6.4.1
+    // 13.7.5.1
     // It is a Syntax Error if the BoundNames of ForDeclaration contains "let".
     testEarlyError("for(let let in 0);", "Lexical declarations must not have a binding named \"let\"");
     testEarlyError("for(const let in 0);", "Lexical declarations must not have a binding named \"let\"");
@@ -338,7 +338,7 @@ suite("Parser", function () {
     testEarlyError("for(let {a, a} of 0);", "Duplicate binding \"a\"");
     testEarlyError("for(const {a, a} of 0);", "Duplicate binding \"a\"");
 
-    // 13.7.1
+    // 13.8.1
     // It is a Syntax Error if this production is not nested, directly or indirectly (but not crossing function boundaries), within an IterationStatement.
     testEarlyError("continue;", "Continue statement must be nested within an iteration statement");
     testModuleEarlyError("continue;", "Continue statement must be nested within an iteration statement");
@@ -352,7 +352,7 @@ suite("Parser", function () {
     testEarlyError("label: while(0) !function(){ continue label; };", "Continue statement must be nested within an iteration statement with label \"label\"");
     testEarlyError("label: while(0) { function f(){ continue label; } }", "Continue statement must be nested within an iteration statement with label \"label\"");
 
-    // 13.8.1
+    // 13.9.1
     // It is a Syntax Error if this production is not nested, directly or indirectly (but not crossing function boundaries), within an IterationStatement or a SwitchStatement.
     testEarlyError("break;", "Break statement must be nested within an iteration statement or a switch statement");
     testModuleEarlyError("break;", "Break statement must be nested within an iteration statement or a switch statement");
@@ -365,13 +365,13 @@ suite("Parser", function () {
     testEarlyError("switch(0) { default: !function(){ break; }; }", "Break statement must be nested within an iteration statement or a switch statement");
     testEarlyError("switch(0) { default: function f(){ break; } }", "Break statement must be nested within an iteration statement or a switch statement");
 
-    // 13.10.1
+    // 13.11.1
     // It is a Syntax Error if the code that matches this production is contained in strict code.
     testEarlyError("'use strict'; with(0);", "Strict mode code must not include a with statement");
     // It is a Syntax Error if IsLabelledFunction(Statement) is true.
     testEarlyError("with(0) label: function f(){}", "The body of a with statement must not be a labeled function declaration");
 
-    // 13.11.1
+    // 13.12.1
     // It is a Syntax Error if the LexicallyDeclaredNames of CaseClauses contains any duplicate entries.
     testEarlyError("switch(0) { case 0: let a; case 1: let a; }", "Duplicate binding \"a\"");
     testEarlyError("switch(0) { case 0: let a; case 1: function a(){} }", "Duplicate binding \"a\"");
@@ -394,11 +394,11 @@ suite("Parser", function () {
     testEarlyError("switch(0) { default: const a = 0; case 0: var a; }", "Duplicate binding \"a\"");
     testEarlyError("switch(0) { default: var a; case 0: const a = 0; }", "Duplicate binding \"a\"");
 
-    // 13.12.1
+    // 13.13.1
     // It is a Syntax Error if any source text matches this rule.
     //  (see Annex B 3.2)
 
-    // 13.14.1
+    // 13.15.1
     // It is a Syntax Error if BoundNames of CatchParameter contains any duplicate elements.
     testEarlyError("try {} catch ([e, e]) {}", "Duplicate binding \"e\"");
     testEarlyError("try {} catch ({e, e}) {}", "Duplicate binding \"e\"");

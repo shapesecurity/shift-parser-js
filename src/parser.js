@@ -206,14 +206,14 @@ export class Parser extends Tokenizer {
     this.strict = false;
 
     this.expect(TokenType.LBRACE);
-    let body = this.markLocation(this.parseBody(), startLocation);
+    let body = this.parseBody();
     this.expect(TokenType.RBRACE);
 
     this.inFunctionBody = oldInFunctionBody;
     this.module = oldModule;
     this.strict = oldStrict;
 
-    return body;
+    return this.markLocation(body, startLocation);
   }
 
   parseBody() {

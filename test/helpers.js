@@ -98,7 +98,10 @@ function schemaCheck(node, spec) {
       }
     } else {
       if (!node.hasOwnProperty(field.name)) {
-        expect(node).to.have.key(field.name);
+        // *default* BindingIdentifier nodes don't have a representation in the program text
+        if (!(node.type === "BindingIdentifier" && node.name === "*default*" && field.name === "loc")) {
+          expect(node).to.have.key(field.name);
+        }
       }
       schemaCheck(node[field.name], field.type);
     }
@@ -171,6 +174,10 @@ function locationSanityCheck(node, parentSpan, prevLocation) {
   for (var i = 0; i < spec.length; i++) {
     var field = spec[i];
     if (node[field.name] === null) return;
+    // *default* BindingIdentifier nodes don't have a representation in the program text
+    if (node[field.name].type === "BindingIdentifier" && node[field.name].name === "*default*") {
+      return;
+    }
     if (typeof node[field.name].type === "string") {  // subnode
       locationSanityCheck(node[field.name], loc, last);
       last = node[field.name].loc.end;

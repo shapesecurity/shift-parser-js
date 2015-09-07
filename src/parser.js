@@ -1963,7 +1963,7 @@ export class Parser extends Tokenizer {
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {
-        name = this.markLocation({ type: "BindingIdentifier", name: "*default*" }, this.getLocation());
+        name = { type: "BindingIdentifier", name: "*default*" };
       } else {
         throw this.createUnexpected(this.lookahead);
       }
@@ -2019,7 +2019,7 @@ export class Parser extends Tokenizer {
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {
-        name = this.markLocation({type: "BindingIdentifier", name: "*default*" }, this.getLocation());
+        name = {type: "BindingIdentifier", name: "*default*" };
       } else {
         throw this.createUnexpected(this.lookahead);
       }

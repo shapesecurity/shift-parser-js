@@ -180,6 +180,9 @@ export class Parser extends Tokenizer {
 
     let startLocation = this.getLocation();
     let {directives, statements} = this.parseBody();
+    if (!this.match(TokenType.EOS)) {
+      throw this.createUnexpected(this.lookahead);
+    }
     return this.markLocation({ type: "Module", directives, items: statements }, startLocation);
   }
 
@@ -187,12 +190,11 @@ export class Parser extends Tokenizer {
     this.lookahead = this.advance();
 
     let startLocation = this.getLocation();
-    let body = this.parseBody();
-    body.type = "Script";
+    let {directives, statements} = this.parseBody();
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
-    return this.markLocation(body, startLocation);
+    return this.markLocation({ type: "Script", directives, statements }, startLocation);
   }
 
   parseFunctionBody() {

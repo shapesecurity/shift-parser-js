@@ -15,6 +15,7 @@
  */
 
 var testParseFailure = require("./assertions").testParseFailure;
+var testParseModuleFailure = require("./assertions").testParseModuleFailure;
 
 // TODO: make sense of this file
 suite("Parser", function () {
@@ -75,6 +76,7 @@ suite("Parser", function () {
     testParseFailure("\u0008", "Unexpected \"\\b\"");
     testParseFailure("{", "Unexpected end of input");
     testParseFailure("}", "Unexpected token \"}\"");
+    testParseModuleFailure("}", "Unexpected token \"}\"");
     testParseFailure("3ea", "Unexpected \"a\"");
     testParseFailure("3in []", "Unexpected \"i\"");
     testParseFailure("3e", "Unexpected end of input");

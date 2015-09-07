@@ -980,19 +980,19 @@ export class Parser extends Tokenizer {
   }
 
   parseArrowExpressionTail(head, startLocation) {
-    let arrow = this.expect(TokenType.ARROW);
-
     // Convert param list.
     let {params = null, rest = null} = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
       if (head.type === "IdentifierExpression") {
         params = [this.transformDestructuring(head)];
       } else {
-        throw this.createUnexpected(arrow);
+        throw this.createUnexpected(this.lookahead);
       }
     }
 
     let paramsNode = this.markLocation({ type: "FormalParameters", items: params, rest }, startLocation);
+
+    let arrow = this.expect(TokenType.ARROW);
 
     if (this.match(TokenType.LBRACE)) {
       let previousYield = this.allowYieldExpression;

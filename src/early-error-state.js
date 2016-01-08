@@ -15,8 +15,7 @@
  */
 
 import {} from "es6-map/implement";
-import * as objectAssign from "object-assign";
-import * as MultiMap from "multimap";
+import MultiMap from "multimap";
 
 // FIXME: remove this when collections/multi-map is working
 MultiMap.prototype.addEach = function(otherMap) {

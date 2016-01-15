@@ -2081,6 +2081,8 @@ export class Parser extends Tokenizer {
           let expr = this.parseAssignmentExpression();
           defaultValue = expr;
           this.allowYieldExpression = previousAllowYieldExpression;
+        } else if (token.type === TokenType.YIELD && this.allowYieldExpression) {
+          throw this.createUnexpected(token);
         }
         return this.markLocation({
           type: "BindingPropertyIdentifier",

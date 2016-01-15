@@ -135,6 +135,10 @@ suite("Parser", function () {
 
     testParseFailure("label: function* a(){}", "Unexpected token \"*\"");
     testParseFailure("function*g(yield){}", "Unexpected token \"yield\"");
+    testParseFailure("function*g({yield}){}", "Unexpected token \"yield\"");
+    testParseFailure("function*g([yield]){}", "Unexpected token \"yield\"");
+    testParseFailure("function*g({a: yield}){}", "Unexpected token \"yield\"");
+    testParseFailure("function*g(yield = 0){}", "Unexpected token \"yield\"");
     testParseFailure("function*g(){ var yield; }", "Unexpected token \"yield\"");
     testParseFailure("function*g(){ var yield = 1; }", "Unexpected token \"yield\"");
     testParseFailure("function*g(){ function yield(){}; }", "Unexpected token \"yield\"");

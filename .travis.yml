@@ -3,14 +3,19 @@ language: node_js
 script:
   - curl https://raw.githubusercontent.com/shapesecurity/CLA/master/cla-travis.sh | bash
   - npm run build
-  - npm run generate-coverage
-  - npm run check-coverage
+  - npm test
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
 node_js:
   - "0.12"
-  - "0.11"
-  - "0.10"
-  - "iojs-2"
-  - "iojs-3"
+  - "4"
+  - "5"
 matrix:
   allow_failures:
     - node_js: "iojs-3"

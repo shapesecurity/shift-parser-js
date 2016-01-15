@@ -1,6 +1,6 @@
 {
   "name": "shift-parser",
-  "version": "4.0.1",
+  "version": "4.0.0",
   "description": "ECMAScript parser that produces a Shift format AST",
   "author": "Shape Security Labs",
   "homepage": "https://github.com/shapesecurity/shift-parser-js",
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
-    "build": "babel --auxiliary-comment-before 'istanbul ignore next' --source-maps-inline --out-dir dist src",
+    "build": "babel --auxiliary-comment-before 'istanbul ignore next' --source-maps-inline --out-dir dist src && sed -E -i'.bak' -f babel-coverage-hack.sed dist/* && rm dist/*.bak",
     "prepublish": "rm -rf dist/* && npm update && npm run build",
     "benchmark": "node benchmark",
     "profile": "node --prof profile.js && node-tick-processor",

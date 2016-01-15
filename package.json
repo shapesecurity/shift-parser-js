@@ -14,12 +14,10 @@
   ],
   "scripts": {
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
-    "build": "babel --auxiliary-comment-before 'istanbul ignore next' --source-maps-inline --out-dir dist src && sed -E -i'.bak' -f babel-coverage-hack.sed dist/* && rm dist/*.bak",
+    "build": "babel --source-maps-inline --out-dir dist src",
     "prepublish": "rm -rf dist/* && npm update && npm run build",
     "benchmark": "node benchmark",
     "profile": "node --prof profile.js && node-tick-processor",
-    "generate-coverage": "istanbul cover -x dist/pattern-acceptor.js _mocha -- --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
-    "check-coverage": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100",
     "cjsify": "npm run build && cjsify dist/index.js --no-node --export Shift --output dist/shift.js"
   },
   "dependencies": {
@@ -39,7 +37,6 @@
     "esprima": "2.5.0",
     "everything.js": "1.0.3",
     "expect.js": "0.3.1",
-    "istanbul": "0.3.17",
     "microtime": "^2.0.0",
     "mocha": "2.2.5",
     "shift-spec": "2015.2.1",

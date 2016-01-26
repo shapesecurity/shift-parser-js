@@ -58,3 +58,4 @@ export const parseModule = generateInterface("parseModule");
 export const parseScript = generateInterface("parseScript");
 export default parseScript;
 export {EarlyErrorChecker};
+export {default as Tokenizer, TokenClass, TokenType} from "./tokenizer";

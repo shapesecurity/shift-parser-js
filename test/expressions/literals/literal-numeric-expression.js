@@ -88,6 +88,7 @@ suite("Parser", function () {
     testParse("0o10", expr, { type: "LiteralNumericExpression", value: 8 });
     testParse("0O0", expr, { type: "LiteralNumericExpression", value: 0 });
     testParse("09", expr, { type: "LiteralNumericExpression", value: 9 });
+    testParse("09.0", expr, { type: "LiteralNumericExpression", value: 9 });
     testParse("018", expr, { type: "LiteralNumericExpression", value: 18 });
     testParse("'use strict'; 0o0", expr, { type: "LiteralNumericExpression", value: 0 });
 
@@ -98,6 +99,7 @@ suite("Parser", function () {
     testParseFailure("0O", "Unexpected end of input");
     testParseFailure("0O1a", "Unexpected \"a\"");
     testParseFailure("0O9", "Unexpected \"9\"");
+    testParseFailure("09.x", "Unexpected identifier");
     testParseFailure("0O18", "Unexpected \"8\"");
 
   });

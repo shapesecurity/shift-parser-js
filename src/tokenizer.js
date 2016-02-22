@@ -1014,10 +1014,22 @@ export default class Tokenizer {
       }
     }
 
+    let slice = this.getSlice(start, startLocation);
+    if (!isOctal) {
+      this.eatDecimalLiteralSuffix();
+      return {
+        type: TokenType.NUMBER,
+        slice,
+        value: +slice.text,
+        octal: true,
+        noctal: !isOctal,
+      };
+    }
+
     return {
       type: TokenType.NUMBER,
-      slice: this.getSlice(start, startLocation),
-      value: parseInt(this.getSlice(start, startLocation).text.substr(1), isOctal ? 8 : 10),
+      slice: slice,
+      value: parseInt(slice.text.substr(1), 8),
       octal: true,
       noctal: !isOctal,
     };
@@ -1074,33 +1086,35 @@ export default class Tokenizer {
       }
     }
 
-    let e = 0;
+    this.eatDecimalLiteralSuffix();
+
+    if (this.index !== this.source.length && isIdentifierStart(this.source.charCodeAt(this.index))) {
+      throw this.createILLEGAL();
+    }
+
+    let slice = this.getSlice(start, startLocation);
+    return {
+      type: TokenType.NUMBER,
+      value: +slice.text,
+      slice,
+      octal: false,
+      noctal: false,
+    };
+  }
+
+  eatDecimalLiteralSuffix() {
+    let ch = this.source.charAt(this.index);
     if (ch === ".") {
       this.index++;
       if (this.index === this.source.length) {
-        let slice = this.getSlice(start, startLocation);
-        return {
-          type: TokenType.NUMBER,
-          value: +slice.text,
-          slice,
-          octal: false,
-          noctal: false,
-        };
+        return;
       }
 
       ch = this.source.charAt(this.index);
       while ("0" <= ch && ch <= "9") {
-        e++;
         this.index++;
         if (this.index === this.source.length) {
-          let slice = this.getSlice(start, startLocation);
-          return {
-            type: TokenType.NUMBER,
-            value: +slice.text,
-            slice,
-            octal: false,
-            noctal: false,
-          };
+          return;
         }
         ch = this.source.charAt(this.index);
       }
@@ -1114,9 +1128,7 @@ export default class Tokenizer {
       }
 
       ch = this.source.charAt(this.index);
-      let neg = false;
       if (ch === "+" || ch === "-") {
-        neg = ch === "-";
         this.index++;
         if (this.index === this.source.length) {
           throw this.createILLEGAL();
@@ -1124,11 +1136,8 @@ export default class Tokenizer {
         ch = this.source.charAt(this.index);
       }
 
-      let f = 0;
       if ("0" <= ch && ch <= "9") {
         while ("0" <= ch && ch <= "9") {
-          f *= 10;
-          f += +ch;
           this.index++;
           if (this.index === this.source.length) {
             break;
@@ -1138,21 +1147,7 @@ export default class Tokenizer {
       } else {
         throw this.createILLEGAL();
       }
-      e += neg ? f : -f;
     }
-
-    if (isIdentifierStart(ch.charCodeAt(0))) {
-      throw this.createILLEGAL();
-    }
-
-    let slice = this.getSlice(start, startLocation);
-    return {
-      type: TokenType.NUMBER,
-      value: +slice.text,
-      slice,
-      octal: false,
-      noctal: false,
-    };
   }
 
   scanStringEscape(str, octal) {

@@ -1000,16 +1000,11 @@ export class Parser extends Tokenizer {
 
     let arrow = this.expect(TokenType.ARROW);
 
-    if (this.match(TokenType.LBRACE)) {
-      let previousYield = this.allowYieldExpression;
-      this.allowYieldExpression = false;
-      let body = this.parseFunctionBody();
-      this.allowYieldExpression = previousYield;
-      return this.markLocation({ type: "ArrowExpression", params: paramsNode, body }, startLocation);
-    } else {
-      let body = this.parseAssignmentExpression();
-      return this.markLocation({ type: "ArrowExpression", params: paramsNode, body }, startLocation);
-    }
+    let previousYield = this.allowYieldExpression;
+    this.allowYieldExpression = false;
+    let body = this.match(TokenType.LBRACE) ? this.parseFunctionBody() : this.parseAssignmentExpression();
+    this.allowYieldExpression = previousYield;
+    return this.markLocation({ type: "ArrowExpression", params: paramsNode, body }, startLocation);
   }
 
   parseAssignmentExpression() {

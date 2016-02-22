@@ -524,11 +524,6 @@ suite("Parser", function () {
     testEarlyError("function* g(){ ({a = yield}) => 0; }", "Arrow parameters must not contain yield expressions");
     testEarlyError("function* g(){ ([a = yield]) => 0; }", "Arrow parameters must not contain yield expressions");
     // TODO: testEarlyError("function* g(){ (...{a = yield}) => 0; }", "Arrow parameters must not contain yield expressions");
-    // It is a Syntax Error if ConciseBody Contains YieldExpression is true.
-    testEarlyError("function* g(){ () => yield; }", "Concise arrow bodies must not contain yield expressions");
-    testEarlyError("function* g(){ () => yield b; }", "Concise arrow bodies must not contain yield expressions");
-    testEarlyError("function* g(){ () => yield* b; }", "Concise arrow bodies must not contain yield expressions");
-    testEarlyError("function* g(){ () => f(x + (yield)); }", "Concise arrow bodies must not contain yield expressions");
     // It is a Syntax Error if any element of the BoundNames of ArrowParameters also occurs in the LexicallyDeclaredNames of ConciseBody.
     testEarlyError("(a) => { let a; }", "Duplicate binding \"a\"");
     testEarlyError("([a]) => { let a; }", "Duplicate binding \"a\"");

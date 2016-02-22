@@ -1074,7 +1074,6 @@ export default class Tokenizer {
       }
     }
 
-    let e = 0;
     if (ch === ".") {
       this.index++;
       if (this.index === this.source.length) {
@@ -1090,7 +1089,6 @@ export default class Tokenizer {
 
       ch = this.source.charAt(this.index);
       while ("0" <= ch && ch <= "9") {
-        e++;
         this.index++;
         if (this.index === this.source.length) {
           let slice = this.getSlice(start, startLocation);
@@ -1114,9 +1112,7 @@ export default class Tokenizer {
       }
 
       ch = this.source.charAt(this.index);
-      let neg = false;
       if (ch === "+" || ch === "-") {
-        neg = ch === "-";
         this.index++;
         if (this.index === this.source.length) {
           throw this.createILLEGAL();
@@ -1124,11 +1120,8 @@ export default class Tokenizer {
         ch = this.source.charAt(this.index);
       }
 
-      let f = 0;
       if ("0" <= ch && ch <= "9") {
         while ("0" <= ch && ch <= "9") {
-          f *= 10;
-          f += +ch;
           this.index++;
           if (this.index === this.source.length) {
             break;
@@ -1138,7 +1131,6 @@ export default class Tokenizer {
       } else {
         throw this.createILLEGAL();
       }
-      e += neg ? f : -f;
     }
 
     if (isIdentifierStart(ch.charCodeAt(0))) {

@@ -571,7 +571,7 @@ suite("Parser", function () {
           }
         ]
       }
-    )
+    );
 
     testParse("class A extends B { a() { ({b: super[c]}) = d } }", stmt,
       { type: "ClassDeclaration",
@@ -614,7 +614,28 @@ suite("Parser", function () {
           }
         ]
       }
-    )
+    );
+
+    // Consise arrow bodies may contain yield as an identifier even in generators.
+    testParse("function* f(){ () => yield; }", stmt,
+      { type: "FunctionDeclaration",
+        isGenerator: true,
+        name: {type: "BindingIdentifier", name: "f"},
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "ArrowExpression",
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: {type: "IdentifierExpression", name: "yield"}
+            }
+          }]
+        }
+      }
+    );
 
   });
 });

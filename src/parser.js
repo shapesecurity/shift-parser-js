@@ -162,8 +162,8 @@ export class Parser extends Tokenizer {
   }
 
   consumeSemicolon() {
-    if (this.hasLineTerminatorBeforeNext) return;
     if (this.eat(TokenType.SEMICOLON)) return;
+    if (this.hasLineTerminatorBeforeNext) return;
     if (!this.eof() && !this.match(TokenType.RBRACE)) {
       throw this.createUnexpected(this.lookahead);
     }
@@ -289,7 +289,6 @@ export class Parser extends Tokenizer {
   parseFromClause() {
     this.expectContextualKeyword("from");
     let value = this.expect(TokenType.STRING).str;
-    this.consumeSemicolon();
     return value;
   }
 
@@ -306,24 +305,30 @@ export class Parser extends Tokenizer {
       case TokenType.LET:
         defaultBinding = this.parseBindingIdentifier();
         if (!this.eat(TokenType.COMMA)) {
-          return this.markLocation({ type: "Import", defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() }, startLocation);
+          let decl = { type: "Import", defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() };
+          this.consumeSemicolon()
+          return this.markLocation(decl, startLocation);
         }
         break;
     }
     if (this.match(TokenType.MUL)) {
-      return this.markLocation({
+      let decl = {
         type: "ImportNamespace",
         defaultBinding,
         namespaceBinding: this.parseNameSpaceBinding(),
         moduleSpecifier: this.parseFromClause(),
-      }, startLocation);
+      };
+      this.consumeSemicolon()
+      return this.markLocation(decl, startLocation);
     } else if (this.match(TokenType.LBRACE)) {
-      return this.markLocation({
+      let decl = {
         type: "Import",
         defaultBinding,
         namedImports: this.parseNamedImports(),
         moduleSpecifier: this.parseFromClause(),
-      }, startLocation);
+      };
+      this.consumeSemicolon()
+      return this.markLocation(decl, startLocation);
     } else {
       throw this.createUnexpected(this.lookahead);
     }
@@ -360,6 +365,7 @@ export class Parser extends Tokenizer {
         this.lex();
         // export * FromClause ;
         decl = { type: "ExportAllFrom", moduleSpecifier: this.parseFromClause() };
+        this.consumeSemicolon();
         break;
       case TokenType.LBRACE:
         // export ExportClause FromClause ;
@@ -370,6 +376,7 @@ export class Parser extends Tokenizer {
           moduleSpecifier = this.parseFromClause();
         }
         decl = { type: "ExportFrom", namedExports, moduleSpecifier };
+        this.consumeSemicolon();
         break;
       case TokenType.CLASS:
         // export ClassDeclaration
@@ -731,15 +738,14 @@ export class Parser extends Tokenizer {
 
     this.lex();
 
-    if (this.hasLineTerminatorBeforeNext) {
+    // Catch the very common case first: immediately a semicolon (U+003B).
+    if (this.eat(TokenType.SEMICOLON) || this.hasLineTerminatorBeforeNext) {
       return { type: "ReturnStatement", expression: null };
     }
 
     let expression = null;
-    if (!this.match(TokenType.SEMICOLON)) {
-      if (!this.match(TokenType.RBRACE) && !this.eof()) {
-        expression = this.parseExpression();
-      }
+    if (!this.match(TokenType.RBRACE) && !this.eof()) {
+      expression = this.parseExpression();
     }
 
     this.consumeSemicolon();

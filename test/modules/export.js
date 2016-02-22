@@ -40,8 +40,6 @@ suite("Parser", function () {
 
     testExportDecl("export * from \"a\"", { type: "ExportAllFrom", moduleSpecifier: "a" });
 
-    testExportDecl("export * from \"a\"", { type: "ExportAllFrom", moduleSpecifier: "a" });
-
     testExportDecl("export {} from \"a\"", { type: "ExportFrom", namedExports: [], moduleSpecifier: "a" });
 
     testExportDecl("export {a} from \"a\"", {
@@ -313,7 +311,6 @@ suite("Parser", function () {
     testParseModule("export {};0", id,
       { type: "Module", directives: [], items: [
         { type: "ExportFrom", namedExports: [], moduleSpecifier: null },
-        { type: "EmptyStatement" },
         { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
       ] }
     );

@@ -669,6 +669,10 @@ export class Parser extends Tokenizer {
         this.allowIn = previousAllowIn;
 
         if (this.isAssignmentTarget && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
+          if (expr.type === "ObjectExpression") {
+            this.firstExprError = null;
+          }
+
           if (startsWithLet && this.matchContextualKeyword("of")) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
           }

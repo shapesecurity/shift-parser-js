@@ -20,7 +20,7 @@ var expr = require("../helpers").expr;
 var testParseFailure = require("../assertions").testParseFailure;
 
 suite("Parser", function () {
-  suite("grouped expressiones", function () {
+  suite("grouped expressions", function () {
     // grouped expression that can be binding element and assignment target
     testParse("(a)", expr, { type: "IdentifierExpression", name: "a" });
 

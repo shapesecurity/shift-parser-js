@@ -137,5 +137,7 @@ suite("Parser", function () {
     testParseFailure("for(let a = 0 of b);", "Invalid variable declaration in for-of statement");
     testParseFailure("for(const a = 0 of b);", "Invalid variable declaration in for-of statement");
 
+    testParseFailure("for(({a}) of 0);", "Invalid left-hand side in for-of");
+    testParseFailure("for(([a]) of 0);", "Invalid left-hand side in for-of");
   });
 });

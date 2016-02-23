@@ -15,6 +15,7 @@
  */
 
 var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
@@ -221,6 +222,7 @@ suite("Parser", function () {
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
-    // TODO: add some assignment failure tests
+    testParseFailure("(({a})=0);", "Invalid left-hand side in assignment");
+    testParseFailure("(([a])=0);", "Invalid left-hand side in assignment");
   });
 });

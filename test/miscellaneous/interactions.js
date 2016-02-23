@@ -573,7 +573,7 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A extends B { a() { ({b: super[c]}) = d } }", stmt,
+    testParse("class A extends B { a() { ({b: super[c]} = d) } }", stmt,
       { type: "ClassDeclaration",
         name: { type: "BindingIdentifier", name: "A" },
         super: { type: "IdentifierExpression", name: "B" },

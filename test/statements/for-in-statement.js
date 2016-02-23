@@ -150,5 +150,8 @@ suite("Parser", function () {
     testParseFailure("for(let a = 0 in b);", "Invalid variable declaration in for-in statement");
     testParseFailure("for(const a = 0 in b);", "Invalid variable declaration in for-in statement");
     testParseFailure("for(let ? b : c in 0);", "Invalid left-hand side in for-in");
+    
+    testParseFailure("for(({a}) in 0);", "Invalid left-hand side in for-in");
+    testParseFailure("for(([a]) in 0);", "Invalid left-hand side in for-in");
   });
 });

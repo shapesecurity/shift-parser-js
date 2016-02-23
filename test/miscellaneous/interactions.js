@@ -637,5 +637,19 @@ suite("Parser", function () {
       }
     );
 
+    // CompoundAssignmentExpressions are not valid binding targets
+    testParse("null && (x += null)", expr,
+      { type: "BinaryExpression",
+        operator: "&&",
+        left: { type: "LiteralNullExpression" },
+        right: {
+          type: "CompoundAssignmentExpression",
+          operator: "+=",
+          binding: { type: "BindingIdentifier", name: "x" },
+          expression: { type: "LiteralNullExpression" } } }
+    );
+
+    testParseFailure("({a: b += 0} = {})", "Invalid left-hand side in assignment");
+    testParseFailure("[a += b] = []", "Invalid left-hand side in assignment");
   });
 });

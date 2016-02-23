@@ -1066,12 +1066,15 @@ export class Parser extends Tokenizer {
     let rhs = this.parseAssignmentExpression();
 
     this.firstExprError = null;
-    return this.markLocation(
-      operator.type === TokenType.ASSIGN
-        ? { type: "AssignmentExpression", binding: expr, expression: rhs }
-        : { type: "CompoundAssignmentExpression", binding: expr, operator: operator.type.name, expression: rhs }
-    , startLocation
-    );
+    let node;
+    if (operator.type === TokenType.ASSIGN) {
+      node = { type: "AssignmentExpression", binding: expr, expression: rhs };
+    }
+    else {
+      node = { type: "CompoundAssignmentExpression", binding: expr, operator: operator.type.name, expression: rhs };
+      this.isBindingElement = this.isAssignmentTarget = false;
+    }
+    return this.markLocation(node, startLocation);
   }
 
   transformDestructuring(node) {

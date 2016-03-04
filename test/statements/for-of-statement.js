@@ -130,6 +130,22 @@ suite("Parser", function () {
       body: { type: "EmptyStatement" }
     });
 
+    testParse("for([{a=0}] of b);", stmt, {
+      type: "ForOfStatement",
+      left: {
+        type: "ArrayBinding",
+        restElement: null,
+        elements: [{
+          type: "ObjectBinding",
+          properties: [{
+            type: "BindingPropertyIdentifier",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: { type: "LiteralNumericExpression", value: 0 } }]
+        }]},
+      right: { type: "IdentifierExpression", name: "b" },
+      body: { type: "EmptyStatement" }
+    });
+
     testParseFailure("for(let of 0);", "Unexpected number");
     testParseFailure("for(this of 0);", "Invalid left-hand side in for-of");
 

@@ -670,7 +670,7 @@ export class Parser extends Tokenizer {
         this.allowIn = previousAllowIn;
 
         if ((isValidSimpleAssignmentTarget(expr) || this.isAssignmentTarget) && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) { // the first condition is an `or` because groups are not assignment targets, but `for((a) in 0);` is a program
-          if (expr.type === "ObjectExpression") {
+          if (expr.type === "ObjectExpression" || expr.type === "ArrayExpression") {
             this.firstExprError = null;
           }
           if (startsWithLet && this.matchContextualKeyword("of")) {

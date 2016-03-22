@@ -206,7 +206,6 @@ export class Parser extends Tokenizer {
     let oldStrict = this.strict;
     this.inFunctionBody = true;
     this.module = false;
-    this.strict = false;
 
     this.expect(TokenType.LBRACE);
     let body = this.parseBody();

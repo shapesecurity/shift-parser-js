@@ -142,6 +142,7 @@ suite("Parser", function () {
     testParseFailure("\"\\1\"; \"use strict\"; null;", "Unexpected legacy octal escape sequence: \\1");
     testParseFailure("\"use strict\"; \"\\1\";", "Unexpected legacy octal escape sequence: \\1");
     testParseFailure("\"use strict\"; \"\\1\"; null;", "Unexpected legacy octal escape sequence: \\1");
+    testParseFailure("\"use strict\"; function f(){\"\\1\";}", "Unexpected legacy octal escape sequence: \\1");
 
   });
 });

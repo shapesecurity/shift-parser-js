@@ -669,6 +669,10 @@ export default class Tokenizer {
       if (ch !== "}") {
         throw this.createILLEGAL();
       }
+      if (i === this.index + 1) {
+        ++this.index; // This is so that the error is 'Unexpected "}"' instead of 'Unexpected "{"'.
+        throw this.createILLEGAL();
+      }
       this.index = i + 1;
       return hexDigits;
     } else {

@@ -18,6 +18,7 @@ var expr = require("./helpers").expr;
 var stmt = require("./helpers").stmt;
 
 var testParse = require("./assertions").testParse;
+var testParseFailure = require("./assertions").testParseFailure;
 var testParseModule = require("./assertions").testParseModule;
 
 function directives(program) {
@@ -135,7 +136,12 @@ suite("Parser", function () {
         directives: [{ type: "Directive", rawValue: "use strict" } ],
         items: []
       }
-    )
+    );
+
+    testParseFailure("\"\\1\"; \"use strict\";", "Unexpected legacy octal escape sequence: \\1");
+    testParseFailure("\"\\1\"; \"use strict\"; null;", "Unexpected legacy octal escape sequence: \\1");
+    testParseFailure("\"use strict\"; \"\\1\";", "Unexpected legacy octal escape sequence: \\1");
+    testParseFailure("\"use strict\"; \"\\1\"; null;", "Unexpected legacy octal escape sequence: \\1");
 
   });
 });

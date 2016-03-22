@@ -220,7 +220,7 @@ export class Parser extends Tokenizer {
   }
 
   parseBody() {
-    let directives = [], statements = [], parsingDirectives = true;
+    let directives = [], statements = [], parsingDirectives = true, directiveOctal = null;
 
     while (true) {
       if (this.eof() || this.match(TokenType.RBRACE)) break;
@@ -232,6 +232,9 @@ export class Parser extends Tokenizer {
       let stmt = isModule ? this.parseModuleItem() : this.parseStatementListItem();
       if (parsingDirectives) {
         if (isStringLiteral && stmt.type === "ExpressionStatement" && stmt.expression.type === "LiteralStringExpression") {
+          if (!directiveOctal && token.octal) {
+            directiveOctal = this.createErrorWithLocation(directiveLocation, "Unexpected legacy octal escape sequence: \\" + token.octal);
+          }
           let rawValue = text.slice(1, -1);
           if (rawValue === "use strict") {
             this.strict = true;
@@ -239,11 +242,17 @@ export class Parser extends Tokenizer {
           directives.push(this.markLocation({ type: "Directive", rawValue }, directiveLocation));
         } else {
           parsingDirectives = false;
+          if (directiveOctal && this.strict) {
+            throw directiveOctal;
+          }
           statements.push(stmt);
         }
       } else {
         statements.push(stmt);
       }
+    }
+    if (directiveOctal && this.strict) {
+      throw directiveOctal;
     }
 
     return { type: "FunctionBody", directives, statements };

@@ -56,10 +56,9 @@ suite("Parser", function () {
     testParseFailure("[0] = 0;", "Invalid left-hand side in assignment");
     // It is an early Reference Error if LeftHandSideExpression is neither an ObjectLiteral nor an ArrayLiteral and IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.
     testParseFailure("0 = 0;", "Invalid left-hand side in assignment");
-    // TODO:
-    //testParseFailure("({a}) = 0;", "Invalid left-hand side in assignment");
-    //testParseFailure("([a]) = 0;", "Invalid left-hand side in assignment");
     // It is an early Reference Error if IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.
+    testParseFailure("({a}) = 0;", "Invalid left-hand side in assignment");
+    testParseFailure("([a]) = 0;", "Invalid left-hand side in assignment");
     testParseFailure("({a} += 0);", "Invalid left-hand side in assignment");
     testParseFailure("[a] *= 0;", "Invalid left-hand side in assignment");
     testParseFailure("0 /= 0;", "Invalid left-hand side in assignment");

@@ -704,9 +704,12 @@ suite("Parser", function () {
     testModuleEarlyError("export let a; export {a};", "Duplicate export \"a\"");
     testModuleEarlyError("export {a}; export const a = 0;", "Duplicate export \"a\"");
     testModuleEarlyError("export let a; let b; export {b as a};", "Duplicate export \"a\"");
-    testModuleEarlyError("export default 0; export default 0;", "Duplicate export \"*default*\"");
-    testModuleEarlyError("export default 0; export default function f(){};", "Duplicate export \"*default*\"");
-    testModuleEarlyError("export default 0; export default class a {};", "Duplicate export \"*default*\"");
+    testModuleEarlyError("export default 0; export default 0;", "Duplicate export \"default\"");
+    testModuleEarlyError("export default 0; export default function f(){};", "Duplicate export \"default\"");
+    testModuleEarlyError("export default 0; export default class a {};", "Duplicate export \"default\"");
+    testModuleEarlyError("var x; export default function() {} export { x as default };", "Duplicate export \"default\"");
+    testModuleEarlyError("var x; export default class {} export { x as default };", "Duplicate export \"default\"");
+    testModuleEarlyError("var x, y; export default x; export { y as default };", "Duplicate export \"default\"");
     // It is a Syntax Error if any element of the ExportedBindings of ModuleItemList does not also occur in either the VarDeclaredNames of ModuleItemList, or the LexicallyDeclaredNames of ModuleItemList.
     testModuleEarlyError("export {a};", "Exported binding \"a\" is not declared");
     testModuleEarlyError("export {b as a};", "Exported binding \"b\" is not declared");

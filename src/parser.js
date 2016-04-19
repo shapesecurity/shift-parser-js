@@ -677,7 +677,7 @@ export class Parser extends Tokenizer {
         let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
         this.allowIn = previousAllowIn;
 
-        if ((isValidSimpleAssignmentTarget(expr) || this.isAssignmentTarget) && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) { // the first condition is an `or` because groups are not assignment targets, but `for((a) in 0);` is a program
+        if (this.isAssignmentTarget && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
           if (expr.type === "ObjectExpression" || expr.type === "ArrayExpression") {
             this.firstExprError = null;
           }
@@ -1062,7 +1062,7 @@ export class Parser extends Tokenizer {
       }
       expr = this.transformDestructuring(expr);
     } else if (operator.type === TokenType.ASSIGN) {
-      if (!isValidSimpleAssignmentTarget(expr) && !this.isAssignmentTarget) { // the first condition is present because groups do not have isAssignmentTarget set, but `(a)=1` is a program.
+      if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
       }
       expr = this.transformDestructuring(expr);
@@ -1735,7 +1735,10 @@ export class Parser extends Tokenizer {
       if (rest) {
         this.ensureArrow();
       }
-      this.isBindingElement = this.isAssignmentTarget = false;
+      this.isBindingElement = false;
+      if (!isValidSimpleAssignmentTarget(group)) {
+        this.isAssignmentTarget = false;
+      }
       return group;
     }
   }

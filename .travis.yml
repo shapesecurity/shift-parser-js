@@ -4,6 +4,11 @@ script:
   - curl https://raw.githubusercontent.com/shapesecurity/CLA/master/cla-travis.sh | bash
   - npm run build
   - npm test
+node_js:
+  - "0.12"
+  - "4"
+  - "6"
+# the following config is needed for the "microtime" native node module
 env:
   - CXX=g++-4.8
 addons:
@@ -12,10 +17,3 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-node_js:
-  - "0.12"
-  - "4"
-  - "5"
-matrix:
-  allow_failures:
-    - node_js: "iojs-3"

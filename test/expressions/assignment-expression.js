@@ -23,35 +23,35 @@ suite("Parser", function () {
     testParse("a=0;", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "a" },
+        binding: { type: "AssignmentTargetIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
     testParse("(a)=(0);", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "a" },
+        binding: { type: "AssignmentTargetIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
     testParse("x = 0", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
     testParse("eval = 0", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "eval" },
+        binding: { type: "AssignmentTargetIdentifier", name: "eval" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
     testParse("arguments = 0", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "arguments" },
+        binding: { type: "AssignmentTargetIdentifier", name: "arguments" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -59,7 +59,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "*=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -67,7 +67,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "*=",
-        binding: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "x" }, property: "x" },
+        binding: { type: "StaticMemberAssignmentTarget", object: { type: "IdentifierExpression", name: "x" }, property: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -75,7 +75,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "/=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -83,7 +83,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "%=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -91,7 +91,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "+=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -99,7 +99,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "-=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -107,7 +107,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "<<=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -115,7 +115,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: ">>=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -123,7 +123,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: ">>>=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -131,7 +131,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "&=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -139,7 +139,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "^=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -147,7 +147,7 @@ suite("Parser", function () {
       {
         type: "CompoundAssignmentExpression",
         operator: "|=",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -156,7 +156,7 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: {
-          type: "ComputedMemberExpression",
+          type: "ComputedMemberAssignmentTarget",
           object: { type: "IdentifierExpression", name: "eval" },
           expression: { type: "LiteralNumericExpression", value: 0 }
         },
@@ -168,7 +168,7 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: {
-          type: "ComputedMemberExpression",
+          type: "ComputedMemberAssignmentTarget",
           object: { type: "IdentifierExpression", name: "arguments" },
           expression: { type: "LiteralNumericExpression", value: 0 }
         },
@@ -179,14 +179,14 @@ suite("Parser", function () {
     testParse("((((((((((((((((((((((((((((((((((((((((a)))))))))))))))))))))))))))))))))))))))) = 0", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "a" },
+        binding: { type: "AssignmentTargetIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
     testParse("((((((((((((((((((((((((((((((((((((((((a.a)))))))))))))))))))))))))))))))))))))))) = 0", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "a" },
+        binding: { type: "StaticMemberAssignmentTarget", object: { type: "IdentifierExpression", name: "a" }, property: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
@@ -194,7 +194,7 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: {
-          type: "StaticMemberExpression",
+          type: "StaticMemberAssignmentTarget",
           object: {
             type: "ArrayExpression",
             elements: [
@@ -210,7 +210,7 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: {
-          type: "StaticMemberExpression",
+          type: "StaticMemberAssignmentTarget",
           object: {
             type: "ArrayExpression",
             elements: [

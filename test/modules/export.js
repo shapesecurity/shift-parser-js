@@ -44,76 +44,73 @@ suite("Parser", function () {
 
     testExportDecl("export {a} from \"a\"", {
       type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
+      namedExports: [{ type: "ExportFromSpecifier", name: "a", exportedName: null }],
       moduleSpecifier: "a"
     });
 
     testExportDecl("export {a,} from \"a\"", {
       type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
+      namedExports: [{ type: "ExportFromSpecifier", name: "a", exportedName: null }],
       moduleSpecifier: "a"
     });
 
     testExportDecl("export {a,b} from \"a\"", {
       type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }, {
-        type: "ExportSpecifier",
-        name: null,
-        exportedName: "b"
+      namedExports: [{ type: "ExportFromSpecifier", name: "a", exportedName: null }, {
+        type: "ExportFromSpecifier",
+        name: "b",
+        exportedName: null
       }],
       moduleSpecifier: "a"
     });
 
     testExportDecl("export {a as b} from \"a\"", {
       type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: "a", exportedName: "b" }],
+      namedExports: [{ type: "ExportFromSpecifier", name: "a", exportedName: "b" }],
       moduleSpecifier: "a"
     });
 
     testExportDecl("export {as as as} from \"as\"", {
       type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: "as", exportedName: "as" }],
+      namedExports: [{ type: "ExportFromSpecifier", name: "as", exportedName: "as" }],
       moduleSpecifier: "as"
     });
 
     testExportDecl("export {as as function} from \"as\"", {
       type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: "as", exportedName: "function" }],
+      namedExports: [{ type: "ExportFromSpecifier", name: "as", exportedName: "function" }],
       moduleSpecifier: "as"
     });
 
     testExportDecl("export {a} from \"m\"", {
       type: "ExportFrom",
-      namedExports: [ { type: "ExportSpecifier", name: null, exportedName: "a" } ],
+      namedExports: [ { type: "ExportFromSpecifier", name: "a", exportedName: null } ],
       moduleSpecifier: "m"
     });
 
     testExportDecl("export {if as var} from \"a\";", {
       type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: "if", exportedName: "var" }],
+      namedExports: [{ type: "ExportFromSpecifier", name: "if", exportedName: "var" }],
       moduleSpecifier: "a"
     });
 
     testExportDecl("export {a}\n var a;", {
-      type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
-      moduleSpecifier: null
+      type: "ExportLocals",
+      namedExports: [{ type: "ExportLocalSpecifier", name: { type: "IdentifierExpression", name: "a" }, exportedName: null }],
     });
 
     testExportDecl("export {a,}\n var a;", {
-      type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }],
-      moduleSpecifier: null
+      type: "ExportLocals",
+      namedExports: [{ type: "ExportLocalSpecifier", name: { type: "IdentifierExpression", name: "a" }, exportedName: null }],
     });
 
     testExportDecl("export {a,b,}\n var a,b;", {
-      type: "ExportFrom",
-      namedExports: [{ type: "ExportSpecifier", name: null, exportedName: "a" }, {
-        type: "ExportSpecifier",
-        name: null,
-        exportedName: "b"
-      }],
-      moduleSpecifier: null
+      type: "ExportLocals",
+      namedExports: [{ type: "ExportLocalSpecifier", name: { type: "IdentifierExpression", name: "a" }, exportedName: null }, {
+        type: "ExportLocalSpecifier",
+        name: { type: "IdentifierExpression", name: "b" },
+        exportedName: null
+      }]
     });
 
     testExportDecl(
@@ -178,7 +175,7 @@ suite("Parser", function () {
           kind: "let",
           declarators: [{
             type: "VariableDeclarator",
-            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null },
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], rest: null },
             init: { type: "LiteralNumericExpression", value: 0 }
           }]
         }
@@ -310,7 +307,7 @@ suite("Parser", function () {
 
     testParseModule("export {};0", id,
       { type: "Module", directives: [], items: [
-        { type: "ExportFrom", namedExports: [], moduleSpecifier: null },
+        { type: "ExportLocals", namedExports: [] },
         { type: "ExpressionStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
       ] }
     );

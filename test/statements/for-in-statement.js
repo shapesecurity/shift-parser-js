@@ -30,7 +30,7 @@ suite("Parser", function () {
                 callee: { type: "IdentifierExpression", name: "process" },
                 arguments:
                   [ { type: "IdentifierExpression", name: "x" } ] } },
-        left: { type: "BindingIdentifier", name: "x" },
+        left: { type: "AssignmentTargetIdentifier", name: "x" },
         right: { type: "IdentifierExpression", name: "list" } }
     );
 
@@ -90,14 +90,14 @@ suite("Parser", function () {
     testParse("for(a in b);", stmt,
       { type: "ForInStatement",
         body: { type: "EmptyStatement" },
-        left: { type: "BindingIdentifier", name: "a" },
+        left: { type: "AssignmentTargetIdentifier", name: "a" },
         right: { type: "IdentifierExpression", name: "b" } }
     );
 
     testParse("for(a in b);", stmt,
       {
         type: "ForInStatement",
-        left: { type: "BindingIdentifier", name: "a" },
+        left: { type: "AssignmentTargetIdentifier", name: "a" },
         right: { type: "IdentifierExpression", name: "b" },
         body: { type: "EmptyStatement" }
       }
@@ -106,7 +106,7 @@ suite("Parser", function () {
     testParse("for(a.b in c);", stmt,
       {
         type: "ForInStatement",
-        left: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "a" }, property: "b" },
+        left: { type: "StaticMemberAssignmentTarget", object: { type: "IdentifierExpression", name: "a" }, property: "b" },
         right: { type: "IdentifierExpression", name: "c" },
         body: { type: "EmptyStatement" }
       }
@@ -137,10 +137,10 @@ suite("Parser", function () {
     testParse("for({a=0} in b);", stmt, {
       type: "ForInStatement",
       left: {
-        type: "ObjectBinding",
+        type: "ObjectAssignmentTarget",
         properties: [{
-          type: "BindingPropertyIdentifier",
-          binding: { type: "BindingIdentifier", name: "a" },
+          type: "AssignmentTargetPropertyIdentifier",
+          binding: { type: "AssignmentTargetIdentifier", name: "a" },
           init: { type: "LiteralNumericExpression", value: 0 } }]
       },
       right: { type: "IdentifierExpression", name: "b" },
@@ -150,13 +150,13 @@ suite("Parser", function () {
     testParse("for([{a=0}] in b);", stmt, {
       type: "ForInStatement",
       left: {
-        type: "ArrayBinding",
-        restElement: null,
+        type: "ArrayAssignmentTarget",
+        rest: null,
         elements: [{
-          type: "ObjectBinding",
+          type: "ObjectAssignmentTarget",
           properties: [{
-            type: "BindingPropertyIdentifier",
-            binding: { type: "BindingIdentifier", name: "a" },
+            type: "AssignmentTargetPropertyIdentifier",
+            binding: { type: "AssignmentTargetIdentifier", name: "a" },
             init: { type: "LiteralNumericExpression", value: 0 } }]
         }]},
       right: { type: "IdentifierExpression", name: "b" },

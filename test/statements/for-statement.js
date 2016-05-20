@@ -38,7 +38,7 @@ suite("Parser", function () {
         type: "ForStatement",
         init: {
           type: "AssignmentExpression",
-          binding: { type: "BindingIdentifier", name: "x" },
+          binding: { type: "AssignmentTargetIdentifier", name: "x" },
           expression: { type: "LiteralNumericExpression", value: 0 }
         },
         test: null,
@@ -129,7 +129,7 @@ suite("Parser", function () {
         update:
           { type: "UpdateExpression",
             isPrefix: false,
-            operand: { type: "BindingIdentifier", name: "x" },
+            operand: { type: "AssignmentTargetIdentifier", name: "x" },
             operator: "++" } }
     );
 
@@ -150,7 +150,7 @@ suite("Parser", function () {
         update:
           { type: "UpdateExpression",
             isPrefix: false,
-            operand: { type: "BindingIdentifier", name: "x" },
+            operand: { type: "AssignmentTargetIdentifier", name: "x" },
             operator: "++" } }
     );
 

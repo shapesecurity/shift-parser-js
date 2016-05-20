@@ -25,10 +25,10 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "x" },
+              type: "AssignmentTargetPropertyIdentifier",
+              binding: { type: "AssignmentTargetIdentifier", name: "x" },
               init: null
             }]
           },
@@ -40,10 +40,10 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "x" },
+              type: "AssignmentTargetPropertyIdentifier",
+              binding: { type: "AssignmentTargetIdentifier", name: "x" },
               init: null
             }]
           },
@@ -55,12 +55,12 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "x" },
+              type: "AssignmentTargetPropertyIdentifier",
+              binding: { type: "AssignmentTargetIdentifier", name: "x" },
               init: null
-            }, { type: "BindingPropertyIdentifier", binding: { type: "BindingIdentifier", name: "y" }, init: null }]
+            }, { type: "AssignmentTargetPropertyIdentifier", binding: { type: "AssignmentTargetIdentifier", name: "y" }, init: null }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -70,12 +70,12 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "x" },
+              type: "AssignmentTargetPropertyIdentifier",
+              binding: { type: "AssignmentTargetIdentifier", name: "x" },
               init: null
-            }, { type: "BindingPropertyIdentifier", binding: { type: "BindingIdentifier", name: "y" }, init: null }]
+            }, { type: "AssignmentTargetPropertyIdentifier", binding: { type: "AssignmentTargetIdentifier", name: "y" }, init: null }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -85,11 +85,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "ComputedPropertyName", expression: { type: "IdentifierExpression", name: "a" } },
-              binding: { type: "BindingIdentifier", name: "a" }
+              binding: { type: "AssignmentTargetIdentifier", name: "a" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 1 }
@@ -100,10 +100,10 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "x" },
+              type: "AssignmentTargetPropertyIdentifier",
+              binding: { type: "AssignmentTargetIdentifier", name: "x" },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
           },
@@ -115,10 +115,10 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyIdentifier",
-              binding: { type: "BindingIdentifier", name: "x" },
+              type: "AssignmentTargetPropertyIdentifier",
+              binding: { type: "AssignmentTargetIdentifier", name: "x" },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
           },
@@ -131,11 +131,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "x" },
-              binding: { type: "BindingIdentifier", name: "y" }
+              binding: { type: "AssignmentTargetIdentifier", name: "y" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -146,11 +146,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "x" },
-              binding: { type: "BindingIdentifier", name: "y" }
+              binding: { type: "AssignmentTargetIdentifier", name: "y" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -161,11 +161,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "var" },
-              binding: { type: "BindingIdentifier", name: "x" }
+              binding: { type: "AssignmentTargetIdentifier", name: "x" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -176,11 +176,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "x" },
-              binding: { type: "BindingIdentifier", name: "y" }
+              binding: { type: "AssignmentTargetIdentifier", name: "y" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -191,11 +191,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "x" },
-              binding: { type: "BindingIdentifier", name: "y" }
+              binding: { type: "AssignmentTargetIdentifier", name: "y" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -206,11 +206,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "0" },
-              binding: { type: "BindingIdentifier", name: "y" }
+              binding: { type: "AssignmentTargetIdentifier", name: "y" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -221,15 +221,15 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "0" },
-              binding: { type: "BindingIdentifier", name: "x" }
+              binding: { type: "AssignmentTargetIdentifier", name: "x" }
             }, {
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "1" },
-              binding: { type: "BindingIdentifier", name: "x" }
+              binding: { type: "AssignmentTargetIdentifier", name: "x" }
             }]
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -240,13 +240,13 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "x" },
               binding: {
-                type: "BindingWithDefault",
-                binding: { type: "BindingIdentifier", name: "y" },
+                type: "AssignmentTargetWithDefault",
+                binding: { type: "AssignmentTargetIdentifier", name: "y" },
                 init: { type: "LiteralNumericExpression", value: 0 }
               }
             }]
@@ -259,16 +259,16 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "x" },
               binding: {
-                type: "BindingWithDefault",
-                binding: { type: "BindingIdentifier", name: "y" },
+                type: "AssignmentTargetWithDefault",
+                binding: { type: "AssignmentTargetIdentifier", name: "y" },
                 init: {
                   type: "AssignmentExpression",
-                  binding: { type: "BindingIdentifier", name: "z" },
+                  binding: { type: "AssignmentTargetIdentifier", name: "z" },
                   expression: { type: "LiteralNumericExpression", value: 0 }
                 }
               }
@@ -282,16 +282,16 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [{
-              type: "BindingPropertyProperty",
+              type: "AssignmentTargetPropertyProperty",
               name: { type: "StaticPropertyName", value: "x" },
               binding: {
-                type: "BindingWithDefault",
+                type: "AssignmentTargetWithDefault",
                 binding: {
-                  type: "ArrayBinding",
-                  elements: [{ type: "BindingIdentifier", name: "y" }],
-                  restElement: null
+                  type: "ArrayAssignmentTarget",
+                  elements: [{ type: "AssignmentTargetIdentifier", name: "y" }],
+                  rest: null
                 },
                 init: { type: "LiteralNumericExpression", value: 0 }
               }
@@ -305,12 +305,12 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [
               {
-                type: "BindingPropertyProperty",
+                type: "AssignmentTargetPropertyProperty",
                 name: { type: "StaticPropertyName", value: "a" },
-                binding: { type: "BindingIdentifier", name: "let" }
+                binding: { type: "AssignmentTargetIdentifier", name: "let" }
               }
             ]
           },
@@ -321,11 +321,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [
               {
-                type: "BindingPropertyIdentifier",
-                binding: { type: "BindingIdentifier", name: "let" },
+                type: "AssignmentTargetPropertyIdentifier",
+                binding: { type: "AssignmentTargetIdentifier", name: "let" },
                 init: null
               }
             ]
@@ -337,12 +337,12 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [
               {
-                type: "BindingPropertyProperty",
+                type: "AssignmentTargetPropertyProperty",
                 name: { type: "StaticPropertyName", value: "a" },
-                binding: { type: "BindingIdentifier", name: "yield" }
+                binding: { type: "AssignmentTargetIdentifier", name: "yield" }
               }
             ]
           },
@@ -353,11 +353,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [
               {
-                type: "BindingPropertyIdentifier",
-                binding: { type: "BindingIdentifier", name: "yield" },
+                type: "AssignmentTargetPropertyIdentifier",
+                binding: { type: "AssignmentTargetIdentifier", name: "yield" },
                 init: null
               }
             ]
@@ -369,11 +369,11 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ObjectBinding",
+            type: "ObjectAssignmentTarget",
             properties: [
               {
-                type: "BindingPropertyIdentifier",
-                binding: { type: "BindingIdentifier", name: "yield" },
+                type: "AssignmentTargetPropertyIdentifier",
+                binding: { type: "AssignmentTargetIdentifier", name: "yield" },
                 init: { type: "LiteralNumericExpression", value: 0 }
               }
             ]
@@ -395,13 +395,13 @@ suite("Parser", function () {
               expression: {
                 type: "AssignmentExpression",
                 binding: {
-                  type: "ArrayBinding",
+                  type: "ArrayAssignmentTarget",
                   elements: [],
-                  restElement: {
-                    type: "ObjectBinding",
+                  rest: {
+                    type: "ObjectAssignmentTarget",
                     properties: [{
-                      type: "BindingPropertyIdentifier",
-                      binding: { type: "BindingIdentifier", name: "x" },
+                      type: "AssignmentTargetPropertyIdentifier",
+                      binding: { type: "AssignmentTargetIdentifier", name: "x" },
                       init: { type: "YieldExpression", expression: null }
                     }]
                   }

@@ -24,7 +24,7 @@ suite("Parser", function () {
     suite("let as binding identifier", function () {
       testParse("for(let in 0);", stmt,
         { type: "ForInStatement",
-          left: { type: "BindingIdentifier", name: "let" },
+          left: { type: "AssignmentTargetIdentifier", name: "let" },
           right: { type: "LiteralNumericExpression", value: 0},
           body: { type: "EmptyStatement"}
         }

@@ -56,7 +56,7 @@ suite("Parser", function () {
     testParse("for(a of b);", stmt,
       {
         type: "ForOfStatement",
-        left: { type: "BindingIdentifier", name: "a" },
+        left: { type: "AssignmentTargetIdentifier", name: "a" },
         right: { type: "IdentifierExpression", name: "b" },
         body: { type: "EmptyStatement" }
       }
@@ -73,7 +73,7 @@ suite("Parser", function () {
             binding: {
               type: "ArrayBinding",
               elements: [{ type: "BindingIdentifier", name: "a" }],
-              restElement: null
+              rest: null
             },
             init: null
           }]
@@ -120,10 +120,10 @@ suite("Parser", function () {
     testParse("for({a=0} of b);", stmt, {
       type: "ForOfStatement",
       left: {
-        type: "ObjectBinding",
+        type: "ObjectAssignmentTarget",
         properties: [{
-          type: "BindingPropertyIdentifier",
-          binding: { type: "BindingIdentifier", name: "a" },
+          type: "AssignmentTargetPropertyIdentifier",
+          binding: { type: "AssignmentTargetIdentifier", name: "a" },
           init: { type: "LiteralNumericExpression", value: 0 } }]
       },
       right: { type: "IdentifierExpression", name: "b" },
@@ -133,13 +133,13 @@ suite("Parser", function () {
     testParse("for([{a=0}] of b);", stmt, {
       type: "ForOfStatement",
       left: {
-        type: "ArrayBinding",
-        restElement: null,
+        type: "ArrayAssignmentTarget",
+        rest: null,
         elements: [{
-          type: "ObjectBinding",
+          type: "ObjectAssignmentTarget",
           properties: [{
-            type: "BindingPropertyIdentifier",
-            binding: { type: "BindingIdentifier", name: "a" },
+            type: "AssignmentTargetPropertyIdentifier",
+            binding: { type: "AssignmentTargetIdentifier", name: "a" },
             init: { type: "LiteralNumericExpression", value: 0 } }]
         }]},
       right: { type: "IdentifierExpression", name: "b" },

@@ -32,7 +32,8 @@ function markLocation(node, location) {
 }
 
 function generateInterface(parsingFunctionName) {
-  return function parse(code, {loc = false, earlyErrors = true} = {}) {
+  return function parse(code, { loc = false, earlyErrors = true } = {}) {
+    earlyErrors = false;  // todo reenable early errors
     let parser = new Parser(code);
     if (loc) {
       parser.markLocation = markLocation;

@@ -24,56 +24,56 @@ suite("Parser", function () {
     testParse("++a", expr,
       { type: "UpdateExpression",
         isPrefix: true,
-        operand: { type: "BindingIdentifier", name: "a" },
+        operand: { type: "AssignmentTargetIdentifier", name: "a" },
         operator: "++" }
     );
 
     testParse("--a", expr,
       { type: "UpdateExpression",
         isPrefix: true,
-        operand: { type: "BindingIdentifier", name: "a" },
+        operand: { type: "AssignmentTargetIdentifier", name: "a" },
         operator: "--" }
     );
 
     testParse("x++", expr,
       { type: "UpdateExpression",
         isPrefix: false,
-        operand: { type: "BindingIdentifier", name: "x" },
+        operand: { type: "AssignmentTargetIdentifier", name: "x" },
         operator: "++" }
     );
 
     testParse("x--", expr,
       { type: "UpdateExpression",
         isPrefix: false,
-        operand: { type: "BindingIdentifier", name: "x" },
+        operand: { type: "AssignmentTargetIdentifier", name: "x" },
         operator: "--" }
     );
 
     testParse("eval++", expr,
       { type: "UpdateExpression",
         isPrefix: false,
-        operand: { type: "BindingIdentifier", name: "eval" },
+        operand: { type: "AssignmentTargetIdentifier", name: "eval" },
         operator: "++" }
     );
 
     testParse("eval--", expr,
       { type: "UpdateExpression",
         isPrefix: false,
-        operand: { type: "BindingIdentifier", name: "eval" },
+        operand: { type: "AssignmentTargetIdentifier", name: "eval" },
         operator: "--" }
     );
 
     testParse("arguments++", expr,
       { type: "UpdateExpression",
         isPrefix: false,
-        operand: { type: "BindingIdentifier", name: "arguments" },
+        operand: { type: "AssignmentTargetIdentifier", name: "arguments" },
         operator: "++" }
     );
 
     testParse("arguments--", expr,
       { type: "UpdateExpression",
         isPrefix: false,
-        operand: { type: "BindingIdentifier", name: "arguments" },
+        operand: { type: "AssignmentTargetIdentifier", name: "arguments" },
         operator: "--" }
     );
   });

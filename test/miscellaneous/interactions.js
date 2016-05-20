@@ -256,7 +256,7 @@ suite("Parser", function () {
     testParse("/* assignment */\n a = b", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "a" },
+        binding: { type: "AssignmentTargetIdentifier", name: "a" },
         expression: { type: "IdentifierExpression", name: "b" }
       }
     );
@@ -494,7 +494,7 @@ suite("Parser", function () {
            left:
             { type: "UpdateExpression",
               isPrefix: false,
-              operand: { type: "BindingIdentifier", name: "i" },
+              operand: { type: "AssignmentTargetIdentifier", name: "i" },
               operator: "--" },
            right: { type: "LiteralNumericExpression", value: 0 } } }
     );
@@ -526,7 +526,7 @@ suite("Parser", function () {
                   left:
                     { type: "UpdateExpression",
                       isPrefix: false,
-                      operand: { type: "BindingIdentifier", name: "i" },
+                      operand: { type: "AssignmentTargetIdentifier", name: "i" },
                       operator: "--" },
                   right: { type: "LiteralNumericExpression", value: 0 } } } ] }
     );
@@ -553,14 +553,14 @@ suite("Parser", function () {
                         expression:
                           { type: "AssignmentExpression",
                             binding:
-                              { type: "ArrayBinding",
+                              { type: "ArrayAssignmentTarget",
                                 elements: [
-                                  { type: "StaticMemberExpression",
+                                  { type: "StaticMemberAssignmentTarget",
                                     object: { type: "Super" },
                                     property: "b"
                                   }
                                 ],
-                                restElement: null
+                                rest: null
                               },
                             expression: { type: "IdentifierExpression", name: "c" }
                           }
@@ -593,12 +593,12 @@ suite("Parser", function () {
                         expression:
                           { type: "AssignmentExpression",
                             binding:
-                              { type: "ObjectBinding",
+                              { type: "ObjectAssignmentTarget",
                                 properties: [
-                                  { type: "BindingPropertyProperty",
+                                  { type: "AssignmentTargetPropertyProperty",
                                     name: { type: "StaticPropertyName", value: "b" },
                                     binding:
-                                      { type: "ComputedMemberExpression",
+                                      { type: "ComputedMemberAssignmentTarget",
                                         object: { type: "Super" },
                                         expression: { type: "IdentifierExpression", name: "c" }
                                       }
@@ -645,7 +645,7 @@ suite("Parser", function () {
         right: {
           type: "CompoundAssignmentExpression",
           operator: "+=",
-          binding: { type: "BindingIdentifier", name: "x" },
+          binding: { type: "AssignmentTargetIdentifier", name: "x" },
           expression: { type: "LiteralNullExpression" } } }
     );
 

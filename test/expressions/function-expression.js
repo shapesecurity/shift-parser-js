@@ -189,7 +189,7 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null }
+                { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], rest: null }
               ],
             rest: null
           },
@@ -252,7 +252,7 @@ suite("Parser", function () {
         name: null,
         params: {
           type: "FormalParameters",
-          items: [{ type: "ArrayBinding", elements: [], restElement: null }],
+          items: [{ type: "ArrayBinding", elements: [], rest: null }],
           rest: null
         },
         body: { type: "FunctionBody", directives: [], statements: [] }

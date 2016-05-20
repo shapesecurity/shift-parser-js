@@ -78,11 +78,11 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: {
-          type: "ObjectBinding",
+          type: "ObjectAssignmentTarget",
           properties: [{
-            type: "BindingPropertyProperty",
+            type: "AssignmentTargetPropertyProperty",
             name: { type: "ComputedPropertyName", expression: { type: "YieldExpression", expression: null } },
-            binding: { type: "BindingIdentifier", name: "a" }
+            binding: { type: "AssignmentTargetIdentifier", name: "a" }
           }]
         },
         expression: { type: "LiteralNumericExpression", value: 0 }

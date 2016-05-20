@@ -164,7 +164,7 @@ suite("Parser", function () {
     );
 
     testParseModule("export {}\n;", items,
-      [ { type: "ExportFrom", namedExports: [], moduleSpecifier: null } ]
+      [ { type: "ExportLocals", namedExports: [] } ]
     );
 
     testParseModule("export {} from \"a\"\n;", items,

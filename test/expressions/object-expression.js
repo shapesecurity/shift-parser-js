@@ -398,32 +398,32 @@ suite("Parser", function () {
     );
 
     testParse("({a})", expr,
-      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: "a" }] }
+      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: { type: "IdentifierExpression", name: "a" } }] }
     );
 
     testParse("({let})", expr,
-      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: "let" }] }
+      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: { type: "IdentifierExpression", name: "let" } }] }
     );
 
     testParse("({yield})", expr,
-      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: "yield" }] }
+      { type: "ObjectExpression", properties: [{ type: "ShorthandProperty", name: { type: "IdentifierExpression", name: "yield" } }] }
     );
 
     testParse("({a, b: 0, c})", expr,
       {
         type: "ObjectExpression",
-        properties: [{ type: "ShorthandProperty", name: "a" }, {
+        properties: [{ type: "ShorthandProperty", name: { type: "IdentifierExpression", name: "a" } }, {
           type: "DataProperty",
           name: { type: "StaticPropertyName", value: "b" },
           expression: { type: "LiteralNumericExpression", value: 0 }
-        }, { type: "ShorthandProperty", name: "c" }]
+        }, { type: "ShorthandProperty", name: { type: "IdentifierExpression", name: "c" } }]
       }
     );
 
     testParse("({a, b})", expr,
       {
         type: "ObjectExpression",
-        properties: [{ type: "ShorthandProperty", name: "a" }, { type: "ShorthandProperty", name: "b" }]
+        properties: [{ type: "ShorthandProperty", name: { type: "IdentifierExpression", name: "a" } }, { type: "ShorthandProperty", name: { type: "IdentifierExpression", name: "b" } }]
       }
     );
 
@@ -572,7 +572,7 @@ suite("Parser", function () {
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
           }],
-          restElement: null
+          rest: null
         },
         body: { type: "FunctionBody", directives: [], statements: [] }
       }]

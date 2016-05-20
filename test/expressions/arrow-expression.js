@@ -70,7 +70,7 @@ suite("Parser", function () {
           { type: "FormalParameters",
             items:
               [
-                { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null }
+                { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], rest: null }
               ],
             rest: null
           },
@@ -202,7 +202,7 @@ suite("Parser", function () {
         params: { type: "FormalParameters", items: [], rest: null },
         body: {
           type: "AssignmentExpression",
-          binding: { type: "BindingIdentifier", name: "a" },
+          binding: { type: "AssignmentTargetIdentifier", name: "a" },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
       }
@@ -276,11 +276,11 @@ suite("Parser", function () {
                 binding: { type: "BindingIdentifier", name: "x" },
                 init: { type: "LiteralNumericExpression", value: 0 }
             }],
-            restElement: null
+            rest: null
           }, {
             type: "ArrayBinding",
             elements: [],
-            restElement: null
+            rest: null
           }],
           rest: null
         },

@@ -36,6 +36,7 @@ exports.testParseFailure = function testParseFailure(source, message) {
     try {
       parse(source, { earlyErrors: false });
     } catch (e) {
+      if (!e.description) console.log(e)
       expect(e.description).to.be(message);
       return;
     }

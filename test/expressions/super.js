@@ -281,7 +281,7 @@ suite("Parser", function () {
               type: "ExpressionStatement",
               expression: {
                 type: "AssignmentExpression",
-                binding: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                binding: { type: "StaticMemberAssignmentTarget", object: { type: "Super" }, property: "b" },
                 expression: { type: "LiteralNumericExpression", value: 0 }
               }
             }]
@@ -304,7 +304,7 @@ suite("Parser", function () {
               expression: {
                 type: "AssignmentExpression",
                 binding: {
-                  type: "ComputedMemberExpression",
+                  type: "ComputedMemberAssignmentTarget",
                   object: { type: "Super" },
                   expression: { type: "LiteralNumericExpression", value: 0 }
                 },
@@ -331,7 +331,7 @@ suite("Parser", function () {
               expression: {
                 type: "AssignmentExpression",
                 binding: {
-                  type: "ComputedMemberExpression",
+                  type: "ComputedMemberAssignmentTarget",
                   object: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
                   expression: { type: "LiteralNumericExpression", value: 0 }
                 },

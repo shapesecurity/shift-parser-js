@@ -32,7 +32,7 @@ suite("Parser", function () {
               binding: {
                 type: "ArrayBinding",
                 elements: [null, { type: "BindingIdentifier", name: "a" }],
-                restElement: null
+                rest: null
               },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
@@ -51,7 +51,7 @@ suite("Parser", function () {
               binding: {
                 type: "ArrayBinding",
                 elements: [{ type: "BindingIdentifier", name: "a" }],
-                restElement: null
+                rest: null
               },
               init: { type: "ArrayExpression", elements: [{ type: "LiteralNumericExpression", value: 1 }] }
             }]
@@ -72,9 +72,9 @@ suite("Parser", function () {
                 elements: [{
                   type: "ArrayBinding",
                   elements: [{ type: "BindingIdentifier", name: "a" }],
-                  restElement: null
+                  rest: null
                 }],
-                restElement: null
+                rest: null
               },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
@@ -97,7 +97,7 @@ suite("Parser", function () {
               binding: {
                 type: "ArrayBinding",
                 elements: [{ type: "BindingIdentifier", name: "a" }],
-                restElement: null
+                rest: null
               },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
@@ -116,7 +116,7 @@ suite("Parser", function () {
               binding: {
                 type: "ArrayBinding",
                 elements: [{ type: "BindingIdentifier", name: "a" }, { type: "BindingIdentifier", name: "a" }],
-                restElement: null
+                rest: null
               },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
@@ -135,7 +135,7 @@ suite("Parser", function () {
               binding: {
                 type: "ArrayBinding",
                 elements: [{ type: "BindingIdentifier", name: "a" }],
-                restElement: { type: "BindingIdentifier", name: "a" }
+                rest: { type: "BindingIdentifier", name: "a" }
               },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
@@ -166,7 +166,7 @@ suite("Parser", function () {
           body: { type: "Block", statements: [] },
           catchClause: {
             type: "CatchClause",
-            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "e" }], restElement: null },
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "e" }], rest: null },
             body: { type: "Block", statements: [] }
           }
         }
@@ -181,7 +181,7 @@ suite("Parser", function () {
             binding: {
               type: "ArrayBinding",
               elements: [{ type: "BindingIdentifier", name: "e" }],
-              restElement: { type: "BindingIdentifier", name: "a" }
+              rest: { type: "BindingIdentifier", name: "a" }
             },
             body: { type: "Block", statements: [] }
           }

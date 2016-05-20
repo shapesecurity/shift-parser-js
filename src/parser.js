@@ -18,7 +18,7 @@ import {ErrorMessages} from "./errors";
 
 import Tokenizer, { TokenClass, TokenType } from "./tokenizer";
 
-import * as AST from "shift-ast";
+import * as AST from "shift-ast/checked";
 
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = "CoverParenthesizedExpressionAndArrowParameterList";
@@ -347,9 +347,9 @@ export class Parser extends Tokenizer {
     let name = this.parseIdentifierName();
     if (this.eatContextualKeyword("as")) {
       let exportedName = this.parseIdentifierName();
-      return this.markLocation(new AST.ExportSpecifier({ name, exportedName }), startLocation);
+      return this.markLocation({ name, exportedName }, startLocation);
     }
-    return this.markLocation(new AST.ExportSpecifier({ name: null, exportedName: name }), startLocation);
+    return this.markLocation({ name, exportedName: null }, startLocation);
   }
 
   parseExportClause() {
@@ -382,8 +382,10 @@ export class Parser extends Tokenizer {
         let moduleSpecifier = null;
         if (this.matchContextualKeyword("from")) {
           moduleSpecifier = this.parseFromClause();
+          decl = new AST.ExportFrom({ namedExports: namedExports.map(e => new AST.ExportFromSpecifier(e)), moduleSpecifier })
+        } else {
+          decl = new AST.ExportLocals({ namedExports: namedExports.map(({name, exportedName}) => new AST.ExportLocalSpecifier({ name: new AST.IdentifierExpression({name}), exportedName })) });
         }
-        decl = new AST.ExportFrom({ namedExports, moduleSpecifier });
         this.consumeSemicolon();
         break;
       case TokenType.CLASS:
@@ -672,11 +674,11 @@ export class Parser extends Tokenizer {
       } else {
         let previousAllowIn = this.allowIn;
         this.allowIn = false;
-        let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+        let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
         this.allowIn = previousAllowIn;
 
         if (this.isAssignmentTarget && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
-          if (expr.type === "ObjectBinding" || expr.type === "ArrayBinding") {
+          if (expr.type === "ObjectAssignmentTarget" || expr.type === "ArrayAssignmentTarget") {
             this.firstExprError = null;
           }
           if (startsWithLet && this.matchContextualKeyword("of")) {
@@ -998,7 +1000,7 @@ export class Parser extends Tokenizer {
     let {params = null, rest = null} = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
       if (head.type === "IdentifierExpression") {
-        params = [this.transformDestructuring(head)];
+        params = [this.targetToBinding(this.transformDestructuring(head))];
       } else {
         throw this.createUnexpected(this.lookahead);
       }
@@ -1016,10 +1018,10 @@ export class Parser extends Tokenizer {
   }
 
   parseAssignmentExpression() {
-    return this.isolateCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+    return this.isolateCoverGrammar(this.parseAssignmentExpressionOrTarget);
   }
 
-  parseAssignmentExpressionOrBindingElement() {
+  parseAssignmentExpressionOrTarget() {
     let startLocation = this.getLocation();
 
     if (this.allowYieldExpression && this.match(TokenType.YIELD)) {
@@ -1081,55 +1083,83 @@ export class Parser extends Tokenizer {
     return this.markLocation(node, startLocation);
   }
 
+  targetToBinding(node) {
+    if (node === null) {
+      return null;
+    }
+
+    switch (node.type) {
+      case "AssignmentTargetIdentifier":
+        return new AST.BindingIdentifier({ name: node.name });
+      case "ArrayAssignmentTarget":
+        return new AST.ArrayBinding({ elements: node.elements.map(e => this.targetToBinding(e)), rest: this.targetToBinding(node.rest) });
+      case "ObjectAssignmentTarget":
+        return new AST.ObjectBinding({ properties: node.properties.map(p => this.targetToBinding(p)) });
+      case "AssignmentTargetPropertyIdentifier":
+        return new AST.BindingPropertyIdentifier({ binding: this.targetToBinding(node.binding), init: node.init });
+      case "AssignmentTargetPropertyProperty":
+        return new AST.BindingPropertyProperty({ name: node.name, binding: this.targetToBinding(node.binding) });
+      case "AssignmentTargetWithDefault":
+        return new AST.BindingWithDefault({ binding: this.targetToBinding(node.binding), init: node.init });
+      default:
+        throw new Error(`todo: ${node.type}`);
+    }
+  }
+
   transformDestructuring(node) {
     switch (node.type) {
 
       case "DataProperty":
-        return copyLocation(node, new AST.BindingPropertyProperty({
+        return copyLocation(node, new AST.AssignmentTargetPropertyProperty({
           name: node.name,
           binding: this.transformDestructuringWithDefault(node.expression),
         }));
       case "ShorthandProperty":
-        return copyLocation(node, new AST.BindingPropertyIdentifier({
-          binding: copyLocation(node, new AST.BindingIdentifier({ name: node.name })),
+        return copyLocation(node, new AST.AssignmentTargetPropertyIdentifier({
+          binding: copyLocation(node, new AST.AssignmentTargetIdentifier({ name: node.name.name })),
           init: null,
         }));
 
       case "ObjectExpression":
-        return copyLocation(node, new AST.ObjectBinding({
+        return copyLocation(node, new AST.ObjectAssignmentTarget({
           properties: node.properties.map(x => this.transformDestructuring(x)),
         }));
       case "ArrayExpression":
         let last = node.elements[node.elements.length - 1];
         if (last != null && last.type === "SpreadElement") {
-          return copyLocation(node, new AST.ArrayBinding({
+          return copyLocation(node, new AST.ArrayAssignmentTarget({
             elements: node.elements.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
-            restElement: copyLocation(last.expression, this.transformDestructuring(last.expression)),
+            rest: copyLocation(last.expression, this.transformDestructuring(last.expression)),
           }));
         } else {
-          return copyLocation(node, new AST.ArrayBinding({
+          return copyLocation(node, new AST.ArrayAssignmentTarget({
             elements: node.elements.map(e => e && this.transformDestructuringWithDefault(e)),
-            restElement: null,
+            rest: null,
           }));
         }
         /* istanbul ignore next */
         break;
       case "IdentifierExpression":
-        return copyLocation(node, new AST.BindingIdentifier({ name: node.name }));
+        return copyLocation(node, new AST.AssignmentTargetIdentifier({ name: node.name }));
       case "AssignmentExpression":
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 
       case "StaticPropertyName":
-        return copyLocation(node, new AST.BindingIdentifier({ name: node.value }));
+        return copyLocation(node, new AST.AssignmentTargetIdentifier({ name: node.value }));
 
       case "ComputedMemberExpression":
+        return copyLocation(node, new AST.ComputedMemberAssignmentTarget({ object: node.object, expression: node.expression }));
       case "StaticMemberExpression":
-      case "ArrayBinding":
-      case "ObjectBinding":
-      case "BindingIdentifier":
-      case "BindingPropertyIdentifier":
-      case "BindingPropertyProperty":
-      case "BindingWithDefault":
+        return copyLocation(node, new AST.StaticMemberAssignmentTarget({ object: node.object, property: node.property }));
+
+      case "ArrayAssignmentTarget":
+      case "ObjectAssignmentTarget":
+      case "ComputedMemberAssignmentTarget":
+      case "StaticMemberAssignmentTarget":
+      case "AssignmentTargetIdentifier":
+      case "AssignmentTargetPropertyIdentifier":
+      case "AssignmentTargetPropertyProperty":
+      case "AssignmentTargetWithDefault":
         return node;
     }
 
@@ -1140,7 +1170,7 @@ export class Parser extends Tokenizer {
   transformDestructuringWithDefault(node) {
     switch (node.type) {
       case "AssignmentExpression":
-        return copyLocation(node, new AST.BindingWithDefault({
+        return copyLocation(node, new AST.AssignmentTargetWithDefault({
           binding: this.transformDestructuring(node.binding),
           init: node.expression,
         }));
@@ -1310,11 +1340,10 @@ export class Parser extends Tokenizer {
     if (isUpdateOperator(operator)) {
       let operandStartLocation = this.getLocation();
       let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
-      if (operand.type === "IdentifierExpression") {
-        operand.type = "BindingIdentifier";
-      } else if (!isValidSimpleAssignmentTarget(operand)) {
+      if (!isValidSimpleAssignmentTarget(operand)) {
         throw this.createErrorWithLocation(operandStartLocation, ErrorMessages.INVALID_UPDATE_OPERAND);
       }
+      operand = this.transformDestructuring(operand);
       node = new AST.UpdateExpression({ isPrefix: true, operator: operator.value, operand });
     } else {
       let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
@@ -1334,11 +1363,10 @@ export class Parser extends Tokenizer {
     if (!isUpdateOperator(operator)) return operand;
     this.lex();
     this.isBindingElement = this.isAssignmentTarget = false;
-    if (operand.type === "IdentifierExpression") {
-      operand.type = "BindingIdentifier";
-    } else if (!isValidSimpleAssignmentTarget(operand)) {
+    if (!isValidSimpleAssignmentTarget(operand)) {
       throw this.createErrorWithLocation(startLocation, ErrorMessages.INVALID_UPDATE_OPERAND);
     }
+    operand = this.transformDestructuring(operand);
 
     return this.markLocation(new AST.UpdateExpression({ isPrefix: false, operator: operator.value, operand }), startLocation);
   }
@@ -1488,6 +1516,52 @@ export class Parser extends Tokenizer {
     }), startLocation);
   }
 
+  parseRegexFlags(flags) {
+    let global = false,
+        ignoreCase = false,
+        multiLine = false,
+        sticky = false,
+        unicode = false;
+    for (let i = 0; i < flags.length; ++i) {
+      let f = flags[i];
+      switch (f) {
+        case 'g':
+          if (global) {
+            throw this.createError("Duplicate regular expression flag 'g'");
+          }
+          global = true;
+          break;
+        case 'i':
+          if (ignoreCase) {
+            throw this.createError("Duplicate regular expression flag 'i'");
+          }
+          ignoreCase = true;
+          break;
+        case 'm':
+          if (multiLine) {
+            throw this.createError("Duplicate regular expression flag 'm'");
+          }
+          multiLine = true;
+          break;
+        case 's':
+          if (sticky) {
+            throw this.createError("Duplicate regular expression flag 's'");
+          }
+          sticky = true;
+          break;
+        case 'u':
+          if (unicode) {
+            throw this.createError("Duplicate regular expression flag 'u'");
+          }
+          unicode = true;
+          break;
+        default:
+          throw this.createError(`Invalid regular expression flag '${f}'`);
+      }
+    }
+    return { global, ignoreCase, multiLine, sticky, unicode };
+  }
+
   parsePrimaryExpression() {
     if (this.match(TokenType.LPAREN)) {
       return this.parseGroupExpression();
@@ -1540,7 +1614,9 @@ export class Parser extends Tokenizer {
         let lastSlash = token.value.lastIndexOf("/");
         let pattern = token.value.slice(1, lastSlash);
         let flags = token.value.slice(lastSlash + 1);
-        return this.markLocation(new AST.LiteralRegExpExpression({ pattern, flags }), startLocation);
+        let ctorArgs = this.parseRegexFlags(flags);
+        ctorArgs.pattern = pattern;
+        return this.markLocation(new AST.LiteralRegExpExpression(ctorArgs), startLocation);
       case TokenType.CLASS:
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.parseClass({ isExpr: true, inDefault: false });
@@ -1661,9 +1737,9 @@ export class Parser extends Tokenizer {
 
 
     let startLocation = this.getLocation();
-    let group = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+    let group = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
 
-    let params = this.isBindingElement ? [this.transformDestructuringWithDefault(group)] : null;
+    let params = this.isBindingElement ? [this.targetToBinding(this.transformDestructuringWithDefault(group))] : null;
 
     while (this.eat(TokenType.COMMA)) {
       this.isAssignmentTarget = false;
@@ -1682,11 +1758,11 @@ export class Parser extends Tokenizer {
         params.push(binding);
       } else {
         // Can be either binding element or assignment target.
-        let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+        let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
         if (!this.isBindingElement) {
           params = null;
         } else {
-          params.push(this.transformDestructuringWithDefault(expr));
+          params.push(this.targetToBinding(this.transformDestructuringWithDefault(expr)));
         }
 
         if (this.firstExprError) {
@@ -1742,11 +1818,11 @@ export class Parser extends Tokenizer {
         let expr;
         if (this.eat(TokenType.ELLIPSIS)) {
           // Spread/Rest element
-          expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+          expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
           if (!this.isAssignmentTarget && this.firstExprError) {
             throw this.firstExprError;
           }
-          if (expr.type === "BindingIdentifier" || expr.type === "ArrayBinding" || expr.type === "ObjectBinding") {
+          if (expr.type === "ArrayAssignmentTarget" || expr.type === "ObjectAssignmentTarget") {
             rest = expr;
             break;
           }
@@ -1755,7 +1831,7 @@ export class Parser extends Tokenizer {
             this.isBindingElement = this.isAssignmentTarget = false;
           }
         } else {
-          expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+          expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
           if (!this.isAssignmentTarget && this.firstExprError) {
             throw this.firstExprError;
           }
@@ -1778,9 +1854,9 @@ export class Parser extends Tokenizer {
       if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
       }
-      return this.markLocation(new AST.ArrayBinding({
+      return this.markLocation(new AST.ArrayAssignmentTarget({
         elements: exprs.map(e => e && this.transformDestructuringWithDefault(e)),
-        restElement: rest,
+        rest,
       }), startLocation);
     } else if (this.firstExprError) {
       if (!this.isAssignmentTarget) {
@@ -1788,14 +1864,14 @@ export class Parser extends Tokenizer {
       }
       let last = exprs[exprs.length - 1];
       if (last != null && last.type === "SpreadElement") {
-        return this.markLocation(new AST.ArrayBinding({
+        return this.markLocation(new AST.ArrayAssignmentTarget({
           elements: exprs.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
-          restElement: this.transformDestructuring(last.expression),
+          rest: this.transformDestructuring(last.expression),
         }), startLocation);
       } else {
-        return this.markLocation(new AST.ArrayBinding({
+        return this.markLocation(new AST.ArrayAssignmentTarget({
           elements: exprs.map(e => e && this.transformDestructuringWithDefault(e)),
-          restElement: null,
+          rest: null,
         }), startLocation);
       }
     } else {
@@ -1822,7 +1898,7 @@ export class Parser extends Tokenizer {
       if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
       }
-      return this.markLocation(new AST.ObjectBinding({ properties: properties.map(p => this.transformDestructuring(p)) }), startLocation);
+      return this.markLocation(new AST.ObjectAssignmentTarget({ properties: properties.map(p => this.transformDestructuring(p)) }), startLocation);
     } else {
       return this.markLocation(new AST.ObjectExpression({ properties }), startLocation);
     }
@@ -1842,7 +1918,7 @@ export class Parser extends Tokenizer {
           // CoverInitializedName
           let init = this.isolateCoverGrammar(this.parseAssignmentExpression);
           this.firstExprError = this.createErrorWithLocation(startLocation, ErrorMessages.ILLEGAL_PROPERTY);
-          return this.markLocation(new AST.BindingPropertyIdentifier({
+          return this.markLocation(new AST.AssignmentTargetPropertyIdentifier({
             binding: this.transformDestructuring(methodOrKey),
             init,
           }), startLocation);
@@ -1850,14 +1926,14 @@ export class Parser extends Tokenizer {
           if (token.type !== TokenType.IDENTIFIER && token.type !== TokenType.YIELD && token.type !== TokenType.LET) {
             throw this.createUnexpected(token);
           }
-          return this.markLocation(new AST.ShorthandProperty({ name: methodOrKey.value }), startLocation);
+          return this.markLocation(new AST.ShorthandProperty({ name: new AST.IdentifierExpression({ name: methodOrKey.value }) }), startLocation);
         }
     }
 
     // DataProperty
     this.expect(TokenType.COLON);
 
-    let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
+    let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
     return this.markLocation(new AST.DataProperty({ name: methodOrKey, expression: expr }), startLocation);
   }
 
@@ -2078,7 +2154,7 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.LBRACK);
 
-    let elements = [], restElement = null;
+    let elements = [], rest = null;
 
     while (true) {
       if (this.match(TokenType.RBRACK)) {
@@ -2090,7 +2166,7 @@ export class Parser extends Tokenizer {
         el = null;
       } else {
         if (this.eat(TokenType.ELLIPSIS)) {
-          restElement = this.parseBindingTarget();
+          rest = this.parseBindingTarget();
           break;
         } else {
           el = this.parseBindingElement();
@@ -2104,7 +2180,7 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.RBRACK);
 
-    return this.markLocation(new AST.ArrayBinding({ elements, restElement }), startLocation);
+    return this.markLocation(new AST.ArrayBinding({ elements, rest }), startLocation);
   }
 
   parseBindingProperty() {

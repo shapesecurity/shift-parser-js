@@ -48,7 +48,7 @@ suite("Parser", function () {
     testParse("x = (0) ? 1 : 2", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "x" },
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
         expression: {
           type: "ConditionalExpression",
           test: { type: "LiteralNumericExpression", value: 0 },

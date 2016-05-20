@@ -40,7 +40,7 @@ suite("Parser", function () {
       {
         type: "AssignmentExpression",
         binding: {
-          type: "ComputedMemberExpression",
+          type: "ComputedMemberAssignmentTarget",
           object: { type: "IdentifierExpression", name: "a" },
           expression: { type: "IdentifierExpression", name: "b" }
         },
@@ -59,7 +59,7 @@ suite("Parser", function () {
         right: {
           type: "AssignmentExpression",
           binding: {
-            type: "ComputedMemberExpression",
+            type: "ComputedMemberAssignmentTarget",
             object: { type: "IdentifierExpression", name: "c" },
             expression: { type: "IdentifierExpression", name: "d" }
           },
@@ -75,14 +75,14 @@ suite("Parser", function () {
         operator: "&&",
         right: {
           type: "AssignmentExpression",
-          binding: { type: "BindingIdentifier", name: "b" },
+          binding: { type: "AssignmentTargetIdentifier", name: "b" },
           expression: { type: "IdentifierExpression", name: "c" }
         }
       },
       operator: "&&",
       right: {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "d" },
+        binding: { type: "AssignmentTargetIdentifier", name: "d" },
         expression: { type: "IdentifierExpression", name: "e" }
       }
 

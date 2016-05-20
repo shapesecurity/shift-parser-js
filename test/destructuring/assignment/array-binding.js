@@ -24,7 +24,7 @@ suite("Parser", function () {
       testParse("[x] = 0", expr,
         {
           type: "AssignmentExpression",
-          binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "x" }], restElement: null },
+          binding: { type: "ArrayAssignmentTarget", elements: [{ type: "AssignmentTargetIdentifier", name: "x" }], rest: null },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
       );
@@ -32,7 +32,7 @@ suite("Parser", function () {
       testParse("[x,] = 0", expr,
         {
           type: "AssignmentExpression",
-          binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "x" }], restElement: null },
+          binding: { type: "ArrayAssignmentTarget", elements: [{ type: "AssignmentTargetIdentifier", name: "x" }], rest: null },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
       );
@@ -41,9 +41,9 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
-            elements: [{ type: "BindingIdentifier", name: "x" }, null],
-            restElement: null
+            type: "ArrayAssignmentTarget",
+            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }, null],
+            rest: null
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -53,13 +53,13 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
+            type: "ArrayAssignmentTarget",
             elements: [{
-              type: "ArrayBinding",
-              elements: [{ type: "BindingIdentifier", name: "x" }],
-              restElement: null
+              type: "ArrayAssignmentTarget",
+              elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
+              rest: null
             }],
-            restElement: null
+            rest: null
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -69,9 +69,9 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
-            elements: [{ type: "BindingIdentifier", name: "x" }, { type: "BindingIdentifier", name: "y" }],
-            restElement: { type: "BindingIdentifier", name: "z" }
+            type: "ArrayAssignmentTarget",
+            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }, { type: "AssignmentTargetIdentifier", name: "y" }],
+            rest: { type: "AssignmentTargetIdentifier", name: "z" }
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -81,9 +81,9 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
-            elements: [null, { type: "BindingIdentifier", name: "x" }, null],
-            restElement: null
+            type: "ArrayAssignmentTarget",
+            elements: [null, { type: "AssignmentTargetIdentifier", name: "x" }, null],
+            rest: null
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -93,12 +93,12 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
+            type: "ArrayAssignmentTarget",
             elements: [],
-            restElement: {
-              type: "ArrayBinding",
-              elements: [{ type: "BindingIdentifier", name: "x" }],
-              restElement: null
+            rest: {
+              type: "ArrayAssignmentTarget",
+              elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
+              rest: null
             }
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
@@ -109,14 +109,14 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
-            elements: [{ type: "BindingIdentifier", name: "x" }],
-            restElement: {
-              type: "ObjectBinding",
+            type: "ArrayAssignmentTarget",
+            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
+            rest: {
+              type: "ObjectAssignmentTarget",
               properties: [{
-                type: "BindingPropertyProperty",
+                type: "AssignmentTargetPropertyProperty",
                 name: { type: "StaticPropertyName", value: "0" },
-                binding: { type: "BindingIdentifier", name: "y" }
+                binding: { type: "AssignmentTargetIdentifier", name: "y" }
               }]
             }
           },
@@ -128,9 +128,9 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
-            elements: [{ type: "BindingIdentifier", name: "x" }, { type: "BindingIdentifier", name: "x" }],
-            restElement: null
+            type: "ArrayAssignmentTarget",
+            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }, { type: "AssignmentTargetIdentifier", name: "x" }],
+            rest: null
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -140,9 +140,9 @@ suite("Parser", function () {
         {
           type: "AssignmentExpression",
           binding: {
-            type: "ArrayBinding",
-            elements: [{ type: "BindingIdentifier", name: "x" }],
-            restElement: { type: "BindingIdentifier", name: "x" }
+            type: "ArrayAssignmentTarget",
+            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
+            rest: { type: "AssignmentTargetIdentifier", name: "x" }
           },
           expression: { type: "LiteralNumericExpression", value: 0 }
         }
@@ -153,9 +153,9 @@ suite("Parser", function () {
         "binding": {
           "elements": [
             {
-              "type": "BindingWithDefault",
+              "type": "AssignmentTargetWithDefault",
               "binding": {
-                "type": "StaticMemberExpression",
+                "type": "StaticMemberAssignmentTarget",
                 "object": {
                   "type": "IdentifierExpression",
                   "name": "x",
@@ -168,8 +168,8 @@ suite("Parser", function () {
               }
             }
           ],
-          "restElement": null,
-          "type": "ArrayBinding",
+          "rest": null,
+          "type": "ArrayAssignmentTarget",
         },
         "expression": {
           "type": "IdentifierExpression",
@@ -182,9 +182,9 @@ suite("Parser", function () {
         binding: {
           elements: [
             {
-              type: "BindingWithDefault",
+              type: "AssignmentTargetWithDefault",
               binding: {
-                type: "ComputedMemberExpression",
+                type: "ComputedMemberAssignmentTarget",
                 object: {
                   type: "IdentifierExpression",
                   name: "x",
@@ -200,8 +200,8 @@ suite("Parser", function () {
               }
             }
           ],
-          restElement: null,
-          type: "ArrayBinding",
+          rest: null,
+          type: "ArrayAssignmentTarget",
         },
         expression: {
           type: "IdentifierExpression",
@@ -212,13 +212,13 @@ suite("Parser", function () {
       testParse("[...[...a[x]]] = b", expr, {
         type: "AssignmentExpression",
         binding: {
-          type: "ArrayBinding",
+          type: "ArrayAssignmentTarget",
           elements: [],
-          restElement: {
-            type: "ArrayBinding",
+          rest: {
+            type: "ArrayAssignmentTarget",
             elements: [],
-            restElement: {
-              type: "ComputedMemberExpression",
+            rest: {
+              type: "ComputedMemberAssignmentTarget",
               object: {
                 type: "IdentifierExpression",
                 name: "a"
@@ -239,9 +239,9 @@ suite("Parser", function () {
       testParse("[] = 0", expr, {
         type: "AssignmentExpression",
         binding: {
-          type: "ArrayBinding",
+          type: "ArrayAssignmentTarget",
           elements: [],
-          restElement: null
+          rest: null
         },
         expression: {
           type: "LiteralNumericExpression",
@@ -252,26 +252,26 @@ suite("Parser", function () {
       testParse("[{a=0},{a=0}] = 0", expr, {
         type: "AssignmentExpression",
         binding: {
-          type: "ArrayBinding",
+          type: "ArrayAssignmentTarget",
           elements: [
             {
-              type: "ObjectBinding",
+              type: "ObjectAssignmentTarget",
               properties: [{
-                type: "BindingPropertyIdentifier",
-                binding: { type: "BindingIdentifier", name: "a" },
+                type: "AssignmentTargetPropertyIdentifier",
+                binding: { type: "AssignmentTargetIdentifier", name: "a" },
                 init: { type: "LiteralNumericExpression", value: 0 }
               }]
             },
             {
-              type: "ObjectBinding",
+              type: "ObjectAssignmentTarget",
               properties: [{
-                type: "BindingPropertyIdentifier",
-                binding: { type: "BindingIdentifier", name: "a" },
+                type: "AssignmentTargetPropertyIdentifier",
+                binding: { type: "AssignmentTargetIdentifier", name: "a" },
                 init: { type: "LiteralNumericExpression", value: 0 }
               }]
             },
           ],
-          restElement: null,
+          rest: null,
         },
         expression: { type: "LiteralNumericExpression", value: 0 }
       });

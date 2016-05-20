@@ -48,13 +48,13 @@ suite("Parser", function () {
                       expression:
                         { type: "UpdateExpression",
                           isPrefix: false,
-                          operand: { type: "BindingIdentifier", name: "x" },
+                          operand: { type: "AssignmentTargetIdentifier", name: "x" },
                           operator: "++" } },
                     { type: "ExpressionStatement",
                       expression:
                         { type: "UpdateExpression",
                           isPrefix: false,
-                          operand: { type: "BindingIdentifier", name: "y" },
+                          operand: { type: "AssignmentTargetIdentifier", name: "y" },
                           operator: "--" } } ] } },
         test:
           { type: "BinaryExpression",

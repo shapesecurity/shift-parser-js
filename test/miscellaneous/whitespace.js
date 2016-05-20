@@ -33,7 +33,7 @@ suite("Parser", function () {
                   expression:
                     { type: "UpdateExpression",
                       isPrefix: true,
-                      operand: { type: "BindingIdentifier", name: "y" },
+                      operand: { type: "AssignmentTargetIdentifier", name: "y" },
                       operator: "++" } } ] } }
     );
 
@@ -48,7 +48,7 @@ suite("Parser", function () {
                   expression:
                     { type: "UpdateExpression",
                       isPrefix: true,
-                      operand: { type: "BindingIdentifier", name: "y" },
+                      operand: { type: "AssignmentTargetIdentifier", name: "y" },
                       operator: "--" } } ] } }
     );
 

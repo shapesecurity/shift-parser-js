@@ -90,7 +90,7 @@ suite("Parser", function () {
 
       testParse("for(let.let in 0);", stmt,
         { type: "ForInStatement",
-          left: { type: "StaticMemberExpression", object: { type: "IdentifierExpression", name: "let" }, property: "let" },
+          left: { type: "StaticMemberAssignmentTarget", object: { type: "IdentifierExpression", name: "let" }, property: "let" },
           right: { type: "LiteralNumericExpression", value: 0},
           body: { type: "EmptyStatement"}
         }

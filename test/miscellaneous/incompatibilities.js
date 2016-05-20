@@ -51,7 +51,7 @@ suite("Parser", function() {
           kind: "let",
           declarators: [{
             type: "VariableDeclarator",
-            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null },
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], rest: null },
             init: { type: "IdentifierExpression", name: "b" }
           }]
         }
@@ -66,7 +66,7 @@ suite("Parser", function() {
           kind: "const",
           declarators: [{
             type: "VariableDeclarator",
-            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], restElement: null },
+            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], rest: null },
             init: { type: "IdentifierExpression", name: "b" }
           }]
         }
@@ -244,7 +244,7 @@ suite("Parser", function() {
         right: {
           type: "UnaryExpression",
           operator: "!",
-          operand: { type: "UpdateExpression", isPrefix: true, operator: "--", operand: { type: "BindingIdentifier", name: "b" } }
+          operand: { type: "UpdateExpression", isPrefix: true, operator: "--", operand: { type: "AssignmentTargetIdentifier", name: "b" } }
         }
       }
     );

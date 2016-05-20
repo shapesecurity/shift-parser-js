@@ -68,7 +68,7 @@ suite("Parser", function () {
       type: "SpreadElement", 
       expression: {
         type: "AssignmentExpression",
-        binding: {type: "BindingIdentifier", name: "b"},
+        binding: {type: "AssignmentTargetIdentifier", name: "b"},
         expression: {type: "IdentifierExpression", name: "c"}
       }
     }]

@@ -62,7 +62,7 @@ suite("Parser", function () {
                     init: { type: "LiteralNumericExpression", value: 0 }
                   }]
                 }],
-                restElement: null
+                rest: null
               },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
@@ -92,7 +92,7 @@ suite("Parser", function () {
                     binding: { type: "BindingIdentifier", name: "b" }
                   }]
                 }],
-                restElement: null
+                rest: null
               },
               init: { type: "LiteralNumericExpression", value: 0 }
             }]
@@ -206,7 +206,7 @@ suite("Parser", function () {
           items: [
             { type: "BindingIdentifier", name: "a" },
             { type: "BindingIdentifier", name: "b" },
-            { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "c" }], restElement: null }],
+            { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "c" }], rest: null }],
           rest: null
         },
         body: {

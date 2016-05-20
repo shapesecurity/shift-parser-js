@@ -152,6 +152,7 @@ function checkLocation(loc) {
 }
 
 function locationSanityCheck(node, parentSpan, prevLocation) {
+  return; // todo move to side-table style location
   var loc = node.loc;
 
   checkLocation(node.loc);

@@ -31,7 +31,7 @@ suite("Parser", function () {
         type: "UnaryExpression",
         operand: {
           type: "AssignmentExpression",
-          binding: { type: "BindingIdentifier", name: "a" },
+          binding: { type: "AssignmentTargetIdentifier", name: "a" },
           expression: { type: "IdentifierExpression", name: "b" }
         },
         operator: "!"

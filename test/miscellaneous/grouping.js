@@ -90,7 +90,7 @@ suite("Parser", function () {
     testParse("(a) = 0", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "a" },
+        binding: { type: "AssignmentTargetIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -98,7 +98,7 @@ suite("Parser", function () {
     testParse("((a)) = 0", expr,
       {
         type: "AssignmentExpression",
-        binding: { type: "BindingIdentifier", name: "a" },
+        binding: { type: "AssignmentTargetIdentifier", name: "a" },
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
@@ -112,15 +112,15 @@ suite("Parser", function () {
     );
 
     testParse("(a++)", expr,
-      { type: "UpdateExpression", isPrefix: false, operand: { type: "BindingIdentifier", name: "a" }, operator: "++" }
+      { type: "UpdateExpression", isPrefix: false, operand: { type: "AssignmentTargetIdentifier", name: "a" }, operator: "++" }
     );
 
     testParse("(a)++", expr,
-      { type: "UpdateExpression", isPrefix: false, operand: { type: "BindingIdentifier", name: "a" }, operator: "++" }
+      { type: "UpdateExpression", isPrefix: false, operand: { type: "AssignmentTargetIdentifier", name: "a" }, operator: "++" }
     );
 
     testParse("(a)--", expr,
-      { type: "UpdateExpression", isPrefix: false, operand: { type: "BindingIdentifier", name: "a" }, operator: "--" }
+      { type: "UpdateExpression", isPrefix: false, operand: { type: "AssignmentTargetIdentifier", name: "a" }, operator: "--" }
     );
 
     testParse("(a) ? (b) : (c)", expr,

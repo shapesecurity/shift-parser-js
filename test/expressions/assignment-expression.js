@@ -224,5 +224,8 @@ suite("Parser", function () {
 
     testParseFailure("(({a})=0);", "Invalid left-hand side in assignment");
     testParseFailure("(([a])=0);", "Invalid left-hand side in assignment");
+
+    testParseFailure("({a: (b = 0)} = {})", "Invalid left-hand side in assignment");
+    testParseFailure("([(a = b)] = []", "Invalid left-hand side in assignment");
   });
 });

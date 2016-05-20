@@ -287,8 +287,8 @@ suite("Parser", function () {
       testParseFailure("[...0,a]=0", "Invalid left-hand side in assignment");
       testParseFailure("[...0,{a=0}]=0", "Illegal property initializer");
       testParseFailure("[...0,...{a=0}]=0", "Illegal property initializer");
-      testParseFailure("[...{a=0},]", "Illegal property initializer");
-      testParseFailure("[...{a=0},]=0", "Invalid left-hand side in assignment");
+      testParseFailure("[...{a=0},]", "Unexpected comma after rest");
+      testParseFailure("[...{a=0},]=0", "Unexpected comma after rest");
       testParseFailure("[0] = 0", "Invalid left-hand side in assignment");
       testParseFailure("[a, ...b, {c=0}]", "Illegal property initializer");
       testParseFailure("{a = [...b, c]} = 0", "Unexpected token \"=\"");

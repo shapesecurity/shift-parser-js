@@ -24,10 +24,12 @@ export const ErrorMessages = {
   UNEXPECTED_TEMPLATE: "Unexpected template",
   UNEXPECTED_EOS: "Unexpected end of input",
   UNEXPECTED_LINE_TERMINATOR: "Unexpected line terminator",
+  UNEXPECTED_COMMA_AFTER_REST: "Unexpected comma after rest",
   NEWLINE_AFTER_THROW: "Illegal newline after throw",
   UNTERMINATED_REGEXP: "Invalid regular expression: missing /",
   INVALID_REGEXP_FLAGS: "Invalid regular expression flags",
   INVALID_LHS_IN_ASSIGNMENT: "Invalid left-hand side in assignment",
+  INVALID_LHS_IN_BINDING: "Invalid left-hand side in binding", // todo collapse messages?
   INVALID_LHS_IN_FOR_IN: "Invalid left-hand side in for-in",
   INVALID_LHS_IN_FOR_OF: "Invalid left-hand side in for-of",
   INVALID_UPDATE_OPERAND: "Increment/decrement target must be an identifier or member expression",

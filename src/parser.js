@@ -18,6 +18,8 @@ import {ErrorMessages} from "./errors";
 
 import Tokenizer, { TokenClass, TokenType } from "./tokenizer";
 
+import * as AST from "shift-ast";
+
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = "CoverParenthesizedExpressionAndArrowParameterList";
 
@@ -184,7 +186,7 @@ export class Parser extends Tokenizer {
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
-    return this.markLocation({ type: "Module", directives, items: statements }, startLocation);
+    return this.markLocation(new AST.Module({ directives, items: statements }), startLocation);
   }
 
   parseScript() {
@@ -195,7 +197,7 @@ export class Parser extends Tokenizer {
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
-    return this.markLocation({ type: "Script", directives, statements }, startLocation);
+    return this.markLocation(new AST.Script({ directives, statements }), startLocation);
   }
 
   parseFunctionBody() {
@@ -208,7 +210,7 @@ export class Parser extends Tokenizer {
     this.module = false;
 
     this.expect(TokenType.LBRACE);
-    let body = this.parseBody();
+    let body = new AST.FunctionBody(this.parseBody());
     this.expect(TokenType.RBRACE);
 
     this.inFunctionBody = oldInFunctionBody;
@@ -238,7 +240,7 @@ export class Parser extends Tokenizer {
           if (rawValue === "use strict") {
             this.strict = true;
           }
-          directives.push(this.markLocation({ type: "Directive", rawValue }, directiveLocation));
+          directives.push(this.markLocation(new AST.Directive({ rawValue }), directiveLocation));
         } else {
           parsingDirectives = false;
           if (directiveOctal && this.strict) {
@@ -254,7 +256,7 @@ export class Parser extends Tokenizer {
       throw directiveOctal;
     }
 
-    return { type: "FunctionBody", directives, statements };
+    return { directives, statements };
   }
 
   parseImportSpecifier() {
@@ -262,18 +264,17 @@ export class Parser extends Tokenizer {
     if (this.match(TokenType.IDENTIFIER) || this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
       name = this.parseIdentifier();
       if (!this.eatContextualKeyword("as")) {
-        return this.markLocation( {
-          type: "ImportSpecifier",
+        return this.markLocation(new AST.ImportSpecifier({
           name: null,
-          binding: this.markLocation({ type: "BindingIdentifier", name: name }, startLocation),
-        }, startLocation);
+          binding: this.markLocation(new AST.BindingIdentifier({ name }), startLocation),
+        }), startLocation);
       }
     } else if (this.lookahead.type.klass.isIdentifierName) {
       name = this.parseIdentifierName();
       this.expectContextualKeyword("as");
     }
 
-    return this.markLocation({ type: "ImportSpecifier", name, binding: this.parseBindingIdentifier() }, startLocation);
+    return this.markLocation(new AST.ImportSpecifier({ name, binding: this.parseBindingIdentifier() }), startLocation);
   }
 
   parseNameSpaceBinding() {
@@ -308,34 +309,32 @@ export class Parser extends Tokenizer {
       case TokenType.STRING:
         moduleSpecifier = this.lex().str;
         this.consumeSemicolon();
-        return this.markLocation({ type: "Import", defaultBinding: null, namedImports: [], moduleSpecifier }, startLocation);
+        return this.markLocation(new AST.Import({ defaultBinding: null, namedImports: [], moduleSpecifier }), startLocation);
       case TokenType.IDENTIFIER:
       case TokenType.YIELD:
       case TokenType.LET:
         defaultBinding = this.parseBindingIdentifier();
         if (!this.eat(TokenType.COMMA)) {
-          let decl = { type: "Import", defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() };
+          let decl = new AST.Import({ defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() });
           this.consumeSemicolon()
           return this.markLocation(decl, startLocation);
         }
         break;
     }
     if (this.match(TokenType.MUL)) {
-      let decl = {
-        type: "ImportNamespace",
+      let decl = new AST.ImportNamespace({
         defaultBinding,
         namespaceBinding: this.parseNameSpaceBinding(),
         moduleSpecifier: this.parseFromClause(),
-      };
+      });
       this.consumeSemicolon()
       return this.markLocation(decl, startLocation);
     } else if (this.match(TokenType.LBRACE)) {
-      let decl = {
-        type: "Import",
+      let decl = new AST.Import({
         defaultBinding,
         namedImports: this.parseNamedImports(),
         moduleSpecifier: this.parseFromClause(),
-      };
+      });
       this.consumeSemicolon()
       return this.markLocation(decl, startLocation);
     } else {
@@ -348,9 +347,9 @@ export class Parser extends Tokenizer {
     let name = this.parseIdentifierName();
     if (this.eatContextualKeyword("as")) {
       let exportedName = this.parseIdentifierName();
-      return this.markLocation({ type: "ExportSpecifier", name, exportedName }, startLocation);
+      return this.markLocation(new AST.ExportSpecifier({ name, exportedName }), startLocation);
     }
-    return this.markLocation({ type: "ExportSpecifier", name: null, exportedName: name }, startLocation);
+    return this.markLocation(new AST.ExportSpecifier({ name: null, exportedName: name }), startLocation);
   }
 
   parseExportClause() {
@@ -373,7 +372,7 @@ export class Parser extends Tokenizer {
       case TokenType.MUL:
         this.lex();
         // export * FromClause ;
-        decl = { type: "ExportAllFrom", moduleSpecifier: this.parseFromClause() };
+        decl = new AST.ExportAllFrom({ moduleSpecifier: this.parseFromClause() });
         this.consumeSemicolon();
         break;
       case TokenType.LBRACE:
@@ -384,34 +383,33 @@ export class Parser extends Tokenizer {
         if (this.matchContextualKeyword("from")) {
           moduleSpecifier = this.parseFromClause();
         }
-        decl = { type: "ExportFrom", namedExports, moduleSpecifier };
+        decl = new AST.ExportFrom({ namedExports, moduleSpecifier });
         this.consumeSemicolon();
         break;
       case TokenType.CLASS:
         // export ClassDeclaration
-        decl = { type: "Export", declaration: this.parseClass({ isExpr: false, inDefault: false }) };
+        decl = new AST.Export({ declaration: this.parseClass({ isExpr: false, inDefault: false }) });
         break;
       case TokenType.FUNCTION:
         // export HoistableDeclaration
-        decl = { type: "Export", declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true }) };
+        decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true }) });
         break;
       case TokenType.DEFAULT:
         this.lex();
         switch (this.lookahead.type) {
           case TokenType.FUNCTION:
             // export default HoistableDeclaration[Default]
-            decl = {
-              type: "ExportDefault",
+            decl = new AST.ExportDefault({
               body: this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: true }),
-            };
+            });
             break;
           case TokenType.CLASS:
             // export default ClassDeclaration[Default]
-            decl = { type: "ExportDefault", body: this.parseClass({ isExpr: false, inDefault: true }) };
+            decl = new AST.ExportDefault({ body: this.parseClass({ isExpr: false, inDefault: true }) });
             break;
           default:
             // export default [lookahead ∉ {function, class}] AssignmentExpression[In] ;
-            decl = { type: "ExportDefault", body: this.parseAssignmentExpression() };
+            decl = new AST.ExportDefault({ body: this.parseAssignmentExpression() });
             this.consumeSemicolon();
             break;
         }
@@ -420,7 +418,7 @@ export class Parser extends Tokenizer {
       case TokenType.LET:
       case TokenType.CONST:
         // export LexicalDeclaration
-        decl = { type: "Export", declaration: this.parseVariableDeclaration(true) };
+        decl = new AST.Export({ declaration: this.parseVariableDeclaration(true) });
         this.consumeSemicolon();
         break;
       default:
@@ -536,10 +534,10 @@ export class Parser extends Tokenizer {
           let labeledBody = this.match(TokenType.FUNCTION)
             ? this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false })
             : this.parseStatement();
-          return { type: "LabeledStatement", label: expr.name, body: labeledBody };
+          return new AST.LabeledStatement({ label: expr.name, body: labeledBody });
         } else {
           this.consumeSemicolon();
-          return { type: "ExpressionStatement", expression: expr };
+          return new AST.ExpressionStatement({ expression: expr });
         }
       }
     }
@@ -547,17 +545,17 @@ export class Parser extends Tokenizer {
 
   parseEmptyStatement() {
     this.lex();
-    return { type: "EmptyStatement" };
+    return new AST.EmptyStatement;
   }
 
   parseBlockStatement() {
-    return { type: "BlockStatement", block: this.parseBlock() };
+    return new AST.BlockStatement({ block: this.parseBlock() });
   }
 
   parseExpressionStatement() {
     let expr = this.parseExpression();
     this.consumeSemicolon();
-    return { type: "ExpressionStatement", expression: expr };
+    return new AST.ExpressionStatement({ expression: expr });
   }
 
   parseBreakStatement() {
@@ -565,7 +563,7 @@ export class Parser extends Tokenizer {
 
     // Catch the very common case first: immediately a semicolon (U+003B).
     if (this.eat(TokenType.SEMICOLON) || this.hasLineTerminatorBeforeNext) {
-      return { type: "BreakStatement", label: null };
+      return new AST.BreakStatement({ label: null });
     }
 
     let label = null;
@@ -575,7 +573,7 @@ export class Parser extends Tokenizer {
 
     this.consumeSemicolon();
 
-    return { type: "BreakStatement", label };
+    return new AST.BreakStatement({ label });
   }
 
   parseContinueStatement() {
@@ -583,7 +581,7 @@ export class Parser extends Tokenizer {
 
     // Catch the very common case first: immediately a semicolon (U+003B).
     if (this.eat(TokenType.SEMICOLON) || this.hasLineTerminatorBeforeNext) {
-      return { type: "ContinueStatement", label: null };
+      return new AST.ContinueStatement({ label: null });
     }
 
     let label = null;
@@ -593,14 +591,14 @@ export class Parser extends Tokenizer {
 
     this.consumeSemicolon();
 
-    return { type: "ContinueStatement", label };
+    return new AST.ContinueStatement({ label });
   }
 
 
   parseDebuggerStatement() {
     this.lex();
     this.consumeSemicolon();
-    return { type: "DebuggerStatement" };
+    return new AST.DebuggerStatement;
   }
 
   parseDoWhileStatement() {
@@ -611,7 +609,7 @@ export class Parser extends Tokenizer {
     let test = this.parseExpression();
     this.expect(TokenType.RPAREN);
     this.eat(TokenType.SEMICOLON);
-    return { type: "DoWhileStatement", body, test };
+    return new AST.DoWhileStatement({ body, test });
   }
 
   parseForStatement() {
@@ -627,7 +625,7 @@ export class Parser extends Tokenizer {
       if (!this.match(TokenType.RPAREN)) {
         right = this.parseExpression();
       }
-      return { type: "ForStatement", init: null, test, update: right, body: this.getIteratorStatementEpilogue() };
+      return new AST.ForStatement({ init: null, test, update: right, body: this.getIteratorStatementEpilogue() });
     } else {
       let startsWithLet = this.match(TokenType.LET);
       let isForDecl = this.lookaheadLexicalDeclaration();
@@ -639,27 +637,27 @@ export class Parser extends Tokenizer {
         this.allowIn = previousAllowIn;
 
         if (init.declarators.length === 1 && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
-          let type;
+          let ctor;
 
           if (this.match(TokenType.IN)) {
             if (init.declarators[0].init != null) {
               throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN);
             }
-            type = "ForInStatement";
+            ctor = AST.ForInStatement;
             this.lex();
             right = this.parseExpression();
           } else {
             if (init.declarators[0].init != null) {
               throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_OF);
             }
-            type = "ForOfStatement";
+            ctor = AST.ForOfStatement;
             this.lex();
             right = this.parseAssignmentExpression();
           }
 
           let body = this.getIteratorStatementEpilogue();
 
-          return { type, left: init, right, body };
+          return new ctor({ left: init, right, body });
         } else {
           this.expect(TokenType.SEMICOLON);
           if (!this.match(TokenType.SEMICOLON)) {
@@ -669,7 +667,7 @@ export class Parser extends Tokenizer {
           if (!this.match(TokenType.RPAREN)) {
             right = this.parseExpression();
           }
-          return { type: "ForStatement", init, test, update: right, body: this.getIteratorStatementEpilogue() };
+          return new AST.ForStatement({ init, test, update: right, body: this.getIteratorStatementEpilogue() });
         }
       } else {
         let previousAllowIn = this.allowIn;
@@ -678,25 +676,25 @@ export class Parser extends Tokenizer {
         this.allowIn = previousAllowIn;
 
         if (this.isAssignmentTarget && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
-          if (expr.type === "ObjectExpression" || expr.type === "ArrayExpression") {
+          if (expr.type === "ObjectBinding" || expr.type === "ArrayBinding") {
             this.firstExprError = null;
           }
           if (startsWithLet && this.matchContextualKeyword("of")) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
           }
-          let type = this.match(TokenType.IN) ? "ForInStatement" : "ForOfStatement";
+          let ctor = this.match(TokenType.IN) ? AST.ForInStatement : AST.ForOfStatement;
 
           this.lex();
           right = this.parseExpression();
 
-          return { type, left: this.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() };
+          return new ctor({ left: this.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() });
         } else {
           if (this.firstExprError) {
             throw this.firstExprError;
           }
           while (this.eat(TokenType.COMMA)) {
             let rhs = this.parseAssignmentExpression();
-            expr = this.markLocation({ type: "BinaryExpression", left: expr, operator: ",", right: rhs}, leftLocation);
+            expr = this.markLocation(new AST.BinaryExpression({ left: expr, operator: ",", right: rhs}), leftLocation);
           }
           if (this.match(TokenType.IN)) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
@@ -712,7 +710,7 @@ export class Parser extends Tokenizer {
           if (!this.match(TokenType.RPAREN)) {
             right = this.parseExpression();
           }
-          return { type: "ForStatement", init: expr, test, update: right, body: this.getIteratorStatementEpilogue() };
+          return new AST.ForStatement({ init: expr, test, update: right, body: this.getIteratorStatementEpilogue() });
         }
       }
     }
@@ -740,7 +738,7 @@ export class Parser extends Tokenizer {
     if (this.eat(TokenType.ELSE)) {
       alternate = this.parseIfStatementChild();
     }
-    return { type: "IfStatement", test, consequent, alternate };
+    return new AST.IfStatement({ test, consequent, alternate });
   }
 
   parseReturnStatement() {
@@ -752,7 +750,7 @@ export class Parser extends Tokenizer {
 
     // Catch the very common case first: immediately a semicolon (U+003B).
     if (this.eat(TokenType.SEMICOLON) || this.hasLineTerminatorBeforeNext) {
-      return { type: "ReturnStatement", expression: null };
+      return new AST.ReturnStatement({ expression: null });
     }
 
     let expression = null;
@@ -761,7 +759,7 @@ export class Parser extends Tokenizer {
     }
 
     this.consumeSemicolon();
-    return { type: "ReturnStatement", expression };
+    return new AST.ReturnStatement({ expression });
   }
 
   parseSwitchStatement() {
@@ -772,7 +770,7 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.LBRACE);
 
     if (this.eat(TokenType.RBRACE)) {
-      return { type: "SwitchStatement", discriminant, cases: [] };
+      return new AST.SwitchStatement({ discriminant, cases: [] });
     }
 
     let cases = this.parseSwitchCases();
@@ -783,16 +781,15 @@ export class Parser extends Tokenizer {
         throw this.createError(ErrorMessages.MULTIPLE_DEFAULTS_IN_SWITCH);
       }
       this.expect(TokenType.RBRACE);
-      return {
-        type: "SwitchStatementWithDefault",
+      return new AST.SwitchStatementWithDefault({
         discriminant,
         preDefaultCases: cases,
         defaultCase,
         postDefaultCases,
-      };
+      });
     } else {
       this.expect(TokenType.RBRACE);
-      return { type: "SwitchStatement", discriminant, cases };
+      return new AST.SwitchStatement({ discriminant, cases });
     }
   }
 
@@ -807,17 +804,16 @@ export class Parser extends Tokenizer {
   parseSwitchCase() {
     let startLocation = this.getLocation();
     this.expect(TokenType.CASE);
-    return this.markLocation({
-      type: "SwitchCase",
+    return this.markLocation(new AST.SwitchCase({
       test: this.parseExpression(),
       consequent: this.parseSwitchCaseBody(),
-    }, startLocation);
+    }), startLocation);
   }
 
   parseSwitchDefault() {
     let startLocation = this.getLocation();
     this.expect(TokenType.DEFAULT);
-    return this.markLocation({ type: "SwitchDefault", consequent: this.parseSwitchCaseBody() }, startLocation);
+    return this.markLocation(new AST.SwitchDefault({ consequent: this.parseSwitchCaseBody() }), startLocation);
   }
 
   parseSwitchCaseBody() {
@@ -840,7 +836,7 @@ export class Parser extends Tokenizer {
     }
     let expression = this.parseExpression();
     this.consumeSemicolon();
-    return { type: "ThrowStatement", expression };
+    return new AST.ThrowStatement({ expression });
   }
 
   parseTryStatement() {
@@ -851,14 +847,14 @@ export class Parser extends Tokenizer {
       let catchClause = this.parseCatchClause();
       if (this.eat(TokenType.FINALLY)) {
         let finalizer = this.parseBlock();
-        return { type: "TryFinallyStatement", body, catchClause, finalizer };
+        return new AST.TryFinallyStatement({ body, catchClause, finalizer });
       }
-      return { type: "TryCatchStatement", body, catchClause };
+      return new AST.TryCatchStatement({ body, catchClause });
     }
 
     if (this.eat(TokenType.FINALLY)) {
       let finalizer = this.parseBlock();
-      return { type: "TryFinallyStatement", body, catchClause: null, finalizer };
+      return new AST.TryFinallyStatement({ body, catchClause: null, finalizer });
     } else {
       throw this.createError(ErrorMessages.NO_CATCH_OR_FINALLY);
     }
@@ -867,7 +863,7 @@ export class Parser extends Tokenizer {
   parseVariableDeclarationStatement() {
     let declaration = this.parseVariableDeclaration(true);
     this.consumeSemicolon();
-    return { type: "VariableDeclarationStatement", declaration };
+    return new AST.VariableDeclarationStatement({ declaration });
   }
 
   parseWhileStatement() {
@@ -875,7 +871,7 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.LPAREN);
     let test = this.parseExpression();
     let body = this.getIteratorStatementEpilogue();
-    return { type: "WhileStatement", test, body };
+    return new AST.WhileStatement({ test, body });
   }
 
   parseWithStatement() {
@@ -884,7 +880,7 @@ export class Parser extends Tokenizer {
     let object = this.parseExpression();
     this.expect(TokenType.RPAREN);
     let body = this.parseStatement();
-    return { type: "WithStatement", object, body };
+    return new AST.WithStatement({ object, body });
   }
 
   parseCatchClause() {
@@ -899,7 +895,7 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.RPAREN);
     let body = this.parseBlock();
 
-    return this.markLocation({ type: "CatchClause", binding, body }, startLocation);
+    return this.markLocation(new AST.CatchClause({ binding, body }), startLocation);
   }
 
   parseBlock() {
@@ -910,7 +906,7 @@ export class Parser extends Tokenizer {
       body.push(this.parseStatementListItem());
     }
     this.expect(TokenType.RBRACE);
-    return this.markLocation({ type: "Block", statements: body }, startLocation);
+    return this.markLocation(new AST.Block({ statements: body }), startLocation);
   }
 
   parseVariableDeclaration(bindingPatternsMustHaveInit) {
@@ -920,7 +916,7 @@ export class Parser extends Tokenizer {
     // preceded by this.match(TokenSubType.VAR) || this.match(TokenSubType.LET);
     let kind = token.type === TokenType.VAR ? "var" : token.type === TokenType.CONST ? "const" : "let";
     let declarators = this.parseVariableDeclaratorList(bindingPatternsMustHaveInit);
-    return this.markLocation({ type: "VariableDeclaration", kind, declarators }, startLocation);
+    return this.markLocation(new AST.VariableDeclaration({ kind, declarators }), startLocation);
   }
 
   parseVariableDeclaratorList(bindingPatternsMustHaveInit) {
@@ -948,7 +944,7 @@ export class Parser extends Tokenizer {
       init = this.parseAssignmentExpression();
     }
 
-    return this.markLocation({ type: "VariableDeclarator", binding, init }, startLocation);
+    return this.markLocation(new AST.VariableDeclarator({ binding, init }), startLocation);
   }
 
   isolateCoverGrammar(parser) {
@@ -991,7 +987,7 @@ export class Parser extends Tokenizer {
         if (!this.match(TokenType.COMMA)) break;
         this.lex();
         let right = this.parseAssignmentExpression();
-        left = this.markLocation({ type: "BinaryExpression", left, operator: ",", right }, startLocation);
+        left = this.markLocation(new AST.BinaryExpression({ left, operator: ",", right }), startLocation);
       }
     }
     return left;
@@ -1008,7 +1004,7 @@ export class Parser extends Tokenizer {
       }
     }
 
-    let paramsNode = this.markLocation({ type: "FormalParameters", items: params, rest }, startLocation);
+    let paramsNode = this.markLocation(new AST.FormalParameters({ items: params, rest }), startLocation);
 
     let arrow = this.expect(TokenType.ARROW);
 
@@ -1016,7 +1012,7 @@ export class Parser extends Tokenizer {
     this.allowYieldExpression = false;
     let body = this.match(TokenType.LBRACE) ? this.parseFunctionBody() : this.parseAssignmentExpression();
     this.allowYieldExpression = previousYield;
-    return this.markLocation({ type: "ArrowExpression", params: paramsNode, body }, startLocation);
+    return this.markLocation(new AST.ArrowExpression({ params: paramsNode, body }), startLocation);
   }
 
   parseAssignmentExpression() {
@@ -1076,10 +1072,10 @@ export class Parser extends Tokenizer {
     this.firstExprError = null;
     let node;
     if (operator.type === TokenType.ASSIGN) {
-      node = { type: "AssignmentExpression", binding: expr, expression: rhs };
+      node = new AST.AssignmentExpression({ binding: expr, expression: rhs });
     }
     else {
-      node = { type: "CompoundAssignmentExpression", binding: expr, operator: operator.type.name, expression: rhs };
+      node = new AST.CompoundAssignmentExpression({ binding: expr, operator: operator.type.name, expression: rhs });
       this.isBindingElement = this.isAssignmentTarget = false;
     }
     return this.markLocation(node, startLocation);
@@ -1089,56 +1085,51 @@ export class Parser extends Tokenizer {
     switch (node.type) {
 
       case "DataProperty":
-        return copyLocation(node, {
-          type: "BindingPropertyProperty",
+        return copyLocation(node, new AST.BindingPropertyProperty({
           name: node.name,
           binding: this.transformDestructuringWithDefault(node.expression),
-        });
+        }));
       case "ShorthandProperty":
-        return copyLocation(node, {
-          type: "BindingPropertyIdentifier",
-          binding: copyLocation(node, { type: "BindingIdentifier", name: node.name }),
+        return copyLocation(node, new AST.BindingPropertyIdentifier({
+          binding: copyLocation(node, new AST.BindingIdentifier({ name: node.name })),
           init: null,
-        });
+        }));
 
       case "ObjectExpression":
-        return copyLocation(node, {
-          type: "ObjectBinding",
+        return copyLocation(node, new AST.ObjectBinding({
           properties: node.properties.map(x => this.transformDestructuring(x)),
-        });
+        }));
       case "ArrayExpression":
         let last = node.elements[node.elements.length - 1];
         if (last != null && last.type === "SpreadElement") {
-          return copyLocation(node, {
-            type: "ArrayBinding",
+          return copyLocation(node, new AST.ArrayBinding({
             elements: node.elements.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
             restElement: copyLocation(last.expression, this.transformDestructuring(last.expression)),
-          });
+          }));
         } else {
-          return copyLocation(node, {
-            type: "ArrayBinding",
+          return copyLocation(node, new AST.ArrayBinding({
             elements: node.elements.map(e => e && this.transformDestructuringWithDefault(e)),
             restElement: null,
-          });
+          }));
         }
         /* istanbul ignore next */
         break;
       case "IdentifierExpression":
-        return copyLocation(node, { type: "BindingIdentifier", name: node.name });
+        return copyLocation(node, new AST.BindingIdentifier({ name: node.name }));
       case "AssignmentExpression":
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 
       case "StaticPropertyName":
-        return copyLocation(node, { type: "BindingIdentifier", name: node.value });
+        return copyLocation(node, new AST.BindingIdentifier({ name: node.value }));
 
       case "ComputedMemberExpression":
       case "StaticMemberExpression":
       case "ArrayBinding":
+      case "ObjectBinding":
       case "BindingIdentifier":
       case "BindingPropertyIdentifier":
       case "BindingPropertyProperty":
       case "BindingWithDefault":
-      case "ObjectBinding":
         return node;
     }
 
@@ -1149,11 +1140,10 @@ export class Parser extends Tokenizer {
   transformDestructuringWithDefault(node) {
     switch (node.type) {
       case "AssignmentExpression":
-        return copyLocation(node, {
-          type: "BindingWithDefault",
+        return copyLocation(node, new AST.BindingWithDefault({
           binding: this.transformDestructuring(node.binding),
           init: node.expression,
-        });
+        }));
     }
     return this.transformDestructuring(node);
   }
@@ -1194,15 +1184,15 @@ export class Parser extends Tokenizer {
 
     this.lex();
     if (this.hasLineTerminatorBeforeNext) {
-      return this.markLocation({ type: "YieldExpression", expression: null }, startLocation);
+      return this.markLocation(new AST.YieldExpression({ expression: null }), startLocation);
     }
     let isGenerator = !!this.eat(TokenType.MUL);
     let expr = null;
     if (isGenerator || this.lookaheadAssignmentExpression()) {
       expr = this.parseAssignmentExpression();
     }
-    let type = isGenerator ? "YieldGeneratorExpression" : "YieldExpression";
-    return this.markLocation({type, expression: expr}, startLocation);
+    let ctor = isGenerator ? AST.YieldGeneratorExpression : AST.YieldExpression;
+    return this.markLocation(new ctor({ expression: expr }), startLocation);
   }
 
   parseConditionalExpression() {
@@ -1217,7 +1207,7 @@ export class Parser extends Tokenizer {
       this.allowIn = previousAllowIn;
       this.expect(TokenType.COLON);
       let alternate = this.isolateCoverGrammar(this.parseAssignmentExpression);
-      return this.markLocation({ type: "ConditionalExpression", test, consequent, alternate }, startLocation);
+      return this.markLocation(new AST.ConditionalExpression({ test, consequent, alternate }), startLocation);
     }
     return test;
   }
@@ -1282,7 +1272,7 @@ export class Parser extends Tokenizer {
         left = stackItem.left;
         stack.pop();
         startLocation = stackItem.startLocation;
-        right = this.markLocation({ type: "BinaryExpression", left, operator: stackOperator.name, right }, startLocation);
+        right = this.markLocation(new AST.BinaryExpression({ left, operator: stackOperator.name, right }), startLocation);
       }
 
       this.lex();
@@ -1295,12 +1285,11 @@ export class Parser extends Tokenizer {
 
     // Final reduce to clean-up the stack.
     return stack.reduceRight((expr, stackItem) =>
-        this.markLocation({
-          type: "BinaryExpression",
+        this.markLocation(new AST.BinaryExpression({
           left: stackItem.left,
           operator: stackItem.operator.name,
           right: expr,
-        }, stackItem.startLocation),
+        }), stackItem.startLocation),
       right);
   }
 
@@ -1326,10 +1315,10 @@ export class Parser extends Tokenizer {
       } else if (!isValidSimpleAssignmentTarget(operand)) {
         throw this.createErrorWithLocation(operandStartLocation, ErrorMessages.INVALID_UPDATE_OPERAND);
       }
-      node = { type: "UpdateExpression", isPrefix: true, operator: operator.value, operand: operand };
+      node = new AST.UpdateExpression({ isPrefix: true, operator: operator.value, operand });
     } else {
       let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
-      node = { type: "UnaryExpression", operator: operator.value, operand: operand };
+      node = new AST.UnaryExpression({ operator: operator.value, operand });
     }
 
     return this.markLocation(node, startLocation);
@@ -1351,7 +1340,7 @@ export class Parser extends Tokenizer {
       throw this.createErrorWithLocation(startLocation, ErrorMessages.INVALID_UPDATE_OPERAND);
     }
 
-    return this.markLocation({ type: "UpdateExpression", isPrefix: false, operator: operator.value, operand }, startLocation);
+    return this.markLocation(new AST.UpdateExpression({ isPrefix: false, operator: operator.value, operand }), startLocation);
   }
 
   parseLeftHandSideExpression({allowCall}) {
@@ -1364,30 +1353,27 @@ export class Parser extends Tokenizer {
     if (this.eat(TokenType.SUPER)) {
       this.isBindingElement = false;
       this.isAssignmentTarget = false;
-      expr = this.markLocation({ type: "Super" }, startLocation);
+      expr = this.markLocation(new AST.Super, startLocation);
       if (this.match(TokenType.LPAREN)) {
         if (allowCall) {
-          expr = this.markLocation({
-            type: "CallExpression",
+          expr = this.markLocation(new AST.CallExpression({
             callee: expr,
             arguments: this.parseArgumentList(),
-          }, startLocation);
+          }), startLocation);
         } else {
           throw this.createUnexpected(token);
         }
       } else if (this.match(TokenType.LBRACK)) {
-        expr = this.markLocation({
-          type: "ComputedMemberExpression",
+        expr = this.markLocation(new AST.ComputedMemberExpression({
           object: expr,
           expression: this.parseComputedMember(),
-        }, startLocation);
+        }), startLocation);
         this.isAssignmentTarget = true;
       } else if (this.match(TokenType.PERIOD)) {
-        expr = this.markLocation({
-          type: "StaticMemberExpression",
+        expr = this.markLocation(new AST.StaticMemberExpression({
           object: expr,
           property: this.parseStaticMember(),
-        }, startLocation);
+        }), startLocation);
         this.isAssignmentTarget = true;
       } else {
         throw this.createUnexpected(token);
@@ -1405,34 +1391,30 @@ export class Parser extends Tokenizer {
     while (true) {
       if (allowCall && this.match(TokenType.LPAREN)) {
         this.isBindingElement = this.isAssignmentTarget = false;
-        expr = this.markLocation({
-          type: "CallExpression",
+        expr = this.markLocation(new AST.CallExpression({
           callee: expr,
           arguments: this.parseArgumentList(),
-        }, startLocation);
+        }), startLocation);
       } else if (this.match(TokenType.LBRACK)) {
         this.isBindingElement = false;
         this.isAssignmentTarget = true;
-        expr = this.markLocation({
-          type: "ComputedMemberExpression",
+        expr = this.markLocation(new AST.ComputedMemberExpression({
           object: expr,
           expression: this.parseComputedMember(),
-        }, startLocation);
+        }), startLocation);
       } else if (this.match(TokenType.PERIOD)) {
         this.isBindingElement = false;
         this.isAssignmentTarget = true;
-        expr = this.markLocation({
-          type: "StaticMemberExpression",
+        expr = this.markLocation(new AST.StaticMemberExpression({
           object: expr,
           property: this.parseStaticMember(),
-        }, startLocation);
+        }), startLocation);
       } else if (this.match(TokenType.TEMPLATE)) {
         this.isBindingElement = this.isAssignmentTarget = false;
-        expr = this.markLocation({
-          type: "TemplateExpression",
+        expr = this.markLocation(new AST.TemplateExpression({
           tag: expr,
           elements: this.parseTemplateElements(),
-        }, startLocation);
+        }), startLocation);
       } else {
         break;
       }
@@ -1448,10 +1430,10 @@ export class Parser extends Tokenizer {
     let token = this.lookahead;
     if (token.tail) {
       this.lex();
-      return [this.markLocation({ type: "TemplateElement", rawValue: token.slice.text.slice(1, -1) }, startLocation)];
+      return [this.markLocation(new AST.TemplateElement({ rawValue: token.slice.text.slice(1, -1) }), startLocation)];
     }
     let result = [
-      this.markLocation({ type: "TemplateElement", rawValue: this.lex().slice.text.slice(1, -2) }, startLocation),
+      this.markLocation(new AST.TemplateElement({ rawValue: this.lex().slice.text.slice(1, -2) }), startLocation),
     ];
     while (true) {
       result.push(this.parseExpression());
@@ -1465,10 +1447,10 @@ export class Parser extends Tokenizer {
       startLocation = this.getLocation();
       token = this.lex();
       if (token.tail) {
-        result.push(this.markLocation({ type: "TemplateElement", rawValue: token.slice.text.slice(1, -1) }, startLocation));
+        result.push(this.markLocation(new AST.TemplateElement({ rawValue: token.slice.text.slice(1, -1) }), startLocation));
         return result;
       } else {
-        result.push(this.markLocation({ type: "TemplateElement", rawValue: token.slice.text.slice(1, -2) }, startLocation));
+        result.push(this.markLocation(new AST.TemplateElement({ rawValue: token.slice.text.slice(1, -2) }), startLocation));
       }
     }
   }
@@ -1497,14 +1479,13 @@ export class Parser extends Tokenizer {
       if (ident.value !== "target") {
         throw this.createUnexpected(ident);
       }
-      return this.markLocation({ type: "NewTargetExpression" }, startLocation);
+      return this.markLocation(new AST.NewTargetExpression, startLocation);
     }
     let callee = this.isolateCoverGrammar(() => this.parseLeftHandSideExpression({ allowCall: false }));
-    return this.markLocation({
-      type: "NewExpression",
+    return this.markLocation(new AST.NewExpression({
       callee,
       arguments: this.match(TokenType.LPAREN) ? this.parseArgumentList() : [],
-    }, startLocation);
+    }), startLocation);
   }
 
   parsePrimaryExpression() {
@@ -1518,7 +1499,7 @@ export class Parser extends Tokenizer {
       case TokenType.IDENTIFIER:
       case TokenType.YIELD:
       case TokenType.LET:
-        return this.markLocation({ type: "IdentifierExpression", name: this.parseIdentifier() }, startLocation);
+        return this.markLocation(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startLocation);
       case TokenType.STRING:
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.parseStringLiteral();
@@ -1528,29 +1509,29 @@ export class Parser extends Tokenizer {
       case TokenType.THIS:
         this.lex();
         this.isBindingElement = this.isAssignmentTarget = false;
-        return this.markLocation({ type: "ThisExpression" }, startLocation);
+        return this.markLocation(new AST.ThisExpression, startLocation);
       case TokenType.FUNCTION:
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.markLocation(this.parseFunction({isExpr: true, inDefault: false, allowGenerator: true}), startLocation);
       case TokenType.TRUE:
         this.lex();
         this.isBindingElement = this.isAssignmentTarget = false;
-        return this.markLocation({ type: "LiteralBooleanExpression", value: true }, startLocation);
+        return this.markLocation(new AST.LiteralBooleanExpression({ value: true }), startLocation);
       case TokenType.FALSE:
         this.lex();
         this.isBindingElement = this.isAssignmentTarget = false;
-        return this.markLocation({ type: "LiteralBooleanExpression", value: false }, startLocation);
+        return this.markLocation(new AST.LiteralBooleanExpression({ value: false }), startLocation);
       case TokenType.NULL:
         this.lex();
         this.isBindingElement = this.isAssignmentTarget = false;
-        return this.markLocation({ type: "LiteralNullExpression" }, startLocation);
+        return this.markLocation(new AST.LiteralNullExpression, startLocation);
       case TokenType.LBRACK:
         return this.parseArrayExpression();
       case TokenType.LBRACE:
         return this.parseObjectExpression();
       case TokenType.TEMPLATE:
         this.isBindingElement = this.isAssignmentTarget = false;
-        return this.markLocation({ type: "TemplateExpression", tag: null, elements: this.parseTemplateElements() }, startLocation);
+        return this.markLocation(new AST.TemplateExpression({ tag: null, elements: this.parseTemplateElements() }), startLocation);
       case TokenType.DIV:
       case TokenType.ASSIGN_DIV:
         this.isBindingElement = this.isAssignmentTarget = false;
@@ -1559,7 +1540,7 @@ export class Parser extends Tokenizer {
         let lastSlash = token.value.lastIndexOf("/");
         let pattern = token.value.slice(1, lastSlash);
         let flags = token.value.slice(lastSlash + 1);
-        return this.markLocation({ type: "LiteralRegExpExpression", pattern, flags }, startLocation);
+        return this.markLocation(new AST.LiteralRegExpExpression({ pattern, flags }), startLocation);
       case TokenType.CLASS:
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.parseClass({ isExpr: true, inDefault: false });
@@ -1579,8 +1560,8 @@ export class Parser extends Tokenizer {
       }
     }
     let node = token.value === 1 / 0
-      ? { type: "LiteralInfinityExpression" }
-      : { type: "LiteralNumericExpression", value: token.value };
+      ? new AST.LiteralInfinityExpression
+      : new AST.LiteralNumericExpression({ value: token.value });
     return this.markLocation(node, startLocation);
   }
 
@@ -1590,7 +1571,7 @@ export class Parser extends Tokenizer {
     if (token.octal != null && this.strict) {
       throw this.createErrorWithLocation(startLocation, "Unexpected legacy octal escape sequence: \\" + token.octal);
     }
-    return this.markLocation({ type: "LiteralStringExpression", value: token.str }, startLocation);
+    return this.markLocation(new AST.LiteralStringExpression({ value: token.str }), startLocation);
   }
 
   parseIdentifierName() {
@@ -1603,7 +1584,7 @@ export class Parser extends Tokenizer {
 
   parseBindingIdentifier() {
     let startLocation = this.getLocation();
-    return this.markLocation({ type: "BindingIdentifier", name: this.parseIdentifier() }, startLocation);
+    return this.markLocation(new AST.BindingIdentifier({ name: this.parseIdentifier() }), startLocation);
   }
 
   parseIdentifier() {
@@ -1630,7 +1611,7 @@ export class Parser extends Tokenizer {
       let arg;
       if (this.eat(TokenType.ELLIPSIS)) {
         let startLocation = this.getLocation();
-        arg = this.markLocation({ type: "SpreadElement", expression: this.parseAssignmentExpression() }, startLocation);
+        arg = this.markLocation(new AST.SpreadElement({ expression: this.parseAssignmentExpression() }), startLocation);
       } else {
         arg = this.parseAssignmentExpression();
       }
@@ -1674,7 +1655,7 @@ export class Parser extends Tokenizer {
       return {
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
-        rest: rest,
+        rest,
       };
     }
 
@@ -1711,12 +1692,11 @@ export class Parser extends Tokenizer {
         if (this.firstExprError) {
           group = null;
         } else {
-          group = this.markLocation({
-            type: "BinaryExpression",
+          group = this.markLocation(new AST.BinaryExpression({
             left: group,
             operator: ",",
             right: expr,
-          }, startLocation);
+          }), startLocation);
         }
       }
     }
@@ -1749,6 +1729,7 @@ export class Parser extends Tokenizer {
     this.lex();
 
     let exprs = [];
+    let rest = null;
 
     while (true) {
       if (this.match(TokenType.RBRACK)) {
@@ -1765,7 +1746,11 @@ export class Parser extends Tokenizer {
           if (!this.isAssignmentTarget && this.firstExprError) {
             throw this.firstExprError;
           }
-          expr = this.markLocation({ type: "SpreadElement", expression: expr }, elementLocation);
+          if (expr.type === "BindingIdentifier" || expr.type === "ArrayBinding" || expr.type === "ObjectBinding") {
+            rest = expr;
+            break;
+          }
+          expr = this.markLocation(new AST.SpreadElement({ expression: expr }), elementLocation);
           if (!this.match(TokenType.RBRACK)) {
             this.isBindingElement = this.isAssignmentTarget = false;
           }
@@ -1783,9 +1768,40 @@ export class Parser extends Tokenizer {
       }
     }
 
+    if (rest && this.match(TokenType.COMMA)) {
+      throw this.createErrorWithLocation(startLocation, ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+    }
+
     this.expect(TokenType.RBRACK);
 
-    return this.markLocation({ type: "ArrayExpression", elements: exprs }, startLocation);
+    if (rest) {
+      if (!this.isAssignmentTarget) {
+        throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
+      }
+      return this.markLocation(new AST.ArrayBinding({
+        elements: exprs.map(e => e && this.transformDestructuringWithDefault(e)),
+        restElement: rest,
+      }), startLocation);
+    } else if (this.firstExprError) {
+      if (!this.isAssignmentTarget) {
+        throw this.firstExprError;
+      }
+      let last = exprs[exprs.length - 1];
+      if (last != null && last.type === "SpreadElement") {
+        return this.markLocation(new AST.ArrayBinding({
+          elements: exprs.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
+          restElement: this.transformDestructuring(last.expression),
+        }), startLocation);
+      } else {
+        return this.markLocation(new AST.ArrayBinding({
+          elements: exprs.map(e => e && this.transformDestructuringWithDefault(e)),
+          restElement: null,
+        }), startLocation);
+      }
+    } else {
+      return this.markLocation(new AST.ArrayExpression({ elements: exprs }), startLocation);
+    }
+
   }
 
   parseObjectExpression() {
@@ -1802,7 +1818,14 @@ export class Parser extends Tokenizer {
       }
     }
     this.expect(TokenType.RBRACE);
-    return this.markLocation({ type: "ObjectExpression", properties }, startLocation);
+    if (this.firstExprError) {
+      if (!this.isAssignmentTarget) {
+        throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
+      }
+      return this.markLocation(new AST.ObjectBinding({ properties: properties.map(p => this.transformDestructuring(p)) }), startLocation);
+    } else {
+      return this.markLocation(new AST.ObjectExpression({ properties }), startLocation);
+    }
   }
 
   parsePropertyDefinition() {
@@ -1819,16 +1842,15 @@ export class Parser extends Tokenizer {
           // CoverInitializedName
           let init = this.isolateCoverGrammar(this.parseAssignmentExpression);
           this.firstExprError = this.createErrorWithLocation(startLocation, ErrorMessages.ILLEGAL_PROPERTY);
-          return this.markLocation({
-            type: "BindingPropertyIdentifier",
+          return this.markLocation(new AST.BindingPropertyIdentifier({
             binding: this.transformDestructuring(methodOrKey),
             init,
-          }, startLocation);
+          }), startLocation);
         } else if (!this.match(TokenType.COLON)) {
           if (token.type !== TokenType.IDENTIFIER && token.type !== TokenType.YIELD && token.type !== TokenType.LET) {
             throw this.createUnexpected(token);
           }
-          return this.markLocation({ type: "ShorthandProperty", name: methodOrKey.value }, startLocation);
+          return this.markLocation(new AST.ShorthandProperty({ name: methodOrKey.value }), startLocation);
         }
     }
 
@@ -1836,7 +1858,7 @@ export class Parser extends Tokenizer {
     this.expect(TokenType.COLON);
 
     let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrBindingElement);
-    return this.markLocation({ type: "DataProperty", name: methodOrKey, expression: expr }, startLocation);
+    return this.markLocation(new AST.DataProperty({ name: methodOrKey, expression: expr }), startLocation);
   }
 
   parsePropertyName() {
@@ -1851,19 +1873,17 @@ export class Parser extends Tokenizer {
     switch (token.type) {
       case TokenType.STRING:
         return {
-          name: this.markLocation({
-            type: "StaticPropertyName",
+          name: this.markLocation(new AST.StaticPropertyName({
             value: this.parseStringLiteral().value,
-          }, startLocation),
+          }), startLocation),
           binding: null,
         };
       case TokenType.NUMBER:
         let numLiteral = this.parseNumericLiteral();
         return {
-          name: this.markLocation({
-            type: "StaticPropertyName",
+          name: this.markLocation(new AST.StaticPropertyName({
             value: `${numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value}`,
-          }, startLocation),
+          }), startLocation),
           binding: null,
         };
       case TokenType.LBRACK:
@@ -1872,13 +1892,13 @@ export class Parser extends Tokenizer {
         let expr = this.parseAssignmentExpression();
         this.expect(TokenType.RBRACK);
         this.allowYieldExpression = previousYield;
-        return { name: this.markLocation({ type: "ComputedPropertyName", expression: expr }, startLocation), binding: null };
+        return { name: this.markLocation(new AST.ComputedPropertyName({ expression: expr }), startLocation), binding: null };
     }
 
     let name = this.parseIdentifierName();
     return {
-      name: this.markLocation({ type: "StaticPropertyName", value: name }, startLocation),
-      binding: this.markLocation({ type: "BindingIdentifier", name }, startLocation),
+      name: this.markLocation(new AST.StaticPropertyName({ value: name }), startLocation),
+      binding: this.markLocation(new AST.BindingIdentifier({ name }), startLocation),
     };
   }
 
@@ -1926,7 +1946,7 @@ export class Parser extends Tokenizer {
           this.expect(TokenType.RPAREN);
           let body = this.parseFunctionBody();
           return {
-            methodOrKey: this.markLocation({ type: "Getter", name, body }, startLocation),
+            methodOrKey: this.markLocation(new AST.Getter({ name, body }), startLocation),
             kind: "method",
           };
         } else if (name === "set" && this.lookaheadPropertyName()) {
@@ -1939,7 +1959,7 @@ export class Parser extends Tokenizer {
           let body = this.parseFunctionBody();
           this.allowYieldExpression = previousYield;
           return {
-            methodOrKey: this.markLocation({ type: "Setter", name, param, body }, startLocation),
+            methodOrKey: this.markLocation(new AST.Setter({ name, param, body }), startLocation),
             kind: "method",
           };
         }
@@ -1955,7 +1975,7 @@ export class Parser extends Tokenizer {
       this.allowYieldExpression = previousYield;
 
       return {
-        methodOrKey: this.markLocation({ type: "Method", isGenerator, name, params, body }, startLocation),
+        methodOrKey: this.markLocation(new AST.Method({ isGenerator, name, params, body }), startLocation),
         kind: "method",
       };
     }
@@ -1967,7 +1987,7 @@ export class Parser extends Tokenizer {
     return {
       methodOrKey: name,
       kind: token.type.klass.isIdentifierName ? "identifier" : "property",
-      binding: binding,
+      binding,
     };
   }
 
@@ -1982,7 +2002,7 @@ export class Parser extends Tokenizer {
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {
-        name = { type: "BindingIdentifier", name: "*default*" };
+        name = new AST.BindingIdentifier({ name: "*default*" });
       } else {
         throw this.createUnexpected(this.lookahead);
       }
@@ -2011,13 +2031,13 @@ export class Parser extends Tokenizer {
         ({methodOrKey, kind} = this.parseMethodDefinition());
       }
       if (kind === "method") {
-        elements.push(copyLocation(methodOrKey, { type: "ClassElement", isStatic, method: methodOrKey }));
+        elements.push(copyLocation(methodOrKey, new AST.ClassElement({ isStatic, method: methodOrKey })));
       } else {
         throw this.createError("Only methods are allowed in classes");
       }
     }
     this.allowYieldExpression = previousParamYield;
-    return this.markLocation({ type: isExpr ? "ClassExpression" : "ClassDeclaration", name, super: heritage, elements }, startLocation);
+    return this.markLocation(new (isExpr ? AST.ClassExpression : AST.ClassDeclaration)({ name, super: heritage, elements }), startLocation);
   }
 
   parseFunction({isExpr, inDefault, allowGenerator}) {
@@ -2038,7 +2058,7 @@ export class Parser extends Tokenizer {
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {
-        name = {type: "BindingIdentifier", name: "*default*" };
+        name = new AST.BindingIdentifier({ name: "*default*" });
       } else {
         throw this.createUnexpected(this.lookahead);
       }
@@ -2050,8 +2070,7 @@ export class Parser extends Tokenizer {
     let body = this.parseFunctionBody();
     this.allowYieldExpression = previousYield;
 
-    let type = isExpr ? "FunctionExpression" : "FunctionDeclaration";
-    return this.markLocation({ type, isGenerator, name, params, body }, startLocation);
+    return this.markLocation(new (isExpr ? AST.FunctionExpression : AST.FunctionDeclaration)({ isGenerator, name, params, body }), startLocation);
   }
 
   parseArrayBinding() {
@@ -2085,7 +2104,7 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.RBRACK);
 
-    return this.markLocation({ type: "ArrayBinding", elements, restElement }, startLocation);
+    return this.markLocation(new AST.ArrayBinding({ elements, restElement }), startLocation);
   }
 
   parseBindingProperty() {
@@ -2103,16 +2122,15 @@ export class Parser extends Tokenizer {
         } else if (token.type === TokenType.YIELD && this.allowYieldExpression) {
           throw this.createUnexpected(token);
         }
-        return this.markLocation({
-          type: "BindingPropertyIdentifier",
-          binding: binding,
+        return this.markLocation(new AST.BindingPropertyIdentifier({
+          binding,
           init: defaultValue,
-        }, startLocation);
+        }), startLocation);
       }
     }
     this.expect(TokenType.COLON);
     binding = this.parseBindingElement();
-    return this.markLocation({ type: "BindingPropertyProperty", name, binding }, startLocation);
+    return this.markLocation(new AST.BindingPropertyProperty({ name, binding }), startLocation);
   }
 
   parseObjectBinding() {
@@ -2130,7 +2148,7 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.RBRACE);
 
-    return this.markLocation({ type: "ObjectBinding", properties }, startLocation);
+    return this.markLocation(new AST.ObjectBinding({ properties }), startLocation);
   }
 
   parseBindingTarget() {
@@ -2154,7 +2172,7 @@ export class Parser extends Tokenizer {
     if (this.eat(TokenType.ASSIGN)) {
       let previousYieldExpression = this.allowYieldExpression;
       let init = this.parseAssignmentExpression();
-      binding = this.markLocation({ type: "BindingWithDefault", binding, init }, startLocation);
+      binding = this.markLocation(new AST.BindingWithDefault({ binding, init }), startLocation);
       this.allowYieldExpression = previousYieldExpression;
     }
     return binding;
@@ -2188,6 +2206,6 @@ export class Parser extends Tokenizer {
 
     this.expect(TokenType.RPAREN);
 
-    return this.markLocation({ type: "FormalParameters", items, rest }, paramsLocation);
+    return this.markLocation(new AST.FormalParameters({ items, rest }), paramsLocation);
   }
 }

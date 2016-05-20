@@ -62,7 +62,6 @@ suite("Parser", function () {
 
   });
 
-  // new test added
   testParse("[a, ...(b=c)]", expr, {
     type: "ArrayExpression",
     elements: [{type: "IdentifierExpression", name: "a"}, {
@@ -73,5 +72,5 @@ suite("Parser", function () {
         expression: {type: "IdentifierExpression", name: "c"}
       }
     }]
-  })
+  });
 });

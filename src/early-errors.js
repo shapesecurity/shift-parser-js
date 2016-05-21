@@ -104,6 +104,14 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return super.reduceAssignmentExpression(...arguments).clearBoundNames();
   }
 
+  reduceAssignmentTargetIdentifier(node) {
+    let s = this.identity;
+    if (isRestrictedWord(node.name) || isStrictModeReservedWord(node.name)) {
+      s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(node.name)} must not be in binding position in strict mode`));
+    }
+    return s;
+  }
+
   reduceArrowExpression(node, {params, body}) {
     params = params.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     if (node.body.type === "FunctionBody") {
@@ -261,16 +269,21 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceExportFrom(node) {
     let s = super.reduceExportFrom(...arguments);
-    if (node.moduleSpecifier != null) {
-      s = s.clearExportedBindings();
-    }
+    s = s.clearExportedBindings();
     return s;
   }
 
-  reduceExportSpecifier(node) {
-    let s = super.reduceExportSpecifier(...arguments);
-    s = s.exportName(node.exportedName, node);
-    s = s.exportBinding(node.name || node.exportedName, node);
+  reduceExportFromSpecifier(node) {
+    let s = super.reduceExportFromSpecifier(...arguments);
+    s = s.exportName(node.exportedName || node.name, node);
+    s = s.exportBinding(node.name, node);
+    return s;
+  }
+
+  reduceExportLocalSpecifier(node) {
+    let s = super.reduceExportLocalSpecifier(...arguments);
+    s = s.exportName(node.exportedName || node.name.name, node);
+    s = s.exportBinding(node.name.name, node);
     return s;
   }
 
@@ -498,9 +511,6 @@ export class EarlyErrorChecker extends MonoidalReducer {
     //if (!PatternAcceptor.test(node.pattern, node.flags.indexOf("u") >= 0)) {
     //  s = s.addError(new EarlyError(node, "Invalid regular expression pattern"));
     //}
-    if (!/^[igmyu]*$/.test(node.flags) || containsDuplicates(node.flags)) {
-      s = s.addError(new EarlyError(node, "Invalid regular expression flags"));
-    }
     return s;
   }
 

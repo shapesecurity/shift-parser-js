@@ -217,9 +217,6 @@ suite("Parser", function () {
     //testEarlyError("/}?/", "Invalid regular expression pattern");
     //testEarlyError("/{*/", "Invalid regular expression pattern");
     //testEarlyError("/(?=.)*/u", "Invalid regular expression pattern");
-    // It is a Syntax Error if FlagText of RegularExpressionLiteral contains any code points other than "g", "i", "m", "u", or "y", or if it contains the same code point more than once.
-    testEarlyError("/./a", "Invalid regular expression flags");
-    testEarlyError("/./ii", "Invalid regular expression flags");
 
     // 12.5.4.1
     // It is a Syntax Error if the UnaryExpression is contained in strict code and the derived UnaryExpression is PrimaryExpression : IdentifierReference.

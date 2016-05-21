@@ -1102,7 +1102,7 @@ export class Parser extends Tokenizer {
       case "AssignmentTargetWithDefault":
         return new AST.BindingWithDefault({ binding: this.targetToBinding(node.binding), init: node.init });
       default:
-        throw new Error(`todo: ${node.type}`);
+        throw new Error('Not reached');
     }
   }
 

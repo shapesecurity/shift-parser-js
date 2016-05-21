@@ -201,5 +201,7 @@ suite("Parser", function () {
     testParseFailure("(\"\\u{}\")", "Unexpected \"}\"");
     testParseFailure("\"use strict\"; function f(){(\"\\1\");}", "Unexpected legacy octal escape sequence: \\1");
     testParseFailure("\"use strict\"; function f(){01;}", "Unexpected legacy octal integer literal");
+    testParseFailure("/./a", "Invalid regular expression flag 'a'");
+    testParseFailure("/./ii", "Duplicate regular expression flag 'i'");
   });
 });

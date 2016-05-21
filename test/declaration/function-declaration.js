@@ -134,6 +134,40 @@ suite("Parser", function () {
       }
     );
 
+    testParse("function a(...b) { }", stmt,
+      { type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params:
+          { type: "FormalParameters",
+            items: [],
+            rest: { type: "BindingIdentifier", name: "b" }
+          },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: []
+        }
+      }
+    );
+
+    testParse("function a(...[]) { }", stmt, 
+      { type: "FunctionDeclaration",
+        isGenerator: false,
+        name: { type: "BindingIdentifier", name: "a" },
+        params:
+          { type: "FormalParameters",
+            items: [],
+            rest: { type: "ArrayBinding", elements: [], rest: null }
+          },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: []
+        }
+      }
+    );
+
     testParse("function universe(__proto__) { }", stmt,
       { type: "FunctionDeclaration",
         isGenerator: false,

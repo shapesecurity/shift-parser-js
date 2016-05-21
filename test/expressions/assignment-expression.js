@@ -87,6 +87,14 @@ suite("Parser", function () {
         expression: { type: "LiteralNumericExpression", value: 0 }
       }
     );
+    testParse("x **= 0", expr,
+      {
+        type: "CompoundAssignmentExpression",
+        operator: "**=",
+        binding: { type: "AssignmentTargetIdentifier", name: "x" },
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      }
+    );
     testParse("x += 0", expr,
       {
         type: "CompoundAssignmentExpression",

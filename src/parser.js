@@ -1051,6 +1051,7 @@ export class Parser extends Tokenizer {
       case TokenType.ASSIGN_MUL:
       case TokenType.ASSIGN_DIV:
       case TokenType.ASSIGN_MOD:
+      case TokenType.ASSIGN_EXP:
         isAssignmentOperator = true;
         break;
     }
@@ -1276,7 +1277,7 @@ export class Parser extends Tokenizer {
 
   parseBinaryExpression() {
     let startLocation = this.getLocation();
-    let left = this.parseUnaryExpression();
+    let left = this.parseExponentiationExpression();
     if (this.firstExprError) {
       return left;
     }
@@ -1291,7 +1292,7 @@ export class Parser extends Tokenizer {
     let stack = [];
     stack.push({startLocation, left, operator, precedence: BinaryPrecedence[operator.name]});
     startLocation = this.getLocation();
-    let right = this.isolateCoverGrammar(this.parseUnaryExpression);
+    let right = this.isolateCoverGrammar(this.parseExponentiationExpression);
     operator = this.lookahead.type;
     while (this.isBinaryOperator(operator)) {
       let precedence = BinaryPrecedence[operator.name];
@@ -1309,7 +1310,7 @@ export class Parser extends Tokenizer {
       stack.push({startLocation, left: right, operator, precedence});
 
       startLocation = this.getLocation();
-      right = this.isolateCoverGrammar(this.parseUnaryExpression);
+      right = this.isolateCoverGrammar(this.parseExponentiationExpression);
       operator = this.lookahead.type;
     }
 
@@ -1321,6 +1322,17 @@ export class Parser extends Tokenizer {
           right: expr,
         }), stackItem.startLocation),
       right);
+  }
+
+  parseExponentiationExpression() {
+    let left = this.parseUnaryExpression();
+    if (this.lookahead.type !== TokenType.EXP) {
+      return left;
+    }
+    this.lex();
+
+    let right = this.isolateCoverGrammar(this.parseExponentiationExpression);
+    return new AST.BinaryExpression({ left, operator: "**", right });
   }
 
   parseUnaryExpression() {
@@ -1724,7 +1736,7 @@ export class Parser extends Tokenizer {
           rest: null,
       };
     } else if (this.eat(TokenType.ELLIPSIS)) {
-      rest = this.parseBindingIdentifier();
+      rest = this.parseBindingTarget();
       this.expect(TokenType.RPAREN);
       this.ensureArrow();
       this.isBindingElement = this.isAssignmentTarget = false;
@@ -1748,7 +1760,7 @@ export class Parser extends Tokenizer {
           throw this.createUnexpected(this.lookahead);
         }
         this.lex();
-        rest = this.parseBindingIdentifier();
+        rest = this.parseBindingTarget();
         break;
       }
 
@@ -2271,7 +2283,7 @@ export class Parser extends Tokenizer {
     if (!this.match(TokenType.RPAREN)) {
       while (!this.eof()) {
         if (this.eat(TokenType.ELLIPSIS)) {
-          rest = this.parseBindingIdentifier();
+          rest = this.parseBindingTarget();
           break;
         }
         items.push(this.parseParam());

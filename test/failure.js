@@ -187,7 +187,7 @@ suite("Parser", function () {
     testParseFailure("({get +:3})", "Unexpected token \"+\"");
     testParseFailure("function t() { ;  ;  ", "Unexpected end of input");
     testParseFailure("#=", "Unexpected \"#\"");
-    testParseFailure("**", "Unexpected token \"*\"");
+    testParseFailure("**", "Unexpected token \"**\"");
     testParseFailure("({a = 0});", "Illegal property initializer");
     testParseFailure("({a: 0, b = 0});", "Invalid left-hand side in binding");
     testParseFailure("({a: b = 0, c = 0});", "Illegal property initializer");

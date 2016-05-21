@@ -58,6 +58,7 @@ export const TokenType = {
   ASSIGN_MUL: {klass: TokenClass.Punctuator, name: "*="},
   ASSIGN_DIV: {klass: TokenClass.Punctuator, name: "/="},
   ASSIGN_MOD: {klass: TokenClass.Punctuator, name: "%="},
+  ASSIGN_EXP: {klass: TokenClass.Punctuator, name: "**="},
   COMMA: {klass: TokenClass.Punctuator, name: ","},
   OR: {klass: TokenClass.Punctuator, name: "||"},
   AND: {klass: TokenClass.Punctuator, name: "&&"},
@@ -72,6 +73,7 @@ export const TokenType = {
   MUL: {klass: TokenClass.Punctuator, name: "*"},
   DIV: {klass: TokenClass.Punctuator, name: "/"},
   MOD: {klass: TokenClass.Punctuator, name: "%"},
+  EXP: {klass: TokenClass.Punctuator, name: "**"},
   EQ: {klass: TokenClass.Punctuator, name: "=="},
   NE: {klass: TokenClass.Punctuator, name: "!="},
   EQ_STRICT: {klass: TokenClass.Punctuator, name: "==="},
@@ -886,9 +888,15 @@ export default class Tokenizer {
           if (ch1 === ">" && ch3 === "=") {
             return TokenType.ASSIGN_SHR;
           }
+
+          if (ch1 === "*" && ch3 === "=") {
+            return TokenType.ASSIGN_EXP;
+          }
         }
         // Other 2-character punctuators: ++ -- << >> && ||
         switch (ch1) {
+          case "*":
+            return TokenType.EXP;
           case "+":
             return TokenType.INC;
           case "-":

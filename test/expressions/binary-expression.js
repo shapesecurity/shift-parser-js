@@ -347,6 +347,14 @@ suite("Parser", function () {
         right: { type: "IdentifierExpression", name: "y" } }
     );
 
+    // Exponentiation Operator
+    testParse("x ** y", expr,
+      { type: "BinaryExpression",
+        operator: "**",
+        left: { type: "IdentifierExpression", name: "x" },
+        right: { type: "IdentifierExpression", name: "y" } }
+    );
+
     // Bitwise Shift Operator
     testParse("x << y", expr,
       { type: "BinaryExpression",

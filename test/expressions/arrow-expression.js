@@ -110,6 +110,39 @@ suite("Parser", function () {
       }
     );
 
+    testParse("(...a) => 0", expr,
+      { type: "ArrowExpression",
+        params:
+          { type: "FormalParameters",
+            items: [],
+            rest: { type: "BindingIdentifier", name: "a" }
+          },
+        body: { type: "LiteralNumericExpression", value: 0 }
+      }
+    );
+
+    testParse("(...[]) => 0", expr,
+      { type: "ArrowExpression",
+        params:
+          { type: "FormalParameters",
+            items: [],
+            rest: { type: "ArrayBinding", elements: [], rest: null }
+          },
+        body: { type: "LiteralNumericExpression", value: 0 }
+      }
+    );
+
+    testParse("(a, ...[]) => 0", expr,
+      { type: "ArrowExpression",
+        params:
+          { type: "FormalParameters",
+            items: [ { type: "BindingIdentifier", name: "a" }],
+            rest: { type: "ArrayBinding", elements: [], rest: null }
+          },
+        body: { type: "LiteralNumericExpression", value: 0 }
+      }
+    );
+
     testParse("() => () => 0", expr,
       { type: "ArrowExpression",
         params:

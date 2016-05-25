@@ -18,7 +18,7 @@ import {ErrorMessages} from "./errors";
 
 import Tokenizer, { TokenClass, TokenType } from "./tokenizer";
 
-import * as AST from "shift-ast/checked";
+import * as AST from "shift-ast/checked"; // todo
 
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = "CoverParenthesizedExpressionAndArrowParameterList";
@@ -2032,7 +2032,10 @@ export class Parser extends Tokenizer {
           ({name} = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
+          let previousYield = this.allowYieldExpression;
+          this.allowYieldExpression = false;
           let body = this.parseFunctionBody();
+          this.allowYieldExpression = previousYield;
           return {
             methodOrKey: this.markLocation(new AST.Getter({ name, body }), startLocation),
             kind: "method",

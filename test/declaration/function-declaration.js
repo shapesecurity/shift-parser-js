@@ -151,7 +151,7 @@ suite("Parser", function () {
       }
     );
 
-    testParse("function a(...[]) { }", stmt, 
+    testParse("function a(...[]) { }", stmt,
       { type: "FunctionDeclaration",
         isGenerator: false,
         name: { type: "BindingIdentifier", name: "a" },

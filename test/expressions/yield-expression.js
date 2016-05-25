@@ -80,5 +80,24 @@ suite("Parser", function () {
       isPrefix: true,
       operand: { type: "AssignmentTargetIdentifier", name: "a" },
       operator: "--" });
+
+    var accessor = function (p) { return stmt(p).body.statements[0].expression.properties[0].body.statements[0].expression; }
+    testParse("function *a(){({get b(){yield}})}", accessor, {
+      type: "IdentifierExpression",
+      name: "yield"
+    });
+    testParse("function *a(){({set b(c){yield}})}", accessor, {
+      type: "IdentifierExpression",
+      name: "yield"
+    });
+    testParse("function *a(){({b(){yield}})}", accessor, {
+      type: "IdentifierExpression",
+      name: "yield"
+    });
+    testParse("function a(){({*[yield](){}})}", function (p) { return stmt(p).body.statements[0].expression.properties[0].name.expression; }, {
+      type: "IdentifierExpression",
+      name: "yield"
+    });
+
   });
 });

@@ -119,5 +119,17 @@ suite("Parser", function () {
         }]
       }
     );
+    testParse("new(a in b)", expr,
+      {
+        type: "NewExpression",
+        callee: {
+          type: "BinaryExpression",
+          left: { type: "IdentifierExpression", name: "a"},
+          operator: "in",
+          right: { type: "IdentifierExpression", name: "b"}
+        },
+        arguments: []
+      }
+    );
   });
 });

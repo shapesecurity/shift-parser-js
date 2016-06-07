@@ -1386,7 +1386,7 @@ export class Parser extends Tokenizer {
   parseLeftHandSideExpression({allowCall}) {
     let startLocation = this.getLocation();
     let previousAllowIn = this.allowIn;
-    this.allowIn = allowCall;
+    this.allowIn = true;
 
     let expr, token = this.lookahead;
 

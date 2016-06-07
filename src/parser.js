@@ -1335,6 +1335,8 @@ export class Parser extends Tokenizer {
     }
     this.lex();
 
+    this.isBindingElement = this.isAssignmentTarget = false;
+
     let right = this.isolateCoverGrammar(this.parseExponentiationExpression);
     return new AST.BinaryExpression({ left, operator: "**", right });
   }

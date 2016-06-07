@@ -230,6 +230,22 @@ suite("Parser", function () {
         expression: { type: "LiteralNumericExpression", value: 0 }
       });
 
+    testParse("(a**b).c=0", expr,
+      {
+        type: "AssignmentExpression",
+        binding: {
+          type: "StaticMemberAssignmentTarget",
+          object: {
+            type: "BinaryExpression",
+            left: { type: "IdentifierExpression", name: "a" },
+            operator: "**",
+            right: { type: "IdentifierExpression", name: "b" }
+          },
+          property: "c"
+        },
+        expression: { type: "LiteralNumericExpression", value: 0 }
+      });
+
     testParseFailure("(({a})=0);", "Invalid left-hand side in assignment");
     testParseFailure("(([a])=0);", "Invalid left-hand side in assignment");
 

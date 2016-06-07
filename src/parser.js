@@ -1532,8 +1532,8 @@ export class Parser extends Tokenizer {
     let global = false,
         ignoreCase = false,
         multiLine = false,
-        sticky = false,
-        unicode = false;
+        unicode = false,
+        sticky = false;
     for (let i = 0; i < flags.length; ++i) {
       let f = flags[i];
       switch (f) {
@@ -1555,23 +1555,23 @@ export class Parser extends Tokenizer {
           }
           multiLine = true;
           break;
-        case 's':
-          if (sticky) {
-            throw this.createError("Duplicate regular expression flag 's'");
-          }
-          sticky = true;
-          break;
         case 'u':
           if (unicode) {
             throw this.createError("Duplicate regular expression flag 'u'");
           }
           unicode = true;
           break;
+        case 'y':
+          if (sticky) {
+            throw this.createError("Duplicate regular expression flag 'y'");
+          }
+          sticky = true;
+          break;
         default:
           throw this.createError(`Invalid regular expression flag '${f}'`);
       }
     }
-    return { global, ignoreCase, multiLine, sticky, unicode };
+    return { global, ignoreCase, multiLine, unicode, sticky };
   }
 
   parsePrimaryExpression() {

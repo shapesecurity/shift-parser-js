@@ -936,7 +936,11 @@ export class Parser extends Tokenizer {
       throw this.createUnexpected(this.lookahead);
     }
 
+    let previousAllowIn = this.allowIn;
+    this.allowIn = true;
     let binding = this.parseBindingTarget();
+    this.allowIn = previousAllowIn;
+
     if (bindingPatternsMustHaveInit && binding.type !== "BindingIdentifier" && !this.match(TokenType.ASSIGN)) {
       this.expect(TokenType.ASSIGN);
     }
@@ -1948,10 +1952,13 @@ export class Parser extends Tokenizer {
         }
     }
 
-    // DataProperty
+    // property
     this.expect(TokenType.COLON);
 
     let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
+    if (this.firstExprError) {
+      return this.markLocation(new AST.AssignmentTargetPropertyProperty({ name: methodOrKey, binding: expr }), startLocation);
+    }
     return this.markLocation(new AST.DataProperty({ name: methodOrKey, expression: expr }), startLocation);
   }
 

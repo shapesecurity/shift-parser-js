@@ -163,6 +163,30 @@ suite("Parser", function () {
       body: { type: "EmptyStatement" }
     });
 
+    testParse("for(let [a=b in c] in null);", stmt, {
+      type: "ForInStatement",
+      left: {
+        type: "VariableDeclaration",
+        kind: "let",
+        declarators: [{ type: "VariableDeclarator", binding: {
+          type: "ArrayBinding",
+          elements: [{
+            type: "BindingWithDefault",
+            binding: { type: "BindingIdentifier", name: "a" },
+            init: {
+              type: "BinaryExpression",
+              left: { type: "IdentifierExpression", name: "b" },
+              operator: "in",
+              right: { type: "IdentifierExpression", name: "c" }
+            }
+          }],
+          rest: null
+        }, init: null }]
+      },
+      right: { type: "LiteralNullExpression" },
+      body: { type: "EmptyStatement" }
+    });
+
     testParseFailure("for(let a = 0 in b);", "Invalid variable declaration in for-in statement");
     testParseFailure("for(const a = 0 in b);", "Invalid variable declaration in for-in statement");
     testParseFailure("for(let ? b : c in 0);", "Invalid left-hand side in for-in");

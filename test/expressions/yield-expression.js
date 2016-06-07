@@ -65,6 +65,26 @@ suite("Parser", function () {
       operator: "-",
       operand: { type: "LiteralNumericExpression", value: 0 }
     });
+    testParse("function *a(){yield delete 0}", yde, {
+      type: "UnaryExpression",
+      operator: "delete",
+      operand: { type: "LiteralNumericExpression", value: 0 }
+    });
+    testParse("function *a(){yield typeof 0}", yde, {
+      type: "UnaryExpression",
+      operator: "typeof",
+      operand: { type: "LiteralNumericExpression", value: 0 }
+    });
+    testParse("function *a(){yield void 0}", yde, {
+      type: "UnaryExpression",
+      operator: "void",
+      operand: { type: "LiteralNumericExpression", value: 0 }
+    });
+    testParse("function *a(){yield ~0}", yde, {
+      type: "UnaryExpression",
+      operator: "~",
+      operand: { type: "LiteralNumericExpression", value: 0 }
+    });
     testParse("function *a(){yield 2e308}", yde, { type: "LiteralInfinityExpression" });
     testParse("function *a(){yield(0)}", yde, { type: "LiteralNumericExpression", value: 0 });
     testParse("function *a(){yield/a/}", yde, { type: "LiteralRegExpExpression", pattern: "a", global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: false });

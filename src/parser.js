@@ -1183,8 +1183,10 @@ export class Parser extends Tokenizer {
     switch (this.lookahead.type) {
       case TokenType.ADD:
       case TokenType.ASSIGN_DIV:
+      case TokenType.BIT_NOT:
       case TokenType.CLASS:
       case TokenType.DEC:
+      case TokenType.DELETE:
       case TokenType.DIV:
       case TokenType.FALSE:
       case TokenType.FUNCTION:
@@ -1203,6 +1205,8 @@ export class Parser extends Tokenizer {
       case TokenType.SUPER:
       case TokenType.THIS:
       case TokenType.TRUE:
+      case TokenType.TYPEOF:
+      case TokenType.VOID:
       case TokenType.YIELD:
       case TokenType.TEMPLATE:
         return true;

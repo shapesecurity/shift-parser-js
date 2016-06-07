@@ -649,6 +649,70 @@ suite("Parser", function () {
           expression: { type: "LiteralNullExpression" } } }
     );
 
+    // YieldExpression is legal in class expression heritage
+    testParse("function* a(){(class extends (yield) {});}", stmt,
+      { type: "FunctionDeclaration",
+        isGenerator: true,
+        name: { "type": "BindingIdentifier", "name": "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "ClassExpression",
+              name: null,
+              super: {
+                type: "YieldExpression",
+                expression: null
+              },
+              elements: []
+            }
+          }]
+        }
+      }
+    );
+
+    // YieldExpression is legal in class expression body
+    testParse("function* a(){(class {[yield](){}})};", stmt,
+      { type: "FunctionDeclaration",
+        isGenerator: true,
+        name: { "type": "BindingIdentifier", "name": "a" },
+        params: { type: "FormalParameters", items: [], rest: null },
+        body: {
+          type: "FunctionBody",
+          directives: [],
+          statements: [{
+            type: "ExpressionStatement",
+            expression: {
+              type: "ClassExpression",
+              name: null,
+              super: null,
+              elements: [{
+                type: "ClassElement",
+                isStatic: false,
+                method: {
+                  type: "Method",
+                  isGenerator: false,
+                  name: {
+                    type: "ComputedPropertyName",
+                    expression: { type: "YieldExpression", expression: null}
+                  },
+                  params: { type: "FormalParameters", items: [], rest: null },
+                  body: {
+                    type: "FunctionBody",
+                    directives: [],
+                    statements: []
+                  }
+                }
+              }]
+            }
+          }]
+        }
+      }
+    );
+
     testParseFailure("({a: b += 0} = {})", "Invalid left-hand side in assignment");
     testParseFailure("[a += b] = []", "Invalid left-hand side in assignment");
   });

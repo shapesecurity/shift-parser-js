@@ -2099,12 +2099,6 @@ export class Parser extends Tokenizer {
       }
     }
 
-    let previousParamYield = this.allowYieldExpression;
-
-    if (isExpr) {
-      this.allowYieldExpression = false;
-    }
-
     if (this.eat(TokenType.EXTENDS)) {
       heritage = this.isolateCoverGrammar(() => this.parseLeftHandSideExpression({ allowCall: true }));
     }
@@ -2127,7 +2121,6 @@ export class Parser extends Tokenizer {
         throw this.createError("Only methods are allowed in classes");
       }
     }
-    this.allowYieldExpression = previousParamYield;
     return this.markLocation(new (isExpr ? AST.ClassExpression : AST.ClassDeclaration)({ name, super: heritage, elements }), startLocation);
   }
 

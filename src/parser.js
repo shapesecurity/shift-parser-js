@@ -2056,10 +2056,10 @@ export class Parser extends Tokenizer {
         } else if (name === "set" && this.lookaheadPropertyName()) {
           ({name} = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
-          let param = this.parseBindingElement();
-          this.expect(TokenType.RPAREN);
           let previousYield = this.allowYieldExpression;
           this.allowYieldExpression = false;
+          let param = this.parseBindingElement();
+          this.expect(TokenType.RPAREN);
           let body = this.parseFunctionBody();
           this.allowYieldExpression = previousYield;
           return {

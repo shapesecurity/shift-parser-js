@@ -118,6 +118,14 @@ suite("Parser", function () {
       type: "IdentifierExpression",
       name: "yield"
     });
+    testParse("function *a(){({*[yield](){}})}", function (p) { return stmt(p).body.statements[0].expression.properties[0].name.expression; }, {
+      type: "YieldExpression",
+      expression: null
+    });
+    testParse("function *a(){({set b(yield){}})}", function (p) { return stmt(p).body.statements[0].expression.properties[0].param; }, {
+      type: "BindingIdentifier",
+      name: "yield"
+    });
 
   });
 });

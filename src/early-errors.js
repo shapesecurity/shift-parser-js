@@ -113,6 +113,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceArrowExpression(node, {params, body}) {
+    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
     params = params.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     if (node.body.type === "FunctionBody") {
       body = body.enforceConflictingLexicallyDeclaredNames(params.lexicallyDeclaredNames, DUPLICATE_BINDING);
@@ -128,6 +129,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       params = params.addError(new EarlyError(node, "Arrow parameters must not contain yield expressions"));
     });
     let s = super.reduceArrowExpression(node, {params, body});
+    if (!isSimpleParameterList && node.body.type === "FunctionBody" && isStrictFunctionBody(node.body)) {
+      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+    }
     s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
     return s;
@@ -400,6 +404,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       body = body.enforceStrictErrors();
     }
     let s = super.reduceFunctionDeclaration(node, {name, params, body});
+    if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
+      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+    }
     s = s.clearYieldExpressions();
     s = s.observeFunctionDeclaration();
     return s;
@@ -432,6 +439,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       body = body.enforceStrictErrors();
     }
     let s = super.reduceFunctionExpression(node, {name, params, body});
+    if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
+      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+    }
     s = s.clearBoundNames();
     s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
@@ -515,6 +525,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceMethod(node, {name, params, body}) {
+    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
     params = params.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     body = body.enforceConflictingLexicallyDeclaredNames(params.lexicallyDeclaredNames, DUPLICATE_BINDING);
     if (node.name.type === "StaticPropertyName" && node.name.value === "constructor") {
@@ -538,6 +549,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       body = body.enforceStrictErrors();
     }
     let s = super.reduceMethod(node, {name, params, body});
+    if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
+      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+    }
     s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
     return s;
@@ -623,6 +637,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceSetter(node, {name, param, body}) {
+    let isSimpleParameterList = node.param.type === "BindingIdentifier";
     param = param.observeLexicalDeclaration();
     param = param.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     body = body.enforceConflictingLexicallyDeclaredNames(param.lexicallyDeclaredNames, DUPLICATE_BINDING);
@@ -637,6 +652,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       body = body.enforceStrictErrors();
     }
     let s = super.reduceSetter(node, {name, param, body});
+    if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
+      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+    }
     s = s.observeVarBoundary();
     return s;
   }

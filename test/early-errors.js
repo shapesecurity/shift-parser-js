@@ -175,15 +175,15 @@ suite("Parser", function () {
     testEarlyError("function a(yield){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("function a(){ 'use strict'; function a(a=yield){}}", "The identifier \"yield\" must not be in expression position in strict mode");
     testEarlyError("function a(){ 'use strict'; function a(yield){}}", "The identifier \"yield\" must not be in binding position in strict mode");
-    testEarlyError("function a([yield]){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
-    testEarlyError("function a({yield}){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
-    testEarlyError("function a({yield=0}){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
-    testEarlyError("function a({a:yield}){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
-    testEarlyError("function a([yield,...a]){ 'use strict'; }", "The identifier \"yield\" must not be in binding position in strict mode");
+    testEarlyError("'use strict'; function a([yield]){}", "The identifier \"yield\" must not be in binding position in strict mode");
+    testEarlyError("'use strict'; function a({yield}){}", "The identifier \"yield\" must not be in binding position in strict mode");
+    testEarlyError("'use strict'; function a({yield=0}){}", "The identifier \"yield\" must not be in binding position in strict mode");
+    testEarlyError("'use strict'; function a({a:yield}){}", "The identifier \"yield\" must not be in binding position in strict mode");
+    testEarlyError("'use strict'; function a([yield,...a]){}", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("class A {set a(yield){}}", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("package => {'use strict'}", "The identifier \"package\" must not be in binding position in strict mode");
     testEarlyError("(package) => {'use strict'}", "The identifier \"package\" must not be in binding position in strict mode");
-    testEarlyError("([let]) => {'use strict'}", "The identifier \"let\" must not be in binding position in strict mode");
+    testEarlyError("'use strict'; ([let]) => {}", "The identifier \"let\" must not be in binding position in strict mode");
     testEarlyError("({a(yield){ 'use strict'; }})", "The identifier \"yield\" must not be in binding position in strict mode");
     testEarlyError("!{ get a() { 'use strict'; +let; } }", "The identifier \"let\" must not be in expression position in strict mode");
     testEarlyError("!{ set a(let) { 'use strict'; } }", "The identifier \"let\" must not be in binding position in strict mode");
@@ -764,6 +764,13 @@ suite("Parser", function () {
     // or the ForBinding of a for-in statement.
     testEarlyError("try {} catch(e) { for(var e of 0); }", "Duplicate binding \"e\"");
 
+    // 14.1.2, 14.2.1, 14.3.1, 14.4.1
+    // It is a Syntax Error if ContainsUseStrict of FunctionBody is true and IsSimpleParameterList of FormalParameters is false.
+    testEarlyError("function a([]){'use strict';}", "Functions with non-simple parameter lists may not contain a \"use strict\" directive");
+    testEarlyError("(function ([]){'use strict';})", "Functions with non-simple parameter lists may not contain a \"use strict\" directive");
+    testEarlyError("(([]) => {'use strict';})", "Functions with non-simple parameter lists may not contain a \"use strict\" directive");
+    testEarlyError("({set a([]){'use strict'}})", "Functions with non-simple parameter lists may not contain a \"use strict\" directive");
+    testEarlyError("({a([]){'use strict'}})", "Functions with non-simple parameter lists may not contain a \"use strict\" directive");
   });
 
   suite("early error locations", function () {

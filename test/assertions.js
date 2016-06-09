@@ -1,20 +1,20 @@
 var expect = require("expect.js");
-var parse = require("../").default;
-var parseModule = require("../").parseModule;
+var parse = require("../").parseScriptWithLocation;
+var parseModule = require("../").parseModuleWithLocation;
 var locationSanityCheck = require("./helpers").locationSanityCheck;
 var schemaCheck = require("./helpers").schemaCheck;
 var SHIFT_SPEC = require("shift-spec").default;
-var Parser = require("../dist/parser").Parser;
+var Parser = require("../dist/parser").GenericParser;
 var EarlyErrorChecker = require("../dist/early-errors").EarlyErrorChecker;
 
 exports.testParse = function testParse(program, accessor, expected) {
   var args = arguments.length;
   test(program, function () {
     expect(args).to.be(testParse.length);
-    var tree = parse(program, { loc: true });
+    var tree = parse(program).tree;
     schemaCheck(tree, SHIFT_SPEC.Script);
     locationSanityCheck(tree);
-    expect(accessor(parse(program, { earlyErrors: false }))).to.eql(expected);
+    expect(accessor(parse(program, { earlyErrors: false }).tree)).to.eql(expected);
   });
 };
 
@@ -22,10 +22,10 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
   var args = arguments.length;
   test(program, function () {
     expect(args).to.be(testParseModule.length);
-    var tree = parseModule(program, { loc: true });
+    var tree = parseModule(program).tree;
     schemaCheck(tree, SHIFT_SPEC.Module);
     locationSanityCheck(tree);
-    expect(accessor(parseModule(program, { earlyErrors: false }))).to.eql(expected);
+    expect(accessor(parseModule(program, { earlyErrors: false }).tree)).to.eql(expected);
   });
 };
 

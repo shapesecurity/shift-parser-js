@@ -36,45 +36,54 @@ suite("API", function () {
   function span(si, sl, sc, ei, el, ec) {
     return {
       start: { line: sl, column: sc, offset: si },
-      end: { line: el, column: ec, offset: ei },
-      source: null
+      end: { line: el, column: ec, offset: ei }
     };
   }
 
   test("script for location information", function () {
-    expect(ShiftParser.default("0", {loc: true, earlyErrors: true})).to.eql(
-      withLoc({
+    var rv = ShiftParser.parseScriptWithLocation("0", { earlyErrors: true });
+    expect(rv.tree).to.eql(
+      {
         type: "Script",
         directives: [],
-        statements: [withLoc({
+        statements: [{
           type: "ExpressionStatement",
-          expression: withLoc({ type: "LiteralNumericExpression", value: 0 }, span(0, 1, 0, 1, 1, 1))
-        }, span(0, 1, 0, 1, 1, 1))]
-      }, span(0, 1, 0, 1, 1, 1))
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }]
+      }
     );
+
+    expect(rv.locations.get(rv.tree)).to.eql(span(0, 1, 0, 1, 1, 1));
+    expect(rv.locations.get(rv.tree.statements[0])).to.eql(span(0, 1, 0, 1, 1, 1));
+    expect(rv.locations.get(rv.tree.statements[0].expression)).to.eql(span(0, 1, 0, 1, 1, 1));
   });
 
   test("module for location information", function () {
-    expect(ShiftParser.parseModule("0", {loc: true, earlyErrors: true})).to.eql(
-      withLoc({
-          type: "Module",
-          directives: [],
-          items: [withLoc({
-            type: "ExpressionStatement",
-            expression: withLoc({ type: "LiteralNumericExpression", value: 0 }, span(0, 1, 0, 1, 1, 1))
-          }, span(0, 1, 0, 1, 1, 1))]
-        },
-        span(0, 1, 0, 1, 1, 1)));
+    var rv = ShiftParser.parseModuleWithLocation("0", { earlyErrors: true });
+    expect(rv.tree).to.eql(
+      {
+        type: "Module",
+        directives: [],
+        items: [{
+          type: "ExpressionStatement",
+          expression: { type: "LiteralNumericExpression", value: 0 }
+        }]
+      }
+    );
+
+    expect(rv.locations.get(rv.tree)).to.eql(span(0, 1, 0, 1, 1, 1));
+    expect(rv.locations.get(rv.tree.items[0])).to.eql(span(0, 1, 0, 1, 1, 1));
+    expect(rv.locations.get(rv.tree.items[0].expression)).to.eql(span(0, 1, 0, 1, 1, 1));
   });
 
   function parseModule(name) {
     var source = require("fs").readFileSync(require.resolve(name), "utf-8");
-    var tree = ShiftParser.parseModule(source, {loc: true, earlyErrors: true});
+    var tree = ShiftParser.parseModuleWithLocation(source, {earlyErrors: true}).tree;
   }
 
   function parseScript(name) {
     var source = require("fs").readFileSync(require.resolve(name), "utf-8");
-    var tree = ShiftParser.parseScript(source, {loc: true, earlyErrors: true});
+    var tree = ShiftParser.parseScriptWithLocation(source, {earlyErrors: true}).tree;
   }
 
   test("location sanity test", function () {

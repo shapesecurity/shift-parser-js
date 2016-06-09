@@ -16,6 +16,7 @@
 
 var expect = require("expect.js");
 var parse = require("../").default;
+var parseWithLocation = require("../").parseScriptWithLocation;
 var testParseFailure = require("./assertions").testParseFailure;
 var testEarlyError = require("./assertions").testEarlyError;
 var testModuleEarlyError = require("./assertions").testModuleEarlyError;
@@ -777,7 +778,7 @@ suite("Parser", function () {
 
     test("location disabled", function () {
       try {
-        parse("super()", { loc: false, earlyErrors: true });
+        parse("super()", { earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(0);
@@ -785,7 +786,7 @@ suite("Parser", function () {
         expect(e.column).to.be(0);
       }
       try {
-        parse("\n\n  super()", { loc: false, earlyErrors: true });
+        parse("\n\n  super()", { earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(0);
@@ -796,7 +797,7 @@ suite("Parser", function () {
 
     test("location enabled", function () {
       try {
-        parse("super()", { loc: true, earlyErrors: true });
+        parseWithLocation("super()", { earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(0);
@@ -804,7 +805,7 @@ suite("Parser", function () {
         expect(e.column).to.be(0);
       }
       try {
-        parse("\n\n  super()", { loc: true, earlyErrors: true });
+        parseWithLocation("\n\n  super()", { earlyErrors: true });
         expect().fail();
       } catch(e) {
         expect(e.index).to.be(4);

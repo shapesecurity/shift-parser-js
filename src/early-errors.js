@@ -294,15 +294,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceExportDefault(node) {
     let s = super.reduceExportDefault(...arguments);
     s = s.functionDeclarationNamesAreLexical();
-    switch (node.body.type) {
-      case "FunctionDeclaration":
-      case "ClassDeclaration":
-        if (node.body.name.name !== "*default*") {
-          s = s.exportDeclaredNames();
-        }
-        break;
-    }
-    s = s.exportName("*default*", node);
+    s = s.exportName("default", node);
     return s;
   }
 
@@ -570,7 +562,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       }
     });
     s.exportedBindings.forEachEntry((nodes, bindingName) => {
-      if (bindingName !== "*default*" && !s.lexicallyDeclaredNames.has(bindingName) && !s.varDeclaredNames.has(bindingName)) {
+      if (!s.lexicallyDeclaredNames.has(bindingName) && !s.varDeclaredNames.has(bindingName)) {
         nodes.forEach(undeclaredNode => {
           s = s.addError(new EarlyError(undeclaredNode, `Exported binding ${JSON.stringify(bindingName)} is not declared`));
         });

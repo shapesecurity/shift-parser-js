@@ -43,6 +43,16 @@ var scriptAST = parseScript("/* ECMAScript Script text */");
 ```
 
 
+Location information is available in environments which support `WeakMap` via an alternative interface:
+
+```js
+let {parseScriptWithLocation, parseModuleWithLocation} = require("shift-parser");
+let {tree, locations} = parseScriptWithLocation("2 + 3");
+let threeNode = tree.statements[0].expression.right;
+locations.get(threeNode); // { start: { line: 1, column: 4, offset: 4 }, end: { line: 1, column: 5, offset: 5 } }
+```
+
+
 ## Contributing
 
 * Open a Github issue with a description of your desired change. If one exists already, leave a message stating that you are working on it with the date you expect it to be complete.

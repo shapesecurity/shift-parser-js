@@ -305,6 +305,33 @@ suite("Parser", function () {
       ] }
     );
 
+    testParseModule("export default function a(){} let b; export {b as a};", id,
+      { type: "Module", directives: [], items: [
+        {
+          type: "ExportDefault",
+            body: {
+              type: "FunctionDeclaration",
+              isGenerator: false,
+              name: { type: "BindingIdentifier", name: "a" },
+              params: { type: "FormalParameters", items: [], rest: null },
+              body: { type: "FunctionBody", directives: [], statements: [] }
+            }
+        },
+        { type: "VariableDeclarationStatement", declaration: { type: "VariableDeclaration", kind: "let", declarators: [ { type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "b"}, init: null }] } },
+        {
+          type: "ExportLocals",
+          namedExports: [{
+            type: "ExportLocalSpecifier",
+            name: {
+              type: "IdentifierExpression",
+              name: "b"
+            },
+            exportedName: "a"
+          }]
+        }
+      ] }
+    );
+
     testParseFailure("export * from \"a\"", "Unexpected token \"export\"");
     testParseModuleFailure("{export default 3;}", "Unexpected token \"export\"");
     testParseModuleFailure("{export {a};}", "Unexpected token \"export\"");

@@ -22,15 +22,8 @@ var testParseModuleFailure = require("../assertions").testParseModuleFailure;
 
 var moduleItem = require("../helpers").moduleItem;
 
-function locationSanityTest(source) {
-  test(source, function() {
-    var tree = ShiftParser.parseModule(source, {loc: true});
-  });
-}
-
 function testExportDecl(code, tree) {
   testParseModule(code, moduleItem, tree);
-  locationSanityTest(code);
 }
 
 function id(x) { return x; }

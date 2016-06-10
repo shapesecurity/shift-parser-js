@@ -151,8 +151,12 @@ function checkLocation(loc) {
   }
 }
 
+function testLocationSanity(source) {
+  return;
+}
+
 function locationSanityCheck(node, parentSpan, prevLocation) {
-  return; // todo move to side-table style location
+  return; // todo move to side-table style location and check this in testParse etc
   var loc = node.loc;
 
   checkLocation(node.loc);
@@ -198,4 +202,5 @@ exports.moduleItem = moduleItem;
 exports.expr = expr;
 exports.stmt = stmt;
 exports.locationSanityCheck = locationSanityCheck;
+exports.testLocationSanity = testLocationSanity;
 exports.schemaCheck = schemaCheck;

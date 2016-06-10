@@ -19,16 +19,10 @@ var testParse = require("../assertions").testParse;
 var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 var stmt = require("../helpers").stmt;
+var testLocationSanity = require("../helpers").testLocationSanity;
 
 suite("Parser", function () {
   suite("class expression", function () {
-
-    // TODO: move this into the testParse assertion
-    function locationSanityTest(source) {
-      test(source, function() {
-        var tree = ShiftParser.default(source, {loc: true});
-      });
-    }
 
     testParse("(class {})", expr, { type: "ClassExpression", name: null, super: null, elements: [] });
     testParse("(class A{})", expr, {
@@ -330,17 +324,17 @@ suite("Parser", function () {
     testParseFailure("(class [a] {})", "Unexpected token \"[\"");
     testParseFailure("(class {[a,b](){}})", "Unexpected token \",\"");
 
-    locationSanityTest("(class {})");
-    locationSanityTest("(class A {})");
-    locationSanityTest("(class A extends A{})");
-    locationSanityTest("(class extends A{})");
-    locationSanityTest("(class {a(){}})");
-    locationSanityTest("(class {[a](){}})");
-    locationSanityTest("(class {[a+b](){}})");
-    locationSanityTest("(class {get [a+b](){}})");
-    locationSanityTest("(class {set [a+b]([a]){}})");
-    locationSanityTest("(class {[a](){};})");
-    locationSanityTest("(class {[a](){};;})");
-    locationSanityTest("(class {static [a](){};;})");
+    testLocationSanity("(class {})");
+    testLocationSanity("(class A {})");
+    testLocationSanity("(class A extends A{})");
+    testLocationSanity("(class extends A{})");
+    testLocationSanity("(class {a(){}})");
+    testLocationSanity("(class {[a](){}})");
+    testLocationSanity("(class {[a+b](){}})");
+    testLocationSanity("(class {get [a+b](){}})");
+    testLocationSanity("(class {set [a+b]([a]){}})");
+    testLocationSanity("(class {[a](){};})");
+    testLocationSanity("(class {[a](){};;})");
+    testLocationSanity("(class {static [a](){};;})");
   });
 });

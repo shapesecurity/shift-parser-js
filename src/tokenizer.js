@@ -154,8 +154,14 @@ export class JsError extends Error {
   constructor(index, line, column, msg) {
     super(msg);
     this.index = index;
-    this.line = line;
-    this.column = column;
+    // Safari defines these properties as non-writable and non-configurable on Error objects
+    try {
+      this.line = line;
+      this.column = column;
+    } catch(e) {}
+    // define these as well so Safari still has access to this info
+    this.parseErrorLine = line;
+    this.parseErrorColumn = column;
     this.description = msg;
     this.message = `[${line}:${column}]: ${msg}`;
   }

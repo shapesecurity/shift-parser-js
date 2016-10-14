@@ -664,6 +664,9 @@ export class GenericParser extends Tokenizer {
           return new ctor({ left: init, right, body });
         } else {
           this.expect(TokenType.SEMICOLON);
+          if (init.declarators.some(decl => decl.binding.type !== "BindingIdentifier" && decl.init === null)) {
+            throw this.createError(ErrorMessages.UNINITIALIZED_BINDINGPATTERN_IN_FOR_INIT);
+          }
           if (!this.match(TokenType.SEMICOLON)) {
             test = this.parseExpression();
           }

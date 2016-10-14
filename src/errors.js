@@ -39,5 +39,6 @@ export const ErrorMessages = {
   ILLEGAL_ARROW_FUNCTION_PARAMS: "Illegal arrow function parameter list",
   INVALID_VAR_INIT_FOR_IN: "Invalid variable declaration in for-in statement",
   INVALID_VAR_INIT_FOR_OF: "Invalid variable declaration in for-of statement",
+  UNINITIALIZED_BINDINGPATTERN_IN_FOR_INIT: "Binding pattern appears without initializer in for statement init",
   ILLEGAL_PROPERTY: "Illegal property initializer",
 };

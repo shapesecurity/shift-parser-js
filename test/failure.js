@@ -139,6 +139,14 @@ suite("Parser", function () {
     testParseFailure("for ((i in {}));", "Unexpected token \")\"");
     testParseFailure("for (i + 1 in {});", "Invalid left-hand side in for-in");
     testParseFailure("for (+i in {});", "Invalid left-hand side in for-in");
+    testParseFailure("for (let [];;);", "Binding pattern appears without initializer in for statement init");
+    testParseFailure("for (let [a = 0];;);", "Binding pattern appears without initializer in for statement init");
+    testParseFailure("for (let a = 0, [];;);", "Binding pattern appears without initializer in for statement init");
+    testParseFailure("for (let [] = 0, [];;);", "Binding pattern appears without initializer in for statement init");
+    testParseFailure("for (let {};;);", "Binding pattern appears without initializer in for statement init");
+    testParseFailure("for (let {a = 0};;);", "Binding pattern appears without initializer in for statement init");
+    testParseFailure("for (let a = 0, {};;);", "Binding pattern appears without initializer in for statement init");
+    testParseFailure("for (let [] = 0, {};;);", "Binding pattern appears without initializer in for statement init");
     testParseFailure("if(false)", "Unexpected end of input");
     testParseFailure("if(false) doThis(); else", "Unexpected end of input");
     testParseFailure("do", "Unexpected end of input");

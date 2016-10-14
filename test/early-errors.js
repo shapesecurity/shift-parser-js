@@ -259,7 +259,7 @@ suite("Parser", function () {
     testEarlyError("for(let a, let;;);", "Lexical declarations must not have a binding named \"let\"");
     testEarlyError("for(const let = 0;;);", "Lexical declarations must not have a binding named \"let\"");
     testEarlyError("for(const a = 0, let = 1;;);", "Lexical declarations must not have a binding named \"let\"");
-    testEarlyError("for(let [let];;);", "Lexical declarations must not have a binding named \"let\"");
+    testEarlyError("for(let [let] = 0;;);", "Lexical declarations must not have a binding named \"let\"");
     // It is a Syntax Error if the BoundNames of BindingList contains any duplicate entries.
     testEarlyError("let a, a;", "Duplicate binding \"a\"");
     testEarlyError("let a, b, a;", "Duplicate binding \"a\"");
@@ -275,7 +275,7 @@ suite("Parser", function () {
     testEarlyError("let x\\u{61}, x\\u{0061};", "Duplicate binding \"xa\"");
     testEarlyError("let x\\u{E01D5}, x\uDB40\uDDD5;", "Duplicate binding \"x\uDB40\uDDD5\"");
     testEarlyError("for(let a, a;;);", "Duplicate binding \"a\"");
-    testEarlyError("for(let [a, a];;);", "Duplicate binding \"a\"");
+    testEarlyError("for(let [a, a] = 0;;);", "Duplicate binding \"a\"");
     testEarlyError("for(const a = 0, a = 1;;);", "Duplicate binding \"a\"");
     testEarlyError("for(const [a, a] = 0;;);", "Duplicate binding \"a\"");
     // It is a Syntax Error if Initializer is not present and IsConstantDeclaration of the LexicalDeclaration containing this production is true.

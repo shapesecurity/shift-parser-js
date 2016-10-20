@@ -15,6 +15,7 @@
  */
 
 var testParse = require("../assertions").testParse;
+var testParseFailure = require("../assertions").testParseFailure;
 var expr = require("../helpers").expr;
 
 suite("Parser", function () {
@@ -354,6 +355,50 @@ suite("Parser", function () {
         left: { type: "IdentifierExpression", name: "x" },
         right: { type: "IdentifierExpression", name: "y" } }
     );
+
+    testParse("x ** y ** z", expr,
+      { type: "BinaryExpression",
+        operator: "**",
+        left: { type: "IdentifierExpression", name: "x" },
+        right:
+          { type: "BinaryExpression",
+            operator: "**",
+            left: { type: "IdentifierExpression", name: "y" },
+            right: { type: "IdentifierExpression", name: "z" } } }
+    );
+
+    testParse("++x ** y", expr,
+      { type: "BinaryExpression",
+        operator: "**",
+        left:
+          { type: "UpdateExpression",
+            operator: "++",
+            isPrefix: true,
+            operand: { type: "AssignmentTargetIdentifier", name: "x" } },
+        right: { type: "IdentifierExpression", name: "y" } }
+    );
+
+    testParse("(-x) ** y", expr,
+      { type: "BinaryExpression",
+        operator: "**",
+        left:
+          { type: "UnaryExpression",
+            operator: "-",
+            operand: { type: "IdentifierExpression", name: "x" } },
+        right: { type: "IdentifierExpression", name: "y" } }
+    );
+
+    testParse("-(x ** y)", expr,
+      { type: "UnaryExpression",
+        operator: "-",
+        operand:
+          { type: "BinaryExpression",
+            operator: "**",
+            left: { type: "IdentifierExpression", name: "x" },
+            right: { type: "IdentifierExpression", name: "y" } } }
+    );
+
+    testParseFailure("-x ** y", "Unary expressions as the left operand of an exponentation expression must be disambiguated with parentheses");
 
     // Bitwise Shift Operator
     testParse("x << y", expr,

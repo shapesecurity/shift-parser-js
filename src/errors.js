@@ -33,6 +33,7 @@ export const ErrorMessages = {
   INVALID_LHS_IN_FOR_IN: "Invalid left-hand side in for-in",
   INVALID_LHS_IN_FOR_OF: "Invalid left-hand side in for-of",
   INVALID_UPDATE_OPERAND: "Increment/decrement target must be an identifier or member expression",
+  INVALID_EXPONENTIATION_LHS: "Unary expressions as the left operand of an exponentation expression must be disambiguated with parentheses",
   MULTIPLE_DEFAULTS_IN_SWITCH: "More than one default clause in switch statement",
   NO_CATCH_OR_FINALLY: "Missing catch or finally after try",
   ILLEGAL_RETURN: "Illegal return statement",

@@ -1338,9 +1338,13 @@ export class GenericParser extends Tokenizer {
   }
 
   parseExponentiationExpression() {
+    let leftIsParenthesized = this.lookahead.type === TokenType.LPAREN;
     let left = this.parseUnaryExpression();
     if (this.lookahead.type !== TokenType.EXP) {
       return left;
+    }
+    if (left.type === "UnaryExpression" && !leftIsParenthesized) {
+      throw this.createError(ErrorMessages.INVALID_EXPONENTIATION_LHS);
     }
     this.lex();
 

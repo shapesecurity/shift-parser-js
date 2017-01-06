@@ -13,7 +13,7 @@
     "dist"
   ],
   "scripts": {
-    "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test",
+    "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test --compilers js:babel-core/register",
     "build": "babel --source-maps-inline --out-dir dist src",
     "prepublish": "rm -rf dist/* && npm update && npm run build",
     "benchmark": "node benchmark",
@@ -31,7 +31,7 @@
     "acorn": "2.1.0",
     "angular": "1.4.3",
     "babel-cli": "6.3.13",
-    "babel-register": "6.3.13",
+    "babel-core": "6.21.0",
     "babel-preset-es2015": "6.3.13",
     "benchmark": "1.0.0",
     "commonjs-everywhere": "0.9.7",
@@ -41,6 +41,7 @@
     "microtime": "^2.0.0",
     "mocha": "2.3.4",
     "shift-spec": "^2016.0.0",
+    "test262-parser-tests": "0.0.1",
     "tick": "0.1.1",
     "traceur": "0.0.91",
     "uglifyjs": "2.4.10"

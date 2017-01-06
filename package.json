@@ -31,8 +31,12 @@
     "acorn": "2.1.0",
     "angular": "1.4.3",
     "babel-cli": "6.3.13",
+<<<<<<< HEAD
     "babel-core": "6.21.0",
+=======
+>>>>>>> Added test262 tests
     "babel-preset-es2015": "6.3.13",
+    "babel-register": "6.3.13",
     "benchmark": "1.0.0",
     "commonjs-everywhere": "0.9.7",
     "esprima": "2.5.0",

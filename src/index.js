@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import {GenericParser} from "./parser";
-import {JsError} from "./tokenizer";
-import {EarlyErrorChecker} from "./early-errors";
+import { GenericParser } from './parser';
+import { JsError } from './tokenizer';
+import { EarlyErrorChecker } from './early-errors';
 
-function markLocation(node, location) {
-  node.loc = {
-    start: location,
-    end: {
-      line: this.lastLine + 1,
-      column: this.lastIndex - this.lastLineStart,
-      offset: this.lastIndex,
-    },
-    source: null,
-  };
-  return node;
-}
+// function markLocation(node, location) {
+//   node.loc = {
+//     start: location,
+//     end: {
+//       line: this.lastLine + 1,
+//       column: this.lastIndex - this.lastLineStart,
+//       offset: this.lastIndex,
+//     },
+//     source: null,
+//   };
+//   return node;
+// }
 
 class ParserWithLocation extends GenericParser {
   constructor(source) {
@@ -63,7 +63,7 @@ function generateInterface(parsingFunctionName) {
       let errors = EarlyErrorChecker.check(tree);
       // for now, just throw the first error; we will handle multiple errors later
       if (errors.length > 0) {
-        let {node, message} = errors[0];
+        let { message } = errors[0];
         throw new JsError(0, 1, 0, message);
       }
     }
@@ -79,8 +79,8 @@ function generateInterfaceWithLocation(parsingFunctionName) {
       let errors = EarlyErrorChecker.check(tree);
       // for now, just throw the first error; we will handle multiple errors later
       if (errors.length > 0) {
-        let {node, message} = errors[0];
-        let {offset, line, column} = parser.locations.get(node).start;
+        let { node, message } = errors[0];
+        let { offset, line, column } = parser.locations.get(node).start;
         throw new JsError(offset, line, column, message);
       }
     }
@@ -88,10 +88,10 @@ function generateInterfaceWithLocation(parsingFunctionName) {
   };
 }
 
-export const parseModule = generateInterface("parseModule");
-export const parseScript = generateInterface("parseScript");
-export const parseModuleWithLocation = generateInterfaceWithLocation("parseModule");
-export const parseScriptWithLocation = generateInterfaceWithLocation("parseScript");
+export const parseModule = generateInterface('parseModule');
+export const parseScript = generateInterface('parseScript');
+export const parseModuleWithLocation = generateInterfaceWithLocation('parseModule');
+export const parseScriptWithLocation = generateInterfaceWithLocation('parseScript');
 export default parseScript;
-export {EarlyErrorChecker, GenericParser, ParserWithLocation};
-export {default as Tokenizer, TokenClass, TokenType} from "./tokenizer";
+export { EarlyErrorChecker, GenericParser, ParserWithLocation };
+export { default as Tokenizer, TokenClass, TokenType } from './tokenizer';

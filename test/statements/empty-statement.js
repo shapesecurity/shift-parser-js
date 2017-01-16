@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("empty expression", function () {
+suite('Parser', function () {
+  suite('empty expression', function () {
 
-    testParse(";", stmt, { type: "EmptyStatement" });
+    testParse(';', stmt, { type: 'EmptyStatement' });
 
   });
 });

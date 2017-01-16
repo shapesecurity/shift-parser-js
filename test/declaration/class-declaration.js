@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("class declaration", function () {
-    testParse("class A{}", stmt, {
-      type: "ClassDeclaration",
-      name: { type: "BindingIdentifier", name: "A" },
+suite('Parser', function () {
+  suite('class declaration', function () {
+    testParse('class A{}', stmt, {
+      type: 'ClassDeclaration',
+      name: { type: 'BindingIdentifier', name: 'A' },
       super: null,
       elements: []
     });
-    testParseFailure("class {}", "Unexpected token \"{\"");
-    testParseFailure("class extends A{}", "Unexpected token \"extends\"");
+    testParseFailure('class {}', 'Unexpected token "{"');
+    testParseFailure('class extends A{}', 'Unexpected token "extends"');
   });
 });

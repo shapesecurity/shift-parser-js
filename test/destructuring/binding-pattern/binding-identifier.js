@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-var stmt = require("../../helpers").stmt;
-var expr = require("../../helpers").expr;
-var testParse = require("../../assertions").testParse;
-var testParseFailure = require("../../assertions").testParseFailure;
+let stmt = require('../../helpers').stmt;
+let testParse = require('../../assertions').testParse;
 
-suite("Parser", function () {
-  suite("binding identifier", function () {
-    suite("let as binding identifier", function () {
-      testParse("for(let in 0);", stmt,
-        { type: "ForInStatement",
-          left: { type: "AssignmentTargetIdentifier", name: "let" },
-          right: { type: "LiteralNumericExpression", value: 0},
-          body: { type: "EmptyStatement"}
+suite('Parser', function () {
+  suite('binding identifier', function () {
+    suite('let as binding identifier', function () {
+      testParse('for(let in 0);', stmt,
+        { type: 'ForInStatement',
+          left: { type: 'AssignmentTargetIdentifier', name: 'let' },
+          right: { type: 'LiteralNumericExpression', value: 0 },
+          body: { type: 'EmptyStatement' }
         }
       );
     });

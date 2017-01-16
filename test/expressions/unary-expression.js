@@ -14,64 +14,64 @@
  * limitations under the License.
  */
 
-var expr = require("../helpers").expr;
-var testParse = require("../assertions").testParse;
+let expr = require('../helpers').expr;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("non-destructive unary expressions", function () {
+suite('Parser', function () {
+  suite('non-destructive unary expressions', function () {
 
-    testParse("!a", expr,
-      { type: "UnaryExpression",
-        operand: { type: "IdentifierExpression", name: "a" },
-        operator: "!" }
+    testParse('!a', expr,
+      { type: 'UnaryExpression',
+        operand: { type: 'IdentifierExpression', name: 'a' },
+        operator: '!' }
     );
 
-    testParse("!(a=b)", expr,
+    testParse('!(a=b)', expr,
       {
-        type: "UnaryExpression",
+        type: 'UnaryExpression',
         operand: {
-          type: "AssignmentExpression",
-          binding: { type: "AssignmentTargetIdentifier", name: "a" },
-          expression: { type: "IdentifierExpression", name: "b" }
+          type: 'AssignmentExpression',
+          binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+          expression: { type: 'IdentifierExpression', name: 'b' }
         },
-        operator: "!"
+        operator: '!'
       }
     );
 
-    testParse("typeof a", expr,
-      { type: "UnaryExpression",
-        operand: { type: "IdentifierExpression", name: "a" },
-        operator: "typeof" }
+    testParse('typeof a', expr,
+      { type: 'UnaryExpression',
+        operand: { type: 'IdentifierExpression', name: 'a' },
+        operator: 'typeof' }
     );
 
-    testParse("void a", expr,
-      { type: "UnaryExpression",
-        operand: { type: "IdentifierExpression", name: "a" },
-        operator: "void" }
+    testParse('void a', expr,
+      { type: 'UnaryExpression',
+        operand: { type: 'IdentifierExpression', name: 'a' },
+        operator: 'void' }
     );
 
-    testParse("delete a", expr,
-      { type: "UnaryExpression",
-        operand: { type: "IdentifierExpression", name: "a" },
-        operator: "delete" }
+    testParse('delete a', expr,
+      { type: 'UnaryExpression',
+        operand: { type: 'IdentifierExpression', name: 'a' },
+        operator: 'delete' }
     );
 
-    testParse("+a", expr,
-      { type: "UnaryExpression",
-        operand: { type: "IdentifierExpression", name: "a" },
-        operator: "+" }
+    testParse('+a', expr,
+      { type: 'UnaryExpression',
+        operand: { type: 'IdentifierExpression', name: 'a' },
+        operator: '+' }
     );
 
-    testParse("~a", expr,
-      { type: "UnaryExpression",
-        operand: { type: "IdentifierExpression", name: "a" },
-        operator: "~" }
+    testParse('~a', expr,
+      { type: 'UnaryExpression',
+        operand: { type: 'IdentifierExpression', name: 'a' },
+        operator: '~' }
     );
 
-    testParse("-a", expr,
-      { type: "UnaryExpression",
-        operand: { type: "IdentifierExpression", name: "a" },
-        operator: "-" }
+    testParse('-a', expr,
+      { type: 'UnaryExpression',
+        operand: { type: 'IdentifierExpression', name: 'a' },
+        operator: '-' }
     );
 
   });

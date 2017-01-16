@@ -14,53 +14,53 @@
  * limitations under the License.
  */
 
-var stmt = require("../helpers").stmt;
-var testParse = require("../assertions").testParse;
+let stmt = require('../helpers').stmt;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("while statement", function () {
+suite('Parser', function () {
+  suite('while statement', function () {
 
-    testParse("while(1);", stmt,
-      { type: "WhileStatement",
-        body: { type: "EmptyStatement" },
-        test: { type: "LiteralNumericExpression", value: 1 } }
+    testParse('while(1);', stmt,
+      { type: 'WhileStatement',
+        body: { type: 'EmptyStatement' },
+        test: { type: 'LiteralNumericExpression', value: 1 } }
     );
 
-    testParse("while (true) doSomething()", stmt,
-      { type: "WhileStatement",
+    testParse('while (true) doSomething()', stmt,
+      { type: 'WhileStatement',
         body:
-          { type: "ExpressionStatement",
-            expression:
-              { type: "CallExpression",
-                callee: { type: "IdentifierExpression", name: "doSomething" },
-                arguments: [] } },
-        test: { type: "LiteralBooleanExpression", value: true } }
+        { type: 'ExpressionStatement',
+          expression:
+          { type: 'CallExpression',
+            callee: { type: 'IdentifierExpression', name: 'doSomething' },
+            arguments: [] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
     );
 
-    testParse("while (x < 10) { x++; y--; }", stmt,
-      { type: "WhileStatement",
+    testParse('while (x < 10) { x++; y--; }', stmt,
+      { type: 'WhileStatement',
         body:
-          { type: "BlockStatement",
-            block:
-              { type: "Block",
-                statements:
-                  [ { type: "ExpressionStatement",
-                      expression:
-                        { type: "UpdateExpression",
-                          isPrefix: false,
-                          operand: { type: "AssignmentTargetIdentifier", name: "x" },
-                          operator: "++" } },
-                    { type: "ExpressionStatement",
-                      expression:
-                        { type: "UpdateExpression",
-                          isPrefix: false,
-                          operand: { type: "AssignmentTargetIdentifier", name: "y" },
-                          operator: "--" } } ] } },
+        { type: 'BlockStatement',
+          block:
+          { type: 'Block',
+            statements:
+            [{ type: 'ExpressionStatement',
+              expression:
+              { type: 'UpdateExpression',
+                isPrefix: false,
+                operand: { type: 'AssignmentTargetIdentifier', name: 'x' },
+                operator: '++' } },
+            { type: 'ExpressionStatement',
+              expression:
+              { type: 'UpdateExpression',
+                isPrefix: false,
+                operand: { type: 'AssignmentTargetIdentifier', name: 'y' },
+                operator: '--' } }] } },
         test:
-          { type: "BinaryExpression",
-            operator: "<",
-            left: { type: "IdentifierExpression", name: "x" },
-            right: { type: "LiteralNumericExpression", value: 10 } } }
+        { type: 'BinaryExpression',
+          operator: '<',
+          left: { type: 'IdentifierExpression', name: 'x' },
+          right: { type: 'LiteralNumericExpression', value: 10 } } }
     );
 
   });

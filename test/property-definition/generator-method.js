@@ -14,44 +14,44 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var expr = require("../helpers").expr;
+let testParse = require('../assertions').testParse;
+let expr = require('../helpers').expr;
 
 
-suite("Parser", function () {
+suite('Parser', function () {
 
-  suite("generator method", function () {
+  suite('generator method', function () {
 
-    testParse("({*a(){}})", expr, {
-      type: "ObjectExpression",
+    testParse('({*a(){}})', expr, {
+      type: 'ObjectExpression',
       properties: [{
-        type: "Method",
+        type: 'Method',
         isGenerator: true,
-        name: { type: "StaticPropertyName", value: "a" },
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        name: { type: 'StaticPropertyName', value: 'a' },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }]
     });
 
-    testParse("({*yield(){}})", expr, {
-      type: "ObjectExpression",
+    testParse('({*yield(){}})', expr, {
+      type: 'ObjectExpression',
       properties: [{
-        type: "Method",
+        type: 'Method',
         isGenerator: true,
-        name: { type: "StaticPropertyName", value: "yield" },
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        name: { type: 'StaticPropertyName', value: 'yield' },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }]
     });
 
-    testParse("({*[yield](){}})", expr, {
-      type: "ObjectExpression",
+    testParse('({*[yield](){}})', expr, {
+      type: 'ObjectExpression',
       properties: [{
-        type: "Method",
+        type: 'Method',
         isGenerator: true,
-        name: { type: "ComputedPropertyName", expression: { type: "IdentifierExpression", name: "yield" } },
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        name: { type: 'ComputedPropertyName', expression: { type: 'IdentifierExpression', name: 'yield' } },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }]
     });
 

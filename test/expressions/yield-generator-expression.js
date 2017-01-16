@@ -15,30 +15,30 @@
  */
 
 
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("yield", function () {
+suite('Parser', function () {
+  suite('yield', function () {
     function yd(p) {
       return stmt(p).body.statements.map(function (es) {
         return es.expression;
       });
     }
 
-    testParse("function*a(){yield*a}", yd, [{
-      type: "YieldGeneratorExpression",
-      expression: { type: "IdentifierExpression", name: "a" }
+    testParse('function*a(){yield*a}', yd, [{
+      type: 'YieldGeneratorExpression',
+      expression: { type: 'IdentifierExpression', name: 'a' }
     }]);
-    testParse("function a(){yield*a}", yd, [{
-      type: "BinaryExpression",
-      operator: "*",
-      left: { type: "IdentifierExpression", name: "yield" },
-      right: { type: "IdentifierExpression", name: "a" }
+    testParse('function a(){yield*a}', yd, [{
+      type: 'BinaryExpression',
+      operator: '*',
+      left: { type: 'IdentifierExpression', name: 'yield' },
+      right: { type: 'IdentifierExpression', name: 'a' }
     }]);
 
-    testParseFailure("function *a(){yield\n*a}", "Unexpected token \"*\"");
-    testParseFailure("function *a(){yield*}", "Unexpected token \"}\"");
+    testParseFailure('function *a(){yield\n*a}', 'Unexpected token "*"');
+    testParseFailure('function *a(){yield*}', 'Unexpected token "}"');
   });
 });

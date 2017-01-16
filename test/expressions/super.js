@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-var expr = require("../helpers").expr;
-var stmt = require("../helpers").stmt;
+let expr = require('../helpers').expr;
+let stmt = require('../helpers').stmt;
 
-var testParseFailure = require("../assertions").testParseFailure;
-var testParse = require("../assertions").testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("super call", function () {
+suite('Parser', function () {
+  suite('super call', function () {
 
-    testParse("(class extends B { constructor() { super() } });", expr,
+    testParse('(class extends B { constructor() { super() } });', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
-        super: { type: "IdentifierExpression", name: "B" },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
-                expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                type: 'ExpressionStatement',
+                expression: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] }
               }]
             }
           }
@@ -49,25 +49,25 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A extends B { constructor() { super() } }", stmt,
+    testParse('class A extends B { constructor() { super() } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
-        super: { type: "IdentifierExpression", name: "B" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
-                expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                type: 'ExpressionStatement',
+                expression: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] }
               }]
             }
           }
@@ -75,25 +75,25 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A extends B { \"constructor\"() { super() } }", stmt,
+    testParse('class A extends B { "constructor"() { super() } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
-        super: { type: "IdentifierExpression", name: "B" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
-                expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                type: 'ExpressionStatement',
+                expression: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] }
               }]
             }
           }
@@ -101,29 +101,29 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A extends B { constructor(a = super()){} }", stmt,
+    testParse('class A extends B { constructor(a = super()){} }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
-        super: { type: "IdentifierExpression", name: "B" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
             params: {
-              type: "FormalParameters",
+              type: 'FormalParameters',
               items: [{
-                type: "BindingWithDefault",
-                binding: { type: "BindingIdentifier", name: "a"},
-                init: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                type: 'BindingWithDefault',
+                binding: { type: 'BindingIdentifier', name: 'a' },
+                init: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] }
               }],
               rest: null
             },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: []
             }
@@ -133,30 +133,30 @@ suite("Parser", function () {
     );
 
 
-    testParse("class A extends B { constructor() { ({a: super()}); } }", stmt,
+    testParse('class A extends B { constructor() { ({a: super()}); } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
-        super: { type: "IdentifierExpression", name: "B" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
+                type: 'ExpressionStatement',
                 expression: {
-                  type: "ObjectExpression",
+                  type: 'ObjectExpression',
                   properties: [{
-                    type: "DataProperty",
-                    name: { type: "StaticPropertyName", value: "a" },
-                    expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                    type: 'DataProperty',
+                    name: { type: 'StaticPropertyName', value: 'a' },
+                    expression: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] }
                   }]
                 }
               }]
@@ -166,28 +166,28 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A extends B { constructor() { () => super(); } }", stmt,
+    testParse('class A extends B { constructor() { () => super(); } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
-        super: { type: "IdentifierExpression", name: "B" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
+                type: 'ExpressionStatement',
                 expression: {
-                  type: "ArrowExpression",
-                  params: { type: "FormalParameters", items: [], rest: null },
-                  body: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                  type: 'ArrowExpression',
+                  params: { type: 'FormalParameters', items: [], rest: null },
+                  body: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] }
                 }
               }]
             }
@@ -196,33 +196,33 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A extends B { constructor() { () => { super(); } } }", stmt,
+    testParse('class A extends B { constructor() { () => { super(); } } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
-        super: { type: "IdentifierExpression", name: "B" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
+                type: 'ExpressionStatement',
                 expression: {
-                  type: "ArrowExpression",
-                  params: { type: "FormalParameters", items: [], rest: null },
+                  type: 'ArrowExpression',
+                  params: { type: 'FormalParameters', items: [], rest: null },
                   body: {
-                    type: "FunctionBody",
+                    type: 'FunctionBody',
                     directives: [],
                     statements: [{
-                      type: "ExpressionStatement",
-                      expression: { type: "CallExpression", callee: { type: "Super" }, arguments: [] }
+                      type: 'ExpressionStatement',
+                      expression: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] }
                     }]
                   }
                 }
@@ -233,31 +233,31 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("function f() { (super)() }", "Unexpected token \"super\"");
-    testParseFailure("class A extends B { constructor() { super; } }", "Unexpected token \"super\"");
-    testParseFailure("class A extends B { constructor() { (super)(); } }", "Unexpected token \"super\"");
-    testParseFailure("class A extends B { constructor() { new super(); } }", "Unexpected token \"super\"");
+    testParseFailure('function f() { (super)() }', 'Unexpected token "super"');
+    testParseFailure('class A extends B { constructor() { super; } }', 'Unexpected token "super"');
+    testParseFailure('class A extends B { constructor() { (super)(); } }', 'Unexpected token "super"');
+    testParseFailure('class A extends B { constructor() { new super(); } }', 'Unexpected token "super"');
 
   });
 
-  suite("super member access", function () {
+  suite('super member access', function () {
 
-    testParse("({ a() { super.b(); } });", expr,
+    testParse('({ a() { super.b(); } });', expr,
       {
-        type: "ObjectExpression",
+        type: 'ObjectExpression',
         properties: [{
-          type: "Method",
+          type: 'Method',
           isGenerator: false,
-          name: { type: "StaticPropertyName", value: "a" },
-          params: { type: "FormalParameters", items: [], rest: null },
+          name: { type: 'StaticPropertyName', value: 'a' },
+          params: { type: 'FormalParameters', items: [], rest: null },
           body: {
-            type: "FunctionBody",
+            type: 'FunctionBody',
             directives: [],
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "CallExpression",
-                callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                type: 'CallExpression',
+                callee: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'b' },
                 arguments: []
               }
             }]
@@ -266,23 +266,23 @@ suite("Parser", function () {
       }
     );
 
-    testParse("({ *a() { super.b = 0; } });", expr,
+    testParse('({ *a() { super.b = 0; } });', expr,
       {
-        type: "ObjectExpression",
+        type: 'ObjectExpression',
         properties: [{
-          type: "Method",
+          type: 'Method',
           isGenerator: true,
-          name: { type: "StaticPropertyName", value: "a" },
-          params: { type: "FormalParameters", items: [], rest: null },
+          name: { type: 'StaticPropertyName', value: 'a' },
+          params: { type: 'FormalParameters', items: [], rest: null },
           body: {
-            type: "FunctionBody",
+            type: 'FunctionBody',
             directives: [],
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "AssignmentExpression",
-                binding: { type: "StaticMemberAssignmentTarget", object: { type: "Super" }, property: "b" },
-                expression: { type: "LiteralNumericExpression", value: 0 }
+                type: 'AssignmentExpression',
+                binding: { type: 'StaticMemberAssignmentTarget', object: { type: 'Super' }, property: 'b' },
+                expression: { type: 'LiteralNumericExpression', value: 0 }
               }
             }]
           }
@@ -290,25 +290,25 @@ suite("Parser", function () {
       }
     );
 
-    testParse("({ get a() { super[0] = 1; } });", expr,
+    testParse('({ get a() { super[0] = 1; } });', expr,
       {
-        type: "ObjectExpression",
+        type: 'ObjectExpression',
         properties: [{
-          type: "Getter",
-          name: { type: "StaticPropertyName", value: "a" },
+          type: 'Getter',
+          name: { type: 'StaticPropertyName', value: 'a' },
           body: {
-            type: "FunctionBody",
+            type: 'FunctionBody',
             directives: [],
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "AssignmentExpression",
+                type: 'AssignmentExpression',
                 binding: {
-                  type: "ComputedMemberAssignmentTarget",
-                  object: { type: "Super" },
-                  expression: { type: "LiteralNumericExpression", value: 0 }
+                  type: 'ComputedMemberAssignmentTarget',
+                  object: { type: 'Super' },
+                  expression: { type: 'LiteralNumericExpression', value: 0 }
                 },
-                expression: { type: "LiteralNumericExpression", value: 1 }
+                expression: { type: 'LiteralNumericExpression', value: 1 }
               }
             }]
           }
@@ -316,26 +316,26 @@ suite("Parser", function () {
       }
     );
 
-    testParse("({ set a(x) { super.b[0] = 1; } });", expr,
+    testParse('({ set a(x) { super.b[0] = 1; } });', expr,
       {
-        type: "ObjectExpression",
+        type: 'ObjectExpression',
         properties: [{
-          type: "Setter",
-          name: { type: "StaticPropertyName", value: "a" },
-          param: { type: "BindingIdentifier", name: "x" },
+          type: 'Setter',
+          name: { type: 'StaticPropertyName', value: 'a' },
+          param: { type: 'BindingIdentifier', name: 'x' },
           body: {
-            type: "FunctionBody",
+            type: 'FunctionBody',
             directives: [],
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "AssignmentExpression",
+                type: 'AssignmentExpression',
                 binding: {
-                  type: "ComputedMemberAssignmentTarget",
-                  object: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
-                  expression: { type: "LiteralNumericExpression", value: 0 }
+                  type: 'ComputedMemberAssignmentTarget',
+                  object: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'b' },
+                  expression: { type: 'LiteralNumericExpression', value: 0 }
                 },
-                expression: { type: "LiteralNumericExpression", value: 1 }
+                expression: { type: 'LiteralNumericExpression', value: 1 }
               }
             }]
           }
@@ -343,25 +343,25 @@ suite("Parser", function () {
       }
     );
 
-    testParse("(class { constructor() { super.x } });", expr,
+    testParse('(class { constructor() { super.x } });', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
-                expression: { type: "StaticMemberExpression", object: { type: "Super" }, property: "x" }
+                type: 'ExpressionStatement',
+                expression: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'x' }
               }]
             }
           }
@@ -369,25 +369,25 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A extends B { constructor() { super.x } }", stmt,
+    testParse('class A extends B { constructor() { super.x } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
-        super: { type: "IdentifierExpression", name: "B" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
+        super: { type: 'IdentifierExpression', name: 'B' },
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "constructor" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'constructor' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
-                expression: { type: "StaticMemberExpression", object: { type: "Super" }, property: "x" }
+                type: 'ExpressionStatement',
+                expression: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'x' }
               }]
             }
           }
@@ -395,28 +395,28 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A { a() { () => super.b; } }", stmt,
+    testParse('class A { a() { () => super.b; } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'a' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
+                type: 'ExpressionStatement',
                 expression: {
-                  type: "ArrowExpression",
-                  params: { type: "FormalParameters", items: [], rest: null },
-                  body: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" }
+                  type: 'ArrowExpression',
+                  params: { type: 'FormalParameters', items: [], rest: null },
+                  body: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'b' }
                 }
               }]
             }
@@ -425,27 +425,27 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A { a() { new super.b; } }", stmt,
+    testParse('class A { a() { new super.b; } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'a' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
+                type: 'ExpressionStatement',
                 expression: {
-                  type: "NewExpression",
-                  callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                  type: 'NewExpression',
+                  callee: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'b' },
                   arguments: []
                 }
               }]
@@ -455,27 +455,27 @@ suite("Parser", function () {
       }
     );
 
-    testParse("class A { a() { new super.b(); } }", stmt,
+    testParse('class A { a() { new super.b(); } }', stmt,
       {
-        type: "ClassDeclaration",
-        name: { type: "BindingIdentifier", name: "A" },
+        type: 'ClassDeclaration',
+        name: { type: 'BindingIdentifier', name: 'A' },
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
+            name: { type: 'StaticPropertyName', value: 'a' },
+            params: { type: 'FormalParameters', items: [], rest: null },
             body: {
-              type: "FunctionBody",
+              type: 'FunctionBody',
               directives: [],
               statements: [{
-                type: "ExpressionStatement",
+                type: 'ExpressionStatement',
                 expression: {
-                  type: "NewExpression",
-                  callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "b" },
+                  type: 'NewExpression',
+                  callee: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'b' },
                   arguments: []
                 }
               }]
@@ -485,24 +485,24 @@ suite("Parser", function () {
       }
     );
 
-    testParse("({ *f() { yield super.f(); } })", expr,
+    testParse('({ *f() { yield super.f(); } })', expr,
       {
-        type: "ObjectExpression",
+        type: 'ObjectExpression',
         properties: [{
-          type: "Method",
+          type: 'Method',
           isGenerator: true,
-          name: { type: "StaticPropertyName", value: "f" },
-          params: { type: "FormalParameters", items: [], rest: null },
+          name: { type: 'StaticPropertyName', value: 'f' },
+          params: { type: 'FormalParameters', items: [], rest: null },
           body: {
-            type: "FunctionBody",
+            type: 'FunctionBody',
             directives: [],
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "YieldExpression",
+                type: 'YieldExpression',
                 expression: {
-                  type: "CallExpression",
-                  callee: { type: "StaticMemberExpression", object: { type: "Super" }, property: "f" },
+                  type: 'CallExpression',
+                  callee: { type: 'StaticMemberExpression', object: { type: 'Super' }, property: 'f' },
                   arguments: [],
                 }
               }
@@ -511,8 +511,8 @@ suite("Parser", function () {
         }],
       });
 
-    testParseFailure("({ a() { (super).b(); } });", "Unexpected token \"super\"");
-    testParseFailure("class A extends B { constructor() { (super).a(); } }", "Unexpected token \"super\"");
+    testParseFailure('({ a() { (super).b(); } });', 'Unexpected token "super"');
+    testParseFailure('class A extends B { constructor() { (super).a(); } }', 'Unexpected token "super"');
 
   });
 });

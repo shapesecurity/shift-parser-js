@@ -14,41 +14,41 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("block statement", function () {
+suite('Parser', function () {
+  suite('block statement', function () {
 
-    testParse("{ foo }", stmt,
-      { type: "BlockStatement",
+    testParse('{ foo }', stmt,
+      { type: 'BlockStatement',
         block:
-          { type: "Block",
-            statements:
-              [ { type: "ExpressionStatement",
-                  expression:
-                    { type: "IdentifierExpression", name: "foo" } } ] } }
+        { type: 'Block',
+          statements:
+          [{ type: 'ExpressionStatement',
+            expression:
+                    { type: 'IdentifierExpression', name: 'foo' } }] } }
     );
 
-    testParse("{ doThis(); doThat(); }", stmt,
-      { type: "BlockStatement",
+    testParse('{ doThis(); doThat(); }', stmt,
+      { type: 'BlockStatement',
         block:
-          { type: "Block",
-            statements:
-              [ { type: "ExpressionStatement",
-                  expression:
-                    { type: "CallExpression",
-                      callee: { type: "IdentifierExpression", name: "doThis" },
-                      arguments: [] } },
-                { type: "ExpressionStatement",
-                  expression:
-                    { type: "CallExpression",
-                      callee: { type: "IdentifierExpression", name: "doThat" },
-                      arguments: [] } } ] } }
+        { type: 'Block',
+          statements:
+          [{ type: 'ExpressionStatement',
+            expression:
+            { type: 'CallExpression',
+              callee: { type: 'IdentifierExpression', name: 'doThis' },
+              arguments: [] } },
+          { type: 'ExpressionStatement',
+            expression:
+            { type: 'CallExpression',
+              callee: { type: 'IdentifierExpression', name: 'doThat' },
+              arguments: [] } }] } }
     );
 
-    testParse("{}", stmt,
-      { type: "BlockStatement", block: { type: "Block", statements: [] } }
+    testParse('{}', stmt,
+      { type: 'BlockStatement', block: { type: 'Block', statements: [] } }
     );
 
   });

@@ -14,209 +14,209 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("continue statement", function () {
+suite('Parser', function () {
+  suite('continue statement', function () {
 
-    testParse("while (true) { continue; }", stmt,
-      { type: "WhileStatement",
+    testParse('while (true) { continue; }', stmt,
+      { type: 'WhileStatement',
         body:
-          { type: "BlockStatement",
+        { type: 'BlockStatement',
+          block:
+          { type: 'Block',
+            statements: [{ type: 'ContinueStatement', label: null }] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
+
+    testParse('while (true) { continue }', stmt,
+      { type: 'WhileStatement',
+        body:
+        { type: 'BlockStatement',
+          block:
+          { type: 'Block',
+            statements: [{ type: 'ContinueStatement', label: null }] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
+    );
+
+    testParse('done: while (true) { continue done }', stmt,
+      { type: 'LabeledStatement',
+        label: 'done',
+        body:
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
             block:
-              { type: "Block",
-                statements: [ { type: "ContinueStatement", label: null } ] } },
-        test: { type: "LiteralBooleanExpression", value: true } }
+            { type: 'Block',
+              statements:
+                      [{ type: 'ContinueStatement', label: 'done' }] } },
+          test: { type: 'LiteralBooleanExpression', value: true } } }
     );
 
-    testParse("while (true) { continue }", stmt,
-      { type: "WhileStatement",
+    testParse('done: while (true) { continue done; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'done',
         body:
-          { type: "BlockStatement",
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
             block:
-              { type: "Block",
-                statements: [ { type: "ContinueStatement", label: null } ] } },
-        test: { type: "LiteralBooleanExpression", value: true } }
+            { type: 'Block',
+              statements:
+                      [{ type: 'ContinueStatement', label: 'done' }] } },
+          test: { type: 'LiteralBooleanExpression', value: true } } }
     );
 
-    testParse("done: while (true) { continue done }", stmt,
-      { type: "LabeledStatement",
-        label: "done",
+    testParse('__proto__: while (true) { continue __proto__; }', stmt,
+      { type: 'LabeledStatement',
+        label: '__proto__',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: "done" } ] } },
-        test: { type: "LiteralBooleanExpression", value: true } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+                      [{ type: 'ContinueStatement', label: '__proto__' }] } },
+          test: { type: 'LiteralBooleanExpression', value: true } } }
     );
 
-    testParse("done: while (true) { continue done; }", stmt,
-      { type: "LabeledStatement",
-        label: "done",
+    testParse('a: do continue a; while(1);', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: "done" } ] } },
-        test: { type: "LiteralBooleanExpression", value: true } } }
+        { type: 'DoWhileStatement',
+          body: { type: 'ContinueStatement', label: 'a' },
+          test: { type: 'LiteralNumericExpression', value: 1 } } }
     );
 
-    testParse("__proto__: while (true) { continue __proto__; }", stmt,
-      { type: "LabeledStatement",
-        label: "__proto__",
+    testParse('a: while (0) { continue \n b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: "__proto__" } ] } },
-        test: { type: "LiteralBooleanExpression", value: true } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
-    testParse("a: do continue a; while(1);", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a: while (0) { continue \r b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "DoWhileStatement",
-            body: { type: "ContinueStatement", label: "a" },
-        test: { type: "LiteralNumericExpression", value: 1 } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
-    testParse("a: while (0) { continue \n b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a: while (0) { continue \r\n b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
-    testParse("a: while (0) { continue \r b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a: while (0) { continue /*\r*/ b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
-    testParse("a: while (0) { continue \r\n b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a: while (0) { continue /*\n*/ b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
-    testParse("a: while (0) { continue /*\r*/ b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a: while (0) { continue /*\r\n*/ b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
-    testParse("a: while (0) { continue /*\n*/ b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a: while (0) { continue /*\u2028*/ b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
-    testParse("a: while (0) { continue /*\r\n*/ b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a: while (0) { continue /*\u2029*/ b; }', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
-    );
-
-    testParse("a: while (0) { continue /*\u2028*/ b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
-        body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
-    );
-
-    testParse("a: while (0) { continue /*\u2029*/ b; }", stmt,
-      { type: "LabeledStatement",
-        label: "a",
-        body:
-          { type: "WhileStatement",
-            body:
-              { type: "BlockStatement",
-                block:
-                  { type: "Block",
-                    statements:
-                      [ { type: "ContinueStatement", label: null },
-                        { type: "ExpressionStatement",
-                          expression: { type: "IdentifierExpression", name: "b" } } ] } },
-        test: { type: "LiteralNumericExpression", value: 0 } } }
+        { type: 'WhileStatement',
+          body:
+          { type: 'BlockStatement',
+            block:
+            { type: 'Block',
+              statements:
+              [{ type: 'ContinueStatement', label: null },
+                { type: 'ExpressionStatement',
+                  expression: { type: 'IdentifierExpression', name: 'b' } }] } },
+          test: { type: 'LiteralNumericExpression', value: 0 } } }
     );
 
   });

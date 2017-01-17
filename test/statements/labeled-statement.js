@@ -14,49 +14,49 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("labeled statement", function () {
+suite('Parser', function () {
+  suite('labeled statement', function () {
 
-    testParse("start: for (;;) break start", stmt,
-      { type: "LabeledStatement",
-        label: "start",
+    testParse('start: for (;;) break start', stmt,
+      { type: 'LabeledStatement',
+        label: 'start',
         body:
-          { type: "ForStatement",
-            body: { type: "BreakStatement", label: "start" },
-            init: null,
-            test: null,
-            update: null } }
+        { type: 'ForStatement',
+          body: { type: 'BreakStatement', label: 'start' },
+          init: null,
+          test: null,
+          update: null } }
     );
 
-    testParse("start: while (true) break start", stmt,
-      { type: "LabeledStatement",
-        label: "start",
+    testParse('start: while (true) break start', stmt,
+      { type: 'LabeledStatement',
+        label: 'start',
         body:
-          { type: "WhileStatement",
-            body: { type: "BreakStatement", label: "start" },
-            test: { type: "LiteralBooleanExpression", value: true } } }
+        { type: 'WhileStatement',
+          body: { type: 'BreakStatement', label: 'start' },
+          test: { type: 'LiteralBooleanExpression', value: true } } }
     );
 
-    testParse("__proto__: test", stmt,
-      { type: "LabeledStatement",
-        label: "__proto__",
+    testParse('__proto__: test', stmt,
+      { type: 'LabeledStatement',
+        label: '__proto__',
         body:
-          { type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", name: "test" } } }
+        { type: 'ExpressionStatement',
+          expression: { type: 'IdentifierExpression', name: 'test' } } }
     );
 
-    testParse("a:{break a;}", stmt,
-      { type: "LabeledStatement",
-        label: "a",
+    testParse('a:{break a;}', stmt,
+      { type: 'LabeledStatement',
+        label: 'a',
         body:
-          { type: "BlockStatement",
-            block:
-              { type: "Block",
-                statements:
-                  [ { type: "BreakStatement", label: "a" } ] } } }
+        { type: 'BlockStatement',
+          block:
+          { type: 'Block',
+            statements:
+                  [{ type: 'BreakStatement', label: 'a' }] } } }
     );
 
   });

@@ -14,285 +14,289 @@
  * limitations under the License.
  */
 
-var expr = require("../../helpers").expr;
-var testParse = require("../../assertions").testParse;
-var testParseFailure = require("../../assertions").testParseFailure;
+let expr = require('../../helpers').expr;
+let testParse = require('../../assertions').testParse;
+let testParseFailure = require('../../assertions').testParseFailure;
 
-suite("Parser", function () {
-  suite("array binding", function () {
-    suite("assignment", function () {
-      testParse("[x] = 0", expr,
+suite('Parser', function () {
+  suite('array binding', function () {
+    suite('assignment', function () {
+      testParse('[x] = 0', expr,
         {
-          type: "AssignmentExpression",
-          binding: { type: "ArrayAssignmentTarget", elements: [{ type: "AssignmentTargetIdentifier", name: "x" }], rest: null },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          type: 'AssignmentExpression',
+          binding: { type: 'ArrayAssignmentTarget',
+            elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' }], rest: null },
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[x,] = 0", expr,
+      testParse('[x,] = 0', expr,
         {
-          type: "AssignmentExpression",
-          binding: { type: "ArrayAssignmentTarget", elements: [{ type: "AssignmentTargetIdentifier", name: "x" }], rest: null },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          type: 'AssignmentExpression',
+          binding: { type: 'ArrayAssignmentTarget',
+            elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' }], rest: null },
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[x,,] = 0", expr,
+      testParse('[x,,] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
-            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }, null],
+            type: 'ArrayAssignmentTarget',
+            elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' }, null],
             rest: null
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[[x]] = 0", expr,
+      testParse('[[x]] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
+            type: 'ArrayAssignmentTarget',
             elements: [{
-              type: "ArrayAssignmentTarget",
-              elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
+              type: 'ArrayAssignmentTarget',
+              elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' }],
               rest: null
             }],
             rest: null
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[x, y, ...z] = 0", expr,
+      testParse('[x, y, ...z] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
-            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }, { type: "AssignmentTargetIdentifier", name: "y" }],
-            rest: { type: "AssignmentTargetIdentifier", name: "z" }
+            type: 'ArrayAssignmentTarget',
+            elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' },
+              { type: 'AssignmentTargetIdentifier', name: 'y' }],
+            rest: { type: 'AssignmentTargetIdentifier', name: 'z' }
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[, x,,] = 0", expr,
+      testParse('[, x,,] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
-            elements: [null, { type: "AssignmentTargetIdentifier", name: "x" }, null],
+            type: 'ArrayAssignmentTarget',
+            elements: [null, { type: 'AssignmentTargetIdentifier', name: 'x' }, null],
             rest: null
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[...[x]] = 0", expr,
+      testParse('[...[x]] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
+            type: 'ArrayAssignmentTarget',
             elements: [],
             rest: {
-              type: "ArrayAssignmentTarget",
-              elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
+              type: 'ArrayAssignmentTarget',
+              elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' }],
               rest: null
             }
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[x, ...{0: y}] = 0", expr,
+      testParse('[x, ...{0: y}] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
-            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
+            type: 'ArrayAssignmentTarget',
+            elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' }],
             rest: {
-              type: "ObjectAssignmentTarget",
+              type: 'ObjectAssignmentTarget',
               properties: [{
-                type: "AssignmentTargetPropertyProperty",
-                name: { type: "StaticPropertyName", value: "0" },
-                binding: { type: "AssignmentTargetIdentifier", name: "y" }
+                type: 'AssignmentTargetPropertyProperty',
+                name: { type: 'StaticPropertyName', value: '0' },
+                binding: { type: 'AssignmentTargetIdentifier', name: 'y' }
               }]
             }
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[x, x] = 0", expr,
+      testParse('[x, x] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
-            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }, { type: "AssignmentTargetIdentifier", name: "x" }],
+            type: 'ArrayAssignmentTarget',
+            elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' },
+              { type: 'AssignmentTargetIdentifier', name: 'x' }],
             rest: null
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[x, ...x] = 0", expr,
+      testParse('[x, ...x] = 0', expr,
         {
-          type: "AssignmentExpression",
+          type: 'AssignmentExpression',
           binding: {
-            type: "ArrayAssignmentTarget",
-            elements: [{ type: "AssignmentTargetIdentifier", name: "x" }],
-            rest: { type: "AssignmentTargetIdentifier", name: "x" }
+            type: 'ArrayAssignmentTarget',
+            elements: [{ type: 'AssignmentTargetIdentifier', name: 'x' }],
+            rest: { type: 'AssignmentTargetIdentifier', name: 'x' }
           },
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }
       );
 
-      testParse("[x.a=a] = b", expr, {
-        "type": "AssignmentExpression",
-        "binding": {
-          "elements": [
+      testParse('[x.a=a] = b', expr, {
+        'type': 'AssignmentExpression',
+        'binding': {
+          'elements': [
             {
-              "type": "AssignmentTargetWithDefault",
-              "binding": {
-                "type": "StaticMemberAssignmentTarget",
-                "object": {
-                  "type": "IdentifierExpression",
-                  "name": "x",
+              'type': 'AssignmentTargetWithDefault',
+              'binding': {
+                'type': 'StaticMemberAssignmentTarget',
+                'object': {
+                  'type': 'IdentifierExpression',
+                  'name': 'x',
                 },
-                "property": "a",
+                'property': 'a',
               },
-              "init": {
-                "type": "IdentifierExpression",
-                "name": "a",
+              'init': {
+                'type': 'IdentifierExpression',
+                'name': 'a',
               }
             }
           ],
-          "rest": null,
-          "type": "ArrayAssignmentTarget",
+          'rest': null,
+          'type': 'ArrayAssignmentTarget',
         },
-        "expression": {
-          "type": "IdentifierExpression",
-          "name": "b",
+        'expression': {
+          'type': 'IdentifierExpression',
+          'name': 'b',
         }
       });
 
-      testParse("[x[a]=a] = b", expr, {
-        type: "AssignmentExpression",
+      testParse('[x[a]=a] = b', expr, {
+        type: 'AssignmentExpression',
         binding: {
           elements: [
             {
-              type: "AssignmentTargetWithDefault",
+              type: 'AssignmentTargetWithDefault',
               binding: {
-                type: "ComputedMemberAssignmentTarget",
+                type: 'ComputedMemberAssignmentTarget',
                 object: {
-                  type: "IdentifierExpression",
-                  name: "x",
+                  type: 'IdentifierExpression',
+                  name: 'x',
                 },
                 expression: {
-                  type: "IdentifierExpression",
-                  name: "a",
+                  type: 'IdentifierExpression',
+                  name: 'a',
                 },
               },
               init: {
-                type: "IdentifierExpression",
-                name: "a",
+                type: 'IdentifierExpression',
+                name: 'a',
               }
             }
           ],
           rest: null,
-          type: "ArrayAssignmentTarget",
+          type: 'ArrayAssignmentTarget',
         },
         expression: {
-          type: "IdentifierExpression",
-          name: "b",
+          type: 'IdentifierExpression',
+          name: 'b',
         }
       });
 
-      testParse("[...[...a[x]]] = b", expr, {
-        type: "AssignmentExpression",
+      testParse('[...[...a[x]]] = b', expr, {
+        type: 'AssignmentExpression',
         binding: {
-          type: "ArrayAssignmentTarget",
+          type: 'ArrayAssignmentTarget',
           elements: [],
           rest: {
-            type: "ArrayAssignmentTarget",
+            type: 'ArrayAssignmentTarget',
             elements: [],
             rest: {
-              type: "ComputedMemberAssignmentTarget",
+              type: 'ComputedMemberAssignmentTarget',
               object: {
-                type: "IdentifierExpression",
-                name: "a"
+                type: 'IdentifierExpression',
+                name: 'a'
               },
               expression: {
-                type: "IdentifierExpression",
-                name: "x"
+                type: 'IdentifierExpression',
+                name: 'x'
               }
             },
           },
         },
         expression: {
-          type: "IdentifierExpression",
-          name: "b",
+          type: 'IdentifierExpression',
+          name: 'b',
         },
       });
 
-      testParse("[] = 0", expr, {
-        type: "AssignmentExpression",
+      testParse('[] = 0', expr, {
+        type: 'AssignmentExpression',
         binding: {
-          type: "ArrayAssignmentTarget",
+          type: 'ArrayAssignmentTarget',
           elements: [],
           rest: null
         },
         expression: {
-          type: "LiteralNumericExpression",
+          type: 'LiteralNumericExpression',
           value: 0
         }
       });
 
-      testParse("[{a=0},{a=0}] = 0", expr, {
-        type: "AssignmentExpression",
+      testParse('[{a=0},{a=0}] = 0', expr, {
+        type: 'AssignmentExpression',
         binding: {
-          type: "ArrayAssignmentTarget",
+          type: 'ArrayAssignmentTarget',
           elements: [
             {
-              type: "ObjectAssignmentTarget",
+              type: 'ObjectAssignmentTarget',
               properties: [{
-                type: "AssignmentTargetPropertyIdentifier",
-                binding: { type: "AssignmentTargetIdentifier", name: "a" },
-                init: { type: "LiteralNumericExpression", value: 0 }
+                type: 'AssignmentTargetPropertyIdentifier',
+                binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+                init: { type: 'LiteralNumericExpression', value: 0 }
               }]
             },
             {
-              type: "ObjectAssignmentTarget",
+              type: 'ObjectAssignmentTarget',
               properties: [{
-                type: "AssignmentTargetPropertyIdentifier",
-                binding: { type: "AssignmentTargetIdentifier", name: "a" },
-                init: { type: "LiteralNumericExpression", value: 0 }
+                type: 'AssignmentTargetPropertyIdentifier',
+                binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+                init: { type: 'LiteralNumericExpression', value: 0 }
               }]
             },
           ],
           rest: null,
         },
-        expression: { type: "LiteralNumericExpression", value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 }
       });
 
-      testParseFailure("[x] += 0", "Invalid left-hand side in assignment");
-      testParseFailure("[, x, ...y,] = 0", "Invalid left-hand side in assignment");
-      testParseFailure("[...x, ...y] = 0", "Invalid left-hand side in assignment");
-      testParseFailure("[...x, y] = 0", "Invalid left-hand side in assignment");
-      testParseFailure("[...x,,] = 0", "Invalid left-hand side in assignment");
-      testParseFailure("[0,{a=0}] = 0", "Illegal property initializer");
-      testParseFailure("[{a=0},{b=0},0] = 0", "Illegal property initializer");
-      testParseFailure("[{a=0},...0]", "Illegal property initializer");
-      testParseFailure("[...0,a]=0", "Invalid left-hand side in assignment");
-      testParseFailure("[...0,{a=0}]=0", "Illegal property initializer");
-      testParseFailure("[...0,...{a=0}]=0", "Illegal property initializer");
-      testParseFailure("[...{a=0},]", "Unexpected comma after rest");
-      testParseFailure("[...{a=0},]=0", "Unexpected comma after rest");
-      testParseFailure("[0] = 0", "Invalid left-hand side in assignment");
-      testParseFailure("[a, ...b, {c=0}]", "Illegal property initializer");
-      testParseFailure("{a = [...b, c]} = 0", "Unexpected token \"=\"");
-      testParseFailure("[a, ...(b = c)] = 0", "Invalid left-hand side in assignment");
+      testParseFailure('[x] += 0', 'Invalid left-hand side in assignment');
+      testParseFailure('[, x, ...y,] = 0', 'Invalid left-hand side in assignment');
+      testParseFailure('[...x, ...y] = 0', 'Invalid left-hand side in assignment');
+      testParseFailure('[...x, y] = 0', 'Invalid left-hand side in assignment');
+      testParseFailure('[...x,,] = 0', 'Invalid left-hand side in assignment');
+      testParseFailure('[0,{a=0}] = 0', 'Illegal property initializer');
+      testParseFailure('[{a=0},{b=0},0] = 0', 'Illegal property initializer');
+      testParseFailure('[{a=0},...0]', 'Illegal property initializer');
+      testParseFailure('[...0,a]=0', 'Invalid left-hand side in assignment');
+      testParseFailure('[...0,{a=0}]=0', 'Illegal property initializer');
+      testParseFailure('[...0,...{a=0}]=0', 'Illegal property initializer');
+      testParseFailure('[...{a=0},]', 'Unexpected comma after rest');
+      testParseFailure('[...{a=0},]=0', 'Unexpected comma after rest');
+      testParseFailure('[0] = 0', 'Invalid left-hand side in assignment');
+      testParseFailure('[a, ...b, {c=0}]', 'Illegal property initializer');
+      testParseFailure('{a = [...b, c]} = 0', 'Unexpected token "="');
+      testParseFailure('[a, ...(b = c)] = 0', 'Invalid left-hand side in assignment');
     });
   });
 });

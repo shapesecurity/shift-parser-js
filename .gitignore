@@ -4,3 +4,5 @@ node_modules/
 coverage/
 dist/
 shift-parser.js
+isolate-0x102801600-v8.log
+npm-debug.log

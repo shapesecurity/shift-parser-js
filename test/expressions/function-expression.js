@@ -14,230 +14,230 @@
  * limitations under the License.
  */
 
-var expr = require("../helpers").expr;
-var stmt = require("../helpers").stmt;
-var testParseFailure = require("../assertions").testParseFailure;
-var testParse = require("../assertions").testParse;
+let expr = require('../helpers').expr;
+let stmt = require('../helpers').stmt;
+let testParseFailure = require('../assertions').testParseFailure;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("function expression", function () {
+suite('Parser', function () {
+  suite('function expression', function () {
 
-    testParse("(function(){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function(){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function x() { y; z() });", expr,
-      { type: "FunctionExpression",
+    testParse('(function x() { y; z() });', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "x" },
-        params: { type: "FormalParameters", items: [], rest: null },
+        name: { type: 'BindingIdentifier', name: 'x' },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
           statements: [{
-            type: "ExpressionStatement",
-            expression: { type: "IdentifierExpression", name: "y" }
+            type: 'ExpressionStatement',
+            expression: { type: 'IdentifierExpression', name: 'y' }
           }, {
-            type: "ExpressionStatement",
-            expression: { type: "CallExpression", callee: { type: "IdentifierExpression", name: "z" }, arguments: [] }
+            type: 'ExpressionStatement',
+            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] }
           }]
         }
       }
     );
 
-    testParse("(function eval() { });", expr,
-      { type: "FunctionExpression",
+    testParse('(function eval() { });', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "eval" },
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        name: { type: 'BindingIdentifier', name: 'eval' },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function arguments() { });", expr,
-      { type: "FunctionExpression",
+    testParse('(function arguments() { });', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "arguments" },
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        name: { type: 'BindingIdentifier', name: 'arguments' },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function x(y, z) { })", expr,
-      { type: "FunctionExpression",
+    testParse('(function x(y, z) { })', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "x" },
+        name: { type: 'BindingIdentifier', name: 'x' },
         params:
-          { type: "FormalParameters",
-            items:
-              [
-                { type: "BindingIdentifier", name: "y" },
-                { type: "BindingIdentifier", name: "z" }
-              ],
-            rest: null
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items:
+          [
+                { type: 'BindingIdentifier', name: 'y' },
+                { type: 'BindingIdentifier', name: 'z' }
+          ],
+          rest: null
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function(a = b){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function(a = b){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params:
-          { type: "FormalParameters",
-            items:
-              [
-                {
-                  type: "BindingWithDefault",
-                  binding: { type: "BindingIdentifier", name: "a" },
-                  init: { type: "IdentifierExpression", name: "b" }
-                }
-              ],
-            rest: null,
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items:
+          [
+            {
+              type: 'BindingWithDefault',
+              binding: { type: 'BindingIdentifier', name: 'a' },
+              init: { type: 'IdentifierExpression', name: 'b' }
+            }
+          ],
+          rest: null,
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function(...a){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function(...a){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params:
-          { type: "FormalParameters",
-            items: [],
-            rest: { type: "BindingIdentifier", name: "a" }
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items: [],
+          rest: { type: 'BindingIdentifier', name: 'a' }
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function(a, ...b){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function(a, ...b){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params:
-          { type: "FormalParameters",
-            items: [{ type: "BindingIdentifier", name: "a" }],
-            rest: { type: "BindingIdentifier", name: "b" }
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items: [{ type: 'BindingIdentifier', name: 'a' }],
+          rest: { type: 'BindingIdentifier', name: 'b' }
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function({a}){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function({a}){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params:
-          { type: "FormalParameters",
-            items:
-              [
-                {
-                  type: "ObjectBinding",
-                  properties: [{
-                    type: "BindingPropertyIdentifier",
-                    binding: { type: "BindingIdentifier", name: "a" },
-                    init: null
-                  }]
-                }
-              ],
-            rest: null,
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items:
+          [
+            {
+              type: 'ObjectBinding',
+              properties: [{
+                type: 'BindingPropertyIdentifier',
+                binding: { type: 'BindingIdentifier', name: 'a' },
+                init: null
+              }]
+            }
+          ],
+          rest: null,
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function({a: x, a: y}){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function({a: x, a: y}){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params:
-          { type: "FormalParameters",
-            items:
-              [
-                {
-                  type: "ObjectBinding",
-                  properties: [{
-                    type: "BindingPropertyProperty",
-                    name: { type: "StaticPropertyName", value: "a" },
-                    binding: { type: "BindingIdentifier", name: "x" }
-                  }, {
-                    type: "BindingPropertyProperty",
-                    name: { type: "StaticPropertyName", value: "a" },
-                    binding: { type: "BindingIdentifier", name: "y" }
-                  }]
-                }
-              ],
-            rest: null
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items:
+          [
+            {
+              type: 'ObjectBinding',
+              properties: [{
+                type: 'BindingPropertyProperty',
+                name: { type: 'StaticPropertyName', value: 'a' },
+                binding: { type: 'BindingIdentifier', name: 'x' }
+              }, {
+                type: 'BindingPropertyProperty',
+                name: { type: 'StaticPropertyName', value: 'a' },
+                binding: { type: 'BindingIdentifier', name: 'y' }
+              }]
+            }
+          ],
+          rest: null
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function([a]){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function([a]){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params:
-          { type: "FormalParameters",
-            items:
-              [
-                { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "a" }], rest: null }
-              ],
-            rest: null
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items:
+          [
+                { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null }
+          ],
+          rest: null
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function({a = 0}){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function({a = 0}){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params:
-          { type: "FormalParameters",
-            items:
-              [
-                {
-                  type: "ObjectBinding",
-                  properties: [{
-                    type: "BindingPropertyIdentifier",
-                    binding: { type: "BindingIdentifier", name: "a" },
-                    init: { type: "LiteralNumericExpression", value: 0 }
-                  }]
-                }
-              ],
-            rest: null
-          },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        { type: 'FormalParameters',
+          items:
+          [
+            {
+              type: 'ObjectBinding',
+              properties: [{
+                type: 'BindingPropertyIdentifier',
+                binding: { type: 'BindingIdentifier', name: 'a' },
+                init: { type: 'LiteralNumericExpression', value: 0 }
+              }]
+            }
+          ],
+          rest: null
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("label: !function(){ label:; };", stmt,
+    testParse('label: !function(){ label:; };', stmt,
       {
-        type: "LabeledStatement",
-        label: "label",
+        type: 'LabeledStatement',
+        label: 'label',
         body: {
-          type: "ExpressionStatement",
+          type: 'ExpressionStatement',
           expression: {
-            type: "UnaryExpression",
-            operator: "!",
+            type: 'UnaryExpression',
+            operator: '!',
             operand: {
-              type: "FunctionExpression",
+              type: 'FunctionExpression',
               isGenerator: false,
               name: null,
-              params: { type: "FormalParameters", items: [], rest: null },
+              params: { type: 'FormalParameters', items: [], rest: null },
               body: {
-                type: "FunctionBody",
+                type: 'FunctionBody',
                 directives: [],
-                statements: [{ type: "LabeledStatement", label: "label", body: { type: "EmptyStatement" } }]
+                statements: [{ type: 'LabeledStatement', label: 'label', body: { type: 'EmptyStatement' } }]
               }
             }
           }
@@ -245,66 +245,66 @@ suite("Parser", function () {
       }
     );
 
-    testParse("(function([]){})", expr,
+    testParse('(function([]){})', expr,
       {
-        type: "FunctionExpression",
+        type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params: {
-          type: "FormalParameters",
-          items: [{ type: "ArrayBinding", elements: [], rest: null }],
+          type: 'FormalParameters',
+          items: [{ type: 'ArrayBinding', elements: [], rest: null }],
           rest: null
         },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       });
 
-    testParse("function* g(){ (function yield(){}); }", stmt,
+    testParse('function* g(){ (function yield(){}); }', stmt,
       {
-        type: "FunctionDeclaration",
+        type: 'FunctionDeclaration',
         isGenerator: true,
-        name: { type: "BindingIdentifier", name: "g" },
-        params: { type: "FormalParameters", items: [], rest: null },
+        name: { type: 'BindingIdentifier', name: 'g' },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
           statements: [{
-            type: "ExpressionStatement",
+            type: 'ExpressionStatement',
             expression: {
-              type: "FunctionExpression",
+              type: 'FunctionExpression',
               isGenerator: false,
-              name: { type: "BindingIdentifier", name: "yield" },
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: { type: "FunctionBody", directives: [], statements: [] },
+              name: { type: 'BindingIdentifier', name: 'yield' },
+              params: { type: 'FormalParameters', items: [], rest: null },
+              body: { type: 'FunctionBody', directives: [], statements: [] },
             }
           }]
         }
       }
     );
 
-    testParse("(function*(){ (function yield(){}); })", expr,
+    testParse('(function*(){ (function yield(){}); })', expr,
       {
-        type: "FunctionExpression",
+        type: 'FunctionExpression',
         isGenerator: true,
         name: null,
-        params: { type: "FormalParameters", items: [], rest: null },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
           statements: [{
-            type: "ExpressionStatement",
+            type: 'ExpressionStatement',
             expression: {
-              type: "FunctionExpression",
+              type: 'FunctionExpression',
               isGenerator: false,
-              name: { type: "BindingIdentifier", name: "yield" },
-              params: { type: "FormalParameters", items: [], rest: null },
-              body: { type: "FunctionBody", directives: [], statements: [] },
+              name: { type: 'BindingIdentifier', name: 'yield' },
+              params: { type: 'FormalParameters', items: [], rest: null },
+              body: { type: 'FunctionBody', directives: [], statements: [] },
             }
           }]
         }
       }
     );
 
-    testParseFailure("(function(...a, b){})", "Unexpected token \",\"");
-    testParseFailure("(function((a)){})", "Unexpected token \"(\"");
+    testParseFailure('(function(...a, b){})', 'Unexpected token ","');
+    testParseFailure('(function((a)){})', 'Unexpected token "("');
   });
 });

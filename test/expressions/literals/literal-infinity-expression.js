@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-var expr = require("../../helpers").expr;
-var testParse = require("../../assertions").testParse;
+let expr = require('../../helpers').expr;
+let testParse = require('../../assertions').testParse;
 
-suite("Parser", function() {
-  suite("literal infinity expression", function () {
+suite('Parser', function () {
+  suite('literal infinity expression', function () {
 
-    testParse("2e308", expr, { type: "LiteralInfinityExpression" });
+    testParse('2e308', expr, { type: 'LiteralInfinityExpression' });
 
   });
 });

@@ -14,67 +14,66 @@
  * limitations under the License.
  */
 
-var expr = require("../helpers").expr;
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
+let expr = require('../helpers').expr;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("destructive unary expressions", function () {
+suite('Parser', function () {
+  suite('destructive unary expressions', function () {
 
-    testParse("++a", expr,
-      { type: "UpdateExpression",
+    testParse('++a', expr,
+      { type: 'UpdateExpression',
         isPrefix: true,
-        operand: { type: "AssignmentTargetIdentifier", name: "a" },
-        operator: "++" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        operator: '++' }
     );
 
-    testParse("--a", expr,
-      { type: "UpdateExpression",
+    testParse('--a', expr,
+      { type: 'UpdateExpression',
         isPrefix: true,
-        operand: { type: "AssignmentTargetIdentifier", name: "a" },
-        operator: "--" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        operator: '--' }
     );
 
-    testParse("x++", expr,
-      { type: "UpdateExpression",
+    testParse('x++', expr,
+      { type: 'UpdateExpression',
         isPrefix: false,
-        operand: { type: "AssignmentTargetIdentifier", name: "x" },
-        operator: "++" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'x' },
+        operator: '++' }
     );
 
-    testParse("x--", expr,
-      { type: "UpdateExpression",
+    testParse('x--', expr,
+      { type: 'UpdateExpression',
         isPrefix: false,
-        operand: { type: "AssignmentTargetIdentifier", name: "x" },
-        operator: "--" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'x' },
+        operator: '--' }
     );
 
-    testParse("eval++", expr,
-      { type: "UpdateExpression",
+    testParse('eval++', expr,
+      { type: 'UpdateExpression',
         isPrefix: false,
-        operand: { type: "AssignmentTargetIdentifier", name: "eval" },
-        operator: "++" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'eval' },
+        operator: '++' }
     );
 
-    testParse("eval--", expr,
-      { type: "UpdateExpression",
+    testParse('eval--', expr,
+      { type: 'UpdateExpression',
         isPrefix: false,
-        operand: { type: "AssignmentTargetIdentifier", name: "eval" },
-        operator: "--" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'eval' },
+        operator: '--' }
     );
 
-    testParse("arguments++", expr,
-      { type: "UpdateExpression",
+    testParse('arguments++', expr,
+      { type: 'UpdateExpression',
         isPrefix: false,
-        operand: { type: "AssignmentTargetIdentifier", name: "arguments" },
-        operator: "++" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'arguments' },
+        operator: '++' }
     );
 
-    testParse("arguments--", expr,
-      { type: "UpdateExpression",
+    testParse('arguments--', expr,
+      { type: 'UpdateExpression',
         isPrefix: false,
-        operand: { type: "AssignmentTargetIdentifier", name: "arguments" },
-        operator: "--" }
+        operand: { type: 'AssignmentTargetIdentifier', name: 'arguments' },
+        operator: '--' }
     );
   });
 });

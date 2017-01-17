@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("declarations", function () {
-    testParse("let a", stmt,
+suite('Parser', function () {
+  suite('declarations', function () {
+    testParse('let a', stmt,
       {
-        type: "VariableDeclarationStatement",
+        type: 'VariableDeclarationStatement',
         declaration: {
-          type: "VariableDeclaration",
-          kind: "let",
-          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+          type: 'VariableDeclaration',
+          kind: 'let',
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
         }
       }
     );
 
-    testParse("{ let a; }", stmt,
+    testParse('{ let a; }', stmt,
       {
-        type: "BlockStatement",
+        type: 'BlockStatement',
         block: {
-          type: "Block",
+          type: 'Block',
           statements: [{
-            type: "VariableDeclarationStatement",
+            type: 'VariableDeclarationStatement',
             declaration: {
-              type: "VariableDeclaration",
-              kind: "let",
+              type: 'VariableDeclaration',
+              kind: 'let',
               declarators: [{
-                type: "VariableDeclarator",
-                binding: { type: "BindingIdentifier", name: "a" },
+                type: 'VariableDeclarator',
+                binding: { type: 'BindingIdentifier', name: 'a' },
                 init: null
               }]
             }
@@ -52,26 +52,26 @@ suite("Parser", function () {
       });
 
     // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token \"let\"");
-    testParse("while(true) var a", stmt,
+    testParse('while(true) var a', stmt,
       {
-        type: "WhileStatement",
-        test: { type: "LiteralBooleanExpression", value: true },
+        type: 'WhileStatement',
+        test: { type: 'LiteralBooleanExpression', value: true },
         body: {
-          type: "VariableDeclarationStatement",
+          type: 'VariableDeclarationStatement',
           declaration: {
-            type: "VariableDeclaration",
-            kind: "var",
-            declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+            type: 'VariableDeclaration',
+            kind: 'var',
+            declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
           }
         }
       });
 
-    testParseFailure("while(true) let a", "Unexpected token \"let\"");
-    testParseFailure("while(true) const a", "Unexpected token \"const\"");
-    testParseFailure("with(true) let a", "Unexpected token \"let\"");
-    testParseFailure("with(true) class a {}", "Unexpected token \"class\"");
+    testParseFailure('while(true) let a', 'Unexpected token "let"');
+    testParseFailure('while(true) const a', 'Unexpected token "const"');
+    testParseFailure('with(true) let a', 'Unexpected token "let"');
+    testParseFailure('with(true) class a {}', 'Unexpected token "class"');
 
-    testParseFailure("a: let a", "Unexpected token \"let\"");
+    testParseFailure('a: let a', 'Unexpected token "let"');
 
   });
 });

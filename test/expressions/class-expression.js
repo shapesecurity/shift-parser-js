@@ -14,327 +14,326 @@
  * limitations under the License.
  */
 
-var ShiftParser = require("../../dist/index.js");
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
-var expr = require("../helpers").expr;
-var stmt = require("../helpers").stmt;
-var testLocationSanity = require("../helpers").testLocationSanity;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let expr = require('../helpers').expr;
+let stmt = require('../helpers').stmt;
+// let testLocationSanity = require('../helpers').testLocationSanity;
 
-suite("Parser", function () {
-  suite("class expression", function () {
+suite('Parser', function () {
+  suite('class expression', function () {
 
-    testParse("(class {})", expr, { type: "ClassExpression", name: null, super: null, elements: [] });
-    testParse("(class A{})", expr, {
-      type: "ClassExpression",
-      name: { type: "BindingIdentifier", name: "A" },
+    testParse('(class {})', expr, { type: 'ClassExpression', name: null, super: null, elements: [] });
+    testParse('(class A{})', expr, {
+      type: 'ClassExpression',
+      name: { type: 'BindingIdentifier', name: 'A' },
       super: null,
       elements: []
     });
-    testParse("(class extends A {})", expr, {
-      type: "ClassExpression",
+    testParse('(class extends A {})', expr, {
+      type: 'ClassExpression',
       name: null,
-      super: { type: "IdentifierExpression", name: "A" },
+      super: { type: 'IdentifierExpression', name: 'A' },
       elements: []
     });
-    testParse("(class A extends A {})", expr, {
-      type: "ClassExpression",
-      name: { type: "BindingIdentifier", name: "A" },
-      super: { type: "IdentifierExpression", name: "A" },
+    testParse('(class A extends A {})', expr, {
+      type: 'ClassExpression',
+      name: { type: 'BindingIdentifier', name: 'A' },
+      super: { type: 'IdentifierExpression', name: 'A' },
       elements: []
     });
 
-    testParse("(class {;;;\n;\n})", expr, { type: "ClassExpression", name: null, super: null, elements: [] });
-    testParse("(class {;;;\n;a(){}})", expr,
+    testParse('(class {;;;\n;\n})', expr, { type: 'ClassExpression', name: null, super: null, elements: [] });
+    testParse('(class {;;;\n;a(){}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            name: { type: 'StaticPropertyName', value: 'a' },
+            params: { type: 'FormalParameters', items: [], rest: null },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {;;;\n;a(){}b(){}})", expr,
+    testParse('(class {;;;\n;a(){}b(){}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            name: { type: 'StaticPropertyName', value: 'a' },
+            params: { type: 'FormalParameters', items: [], rest: null },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }, {
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "b" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            name: { type: 'StaticPropertyName', value: 'b' },
+            params: { type: 'FormalParameters', items: [], rest: null },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {set a(b) {}})", expr,
+    testParse('(class {set a(b) {}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Setter",
-            name: { type: "StaticPropertyName", value: "a" },
-            param: { type: "BindingIdentifier", name: "b" },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            type: 'Setter',
+            name: { type: 'StaticPropertyName', value: 'a' },
+            param: { type: 'BindingIdentifier', name: 'b' },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {get a() {}})", expr,
+    testParse('(class {get a() {}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Getter",
-            name: { type: "StaticPropertyName", value: "a" },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            type: 'Getter',
+            name: { type: 'StaticPropertyName', value: 'a' },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {set a(b) {'use strict';}})", expr,
+    testParse('(class {set a(b) {\'use strict\';}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Setter",
-            name: { type: "StaticPropertyName", value: "a" },
-            param: { type: "BindingIdentifier", name: "b" },
-            body: { type: "FunctionBody", directives: [{ type: "Directive", rawValue: "use strict" }], statements: [] }
+            type: 'Setter',
+            name: { type: 'StaticPropertyName', value: 'a' },
+            param: { type: 'BindingIdentifier', name: 'b' },
+            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {a(b) {'use strict';}})", expr,
+    testParse('(class {a(b) {\'use strict\';}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "a" },
-            params: { type: "FormalParameters", items: [{ type: "BindingIdentifier", name: "b" }], rest: null },
-            body: { type: "FunctionBody", directives: [{ type: "Directive", rawValue: "use strict" }], statements: [] }
+            name: { type: 'StaticPropertyName', value: 'a' },
+            params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'b' }], rest: null },
+            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {prototype() {}})", expr,
+    testParse('(class {prototype() {}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "prototype" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            name: { type: 'StaticPropertyName', value: 'prototype' },
+            params: { type: 'FormalParameters', items: [], rest: null },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {a() {}})", expr,
+    testParse('(class {a() {}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "a" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            name: { type: 'StaticPropertyName', value: 'a' },
+            params: { type: 'FormalParameters', items: [], rest: null },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class {3() {}})", expr,
+    testParse('(class {3() {}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
-            name: { type: "StaticPropertyName", value: "3" },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            name: { type: 'StaticPropertyName', value: '3' },
+            params: { type: 'FormalParameters', items: [], rest: null },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class{[3+5](){}})", expr,
+    testParse('(class{[3+5](){}})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: null,
         elements: [{
-          type: "ClassElement",
+          type: 'ClassElement',
           isStatic: false,
           method: {
-            type: "Method",
+            type: 'Method',
             isGenerator: false,
             name: {
-              type: "ComputedPropertyName",
+              type: 'ComputedPropertyName',
               expression: {
-                type: "BinaryExpression",
-                operator: "+",
-                left: { type: "LiteralNumericExpression", value: 3 },
-                right: { type: "LiteralNumericExpression", value: 5 }
+                type: 'BinaryExpression',
+                operator: '+',
+                left: { type: 'LiteralNumericExpression', value: 3 },
+                right: { type: 'LiteralNumericExpression', value: 5 }
               }
             },
-            params: { type: "FormalParameters", items: [], rest: null },
-            body: { type: "FunctionBody", directives: [], statements: [] }
+            params: { type: 'FormalParameters', items: [], rest: null },
+            body: { type: 'FunctionBody', directives: [], statements: [] }
           }
         }]
       }
     );
 
-    testParse("(class extends (a,b) {})", expr,
+    testParse('(class extends (a,b) {})', expr,
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: {
-          type: "BinaryExpression",
-          operator: ",",
-          left: { type: "IdentifierExpression", name: "a" },
-          right: { type: "IdentifierExpression", name: "b" }
+          type: 'BinaryExpression',
+          operator: ',',
+          left: { type: 'IdentifierExpression', name: 'a' },
+          right: { type: 'IdentifierExpression', name: 'b' }
         },
         elements: []
       }
     );
 
-    testParse("var x = class extends (a,b) {};", function (program) {
-        return stmt(program).declaration.declarators[0].init;
-      },
+    testParse('var x = class extends (a,b) {};', function (program) {
+      return stmt(program).declaration.declarators[0].init;
+    },
       {
-        type: "ClassExpression",
+        type: 'ClassExpression',
         name: null,
         super: {
-          type: "BinaryExpression",
-          operator: ",",
-          left: { type: "IdentifierExpression", name: "a" },
-          right: { type: "IdentifierExpression", name: "b" }
+          type: 'BinaryExpression',
+          operator: ',',
+          left: { type: 'IdentifierExpression', name: 'a' },
+          right: { type: 'IdentifierExpression', name: 'b' }
         },
         elements: []
       }
     );
 
-    testParse("(class {static(){}})", expr, {
-      type: "ClassExpression",
+    testParse('(class {static(){}})', expr, {
+      type: 'ClassExpression',
       name: null,
       super: null,
       elements: [{
-        type: "ClassElement",
+        type: 'ClassElement',
         isStatic: false,
         method: {
-          type: "Method",
+          type: 'Method',
           isGenerator: false,
-          name: { type: "StaticPropertyName", value: "static" },
-          params: { type: "FormalParameters", items: [], rest: null },
-          body: { type: "FunctionBody", directives: [], statements: [] }
+          name: { type: 'StaticPropertyName', value: 'static' },
+          params: { type: 'FormalParameters', items: [], rest: null },
+          body: { type: 'FunctionBody', directives: [], statements: [] }
         }
       }]
     });
 
-    testParse("(class {static constructor(){}})", expr, {
-      type: "ClassExpression",
+    testParse('(class {static constructor(){}})', expr, {
+      type: 'ClassExpression',
       name: null,
       super: null,
       elements: [{
-        type: "ClassElement",
+        type: 'ClassElement',
         isStatic: true,
         method: {
-          type: "Method",
+          type: 'Method',
           isGenerator: false,
-          name: { type: "StaticPropertyName", value: "constructor" },
-          params: { type: "FormalParameters", items: [], rest: null },
-          body: { type: "FunctionBody", directives: [], statements: [] }
+          name: { type: 'StaticPropertyName', value: 'constructor' },
+          params: { type: 'FormalParameters', items: [], rest: null },
+          body: { type: 'FunctionBody', directives: [], statements: [] }
         }
       }]
     });
 
-    testParseFailure("(class {a:0})", "Only methods are allowed in classes");
-    testParseFailure("(class {a=0})", "Only methods are allowed in classes");
-    testParseFailure("(class {a})", "Only methods are allowed in classes");
-    testParseFailure("(class {3:0})", "Only methods are allowed in classes");
-    testParseFailure("(class {[3]:0})", "Only methods are allowed in classes");
-    testParseFailure("(class {)", "Unexpected token \")\"");
-    testParseFailure("(class extends a,b {})", "Unexpected token \",\"");
-    testParseFailure("(class extends !a {})", "Unexpected token \"!\"");
-    testParseFailure("(class [a] {})", "Unexpected token \"[\"");
-    testParseFailure("(class {[a,b](){}})", "Unexpected token \",\"");
+    testParseFailure('(class {a:0})', 'Only methods are allowed in classes');
+    testParseFailure('(class {a=0})', 'Only methods are allowed in classes');
+    testParseFailure('(class {a})', 'Only methods are allowed in classes');
+    testParseFailure('(class {3:0})', 'Only methods are allowed in classes');
+    testParseFailure('(class {[3]:0})', 'Only methods are allowed in classes');
+    testParseFailure('(class {)', 'Unexpected token ")"');
+    testParseFailure('(class extends a,b {})', 'Unexpected token ","');
+    testParseFailure('(class extends !a {})', 'Unexpected token "!"');
+    testParseFailure('(class [a] {})', 'Unexpected token "["');
+    testParseFailure('(class {[a,b](){}})', 'Unexpected token ","');
 
-    testLocationSanity("(class {})");
-    testLocationSanity("(class A {})");
-    testLocationSanity("(class A extends A{})");
-    testLocationSanity("(class extends A{})");
-    testLocationSanity("(class {a(){}})");
-    testLocationSanity("(class {[a](){}})");
-    testLocationSanity("(class {[a+b](){}})");
-    testLocationSanity("(class {get [a+b](){}})");
-    testLocationSanity("(class {set [a+b]([a]){}})");
-    testLocationSanity("(class {[a](){};})");
-    testLocationSanity("(class {[a](){};;})");
-    testLocationSanity("(class {static [a](){};;})");
+    // testLocationSanity('(class {})');
+    // testLocationSanity('(class A {})');
+    // testLocationSanity('(class A extends A{})');
+    // testLocationSanity('(class extends A{})');
+    // testLocationSanity('(class {a(){}})');
+    // testLocationSanity('(class {[a](){}})');
+    // testLocationSanity('(class {[a+b](){}})');
+    // testLocationSanity('(class {get [a+b](){}})');
+    // testLocationSanity('(class {set [a+b]([a]){}})');
+    // testLocationSanity('(class {[a](){};})');
+    // testLocationSanity('(class {[a](){};;})');
+    // testLocationSanity('(class {static [a](){};;})');
   });
 });

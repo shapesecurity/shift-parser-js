@@ -65,7 +65,7 @@ export class PatternAcceptor {
 
 
   readDisjunction() {
-    return this.readAlternative() && (this.eat("|") ? this.readDisjunction() : true);
+    return this.readAlternative() && (this.eat('|') ? this.readDisjunction() : true);
   }
 
   readAlternative() {
@@ -92,23 +92,23 @@ export class PatternAcceptor {
   }
 
   readAssertion() {
-    return this.eat("^") || this.eat("$") || this.eatN(2, /^\\[bB]$/);
+    return this.eat('^') || this.eat('$') || this.eatN(2, /^\\[bB]$/);
   }
 
   readQuantifiableAssertion() {
     let start = this.index;
-    return this.eatN(3, /^\(\?[=!]$/) && this.trackback(start, this.readDisjunction() && this.eat(")"));
+    return this.eatN(3, /^\(\?[=!]$/) && this.trackback(start, this.readDisjunction() && this.eat(')'));
   }
 
   readQuantifier() {
-    return this.readQuantifierPrefix() && (this.eat("?"), true);
+    return this.readQuantifierPrefix() && (this.eat('?'), true);
   }
 
   readQuantifierPrefix() {
-    if (this.eat("*") || this.eat("+") || this.eat("?")) return true;
-    if (this.eat("{") && this.readDecimalDigits()) {
-      if (this.eat(",")) this.readDecimalDigits();
-      return this.eat("}");
+    if (this.eat('*') || this.eat('+') || this.eat('?')) return true;
+    if (this.eat('{') && this.readDecimalDigits()) {
+      if (this.eat(',')) this.readDecimalDigits();
+      return this.eat('}');
     }
     return false;
   }
@@ -122,12 +122,12 @@ export class PatternAcceptor {
   readAtomNoBrace() {
     let start = this.index;
     let startingParens = this.nCapturingParens;
-    if (this.readPatternCharacterNoBrace() || this.eat(".")) return true;
-    if (this.eat("\\")) return this.trackback(start, this.readAtomEscape());
+    if (this.readPatternCharacterNoBrace() || this.eat('.')) return true;
+    if (this.eat('\\')) return this.trackback(start, this.readAtomEscape());
     if (this.readCharacterClass()) return true;
-    if (this.eat("(")) {
+    if (this.eat('(')) {
       if (!this.eatN(2, /^\?:$/)) ++this.nCapturingParens;
-      if (this.readDisjunction() && this.eat(")")) return true;
+      if (this.readDisjunction() && this.eat(')')) return true;
       this.nCapturingParens = startingParens;
       this.index = start;
       return false;
@@ -136,7 +136,7 @@ export class PatternAcceptor {
   }
 
   readAtom() {
-    return this.readAtomNoBrace() || this.eat("{") || this.eat("}");
+    return this.readAtomNoBrace() || this.eat('{') || this.eat('}');
   }
 
   readSyntaxCharacter() {
@@ -144,7 +144,7 @@ export class PatternAcceptor {
   }
 
   readPatternCharacterNoBrace() {
-    return this.eatRegExp(/^[^\^$\\.*+?()[\]{}|]$/);
+    return this.eatRegExp(/^[^^$\\.*+?()[\]{}|]$/);
   }
 
   readAtomEscape() {
@@ -153,7 +153,7 @@ export class PatternAcceptor {
 
   readCharacterEscape() {
     return this.readControlEscape() ||
-      this.eat("c") && this.readControlLetter() ||
+      this.eat('c') && this.readControlLetter() ||
       this.readHexEscapeSequence() ||
       this.readRegExpUnicodeEscapeSequence() ||
       this.readIdentityEscape();
@@ -168,7 +168,7 @@ export class PatternAcceptor {
   }
 
   readHexEscapeSequence() {
-    return this.eat("x") && this.readHexDigit() && this.readHexDigit();
+    return this.eat('x') && this.readHexDigit() && this.readHexDigit();
   }
 
   readHexDigit() {
@@ -176,16 +176,15 @@ export class PatternAcceptor {
   }
 
   readRegExpUnicodeEscapeSequence() {
-    if (!this.eat("u")) return false;
+    if (!this.eat('u')) return false;
     if (this.u) {
       if (this.eatN(4, /^D[abAB89][a-fA-F0-9]{2}$/)) {
         this.eatN(6, /^\\u[dD][c-fC-F0-9][a-fA-F0-9]{2}$/);
         return true;
       }
-      return this.readHex4Digits() || this.eat("{") && this.readHexDigits() && this.eat("}");
-    } else {
-      return this.readHex4Digits();
+      return this.readHex4Digits() || this.eat('{') && this.readHexDigits() && this.eat('}');
     }
+    return this.readHex4Digits();
   }
 
   readHex4Digits() {
@@ -205,21 +204,21 @@ export class PatternAcceptor {
 
   readIdentityEscape() {
     if (this.u) {
-      return this.readSyntaxCharacter() || this.eat("/");
-    } else {
-      return this.eatRegExp(/^[^a-zA-Z0-9_]$/); // TODO: SourceCharacter but not UnicodeIDContinue
+      return this.readSyntaxCharacter() || this.eat('/');
     }
+    return this.eatRegExp(/^[^a-zA-Z0-9_]$/); // TODO: SourceCharacter but not UnicodeIDContinue
   }
 
   readDecimalEscape() {
-    if (this.eat("0")) {
+    if (this.eat('0')) {
       if (!this.matchRegExp(/^\d$/)) return true;
       --this.index;
       return false;
     }
     let start = this.index;
     while (this.eatRegExp(/^\d$/));
-    return this.trackback(start, this.index > start && (this.u || +this.pattern.slice(start, this.index) <= this.nCapturingParens));
+    return this.trackback(start, this.index > start &&
+     (this.u || +this.pattern.slice(start, this.index) <= this.nCapturingParens));
   }
 
   readCharacterClassEscape() {
@@ -228,7 +227,7 @@ export class PatternAcceptor {
 
   readCharacterClass() {
     let start = this.index;
-    return this.eat("[") && this.trackback(start, (this.eat("^"), true) && this.readClassRanges() && this.eat("]"));
+    return this.eat('[') && this.trackback(start, (this.eat('^'), true) && this.readClassRanges() && this.eat(']'));
   }
 
   readClassRanges() {
@@ -241,10 +240,10 @@ export class PatternAcceptor {
 
   readNonemptyClassRanges() {
     if (!this.readClassAtom()) return false;
-    if (this.match("]")) return true;
-    if (this.eat("-")) {
-      if (this.match("]")) return true;
-     return this.readClassAtom() && this.readClassRanges();
+    if (this.match(']')) return true;
+    if (this.eat('-')) {
+      if (this.match(']')) return true;
+      return this.readClassAtom() && this.readClassRanges();
     }
     return this.readNonemptyClassRangesNoDash();
   }
@@ -254,24 +253,25 @@ export class PatternAcceptor {
     // the pattern "[-a" would reach here if it could get past RegularExpressionLiteral
     /* istanbul ignore next */
     if (!this.readClassAtomNoDash()) return false;
-    if (this.match("]")) return true;
-    if (this.eat("-")) {
-      if (this.match("]")) return true;
+    if (this.match(']')) return true;
+    if (this.eat('-')) {
+      if (this.match(']')) return true;
       return this.readClassAtom() && this.readClassRanges();
     }
     return this.readNonemptyClassRangesNoDash();
   }
 
   readClassAtom() {
-    return this.eat("-") || this.readClassAtomNoDash();
+    return this.eat('-') || this.readClassAtomNoDash();
   }
 
   readClassAtomNoDash() {
-    return this.eatRegExp(/^[^\\\]-]$/) || this.eat("\\") && this.readClassEscape();
+    return this.eatRegExp(/^[^\\\]-]$/) || this.eat('\\') && this.readClassEscape();
   }
 
   readClassEscape() {
-    return this.readDecimalEscape() || this.eat("b") || this.u && this.eat("-") || this.readCharacterEscape() || this.readCharacterClassEscape();
+    return this.readDecimalEscape() || this.eat('b') || this.u && this.eat('-') ||
+     this.readCharacterEscape() || this.readCharacterClassEscape();
   }
 
 }

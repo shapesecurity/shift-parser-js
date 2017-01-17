@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* eslint-disable no-constant-condition */
+import { ErrorMessages } from './errors';
 
-import {ErrorMessages} from "./errors";
+import Tokenizer, { TokenClass, TokenType } from './tokenizer';
 
-import Tokenizer, { TokenClass, TokenType } from "./tokenizer";
-
-import * as AST from "shift-ast";
+import * as AST from 'shift-ast';
 
 // Empty parameter list for ArrowExpression
-const ARROW_EXPRESSION_PARAMS = "CoverParenthesizedExpressionAndArrowParameterList";
+const ARROW_EXPRESSION_PARAMS = 'CoverParenthesizedExpressionAndArrowParameterList';
 
 const Precedence = {
   Sequence: 0,
@@ -49,37 +49,37 @@ const Precedence = {
 };
 
 const BinaryPrecedence = {
-  "||": Precedence.LogicalOR,
-  "&&": Precedence.LogicalAND,
-  "|": Precedence.BitwiseOR,
-  "^": Precedence.BitwiseXOR,
-  "&": Precedence.BitwiseAND,
-  "==": Precedence.Equality,
-  "!=": Precedence.Equality,
-  "===": Precedence.Equality,
-  "!==": Precedence.Equality,
-  "<": Precedence.Relational,
-  ">": Precedence.Relational,
-  "<=": Precedence.Relational,
-  ">=": Precedence.Relational,
-  "in": Precedence.Relational,
-  "instanceof": Precedence.Relational,
-  "<<": Precedence.BitwiseSHIFT,
-  ">>": Precedence.BitwiseSHIFT,
-  ">>>": Precedence.BitwiseSHIFT,
-  "+": Precedence.Additive,
-  "-": Precedence.Additive,
-  "*": Precedence.Multiplicative,
-  "%": Precedence.Multiplicative,
-  "/": Precedence.Multiplicative,
+  '||': Precedence.LogicalOR,
+  '&&': Precedence.LogicalAND,
+  '|': Precedence.BitwiseOR,
+  '^': Precedence.BitwiseXOR,
+  '&': Precedence.BitwiseAND,
+  '==': Precedence.Equality,
+  '!=': Precedence.Equality,
+  '===': Precedence.Equality,
+  '!==': Precedence.Equality,
+  '<': Precedence.Relational,
+  '>': Precedence.Relational,
+  '<=': Precedence.Relational,
+  '>=': Precedence.Relational,
+  'in': Precedence.Relational,
+  'instanceof': Precedence.Relational,
+  '<<': Precedence.BitwiseSHIFT,
+  '>>': Precedence.BitwiseSHIFT,
+  '>>>': Precedence.BitwiseSHIFT,
+  '+': Precedence.Additive,
+  '-': Precedence.Additive,
+  '*': Precedence.Multiplicative,
+  '%': Precedence.Multiplicative,
+  '/': Precedence.Multiplicative,
 };
 
 function isValidSimpleAssignmentTarget(node) {
   if (node == null) return false;
   switch (node.type) {
-    case "IdentifierExpression":
-    case "ComputedMemberExpression":
-    case "StaticMemberExpression":
+    case 'IdentifierExpression':
+    case 'ComputedMemberExpression':
+    case 'StaticMemberExpression':
       return true;
   }
   return false;
@@ -130,6 +130,7 @@ export class GenericParser extends Tokenizer {
     if (this.lookahead.type === tokenType) {
       return this.lex();
     }
+    return void 0;
   }
 
   expect(tokenType) {
@@ -146,15 +147,16 @@ export class GenericParser extends Tokenizer {
   expectContextualKeyword(keyword) {
     if (this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword) {
       return this.lex();
-    } else {
-      throw this.createUnexpected(this.lookahead);
     }
+    throw this.createUnexpected(this.lookahead);
+
   }
 
   eatContextualKeyword(keyword) {
     if (this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword) {
       return this.lex();
     }
+    return void 0;
   }
 
   consumeSemicolon() {
@@ -174,7 +176,7 @@ export class GenericParser extends Tokenizer {
     return dest;
   }
 
-  finishNode(node, startState) {
+  finishNode(node) {
     return node;
   }
 
@@ -183,7 +185,7 @@ export class GenericParser extends Tokenizer {
     this.lookahead = this.advance();
 
     let startState = this.startNode();
-    let {directives, statements} = this.parseBody();
+    let { directives, statements } = this.parseBody();
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
@@ -194,7 +196,7 @@ export class GenericParser extends Tokenizer {
     this.lookahead = this.advance();
 
     let startState = this.startNode();
-    let {directives, statements} = this.parseBody();
+    let { directives, statements } = this.parseBody();
     if (!this.match(TokenType.EOS)) {
       throw this.createUnexpected(this.lookahead);
     }
@@ -234,12 +236,14 @@ export class GenericParser extends Tokenizer {
       let directiveStartState = this.startNode();
       let stmt = isModule ? this.parseModuleItem() : this.parseStatementListItem();
       if (parsingDirectives) {
-        if (isStringLiteral && stmt.type === "ExpressionStatement" && stmt.expression.type === "LiteralStringExpression") {
+        if (isStringLiteral && stmt.type === 'ExpressionStatement' &&
+         stmt.expression.type === 'LiteralStringExpression') {
           if (!directiveOctal && token.octal) {
-            directiveOctal = this.createErrorWithLocation(directiveLocation, "Unexpected legacy octal escape sequence: \\" + token.octal);
+            directiveOctal = this.createErrorWithLocation(directiveLocation,
+             'Unexpected legacy octal escape sequence: \\' + token.octal);
           }
           let rawValue = text.slice(1, -1);
-          if (rawValue === "use strict") {
+          if (rawValue === 'use strict') {
             this.strict = true;
           }
           directives.push(this.finishNode(new AST.Directive({ rawValue }), directiveStartState));
@@ -265,7 +269,7 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode(), name;
     if (this.match(TokenType.IDENTIFIER) || this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
       name = this.parseIdentifier();
-      if (!this.eatContextualKeyword("as")) {
+      if (!this.eatContextualKeyword('as')) {
         return this.finishNode(new AST.ImportSpecifier({
           name: null,
           binding: this.finishNode(new AST.BindingIdentifier({ name }), startState),
@@ -273,7 +277,7 @@ export class GenericParser extends Tokenizer {
       }
     } else if (this.lookahead.type.klass.isIdentifierName) {
       name = this.parseIdentifierName();
-      this.expectContextualKeyword("as");
+      this.expectContextualKeyword('as');
     }
 
     return this.finishNode(new AST.ImportSpecifier({ name, binding: this.parseBindingIdentifier() }), startState);
@@ -281,7 +285,7 @@ export class GenericParser extends Tokenizer {
 
   parseNameSpaceBinding() {
     this.expect(TokenType.MUL);
-    this.expectContextualKeyword("as");
+    this.expectContextualKeyword('as');
     return this.parseBindingIdentifier();
   }
 
@@ -299,7 +303,7 @@ export class GenericParser extends Tokenizer {
   }
 
   parseFromClause() {
-    this.expectContextualKeyword("from");
+    this.expectContextualKeyword('from');
     let value = this.expect(TokenType.STRING).str;
     return value;
   }
@@ -318,7 +322,7 @@ export class GenericParser extends Tokenizer {
         defaultBinding = this.parseBindingIdentifier();
         if (!this.eat(TokenType.COMMA)) {
           let decl = new AST.Import({ defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() });
-          this.consumeSemicolon()
+          this.consumeSemicolon();
           return this.finishNode(decl, startState);
         }
         break;
@@ -329,7 +333,7 @@ export class GenericParser extends Tokenizer {
         namespaceBinding: this.parseNameSpaceBinding(),
         moduleSpecifier: this.parseFromClause(),
       });
-      this.consumeSemicolon()
+      this.consumeSemicolon();
       return this.finishNode(decl, startState);
     } else if (this.match(TokenType.LBRACE)) {
       let decl = new AST.Import({
@@ -337,17 +341,16 @@ export class GenericParser extends Tokenizer {
         namedImports: this.parseNamedImports(),
         moduleSpecifier: this.parseFromClause(),
       });
-      this.consumeSemicolon()
+      this.consumeSemicolon();
       return this.finishNode(decl, startState);
-    } else {
-      throw this.createUnexpected(this.lookahead);
     }
+    throw this.createUnexpected(this.lookahead);
   }
 
   parseExportSpecifier() {
     let startState = this.startNode();
     let name = this.parseIdentifierName();
-    if (this.eatContextualKeyword("as")) {
+    if (this.eatContextualKeyword('as')) {
       let exportedName = this.parseIdentifierName();
       return this.finishNode({ name, exportedName }, startState);
     }
@@ -377,26 +380,30 @@ export class GenericParser extends Tokenizer {
         decl = new AST.ExportAllFrom({ moduleSpecifier: this.parseFromClause() });
         this.consumeSemicolon();
         break;
-      case TokenType.LBRACE:
+      case TokenType.LBRACE: {
         // export ExportClause FromClause ;
         // export ExportClause ;
         let namedExports = this.parseExportClause();
         let moduleSpecifier = null;
-        if (this.matchContextualKeyword("from")) {
+        if (this.matchContextualKeyword('from')) {
           moduleSpecifier = this.parseFromClause();
-          decl = new AST.ExportFrom({ namedExports: namedExports.map(e => new AST.ExportFromSpecifier(e)), moduleSpecifier })
+          decl = new AST.ExportFrom({ namedExports: namedExports.map(e => new AST.ExportFromSpecifier(e)),
+            moduleSpecifier });
         } else {
-          decl = new AST.ExportLocals({ namedExports: namedExports.map(({name, exportedName}) => new AST.ExportLocalSpecifier({ name: new AST.IdentifierExpression({name}), exportedName })) });
+          decl = new AST.ExportLocals({ namedExports: namedExports.map(({ name, exportedName }) =>
+            new AST.ExportLocalSpecifier({ name: new AST.IdentifierExpression({ name }), exportedName })) });
         }
         this.consumeSemicolon();
         break;
+      }
       case TokenType.CLASS:
         // export ClassDeclaration
         decl = new AST.Export({ declaration: this.parseClass({ isExpr: false, inDefault: false }) });
         break;
       case TokenType.FUNCTION:
         // export HoistableDeclaration
-        decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true }) });
+        decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false,
+          inDefault: false, allowGenerator: true }) });
         break;
       case TokenType.DEFAULT:
         this.lex();
@@ -455,9 +462,8 @@ export class GenericParser extends Tokenizer {
       ) {
         this.restoreLexerState(lexerState);
         return true;
-      } else {
-        this.restoreLexerState(lexerState);
       }
+      this.restoreLexerState(lexerState);
     }
     return false;
   }
@@ -474,9 +480,8 @@ export class GenericParser extends Tokenizer {
         if (this.lookaheadLexicalDeclaration()) {
           let startState = this.startNode();
           return this.finishNode(this.parseVariableDeclarationStatement(), startState);
-        } else {
-          return this.parseStatement();
         }
+        return this.parseStatement();
     }
   }
 
@@ -534,15 +539,14 @@ export class GenericParser extends Tokenizer {
         }
         let expr = this.parseExpression();
         // 12.12 Labelled Statements;
-        if (expr.type === "IdentifierExpression" && this.eat(TokenType.COLON)) {
+        if (expr.type === 'IdentifierExpression' && this.eat(TokenType.COLON)) {
           let labeledBody = this.match(TokenType.FUNCTION)
             ? this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false })
             : this.parseStatement();
           return new AST.LabeledStatement({ label: expr.name, body: labeledBody });
-        } else {
-          this.consumeSemicolon();
-          return new AST.ExpressionStatement({ expression: expr });
         }
+        this.consumeSemicolon();
+        return new AST.ExpressionStatement({ expression: expr });
       }
     }
   }
@@ -630,97 +634,94 @@ export class GenericParser extends Tokenizer {
         right = this.parseExpression();
       }
       return new AST.ForStatement({ init: null, test, update: right, body: this.getIteratorStatementEpilogue() });
-    } else {
-      let startsWithLet = this.match(TokenType.LET);
-      let isForDecl = this.lookaheadLexicalDeclaration();
-      let leftStartState = this.startNode();
-      if (this.match(TokenType.VAR) || isForDecl) {
-        let previousAllowIn = this.allowIn;
-        this.allowIn = false;
-        let init = this.parseVariableDeclaration(false);
-        this.allowIn = previousAllowIn;
+    }
+    let startsWithLet = this.match(TokenType.LET);
+    let isForDecl = this.lookaheadLexicalDeclaration();
+    let leftStartState = this.startNode();
+    if (this.match(TokenType.VAR) || isForDecl) {
+      let previousAllowIn = this.allowIn;
+      this.allowIn = false;
+      let init = this.parseVariableDeclaration(false);
+      this.allowIn = previousAllowIn;
 
-        if (init.declarators.length === 1 && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
-          let ctor;
+      if (init.declarators.length === 1 && (this.match(TokenType.IN) || this.matchContextualKeyword('of'))) {
+        let ctor;
 
-          if (this.match(TokenType.IN)) {
-            if (init.declarators[0].init != null) {
-              throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN);
-            }
-            ctor = AST.ForInStatement;
-            this.lex();
-            right = this.parseExpression();
-          } else {
-            if (init.declarators[0].init != null) {
-              throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_OF);
-            }
-            ctor = AST.ForOfStatement;
-            this.lex();
-            right = this.parseAssignmentExpression();
+        if (this.match(TokenType.IN)) {
+          if (init.declarators[0].init != null) {
+            throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN);
           }
-
-          let body = this.getIteratorStatementEpilogue();
-
-          return new ctor({ left: init, right, body });
-        } else {
-          this.expect(TokenType.SEMICOLON);
-          if (init.declarators.some(decl => decl.binding.type !== "BindingIdentifier" && decl.init === null)) {
-            throw this.createError(ErrorMessages.UNINITIALIZED_BINDINGPATTERN_IN_FOR_INIT);
-          }
-          if (!this.match(TokenType.SEMICOLON)) {
-            test = this.parseExpression();
-          }
-          this.expect(TokenType.SEMICOLON);
-          if (!this.match(TokenType.RPAREN)) {
-            right = this.parseExpression();
-          }
-          return new AST.ForStatement({ init, test, update: right, body: this.getIteratorStatementEpilogue() });
-        }
-      } else {
-        let previousAllowIn = this.allowIn;
-        this.allowIn = false;
-        let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
-        this.allowIn = previousAllowIn;
-
-        if (this.isAssignmentTarget && expr.type !== "AssignmentExpression" && (this.match(TokenType.IN) || this.matchContextualKeyword("of"))) {
-          if (expr.type === "ObjectAssignmentTarget" || expr.type === "ArrayAssignmentTarget") {
-            this.firstExprError = null;
-          }
-          if (startsWithLet && this.matchContextualKeyword("of")) {
-            throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
-          }
-          let ctor = this.match(TokenType.IN) ? AST.ForInStatement : AST.ForOfStatement;
-
+          ctor = AST.ForInStatement;
           this.lex();
           right = this.parseExpression();
-
-          return new ctor({ left: this.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() });
         } else {
-          if (this.firstExprError) {
-            throw this.firstExprError;
+          if (init.declarators[0].init != null) {
+            throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_OF);
           }
-          while (this.eat(TokenType.COMMA)) {
-            let rhs = this.parseAssignmentExpression();
-            expr = this.finishNode(new AST.BinaryExpression({ left: expr, operator: ",", right: rhs}), leftStartState);
-          }
-          if (this.match(TokenType.IN)) {
-            throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
-          }
-          if (this.matchContextualKeyword("of")) {
-            throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
-          }
-          this.expect(TokenType.SEMICOLON);
-          if (!this.match(TokenType.SEMICOLON)) {
-            test = this.parseExpression();
-          }
-          this.expect(TokenType.SEMICOLON);
-          if (!this.match(TokenType.RPAREN)) {
-            right = this.parseExpression();
-          }
-          return new AST.ForStatement({ init: expr, test, update: right, body: this.getIteratorStatementEpilogue() });
+          ctor = AST.ForOfStatement;
+          this.lex();
+          right = this.parseAssignmentExpression();
         }
+
+        let body = this.getIteratorStatementEpilogue();
+
+        return new ctor({ left: init, right, body });
       }
+      this.expect(TokenType.SEMICOLON);
+      if (init.declarators.some(decl => decl.binding.type !== 'BindingIdentifier' && decl.init === null)) {
+        throw this.createError(ErrorMessages.UNINITIALIZED_BINDINGPATTERN_IN_FOR_INIT);
+      }
+      if (!this.match(TokenType.SEMICOLON)) {
+        test = this.parseExpression();
+      }
+      this.expect(TokenType.SEMICOLON);
+      if (!this.match(TokenType.RPAREN)) {
+        right = this.parseExpression();
+      }
+      return new AST.ForStatement({ init, test, update: right, body: this.getIteratorStatementEpilogue() });
     }
+    let previousAllowIn = this.allowIn;
+    this.allowIn = false;
+    let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
+    this.allowIn = previousAllowIn;
+
+    if (this.isAssignmentTarget && expr.type !== 'AssignmentExpression' &&
+     (this.match(TokenType.IN) || this.matchContextualKeyword('of'))) {
+      if (expr.type === 'ObjectAssignmentTarget' || expr.type === 'ArrayAssignmentTarget') {
+        this.firstExprError = null;
+      }
+      if (startsWithLet && this.matchContextualKeyword('of')) {
+        throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
+      }
+      let ctor = this.match(TokenType.IN) ? AST.ForInStatement : AST.ForOfStatement;
+
+      this.lex();
+      right = this.parseExpression();
+
+      return new ctor({ left: this.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() });
+    }
+    if (this.firstExprError) {
+      throw this.firstExprError;
+    }
+    while (this.eat(TokenType.COMMA)) {
+      let rhs = this.parseAssignmentExpression();
+      expr = this.finishNode(new AST.BinaryExpression({ left: expr, operator: ',', right: rhs }), leftStartState);
+    }
+    if (this.match(TokenType.IN)) {
+      throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_IN);
+    }
+    if (this.matchContextualKeyword('of')) {
+      throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
+    }
+    this.expect(TokenType.SEMICOLON);
+    if (!this.match(TokenType.SEMICOLON)) {
+      test = this.parseExpression();
+    }
+    this.expect(TokenType.SEMICOLON);
+    if (!this.match(TokenType.RPAREN)) {
+      right = this.parseExpression();
+    }
+    return new AST.ForStatement({ init: expr, test, update: right, body: this.getIteratorStatementEpilogue() });
   }
 
   getIteratorStatementEpilogue() {
@@ -731,7 +732,7 @@ export class GenericParser extends Tokenizer {
 
   parseIfStatementChild() {
     return this.match(TokenType.FUNCTION)
-      ? this.parseFunction({isExpr: false, inDefault: false, allowGenerator: false})
+      ? this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false })
       : this.parseStatement();
   }
 
@@ -794,10 +795,9 @@ export class GenericParser extends Tokenizer {
         defaultCase,
         postDefaultCases,
       });
-    } else {
-      this.expect(TokenType.RBRACE);
-      return new AST.SwitchStatement({ discriminant, cases });
     }
+    this.expect(TokenType.RBRACE);
+    return new AST.SwitchStatement({ discriminant, cases });
   }
 
   parseSwitchCases() {
@@ -830,7 +830,8 @@ export class GenericParser extends Tokenizer {
 
   parseStatementListInSwitchCaseBody() {
     let result = [];
-    while (!(this.eof() || this.match(TokenType.RBRACE) || this.match(TokenType.DEFAULT) || this.match(TokenType.CASE))) {
+    while (!(this.eof() || this.match(TokenType.RBRACE) || this.match(TokenType.DEFAULT) ||
+      this.match(TokenType.CASE))) {
       result.push(this.parseStatementListItem());
     }
     return result;
@@ -862,9 +863,8 @@ export class GenericParser extends Tokenizer {
     if (this.eat(TokenType.FINALLY)) {
       let finalizer = this.parseBlock();
       return new AST.TryFinallyStatement({ body, catchClause: null, finalizer });
-    } else {
-      throw this.createError(ErrorMessages.NO_CATCH_OR_FINALLY);
     }
+    throw this.createError(ErrorMessages.NO_CATCH_OR_FINALLY);
   }
 
   parseVariableDeclarationStatement() {
@@ -921,7 +921,7 @@ export class GenericParser extends Tokenizer {
     let token = this.lex();
 
     // preceded by this.match(TokenSubType.VAR) || this.match(TokenSubType.LET);
-    let kind = token.type === TokenType.VAR ? "var" : token.type === TokenType.CONST ? "const" : "let";
+    let kind = token.type === TokenType.VAR ? 'var' : token.type === TokenType.CONST ? 'const' : 'let';
     let declarators = this.parseVariableDeclaratorList(bindingPatternsMustHaveInit);
     return this.finishNode(new AST.VariableDeclaration({ kind, declarators }), startState);
   }
@@ -946,7 +946,7 @@ export class GenericParser extends Tokenizer {
     let binding = this.parseBindingTarget();
     this.allowIn = previousAllowIn;
 
-    if (bindingPatternsMustHaveInit && binding.type !== "BindingIdentifier" && !this.match(TokenType.ASSIGN)) {
+    if (bindingPatternsMustHaveInit && binding.type !== 'BindingIdentifier' && !this.match(TokenType.ASSIGN)) {
       this.expect(TokenType.ASSIGN);
     }
 
@@ -959,10 +959,10 @@ export class GenericParser extends Tokenizer {
   }
 
   isolateCoverGrammar(parser) {
-    var oldIsBindingElement = this.isBindingElement,
-      oldIsAssignmentTarget = this.isAssignmentTarget,
-      oldFirstExprError = this.firstExprError,
-      result;
+    let oldIsBindingElement = this.isBindingElement,
+        oldIsAssignmentTarget = this.isAssignmentTarget,
+        oldFirstExprError = this.firstExprError,
+        result;
     this.isBindingElement = this.isAssignmentTarget = true;
     this.firstExprError = null;
     result = parser.call(this);
@@ -976,10 +976,10 @@ export class GenericParser extends Tokenizer {
   }
 
   inheritCoverGrammar(parser) {
-    var oldIsBindingElement = this.isBindingElement,
-      oldIsAssignmentTarget = this.isAssignmentTarget,
-      oldFirstExprError = this.firstExprError,
-      result;
+    let oldIsBindingElement = this.isBindingElement,
+        oldIsAssignmentTarget = this.isAssignmentTarget,
+        oldFirstExprError = this.firstExprError,
+        result;
     this.isBindingElement = this.isAssignmentTarget = true;
     this.firstExprError = null;
     result = parser.call(this);
@@ -998,7 +998,7 @@ export class GenericParser extends Tokenizer {
         if (!this.match(TokenType.COMMA)) break;
         this.lex();
         let right = this.parseAssignmentExpression();
-        left = this.finishNode(new AST.BinaryExpression({ left, operator: ",", right }), startState);
+        left = this.finishNode(new AST.BinaryExpression({ left, operator: ',', right }), startState);
       }
     }
     return left;
@@ -1006,9 +1006,9 @@ export class GenericParser extends Tokenizer {
 
   parseArrowExpressionTail(head, startState) {
     // Convert param list.
-    let {params = null, rest = null} = head;
+    let { params = null, rest = null } = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
-      if (head.type === "IdentifierExpression") {
+      if (head.type === 'IdentifierExpression') {
         params = [this.targetToBinding(this.transformDestructuring(head))];
       } else {
         throw this.createUnexpected(this.lookahead);
@@ -1016,8 +1016,6 @@ export class GenericParser extends Tokenizer {
     }
 
     let paramsNode = this.finishNode(new AST.FormalParameters({ items: params, rest }), startState);
-
-    let arrow = this.expect(TokenType.ARROW);
 
     let previousYield = this.allowYieldExpression;
     this.allowYieldExpression = false;
@@ -1085,8 +1083,7 @@ export class GenericParser extends Tokenizer {
     let node;
     if (operator.type === TokenType.ASSIGN) {
       node = new AST.AssignmentExpression({ binding: expr, expression: rhs });
-    }
-    else {
+    } else {
       node = new AST.CompoundAssignmentExpression({ binding: expr, operator: operator.type.name, expression: rhs });
       this.isBindingElement = this.isAssignmentTarget = false;
     }
@@ -1099,17 +1096,18 @@ export class GenericParser extends Tokenizer {
     }
 
     switch (node.type) {
-      case "AssignmentTargetIdentifier":
+      case 'AssignmentTargetIdentifier':
         return new AST.BindingIdentifier({ name: node.name });
-      case "ArrayAssignmentTarget":
-        return new AST.ArrayBinding({ elements: node.elements.map(e => this.targetToBinding(e)), rest: this.targetToBinding(node.rest) });
-      case "ObjectAssignmentTarget":
+      case 'ArrayAssignmentTarget':
+        return new AST.ArrayBinding({ elements: node.elements.map(e => this.targetToBinding(e)),
+          rest: this.targetToBinding(node.rest) });
+      case 'ObjectAssignmentTarget':
         return new AST.ObjectBinding({ properties: node.properties.map(p => this.targetToBinding(p)) });
-      case "AssignmentTargetPropertyIdentifier":
+      case 'AssignmentTargetPropertyIdentifier':
         return new AST.BindingPropertyIdentifier({ binding: this.targetToBinding(node.binding), init: node.init });
-      case "AssignmentTargetPropertyProperty":
+      case 'AssignmentTargetPropertyProperty':
         return new AST.BindingPropertyProperty({ name: node.name, binding: this.targetToBinding(node.binding) });
-      case "AssignmentTargetWithDefault":
+      case 'AssignmentTargetWithDefault':
         return new AST.BindingWithDefault({ binding: this.targetToBinding(node.binding), init: node.init });
       default:
         throw new Error('Not reached');
@@ -1119,67 +1117,67 @@ export class GenericParser extends Tokenizer {
   transformDestructuring(node) {
     switch (node.type) {
 
-      case "DataProperty":
+      case 'DataProperty':
         return this.copyNode(node, new AST.AssignmentTargetPropertyProperty({
           name: node.name,
           binding: this.transformDestructuringWithDefault(node.expression),
         }));
-      case "ShorthandProperty":
+      case 'ShorthandProperty':
         return this.copyNode(node, new AST.AssignmentTargetPropertyIdentifier({
           binding: this.copyNode(node, new AST.AssignmentTargetIdentifier({ name: node.name.name })),
           init: null,
         }));
 
-      case "ObjectExpression":
+      case 'ObjectExpression':
         return this.copyNode(node, new AST.ObjectAssignmentTarget({
           properties: node.properties.map(x => this.transformDestructuring(x)),
         }));
-      case "ArrayExpression":
+      case 'ArrayExpression': {
         let last = node.elements[node.elements.length - 1];
-        if (last != null && last.type === "SpreadElement") {
+        if (last != null && last.type === 'SpreadElement') {
           return this.copyNode(node, new AST.ArrayAssignmentTarget({
             elements: node.elements.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
             rest: this.copyNode(last.expression, this.transformDestructuring(last.expression)),
           }));
-        } else {
-          return this.copyNode(node, new AST.ArrayAssignmentTarget({
-            elements: node.elements.map(e => e && this.transformDestructuringWithDefault(e)),
-            rest: null,
-          }));
         }
-        /* istanbul ignore next */
-        break;
-      case "IdentifierExpression":
+        return this.copyNode(node, new AST.ArrayAssignmentTarget({
+          elements: node.elements.map(e => e && this.transformDestructuringWithDefault(e)),
+          rest: null,
+        }));
+      }
+      case 'IdentifierExpression':
         return this.copyNode(node, new AST.AssignmentTargetIdentifier({ name: node.name }));
-      case "AssignmentExpression":
+      case 'AssignmentExpression':
         throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 
-      case "StaticPropertyName":
+      case 'StaticPropertyName':
         return this.copyNode(node, new AST.AssignmentTargetIdentifier({ name: node.value }));
 
-      case "ComputedMemberExpression":
-        return this.copyNode(node, new AST.ComputedMemberAssignmentTarget({ object: node.object, expression: node.expression }));
-      case "StaticMemberExpression":
-        return this.copyNode(node, new AST.StaticMemberAssignmentTarget({ object: node.object, property: node.property }));
+      case 'ComputedMemberExpression':
+        return this.copyNode(node, new AST.ComputedMemberAssignmentTarget(
+          { object: node.object, expression: node.expression }));
+      case 'StaticMemberExpression':
+        return this.copyNode(node, new AST.StaticMemberAssignmentTarget(
+          { object: node.object, property: node.property }));
 
-      case "ArrayAssignmentTarget":
-      case "ObjectAssignmentTarget":
-      case "ComputedMemberAssignmentTarget":
-      case "StaticMemberAssignmentTarget":
-      case "AssignmentTargetIdentifier":
-      case "AssignmentTargetPropertyIdentifier":
-      case "AssignmentTargetPropertyProperty":
-      case "AssignmentTargetWithDefault":
+      case 'ArrayAssignmentTarget':
+      case 'ObjectAssignmentTarget':
+      case 'ComputedMemberAssignmentTarget':
+      case 'StaticMemberAssignmentTarget':
+      case 'AssignmentTargetIdentifier':
+      case 'AssignmentTargetPropertyIdentifier':
+      case 'AssignmentTargetPropertyProperty':
+      case 'AssignmentTargetWithDefault':
         return node;
     }
 
     // istanbul ignore next
-    throw new Error("Not reached");
+    throw new Error('Not reached');
   }
 
   transformDestructuringWithDefault(node) {
     switch (node.type) {
-      case "AssignmentExpression":
+      case 'AssignmentExpression':
         return this.copyNode(node, new AST.AssignmentTargetWithDefault({
           binding: this.transformDestructuring(node.binding),
           init: node.expression,
@@ -1303,7 +1301,7 @@ export class GenericParser extends Tokenizer {
 
     this.lex();
     let stack = [];
-    stack.push({startState, left, operator, precedence: BinaryPrecedence[operator.name]});
+    stack.push({ startState, left, operator, precedence: BinaryPrecedence[operator.name] });
     startState = this.startNode();
     let right = this.isolateCoverGrammar(this.parseExponentiationExpression);
     operator = this.lookahead.type;
@@ -1320,7 +1318,7 @@ export class GenericParser extends Tokenizer {
       }
 
       this.lex();
-      stack.push({startState, left: right, operator, precedence});
+      stack.push({ startState, left: right, operator, precedence });
 
       startState = this.startNode();
       right = this.isolateCoverGrammar(this.parseExponentiationExpression);
@@ -1343,7 +1341,7 @@ export class GenericParser extends Tokenizer {
     if (this.lookahead.type !== TokenType.EXP) {
       return left;
     }
-    if (left.type === "UnaryExpression" && !leftIsParenthesized) {
+    if (left.type === 'UnaryExpression' && !leftIsParenthesized) {
       throw this.createError(ErrorMessages.INVALID_EXPONENTIATION_LHS);
     }
     this.lex();
@@ -1351,7 +1349,7 @@ export class GenericParser extends Tokenizer {
     this.isBindingElement = this.isAssignmentTarget = false;
 
     let right = this.isolateCoverGrammar(this.parseExponentiationExpression);
-    return new AST.BinaryExpression({ left, operator: "**", right });
+    return new AST.BinaryExpression({ left, operator: '**', right });
   }
 
   parseUnaryExpression() {
@@ -1400,10 +1398,11 @@ export class GenericParser extends Tokenizer {
     }
     operand = this.transformDestructuring(operand);
 
-    return this.finishNode(new AST.UpdateExpression({ isPrefix: false, operator: operator.value, operand }), startState);
+    return this.finishNode(new AST.UpdateExpression(
+      { isPrefix: false, operator: operator.value, operand }), startState);
   }
 
-  parseLeftHandSideExpression({allowCall}) {
+  parseLeftHandSideExpression({ allowCall }) {
     let startState = this.startNode();
     let previousAllowIn = this.allowIn;
     this.allowIn = true;
@@ -1509,9 +1508,8 @@ export class GenericParser extends Tokenizer {
       if (token.tail) {
         result.push(this.finishNode(new AST.TemplateElement({ rawValue: token.slice.text.slice(1, -1) }), startState));
         return result;
-      } else {
-        result.push(this.finishNode(new AST.TemplateElement({ rawValue: token.slice.text.slice(1, -2) }), startState));
       }
+      result.push(this.finishNode(new AST.TemplateElement({ rawValue: token.slice.text.slice(1, -2) }), startState));
     }
   }
 
@@ -1536,7 +1534,7 @@ export class GenericParser extends Tokenizer {
     this.lex();
     if (this.eat(TokenType.PERIOD)) {
       let ident = this.expect(TokenType.IDENTIFIER);
-      if (ident.value !== "target") {
+      if (ident.value !== 'target') {
         throw this.createUnexpected(ident);
       }
       return this.finishNode(new AST.NewTargetExpression, startState);
@@ -1549,7 +1547,7 @@ export class GenericParser extends Tokenizer {
   }
 
   parseRegexFlags(flags) {
-    let global = false,
+    let g = false,
         ignoreCase = false,
         multiLine = false,
         unicode = false,
@@ -1558,32 +1556,32 @@ export class GenericParser extends Tokenizer {
       let f = flags[i];
       switch (f) {
         case 'g':
-          if (global) {
-            throw this.createError("Duplicate regular expression flag 'g'");
+          if (g) {
+            throw this.createError('Duplicate regular expression flag \'g\'');
           }
-          global = true;
+          g = true;
           break;
         case 'i':
           if (ignoreCase) {
-            throw this.createError("Duplicate regular expression flag 'i'");
+            throw this.createError('Duplicate regular expression flag \'i\'');
           }
           ignoreCase = true;
           break;
         case 'm':
           if (multiLine) {
-            throw this.createError("Duplicate regular expression flag 'm'");
+            throw this.createError('Duplicate regular expression flag \'m\'');
           }
           multiLine = true;
           break;
         case 'u':
           if (unicode) {
-            throw this.createError("Duplicate regular expression flag 'u'");
+            throw this.createError('Duplicate regular expression flag \'u\'');
           }
           unicode = true;
           break;
         case 'y':
           if (sticky) {
-            throw this.createError("Duplicate regular expression flag 'y'");
+            throw this.createError('Duplicate regular expression flag \'y\'');
           }
           sticky = true;
           break;
@@ -1591,7 +1589,7 @@ export class GenericParser extends Tokenizer {
           throw this.createError(`Invalid regular expression flag '${f}'`);
       }
     }
-    return { global, ignoreCase, multiLine, unicode, sticky };
+    return { global: g, ignoreCase, multiLine, unicode, sticky };
   }
 
   parsePrimaryExpression() {
@@ -1618,7 +1616,8 @@ export class GenericParser extends Tokenizer {
         return this.finishNode(new AST.ThisExpression, startState);
       case TokenType.FUNCTION:
         this.isBindingElement = this.isAssignmentTarget = false;
-        return this.finishNode(this.parseFunction({isExpr: true, inDefault: false, allowGenerator: true}), startState);
+        return this.finishNode(this.parseFunction(
+          { isExpr: true, inDefault: false, allowGenerator: true }), startState);
       case TokenType.TRUE:
         this.lex();
         this.isBindingElement = this.isAssignmentTarget = false;
@@ -1637,18 +1636,20 @@ export class GenericParser extends Tokenizer {
         return this.parseObjectExpression();
       case TokenType.TEMPLATE:
         this.isBindingElement = this.isAssignmentTarget = false;
-        return this.finishNode(new AST.TemplateExpression({ tag: null, elements: this.parseTemplateElements() }), startState);
+        return this.finishNode(new AST.TemplateExpression(
+          { tag: null, elements: this.parseTemplateElements() }), startState);
       case TokenType.DIV:
-      case TokenType.ASSIGN_DIV:
+      case TokenType.ASSIGN_DIV: {
         this.isBindingElement = this.isAssignmentTarget = false;
-        this.lookahead = this.scanRegExp(this.match(TokenType.DIV) ? "/" : "/=");
+        this.lookahead = this.scanRegExp(this.match(TokenType.DIV) ? '/' : '/=');
         let token = this.lex();
-        let lastSlash = token.value.lastIndexOf("/");
+        let lastSlash = token.value.lastIndexOf('/');
         let pattern = token.value.slice(1, lastSlash);
         let flags = token.value.slice(lastSlash + 1);
         let ctorArgs = this.parseRegexFlags(flags);
         ctorArgs.pattern = pattern;
         return this.finishNode(new AST.LiteralRegExpExpression(ctorArgs), startState);
+      }
       case TokenType.CLASS:
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.parseClass({ isExpr: true, inDefault: false });
@@ -1663,9 +1664,9 @@ export class GenericParser extends Tokenizer {
     let token = this.lex();
     if (token.octal && this.strict) {
       if (token.noctal) {
-        throw this.createErrorWithLocation(startLocation, "Unexpected noctal integer literal");
+        throw this.createErrorWithLocation(startLocation, 'Unexpected noctal integer literal');
       } else {
-        throw this.createErrorWithLocation(startLocation, "Unexpected legacy octal integer literal");
+        throw this.createErrorWithLocation(startLocation, 'Unexpected legacy octal integer literal');
       }
     }
     let node = token.value === 1 / 0
@@ -1679,7 +1680,7 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
     let token = this.lex();
     if (token.octal != null && this.strict) {
-      throw this.createErrorWithLocation(startLocation, "Unexpected legacy octal escape sequence: \\" + token.octal);
+      throw this.createErrorWithLocation(startLocation, 'Unexpected legacy octal escape sequence: \\' + token.octal);
     }
     return this.finishNode(new AST.LiteralStringExpression({ value: token.str }), startState);
   }
@@ -1687,9 +1688,8 @@ export class GenericParser extends Tokenizer {
   parseIdentifierName() {
     if (this.lookahead.type.klass.isIdentifierName) {
       return this.lex().value;
-    } else {
-      throw this.createUnexpected(this.lookahead);
     }
+    throw this.createUnexpected(this.lookahead);
   }
 
   parseBindingIdentifier() {
@@ -1699,8 +1699,9 @@ export class GenericParser extends Tokenizer {
 
   parseIdentifier() {
     let type = this.lookahead.type;
-    if (type === TokenType.IDENTIFIER || type === TokenType.YIELD && !this.allowYieldExpression || type === TokenType.LET) {
-        return this.lex().value;
+    if (type === TokenType.IDENTIFIER || type === TokenType.YIELD && !this.allowYieldExpression ||
+      type === TokenType.LET) {
+      return this.lex().value;
     }
     throw this.createUnexpected(this.lookahead);
   }
@@ -1753,9 +1754,9 @@ export class GenericParser extends Tokenizer {
       this.ensureArrow();
       this.isBindingElement = this.isAssignmentTarget = false;
       return {
-          type: ARROW_EXPRESSION_PARAMS,
-          params: [],
-          rest: null,
+        type: ARROW_EXPRESSION_PARAMS,
+        params: [],
+        rest: null,
       };
     } else if (this.eat(TokenType.ELLIPSIS)) {
       rest = this.parseBindingTarget();
@@ -1804,7 +1805,7 @@ export class GenericParser extends Tokenizer {
         } else {
           group = this.finishNode(new AST.BinaryExpression({
             left: group,
-            operator: ",",
+            operator: ',',
             right: expr,
           }), startState);
         }
@@ -1820,17 +1821,16 @@ export class GenericParser extends Tokenizer {
 
       this.isBindingElement = false;
       return { type: ARROW_EXPRESSION_PARAMS, params, rest };
-    } else {
-      // Ensure assignment pattern:
-      if (rest) {
-        this.ensureArrow();
-      }
-      this.isBindingElement = false;
-      if (!isValidSimpleAssignmentTarget(group)) {
-        this.isAssignmentTarget = false;
-      }
-      return group;
     }
+    // Ensure assignment pattern:
+    if (rest) {
+      this.ensureArrow();
+    }
+    this.isBindingElement = false;
+    if (!isValidSimpleAssignmentTarget(group)) {
+      this.isAssignmentTarget = false;
+    }
+    return group;
   }
 
   parseArrayExpression() {
@@ -1857,7 +1857,7 @@ export class GenericParser extends Tokenizer {
           if (!this.isAssignmentTarget && this.firstExprError) {
             throw this.firstExprError;
           }
-          if (expr.type === "ArrayAssignmentTarget" || expr.type === "ObjectAssignmentTarget") {
+          if (expr.type === 'ArrayAssignmentTarget' || expr.type === 'ObjectAssignmentTarget') {
             rest = expr;
             break;
           }
@@ -1898,21 +1898,18 @@ export class GenericParser extends Tokenizer {
         throw this.firstExprError;
       }
       let last = exprs[exprs.length - 1];
-      if (last != null && last.type === "SpreadElement") {
+      if (last != null && last.type === 'SpreadElement') {
         return this.finishNode(new AST.ArrayAssignmentTarget({
           elements: exprs.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
           rest: this.transformDestructuring(last.expression),
         }), startState);
-      } else {
-        return this.finishNode(new AST.ArrayAssignmentTarget({
-          elements: exprs.map(e => e && this.transformDestructuringWithDefault(e)),
-          rest: null,
-        }), startState);
       }
-    } else {
-      return this.finishNode(new AST.ArrayExpression({ elements: exprs }), startState);
+      return this.finishNode(new AST.ArrayAssignmentTarget({
+        elements: exprs.map(e => e && this.transformDestructuringWithDefault(e)),
+        rest: null,
+      }), startState);
     }
-
+    return this.finishNode(new AST.ArrayExpression({ elements: exprs }), startState);
   }
 
   parseObjectExpression() {
@@ -1933,10 +1930,10 @@ export class GenericParser extends Tokenizer {
       if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
       }
-      return this.finishNode(new AST.ObjectAssignmentTarget({ properties: properties.map(p => this.transformDestructuring(p)) }), startState);
-    } else {
-      return this.finishNode(new AST.ObjectExpression({ properties }), startState);
+      return this.finishNode(new AST.ObjectAssignmentTarget(
+        { properties: properties.map(p => this.transformDestructuring(p)) }), startState);
     }
+    return this.finishNode(new AST.ObjectExpression({ properties }), startState);
   }
 
   parsePropertyDefinition() {
@@ -1944,12 +1941,12 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
     let token = this.lookahead;
 
-    let {methodOrKey, kind} = this.parseMethodDefinition();
+    let { methodOrKey, kind } = this.parseMethodDefinition();
     switch (kind) {
-      case "method":
+      case 'method':
         this.isBindingElement = this.isAssignmentTarget = false;
         return methodOrKey;
-      case "identifier":
+      case 'identifier':
         if (this.eat(TokenType.ASSIGN)) {
           // CoverInitializedName
           let init = this.isolateCoverGrammar(this.parseAssignmentExpression);
@@ -1962,7 +1959,8 @@ export class GenericParser extends Tokenizer {
           if (token.type !== TokenType.IDENTIFIER && token.type !== TokenType.YIELD && token.type !== TokenType.LET) {
             throw this.createUnexpected(token);
           }
-          return this.finishNode(new AST.ShorthandProperty({ name: new AST.IdentifierExpression({ name: methodOrKey.value }) }), startState);
+          return this.finishNode(new AST.ShorthandProperty(
+            { name: new AST.IdentifierExpression({ name: methodOrKey.value }) }), startState);
         }
     }
 
@@ -1971,7 +1969,8 @@ export class GenericParser extends Tokenizer {
 
     let expr = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
     if (this.firstExprError) {
-      return this.finishNode(new AST.AssignmentTargetPropertyProperty({ name: methodOrKey, binding: expr }), startState);
+      return this.finishNode(new AST.AssignmentTargetPropertyProperty(
+        { name: methodOrKey, binding: expr }), startState);
     }
     return this.finishNode(new AST.DataProperty({ name: methodOrKey, expression: expr }), startState);
   }
@@ -1993,21 +1992,23 @@ export class GenericParser extends Tokenizer {
           }), startState),
           binding: null,
         };
-      case TokenType.NUMBER:
+      case TokenType.NUMBER: {
         let numLiteral = this.parseNumericLiteral();
         return {
           name: this.finishNode(new AST.StaticPropertyName({
-            value: `${numLiteral.type === "LiteralInfinityExpression" ? 1 / 0 : numLiteral.value}`,
+            value: `${numLiteral.type === 'LiteralInfinityExpression' ? 1 / 0 : numLiteral.value}`,
           }), startState),
           binding: null,
         };
-      case TokenType.LBRACK:
+      }
+      case TokenType.LBRACK: {
         let previousYield = this.allowYieldExpression;
         this.lex();
         let expr = this.parseAssignmentExpression();
         this.expect(TokenType.RBRACK);
         this.allowYieldExpression = previousYield;
         return { name: this.finishNode(new AST.ComputedPropertyName({ expression: expr }), startState), binding: null };
+      }
     }
 
     let name = this.parseIdentifierName();
@@ -2019,7 +2020,7 @@ export class GenericParser extends Tokenizer {
 
   /**
    * Test if lookahead can be the beginning of a `PropertyName`.
-   * @returns {boolean}
+   * @returns {boolean} true if lookaheadPropertyName matches
    */
   lookaheadPropertyName() {
     switch (this.lookahead.type) {
@@ -2040,8 +2041,7 @@ export class GenericParser extends Tokenizer {
    *  * `CoverInitializedName` (`IdentifierReference "=" AssignmentExpression`)
    *  * `PropertyName : AssignmentExpression`
    * The parser will stop at the end of the leading `Identifier` or `PropertyName` and return it.
-   *
-   * @returns {{methodOrKey: (Method|PropertyName), kind: string}}
+   * @returns {{methodOrKey: (Method|PropertyName), kind: string}} an object with the method/prpertyName and its type
    */
   parseMethodDefinition() {
     let token = this.lookahead;
@@ -2049,14 +2049,14 @@ export class GenericParser extends Tokenizer {
 
     let isGenerator = !!this.eat(TokenType.MUL);
 
-    let {name, binding} = this.parsePropertyName();
+    let { propName, binding } = this.parsePropertyName();
 
     if (!isGenerator && token.type === TokenType.IDENTIFIER) {
       let name = token.value;
       if (name.length === 3) {
         // Property Assignment: Getter and Setter.
-        if (name === "get" && this.lookaheadPropertyName()) {
-          ({name} = this.parsePropertyName());
+        if (name === 'get' && this.lookaheadPropertyName()) {
+          ({ name } = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
           let previousYield = this.allowYieldExpression;
@@ -2065,10 +2065,10 @@ export class GenericParser extends Tokenizer {
           this.allowYieldExpression = previousYield;
           return {
             methodOrKey: this.finishNode(new AST.Getter({ name, body }), startState),
-            kind: "method",
+            kind: 'method',
           };
-        } else if (name === "set" && this.lookaheadPropertyName()) {
-          ({name} = this.parsePropertyName());
+        } else if (name === 'set' && this.lookaheadPropertyName()) {
+          ({ name } = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           let previousYield = this.allowYieldExpression;
           this.allowYieldExpression = false;
@@ -2078,7 +2078,7 @@ export class GenericParser extends Tokenizer {
           this.allowYieldExpression = previousYield;
           return {
             methodOrKey: this.finishNode(new AST.Setter({ name, param, body }), startState),
-            kind: "method",
+            kind: 'method',
           };
         }
       }
@@ -2093,8 +2093,8 @@ export class GenericParser extends Tokenizer {
       this.allowYieldExpression = previousYield;
 
       return {
-        methodOrKey: this.finishNode(new AST.Method({ isGenerator, name, params, body }), startState),
-        kind: "method",
+        methodOrKey: this.finishNode(new AST.Method({ isGenerator, propName, params, body }), startState),
+        kind: 'method',
       };
     }
 
@@ -2103,13 +2103,13 @@ export class GenericParser extends Tokenizer {
     }
 
     return {
-      methodOrKey: name,
-      kind: token.type.klass.isIdentifierName ? "identifier" : "property",
+      methodOrKey: propName,
+      kind: token.type.klass.isIdentifierName ? 'identifier' : 'property',
       binding,
     };
   }
 
-  parseClass({isExpr, inDefault}) {
+  parseClass({ isExpr, inDefault }) {
     let startState = this.startNode();
 
     this.lex();
@@ -2120,7 +2120,7 @@ export class GenericParser extends Tokenizer {
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {
-        name = new AST.BindingIdentifier({ name: "*default*" });
+        name = new AST.BindingIdentifier({ name: '*default*' });
       } else {
         throw this.createUnexpected(this.lookahead);
       }
@@ -2137,21 +2137,22 @@ export class GenericParser extends Tokenizer {
         continue;
       }
       let isStatic = false;
-      let {methodOrKey, kind} = this.parseMethodDefinition();
-      if (kind === "identifier" && methodOrKey.value === "static") {
+      let { methodOrKey, kind } = this.parseMethodDefinition();
+      if (kind === 'identifier' && methodOrKey.value === 'static') {
         isStatic = true;
-        ({methodOrKey, kind} = this.parseMethodDefinition());
+        ({ methodOrKey, kind } = this.parseMethodDefinition());
       }
-      if (kind === "method") {
+      if (kind === 'method') {
         elements.push(this.copyNode(methodOrKey, new AST.ClassElement({ isStatic, method: methodOrKey })));
       } else {
-        throw this.createError("Only methods are allowed in classes");
+        throw this.createError('Only methods are allowed in classes');
       }
     }
-    return this.finishNode(new (isExpr ? AST.ClassExpression : AST.ClassDeclaration)({ name, super: heritage, elements }), startState);
+    return this.finishNode(new (isExpr ? AST.ClassExpression : AST.ClassDeclaration)(
+      { name, super: heritage, elements }), startState);
   }
 
-  parseFunction({isExpr, inDefault, allowGenerator}) {
+  parseFunction({ isExpr, inDefault, allowGenerator }) {
     let startState = this.startNode();
 
     this.lex();
@@ -2169,7 +2170,7 @@ export class GenericParser extends Tokenizer {
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {
-        name = new AST.BindingIdentifier({ name: "*default*" });
+        name = new AST.BindingIdentifier({ name: '*default*' });
       } else {
         throw this.createUnexpected(this.lookahead);
       }
@@ -2181,7 +2182,8 @@ export class GenericParser extends Tokenizer {
     let body = this.parseFunctionBody();
     this.allowYieldExpression = previousYield;
 
-    return this.finishNode(new (isExpr ? AST.FunctionExpression : AST.FunctionDeclaration)({ isGenerator, name, params, body }), startState);
+    return this.finishNode(new (isExpr ? AST.FunctionExpression : AST.FunctionDeclaration)(
+      { isGenerator, name, params, body }), startState);
   }
 
   parseArrayBinding() {
@@ -2221,8 +2223,9 @@ export class GenericParser extends Tokenizer {
   parseBindingProperty() {
     let startState = this.startNode();
     let token = this.lookahead;
-    let {name, binding} = this.parsePropertyName();
-    if ((token.type === TokenType.IDENTIFIER || token.type === TokenType.LET || token.type === TokenType.YIELD) && name.type === "StaticPropertyName") {
+    let { name, binding } = this.parsePropertyName();
+    if ((token.type === TokenType.IDENTIFIER || token.type === TokenType.LET ||
+      token.type === TokenType.YIELD) && name.type === 'StaticPropertyName') {
       if (!this.match(TokenType.COLON)) {
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {

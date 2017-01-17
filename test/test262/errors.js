@@ -32,7 +32,6 @@ suite('test262', () => {
           expect(function parsePass() {
             passTree = parse(passSrc, f.match('.module.js'), true);
           }).to.not.throwError();
-          
           let passExplicitSrc = fs.readFileSync(passExplicitTestDir, 'utf8');
           expect(function parsePassExplicit() {
             passExplicitTree = parse(passExplicitSrc, f.match('.module.js'), true);
@@ -69,7 +68,6 @@ suite('test262', () => {
         });
       });
   });
-
   suite('early', () => {
     let earlyExcludes = [
       // https://github.com/shapesecurity/shift-parser-js/issues/316

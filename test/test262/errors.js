@@ -21,28 +21,31 @@ suite('test262', () => {
       // https://github.com/shapesecurity/shift-parser-js/issues/311
       '1012.script.js'
     ];
-    fs.readdirSync(`${scriptDir}/pass`).filter( item => {
-      return passExcludes.indexOf(item) === -1;
-    }).forEach( f => {
-      let passTree, passExplicitTree;
-      test(`does not throw error and generates same tree[${f}]`, () => {
-        expect(function parsePass() {
-          passTree = parse(
-            fs.readFileSync(scriptDir + '/pass/' + f, 'utf8'), f.match('.module.js'), true);
-        }).to.not.throwError();
+    fs.readdirSync(`${scriptDir}/pass`)
+      .filter(item => passExcludes.indexOf(item) === -1)
+      .forEach(f => {
+        let passTree, passExplicitTree;
+        let passTestDir = `${scriptDir}/pass/${f}`;
+        let passExplicitTestDir = `${scriptDir}/pass-explicit/${f}`;
+        test(`does not throw error and generates same tree[${f}]`, () => {
+          let passSrc = fs.readFileSync(passTestDir, 'utf8');
+          expect(function parsePass() {
+            passTree = parse(passSrc, f.match('.module.js'), true);
+          }).to.not.throwError();
+          
+          let passExplicitSrc = fs.readFileSync(passExplicitTestDir, 'utf8');
+          expect(function parsePassExplicit() {
+            passExplicitTree = parse(passExplicitSrc, f.match('.module.js'), true);
+          }).to.not.throwError();
 
-        expect(function parsePassExplicit() {
-          passExplicitTree = parse(
-            fs.readFileSync(scriptDir + '/pass-explicit/' + f, 'utf8'), f.match('.module.js'), true);
-        }).to.not.throwError();
-
-        expect.eql(passTree, passExplicitTree);
+          expect.eql(passTree, passExplicitTree);
+        });
       });
-    });
   });
 
   suite('fail', () => {
-    var failExcludes = [
+    let failTestDir = `${scriptDir}/fail`;
+    let failExcludes = [
       // https://github.com/shapesecurity/shift-parser-js/issues/313
       '69.script.js',
       '70.script.js',
@@ -55,21 +58,20 @@ suite('test262', () => {
       '248.script.js',
       '519.script.js'
     ];
-    fs.readdirSync(`${scriptDir}/fail`).filter( item => {
-      return failExcludes.indexOf(item) === -1;
-    }).forEach( f => {
-      test(`throws error[${f}]`, function () {
-        expect(function () {
-          parse(
-            fs.readFileSync(`${scriptDir}/fail/${f}`, 'utf8'), f.match('.module.js'), false);
-        }
-        ).to.throwError();
+    fs.readdirSync(failTestDir)
+      .filter(item => failExcludes.indexOf(item) === -1)
+      .forEach(f => {
+        test(`throws error[${f}]`, () => {
+          let src = fs.readFileSync(`${failTestDir}/${f}`, 'utf8');
+          expect(() => {
+            parse(src, f.match('.module.js'), false);
+          }).to.throwError();
+        });
       });
-    });
   });
 
   suite('early', () => {
-    var earlyExcludes = [
+    let earlyExcludes = [
       // https://github.com/shapesecurity/shift-parser-js/issues/316
       '56.script.js', '641.script.js', '642.script.js',
 
@@ -104,22 +106,21 @@ suite('test262', () => {
       // causes Syntax Errors in the test script
       '599.script.js', '600.script.js', '601.script.js', '602.script.js'
     ];
-
-    fs.readdirSync(`${scriptDir}/early`).filter( item => {
-      return earlyExcludes.indexOf(item) === -1;
-    }).forEach( f => {
-      test(`does not throw error with earlyErrors false[${f}]`, function () {
-        expect(function () {
-          parse(
-          fs.readFileSync(`${scriptDir}/early/${f}`, 'utf8'), f.match('.module.js'), false);
-        }).to.not.throwError();
+    let earlyErrorsTestDir = `${scriptDir}/early`;
+    fs.readdirSync(earlyErrorsTestDir)
+      .filter(item => earlyExcludes.indexOf(item) === -1)
+      .forEach(f => {
+        let src = fs.readFileSync(`${earlyErrorsTestDir}/${f}`, 'utf8');
+        test(`does not throw error with earlyErrors false[${f}]`, function () {
+          expect(() => {
+            parse(src, f.match('.module.js'), false);
+          }).to.not.throwError();
+        });
+        test(`throws error with earlyErrors true[${f}]`, function () {
+          expect(() => {
+            parse(src, f.match('.module.js'), true);
+          }).to.throwError();
+        });
       });
-      test(`throws error with earlyErrors true[${f}]`, function () {
-        expect(function () {
-          parse(
-          fs.readFileSync(`${scriptDir}/early/${f}`, 'utf8'), f.match('.module.js'), true);
-        }).to.throwError();
-      });
-    });
   });
 });

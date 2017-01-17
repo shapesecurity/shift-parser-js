@@ -5,7 +5,6 @@ script:
   - npm run build
   - npm test
 node_js:
-  - "0.12"
   - "4"
   - "6"
 # the following config is needed for the "microtime" native node module

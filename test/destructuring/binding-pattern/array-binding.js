@@ -14,176 +14,176 @@
  * limitations under the License.
  */
 
-var stmt = require("../../helpers").stmt;
-var testParse = require("../../assertions").testParse;
-var testParseFailure = require("../../assertions").testParseFailure;
+let stmt = require('../../helpers').stmt;
+let testParse = require('../../assertions').testParse;
+let testParseFailure = require('../../assertions').testParseFailure;
 
-suite("Parser", function () {
-  suite("array binding", function () {
-    suite("variable declarator", function () {
-      testParse("var [,a] = 0;", stmt,
+suite('Parser', function () {
+  suite('array binding', function () {
+    suite('variable declarator', function () {
+      testParse('var [,a] = 0;', stmt,
         {
-          type: "VariableDeclarationStatement",
+          type: 'VariableDeclarationStatement',
           declaration: {
-            type: "VariableDeclaration",
-            kind: "var",
+            type: 'VariableDeclaration',
+            kind: 'var',
             declarators: [{
-              type: "VariableDeclarator",
+              type: 'VariableDeclarator',
               binding: {
-                type: "ArrayBinding",
-                elements: [null, { type: "BindingIdentifier", name: "a" }],
+                type: 'ArrayBinding',
+                elements: [null, { type: 'BindingIdentifier', name: 'a' }],
                 rest: null
               },
-              init: { type: "LiteralNumericExpression", value: 0 }
+              init: { type: 'LiteralNumericExpression', value: 0 }
             }]
           }
         }
       );
 
-      testParse("var [a]=[1];", stmt,
+      testParse('var [a]=[1];', stmt,
         {
-          type: "VariableDeclarationStatement",
+          type: 'VariableDeclarationStatement',
           declaration: {
-            type: "VariableDeclaration",
-            kind: "var",
+            type: 'VariableDeclaration',
+            kind: 'var',
             declarators: [{
-              type: "VariableDeclarator",
+              type: 'VariableDeclarator',
               binding: {
-                type: "ArrayBinding",
-                elements: [{ type: "BindingIdentifier", name: "a" }],
+                type: 'ArrayBinding',
+                elements: [{ type: 'BindingIdentifier', name: 'a' }],
                 rest: null
               },
-              init: { type: "ArrayExpression", elements: [{ type: "LiteralNumericExpression", value: 1 }] }
+              init: { type: 'ArrayExpression', elements: [{ type: 'LiteralNumericExpression', value: 1 }] }
             }]
           }
         }
       );
 
-      testParse("var [[a]]=0;", stmt,
+      testParse('var [[a]]=0;', stmt,
         {
-          type: "VariableDeclarationStatement",
+          type: 'VariableDeclarationStatement',
           declaration: {
-            type: "VariableDeclaration",
-            kind: "var",
+            type: 'VariableDeclaration',
+            kind: 'var',
             declarators: [{
-              type: "VariableDeclarator",
+              type: 'VariableDeclarator',
               binding: {
-                type: "ArrayBinding",
+                type: 'ArrayBinding',
                 elements: [{
-                  type: "ArrayBinding",
-                  elements: [{ type: "BindingIdentifier", name: "a" }],
+                  type: 'ArrayBinding',
+                  elements: [{ type: 'BindingIdentifier', name: 'a' }],
                   rest: null
                 }],
                 rest: null
               },
-              init: { type: "LiteralNumericExpression", value: 0 }
+              init: { type: 'LiteralNumericExpression', value: 0 }
             }]
           }
         }
       );
 
-      testParse("var a, [a] = 0;", stmt,
+      testParse('var a, [a] = 0;', stmt,
         {
-          type: "VariableDeclarationStatement",
+          type: 'VariableDeclarationStatement',
           declaration: {
-            type: "VariableDeclaration",
-            kind: "var",
+            type: 'VariableDeclaration',
+            kind: 'var',
             declarators: [{
-              type: "VariableDeclarator",
-              binding: { type: "BindingIdentifier", name: "a" },
+              type: 'VariableDeclarator',
+              binding: { type: 'BindingIdentifier', name: 'a' },
               init: null
             }, {
-              type: "VariableDeclarator",
+              type: 'VariableDeclarator',
               binding: {
-                type: "ArrayBinding",
-                elements: [{ type: "BindingIdentifier", name: "a" }],
+                type: 'ArrayBinding',
+                elements: [{ type: 'BindingIdentifier', name: 'a' }],
                 rest: null
               },
-              init: { type: "LiteralNumericExpression", value: 0 }
+              init: { type: 'LiteralNumericExpression', value: 0 }
             }]
           }
         }
       );
 
-      testParse("var [a, a] = 0;", stmt,
+      testParse('var [a, a] = 0;', stmt,
         {
-          type: "VariableDeclarationStatement",
+          type: 'VariableDeclarationStatement',
           declaration: {
-            type: "VariableDeclaration",
-            kind: "var",
+            type: 'VariableDeclaration',
+            kind: 'var',
             declarators: [{
-              type: "VariableDeclarator",
+              type: 'VariableDeclarator',
               binding: {
-                type: "ArrayBinding",
-                elements: [{ type: "BindingIdentifier", name: "a" }, { type: "BindingIdentifier", name: "a" }],
+                type: 'ArrayBinding',
+                elements: [{ type: 'BindingIdentifier', name: 'a' }, { type: 'BindingIdentifier', name: 'a' }],
                 rest: null
               },
-              init: { type: "LiteralNumericExpression", value: 0 }
+              init: { type: 'LiteralNumericExpression', value: 0 }
             }]
           }
         }
       );
 
-      testParse("var [a, ...a] = 0;", stmt,
+      testParse('var [a, ...a] = 0;', stmt,
         {
-          type: "VariableDeclarationStatement",
+          type: 'VariableDeclarationStatement',
           declaration: {
-            type: "VariableDeclaration",
-            kind: "var",
+            type: 'VariableDeclaration',
+            kind: 'var',
             declarators: [{
-              type: "VariableDeclarator",
+              type: 'VariableDeclarator',
               binding: {
-                type: "ArrayBinding",
-                elements: [{ type: "BindingIdentifier", name: "a" }],
-                rest: { type: "BindingIdentifier", name: "a" }
+                type: 'ArrayBinding',
+                elements: [{ type: 'BindingIdentifier', name: 'a' }],
+                rest: { type: 'BindingIdentifier', name: 'a' }
               },
-              init: { type: "LiteralNumericExpression", value: 0 }
+              init: { type: 'LiteralNumericExpression', value: 0 }
             }]
           }
         }
       );
 
-      testParseFailure("var [a.b] = 0", "Unexpected token \".\"");
-      testParseFailure("var ([x]) = 0", "Unexpected token \"(\"");
+      testParseFailure('var [a.b] = 0', 'Unexpected token "."');
+      testParseFailure('var ([x]) = 0', 'Unexpected token "("');
     });
 
-    suite("formal parameter", function () {
+    suite('formal parameter', function () {
       // passing cases are tested in other function test cases.
-      testParseFailure("([a.b]) => 0", "Illegal arrow function parameter list");
-      testParseFailure("function a([a.b]) {}", "Unexpected token \".\"");
-      testParseFailure("function* a([a.b]) {}", "Unexpected token \".\"");
-      testParseFailure("(function ([a.b]) {})", "Unexpected token \".\"");
-      testParseFailure("(function* ([a.b]) {})", "Unexpected token \".\"");
-      testParseFailure("({a([a.b]){}})", "Unexpected token \".\"");
-      testParseFailure("({*a([a.b]){}})", "Unexpected token \".\"");
-      testParseFailure("({set a([a.b]){}})", "Unexpected token \".\"");
+      testParseFailure('([a.b]) => 0', 'Illegal arrow function parameter list');
+      testParseFailure('function a([a.b]) {}', 'Unexpected token "."');
+      testParseFailure('function* a([a.b]) {}', 'Unexpected token "."');
+      testParseFailure('(function ([a.b]) {})', 'Unexpected token "."');
+      testParseFailure('(function* ([a.b]) {})', 'Unexpected token "."');
+      testParseFailure('({a([a.b]){}})', 'Unexpected token "."');
+      testParseFailure('({*a([a.b]){}})', 'Unexpected token "."');
+      testParseFailure('({set a([a.b]){}})', 'Unexpected token "."');
     });
 
-    suite("catch clause", function () {
-      testParse("try {} catch ([e]) {}", stmt,
+    suite('catch clause', function () {
+      testParse('try {} catch ([e]) {}', stmt,
         {
-          type: "TryCatchStatement",
-          body: { type: "Block", statements: [] },
+          type: 'TryCatchStatement',
+          body: { type: 'Block', statements: [] },
           catchClause: {
-            type: "CatchClause",
-            binding: { type: "ArrayBinding", elements: [{ type: "BindingIdentifier", name: "e" }], rest: null },
-            body: { type: "Block", statements: [] }
+            type: 'CatchClause',
+            binding: { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'e' }], rest: null },
+            body: { type: 'Block', statements: [] }
           }
         }
       );
 
-      testParse("try {} catch ([e, ...a]) {}", stmt,
+      testParse('try {} catch ([e, ...a]) {}', stmt,
         {
-          type: "TryCatchStatement",
-          body: { type: "Block", statements: [] },
+          type: 'TryCatchStatement',
+          body: { type: 'Block', statements: [] },
           catchClause: {
-            type: "CatchClause",
+            type: 'CatchClause',
             binding: {
-              type: "ArrayBinding",
-              elements: [{ type: "BindingIdentifier", name: "e" }],
-              rest: { type: "BindingIdentifier", name: "a" }
+              type: 'ArrayBinding',
+              elements: [{ type: 'BindingIdentifier', name: 'e' }],
+              rest: { type: 'BindingIdentifier', name: 'a' }
             },
-            body: { type: "Block", statements: [] }
+            body: { type: 'Block', statements: [] }
           }
         }
       );

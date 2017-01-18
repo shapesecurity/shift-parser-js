@@ -15,119 +15,119 @@
  */
 
 
-import {getHexValue, isLineTerminator, isWhiteSpace, isIdentifierStart, isIdentifierPart, isDecimalDigit} from "./utils";
-import {ErrorMessages} from "./errors";
+import { getHexValue, isLineTerminator, isWhiteSpace, isIdentifierStart, isIdentifierPart, isDecimalDigit } from './utils';
+import { ErrorMessages } from './errors';
 
 export const TokenClass = {
-  Eof: {name: "<End>"},
-  Ident: {name: "Identifier", isIdentifierName: true},
-  Keyword: {name: "Keyword", isIdentifierName: true},
-  NumericLiteral: {name: "Numeric"},
-  TemplateElement: {name: "Template"},
-  Punctuator: {name: "Punctuator"},
-  StringLiteral: {name: "String"},
-  RegularExpression: {name: "RegularExpression"},
-  Illegal: {name: "Illegal"},
+  Eof: { name: '<End>' },
+  Ident: { name: 'Identifier', isIdentifierName: true },
+  Keyword: { name: 'Keyword', isIdentifierName: true },
+  NumericLiteral: { name: 'Numeric' },
+  TemplateElement: { name: 'Template' },
+  Punctuator: { name: 'Punctuator' },
+  StringLiteral: { name: 'String' },
+  RegularExpression: { name: 'RegularExpression' },
+  Illegal: { name: 'Illegal' },
 };
 
 export const TokenType = {
-  EOS: {klass: TokenClass.Eof, name: "EOS"},
-  LPAREN: {klass: TokenClass.Punctuator, name: "("},
-  RPAREN: {klass: TokenClass.Punctuator, name: ")"},
-  LBRACK: {klass: TokenClass.Punctuator, name: "["},
-  RBRACK: {klass: TokenClass.Punctuator, name: "]"},
-  LBRACE: {klass: TokenClass.Punctuator, name: "{"},
-  RBRACE: {klass: TokenClass.Punctuator, name: "}"},
-  COLON: {klass: TokenClass.Punctuator, name: ":"},
-  SEMICOLON: {klass: TokenClass.Punctuator, name: ";"},
-  PERIOD: {klass: TokenClass.Punctuator, name: "."},
-  ELLIPSIS: {klass: TokenClass.Punctuator, name: "..."},
-  ARROW: {klass: TokenClass.Punctuator, name: "=>"},
-  CONDITIONAL: {klass: TokenClass.Punctuator, name: "?"},
-  INC: {klass: TokenClass.Punctuator, name: "++"},
-  DEC: {klass: TokenClass.Punctuator, name: "--"},
-  ASSIGN: {klass: TokenClass.Punctuator, name: "="},
-  ASSIGN_BIT_OR: {klass: TokenClass.Punctuator, name: "|="},
-  ASSIGN_BIT_XOR: {klass: TokenClass.Punctuator, name: "^="},
-  ASSIGN_BIT_AND: {klass: TokenClass.Punctuator, name: "&="},
-  ASSIGN_SHL: {klass: TokenClass.Punctuator, name: "<<="},
-  ASSIGN_SHR: {klass: TokenClass.Punctuator, name: ">>="},
-  ASSIGN_SHR_UNSIGNED: {klass: TokenClass.Punctuator, name: ">>>="},
-  ASSIGN_ADD: {klass: TokenClass.Punctuator, name: "+="},
-  ASSIGN_SUB: {klass: TokenClass.Punctuator, name: "-="},
-  ASSIGN_MUL: {klass: TokenClass.Punctuator, name: "*="},
-  ASSIGN_DIV: {klass: TokenClass.Punctuator, name: "/="},
-  ASSIGN_MOD: {klass: TokenClass.Punctuator, name: "%="},
-  ASSIGN_EXP: {klass: TokenClass.Punctuator, name: "**="},
-  COMMA: {klass: TokenClass.Punctuator, name: ","},
-  OR: {klass: TokenClass.Punctuator, name: "||"},
-  AND: {klass: TokenClass.Punctuator, name: "&&"},
-  BIT_OR: {klass: TokenClass.Punctuator, name: "|"},
-  BIT_XOR: {klass: TokenClass.Punctuator, name: "^"},
-  BIT_AND: {klass: TokenClass.Punctuator, name: "&"},
-  SHL: {klass: TokenClass.Punctuator, name: "<<"},
-  SHR: {klass: TokenClass.Punctuator, name: ">>"},
-  SHR_UNSIGNED: {klass: TokenClass.Punctuator, name: ">>>"},
-  ADD: {klass: TokenClass.Punctuator, name: "+"},
-  SUB: {klass: TokenClass.Punctuator, name: "-"},
-  MUL: {klass: TokenClass.Punctuator, name: "*"},
-  DIV: {klass: TokenClass.Punctuator, name: "/"},
-  MOD: {klass: TokenClass.Punctuator, name: "%"},
-  EXP: {klass: TokenClass.Punctuator, name: "**"},
-  EQ: {klass: TokenClass.Punctuator, name: "=="},
-  NE: {klass: TokenClass.Punctuator, name: "!="},
-  EQ_STRICT: {klass: TokenClass.Punctuator, name: "==="},
-  NE_STRICT: {klass: TokenClass.Punctuator, name: "!=="},
-  LT: {klass: TokenClass.Punctuator, name: "<"},
-  GT: {klass: TokenClass.Punctuator, name: ">"},
-  LTE: {klass: TokenClass.Punctuator, name: "<="},
-  GTE: {klass: TokenClass.Punctuator, name: ">="},
-  INSTANCEOF: {klass: TokenClass.Keyword, name: "instanceof"},
-  IN: {klass: TokenClass.Keyword, name: "in"},
-  NOT: {klass: TokenClass.Punctuator, name: "!"},
-  BIT_NOT: {klass: TokenClass.Punctuator, name: "~"},
-  AWAIT: {klass: TokenClass.Keyword, name: "await"},
-  DELETE: {klass: TokenClass.Keyword, name: "delete"},
-  TYPEOF: {klass: TokenClass.Keyword, name: "typeof"},
-  VOID: {klass: TokenClass.Keyword, name: "void"},
-  BREAK: {klass: TokenClass.Keyword, name: "break"},
-  CASE: {klass: TokenClass.Keyword, name: "case"},
-  CATCH: {klass: TokenClass.Keyword, name: "catch"},
-  CLASS: {klass: TokenClass.Keyword, name: "class"},
-  CONTINUE: {klass: TokenClass.Keyword, name: "continue"},
-  DEBUGGER: {klass: TokenClass.Keyword, name: "debugger"},
-  DEFAULT: {klass: TokenClass.Keyword, name: "default"},
-  DO: {klass: TokenClass.Keyword, name: "do"},
-  ELSE: {klass: TokenClass.Keyword, name: "else"},
-  EXPORT: {klass: TokenClass.Keyword, name: "export"},
-  EXTENDS: {klass: TokenClass.Keyword, name: "extends"},
-  FINALLY: {klass: TokenClass.Keyword, name: "finally"},
-  FOR: {klass: TokenClass.Keyword, name: "for"},
-  FUNCTION: {klass: TokenClass.Keyword, name: "function"},
-  IF: {klass: TokenClass.Keyword, name: "if"},
-  IMPORT: {klass: TokenClass.Keyword, name: "import"},
-  LET: {klass: TokenClass.Keyword, name: "let"},
-  NEW: {klass: TokenClass.Keyword, name: "new"},
-  RETURN: {klass: TokenClass.Keyword, name: "return"},
-  SUPER: {klass: TokenClass.Keyword, name: "super"},
-  SWITCH: {klass: TokenClass.Keyword, name: "switch"},
-  THIS: {klass: TokenClass.Keyword, name: "this"},
-  THROW: {klass: TokenClass.Keyword, name: "throw"},
-  TRY: {klass: TokenClass.Keyword, name: "try"},
-  VAR: {klass: TokenClass.Keyword, name: "var"},
-  WHILE: {klass: TokenClass.Keyword, name: "while"},
-  WITH: {klass: TokenClass.Keyword, name: "with"},
-  NULL: {klass: TokenClass.Keyword, name: "null"},
-  TRUE: {klass: TokenClass.Keyword, name: "true"},
-  FALSE: {klass: TokenClass.Keyword, name: "false"},
-  YIELD: {klass: TokenClass.Keyword, name: "yield"},
-  NUMBER: {klass: TokenClass.NumericLiteral, name: ""},
-  STRING: {klass: TokenClass.StringLiteral, name: ""},
-  REGEXP: {klass: TokenClass.RegularExpression, name: ""},
-  IDENTIFIER: {klass: TokenClass.Ident, name: ""},
-  CONST: {klass: TokenClass.Keyword, name: "const"},
-  TEMPLATE: {klass: TokenClass.TemplateElement, name: ""},
-  ILLEGAL: {klass: TokenClass.Illegal, name: ""},
+  EOS: { klass: TokenClass.Eof, name: 'EOS' },
+  LPAREN: { klass: TokenClass.Punctuator, name: '(' },
+  RPAREN: { klass: TokenClass.Punctuator, name: ')' },
+  LBRACK: { klass: TokenClass.Punctuator, name: '[' },
+  RBRACK: { klass: TokenClass.Punctuator, name: ']' },
+  LBRACE: { klass: TokenClass.Punctuator, name: '{' },
+  RBRACE: { klass: TokenClass.Punctuator, name: '}' },
+  COLON: { klass: TokenClass.Punctuator, name: ':' },
+  SEMICOLON: { klass: TokenClass.Punctuator, name: ';' },
+  PERIOD: { klass: TokenClass.Punctuator, name: '.' },
+  ELLIPSIS: { klass: TokenClass.Punctuator, name: '...' },
+  ARROW: { klass: TokenClass.Punctuator, name: '=>' },
+  CONDITIONAL: { klass: TokenClass.Punctuator, name: '?' },
+  INC: { klass: TokenClass.Punctuator, name: '++' },
+  DEC: { klass: TokenClass.Punctuator, name: '--' },
+  ASSIGN: { klass: TokenClass.Punctuator, name: '=' },
+  ASSIGN_BIT_OR: { klass: TokenClass.Punctuator, name: '|=' },
+  ASSIGN_BIT_XOR: { klass: TokenClass.Punctuator, name: '^=' },
+  ASSIGN_BIT_AND: { klass: TokenClass.Punctuator, name: '&=' },
+  ASSIGN_SHL: { klass: TokenClass.Punctuator, name: '<<=' },
+  ASSIGN_SHR: { klass: TokenClass.Punctuator, name: '>>=' },
+  ASSIGN_SHR_UNSIGNED: { klass: TokenClass.Punctuator, name: '>>>=' },
+  ASSIGN_ADD: { klass: TokenClass.Punctuator, name: '+=' },
+  ASSIGN_SUB: { klass: TokenClass.Punctuator, name: '-=' },
+  ASSIGN_MUL: { klass: TokenClass.Punctuator, name: '*=' },
+  ASSIGN_DIV: { klass: TokenClass.Punctuator, name: '/=' },
+  ASSIGN_MOD: { klass: TokenClass.Punctuator, name: '%=' },
+  ASSIGN_EXP: { klass: TokenClass.Punctuator, name: '**=' },
+  COMMA: { klass: TokenClass.Punctuator, name: ',' },
+  OR: { klass: TokenClass.Punctuator, name: '||' },
+  AND: { klass: TokenClass.Punctuator, name: '&&' },
+  BIT_OR: { klass: TokenClass.Punctuator, name: '|' },
+  BIT_XOR: { klass: TokenClass.Punctuator, name: '^' },
+  BIT_AND: { klass: TokenClass.Punctuator, name: '&' },
+  SHL: { klass: TokenClass.Punctuator, name: '<<' },
+  SHR: { klass: TokenClass.Punctuator, name: '>>' },
+  SHR_UNSIGNED: { klass: TokenClass.Punctuator, name: '>>>' },
+  ADD: { klass: TokenClass.Punctuator, name: '+' },
+  SUB: { klass: TokenClass.Punctuator, name: '-' },
+  MUL: { klass: TokenClass.Punctuator, name: '*' },
+  DIV: { klass: TokenClass.Punctuator, name: '/' },
+  MOD: { klass: TokenClass.Punctuator, name: '%' },
+  EXP: { klass: TokenClass.Punctuator, name: '**' },
+  EQ: { klass: TokenClass.Punctuator, name: '==' },
+  NE: { klass: TokenClass.Punctuator, name: '!=' },
+  EQ_STRICT: { klass: TokenClass.Punctuator, name: '===' },
+  NE_STRICT: { klass: TokenClass.Punctuator, name: '!==' },
+  LT: { klass: TokenClass.Punctuator, name: '<' },
+  GT: { klass: TokenClass.Punctuator, name: '>' },
+  LTE: { klass: TokenClass.Punctuator, name: '<=' },
+  GTE: { klass: TokenClass.Punctuator, name: '>=' },
+  INSTANCEOF: { klass: TokenClass.Keyword, name: 'instanceof' },
+  IN: { klass: TokenClass.Keyword, name: 'in' },
+  NOT: { klass: TokenClass.Punctuator, name: '!' },
+  BIT_NOT: { klass: TokenClass.Punctuator, name: '~' },
+  AWAIT: { klass: TokenClass.Keyword, name: 'await' },
+  DELETE: { klass: TokenClass.Keyword, name: 'delete' },
+  TYPEOF: { klass: TokenClass.Keyword, name: 'typeof' },
+  VOID: { klass: TokenClass.Keyword, name: 'void' },
+  BREAK: { klass: TokenClass.Keyword, name: 'break' },
+  CASE: { klass: TokenClass.Keyword, name: 'case' },
+  CATCH: { klass: TokenClass.Keyword, name: 'catch' },
+  CLASS: { klass: TokenClass.Keyword, name: 'class' },
+  CONTINUE: { klass: TokenClass.Keyword, name: 'continue' },
+  DEBUGGER: { klass: TokenClass.Keyword, name: 'debugger' },
+  DEFAULT: { klass: TokenClass.Keyword, name: 'default' },
+  DO: { klass: TokenClass.Keyword, name: 'do' },
+  ELSE: { klass: TokenClass.Keyword, name: 'else' },
+  EXPORT: { klass: TokenClass.Keyword, name: 'export' },
+  EXTENDS: { klass: TokenClass.Keyword, name: 'extends' },
+  FINALLY: { klass: TokenClass.Keyword, name: 'finally' },
+  FOR: { klass: TokenClass.Keyword, name: 'for' },
+  FUNCTION: { klass: TokenClass.Keyword, name: 'function' },
+  IF: { klass: TokenClass.Keyword, name: 'if' },
+  IMPORT: { klass: TokenClass.Keyword, name: 'import' },
+  LET: { klass: TokenClass.Keyword, name: 'let' },
+  NEW: { klass: TokenClass.Keyword, name: 'new' },
+  RETURN: { klass: TokenClass.Keyword, name: 'return' },
+  SUPER: { klass: TokenClass.Keyword, name: 'super' },
+  SWITCH: { klass: TokenClass.Keyword, name: 'switch' },
+  THIS: { klass: TokenClass.Keyword, name: 'this' },
+  THROW: { klass: TokenClass.Keyword, name: 'throw' },
+  TRY: { klass: TokenClass.Keyword, name: 'try' },
+  VAR: { klass: TokenClass.Keyword, name: 'var' },
+  WHILE: { klass: TokenClass.Keyword, name: 'while' },
+  WITH: { klass: TokenClass.Keyword, name: 'with' },
+  NULL: { klass: TokenClass.Keyword, name: 'null' },
+  TRUE: { klass: TokenClass.Keyword, name: 'true' },
+  FALSE: { klass: TokenClass.Keyword, name: 'false' },
+  YIELD: { klass: TokenClass.Keyword, name: 'yield' },
+  NUMBER: { klass: TokenClass.NumericLiteral, name: '' },
+  STRING: { klass: TokenClass.StringLiteral, name: '' },
+  REGEXP: { klass: TokenClass.RegularExpression, name: '' },
+  IDENTIFIER: { klass: TokenClass.Ident, name: '' },
+  CONST: { klass: TokenClass.Keyword, name: 'const' },
+  TEMPLATE: { klass: TokenClass.TemplateElement, name: '' },
+  ILLEGAL: { klass: TokenClass.Illegal, name: '' },
 };
 
 const TT = TokenType;
@@ -158,7 +158,7 @@ export class JsError extends Error {
     try {
       this.line = line;
       this.column = column;
-    } catch(e) {}
+    } catch (e) {}
     // define these as well so Safari still has access to this info
     this.parseErrorLine = line;
     this.parseErrorColumn = column;
@@ -170,7 +170,7 @@ export class JsError extends Error {
 function fromCodePoint(cp) {
   if (cp <= 0xFFFF) return String.fromCharCode(cp);
   let cu1 = String.fromCharCode(Math.floor((cp - 0x10000) / 0x400) + 0xD800);
-  let cu2 = String.fromCharCode(((cp - 0x10000) % 0x400) + 0xDC00);
+  let cu2 = String.fromCharCode((cp - 0x10000) % 0x400 + 0xDC00);
   return cu1 + cu2;
 }
 
@@ -257,9 +257,13 @@ export default class Tokenizer {
     }
   }
 
-  createError(message) {
-    /* istanbul ignore next */
-    let msg = message.replace(/\{(\d+)\}/g, (_, n) => JSON.stringify(arguments[+n + 1]));
+  createError(message, ...params) {
+    let msg;
+    if (typeof message === 'function') {
+      msg = message(...params);
+    } else {
+      msg = message;
+    }
     return new JsError(this.startIndex, this.startLine + 1, this.startIndex - this.startLineStart + 1, msg);
   }
 
@@ -305,18 +309,18 @@ export default class Tokenizer {
     switch (id.length) {
       case 2:
         switch (id.charAt(0)) {
-          case "i":
+          case 'i':
             switch (id.charAt(1)) {
-              case "f":
+              case 'f':
                 return TokenType.IF;
-              case "n":
+              case 'n':
                 return TokenType.IN;
               default:
                 break;
             }
             break;
-          case "d":
-            if (id.charAt(1) === "o") {
+          case 'd':
+            if (id.charAt(1) === 'o') {
               return TokenType.DO;
             }
             break;
@@ -324,28 +328,28 @@ export default class Tokenizer {
         break;
       case 3:
         switch (id.charAt(0)) {
-          case "v":
-            if (Tokenizer.cse2(id, "a", "r")) {
+          case 'v':
+            if (Tokenizer.cse2(id, 'a', 'r')) {
               return TokenType.VAR;
             }
             break;
-          case "f":
-            if (Tokenizer.cse2(id, "o", "r")) {
+          case 'f':
+            if (Tokenizer.cse2(id, 'o', 'r')) {
               return TokenType.FOR;
             }
             break;
-          case "n":
-            if (Tokenizer.cse2(id, "e", "w")) {
+          case 'n':
+            if (Tokenizer.cse2(id, 'e', 'w')) {
               return TokenType.NEW;
             }
             break;
-          case "t":
-            if (Tokenizer.cse2(id, "r", "y")) {
+          case 't':
+            if (Tokenizer.cse2(id, 'r', 'y')) {
               return TokenType.TRY;
             }
             break;
-          case "l":
-            if (Tokenizer.cse2(id, "e", "t")) {
+          case 'l':
+            if (Tokenizer.cse2(id, 'e', 't')) {
               return TokenType.LET;
             }
             break;
@@ -353,35 +357,35 @@ export default class Tokenizer {
         break;
       case 4:
         switch (id.charAt(0)) {
-          case "t":
-            if (Tokenizer.cse3(id, "h", "i", "s")) {
+          case 't':
+            if (Tokenizer.cse3(id, 'h', 'i', 's')) {
               return TokenType.THIS;
-            } else if (Tokenizer.cse3(id, "r", "u", "e")) {
+            } else if (Tokenizer.cse3(id, 'r', 'u', 'e')) {
               return TokenType.TRUE;
             }
             break;
-          case "n":
-            if (Tokenizer.cse3(id, "u", "l", "l")) {
+          case 'n':
+            if (Tokenizer.cse3(id, 'u', 'l', 'l')) {
               return TokenType.NULL;
             }
             break;
-          case "e":
-            if (Tokenizer.cse3(id, "l", "s", "e")) {
+          case 'e':
+            if (Tokenizer.cse3(id, 'l', 's', 'e')) {
               return TokenType.ELSE;
             }
             break;
-          case "c":
-            if (Tokenizer.cse3(id, "a", "s", "e")) {
+          case 'c':
+            if (Tokenizer.cse3(id, 'a', 's', 'e')) {
               return TokenType.CASE;
             }
             break;
-          case "v":
-            if (Tokenizer.cse3(id, "o", "i", "d")) {
+          case 'v':
+            if (Tokenizer.cse3(id, 'o', 'i', 'd')) {
               return TokenType.VOID;
             }
             break;
-          case "w":
-            if (Tokenizer.cse3(id, "i", "t", "h")) {
+          case 'w':
+            if (Tokenizer.cse3(id, 'i', 't', 'h')) {
               return TokenType.WITH;
             }
             break;
@@ -389,47 +393,47 @@ export default class Tokenizer {
         break;
       case 5:
         switch (id.charAt(0)) {
-          case "a":
-            if (this.moduleIsTheGoalSymbol && Tokenizer.cse4(id, "w", "a", "i", "t")) {
+          case 'a':
+            if (this.moduleIsTheGoalSymbol && Tokenizer.cse4(id, 'w', 'a', 'i', 't')) {
               return TokenType.AWAIT;
             }
             break;
-          case "w":
-            if (Tokenizer.cse4(id, "h", "i", "l", "e")) {
+          case 'w':
+            if (Tokenizer.cse4(id, 'h', 'i', 'l', 'e')) {
               return TokenType.WHILE;
             }
             break;
-          case "b":
-            if (Tokenizer.cse4(id, "r", "e", "a", "k")) {
+          case 'b':
+            if (Tokenizer.cse4(id, 'r', 'e', 'a', 'k')) {
               return TokenType.BREAK;
             }
             break;
-          case "f":
-            if (Tokenizer.cse4(id, "a", "l", "s", "e")) {
+          case 'f':
+            if (Tokenizer.cse4(id, 'a', 'l', 's', 'e')) {
               return TokenType.FALSE;
             }
             break;
-          case "c":
-            if (Tokenizer.cse4(id, "a", "t", "c", "h")) {
+          case 'c':
+            if (Tokenizer.cse4(id, 'a', 't', 'c', 'h')) {
               return TokenType.CATCH;
-            } else if (Tokenizer.cse4(id, "o", "n", "s", "t")) {
+            } else if (Tokenizer.cse4(id, 'o', 'n', 's', 't')) {
               return TokenType.CONST;
-            } else if (Tokenizer.cse4(id, "l", "a", "s", "s")) {
+            } else if (Tokenizer.cse4(id, 'l', 'a', 's', 's')) {
               return TokenType.CLASS;
             }
             break;
-          case "t":
-            if (Tokenizer.cse4(id, "h", "r", "o", "w")) {
+          case 't':
+            if (Tokenizer.cse4(id, 'h', 'r', 'o', 'w')) {
               return TokenType.THROW;
             }
             break;
-          case "y":
-            if (Tokenizer.cse4(id, "i", "e", "l", "d")) {
+          case 'y':
+            if (Tokenizer.cse4(id, 'i', 'e', 'l', 'd')) {
               return TokenType.YIELD;
             }
             break;
-          case "s":
-            if (Tokenizer.cse4(id, "u", "p", "e", "r")) {
+          case 's':
+            if (Tokenizer.cse4(id, 'u', 'p', 'e', 'r')) {
               return TokenType.SUPER;
             }
             break;
@@ -437,33 +441,33 @@ export default class Tokenizer {
         break;
       case 6:
         switch (id.charAt(0)) {
-          case "r":
-            if (Tokenizer.cse5(id, "e", "t", "u", "r", "n")) {
+          case 'r':
+            if (Tokenizer.cse5(id, 'e', 't', 'u', 'r', 'n')) {
               return TokenType.RETURN;
             }
             break;
-          case "t":
-            if (Tokenizer.cse5(id, "y", "p", "e", "o", "f")) {
+          case 't':
+            if (Tokenizer.cse5(id, 'y', 'p', 'e', 'o', 'f')) {
               return TokenType.TYPEOF;
             }
             break;
-          case "d":
-            if (Tokenizer.cse5(id, "e", "l", "e", "t", "e")) {
+          case 'd':
+            if (Tokenizer.cse5(id, 'e', 'l', 'e', 't', 'e')) {
               return TokenType.DELETE;
             }
             break;
-          case "s":
-            if (Tokenizer.cse5(id, "w", "i", "t", "c", "h")) {
+          case 's':
+            if (Tokenizer.cse5(id, 'w', 'i', 't', 'c', 'h')) {
               return TokenType.SWITCH;
             }
             break;
-          case "e":
-            if (Tokenizer.cse5(id, "x", "p", "o", "r", "t")) {
+          case 'e':
+            if (Tokenizer.cse5(id, 'x', 'p', 'o', 'r', 't')) {
               return TokenType.EXPORT;
             }
             break;
-          case "i":
-            if (Tokenizer.cse5(id, "m", "p", "o", "r", "t")) {
+          case 'i':
+            if (Tokenizer.cse5(id, 'm', 'p', 'o', 'r', 't')) {
               return TokenType.IMPORT;
             }
             break;
@@ -471,18 +475,18 @@ export default class Tokenizer {
         break;
       case 7:
         switch (id.charAt(0)) {
-          case "d":
-            if (Tokenizer.cse6(id, "e", "f", "a", "u", "l", "t")) {
+          case 'd':
+            if (Tokenizer.cse6(id, 'e', 'f', 'a', 'u', 'l', 't')) {
               return TokenType.DEFAULT;
             }
             break;
-          case "f":
-            if (Tokenizer.cse6(id, "i", "n", "a", "l", "l", "y")) {
+          case 'f':
+            if (Tokenizer.cse6(id, 'i', 'n', 'a', 'l', 'l', 'y')) {
               return TokenType.FINALLY;
             }
             break;
-          case "e":
-            if (Tokenizer.cse6(id, "x", "t", "e", "n", "d", "s")) {
+          case 'e':
+            if (Tokenizer.cse6(id, 'x', 't', 'e', 'n', 'd', 's')) {
               return TokenType.EXTENDS;
             }
             break;
@@ -490,25 +494,25 @@ export default class Tokenizer {
         break;
       case 8:
         switch (id.charAt(0)) {
-          case "f":
-            if (Tokenizer.cse7(id, "u", "n", "c", "t", "i", "o", "n")) {
+          case 'f':
+            if (Tokenizer.cse7(id, 'u', 'n', 'c', 't', 'i', 'o', 'n')) {
               return TokenType.FUNCTION;
             }
             break;
-          case "c":
-            if (Tokenizer.cse7(id, "o", "n", "t", "i", "n", "u", "e")) {
+          case 'c':
+            if (Tokenizer.cse7(id, 'o', 'n', 't', 'i', 'n', 'u', 'e')) {
               return TokenType.CONTINUE;
             }
             break;
-          case "d":
-            if (Tokenizer.cse7(id, "e", "b", "u", "g", "g", "e", "r")) {
+          case 'd':
+            if (Tokenizer.cse7(id, 'e', 'b', 'u', 'g', 'g', 'e', 'r')) {
               return TokenType.DEBUGGER;
             }
             break;
         }
         break;
       case 10:
-        if (id === "instanceof") {
+        if (id === 'instanceof') {
           return TokenType.INSTANCEOF;
         }
         break;
@@ -526,7 +530,7 @@ export default class Tokenizer {
       this.index++;
       if (isLineTerminator(chCode)) {
         this.hasLineTerminatorBeforeNext = true;
-        if (chCode === 0xD /* "\r" */ && this.source.charCodeAt(this.index) === 0xA /*"\n" */) {
+        if (chCode === 0xD /* "\r" */ && this.source.charCodeAt(this.index) === 0xA /* "\n" */) {
           this.index++;
         }
         this.lineStart = this.index;
@@ -546,7 +550,7 @@ export default class Tokenizer {
         switch (chCode) {
           case 42:  // "*"
             // Block comment ends with "*/".
-            if (this.source.charAt(this.index + 1) === "/") {
+            if (this.source.charAt(this.index + 1) === '/') {
               this.index = this.index + 2;
               return isLineStart;
             }
@@ -562,7 +566,7 @@ export default class Tokenizer {
           case 13: // "\r":
             isLineStart = true;
             this.hasLineTerminatorBeforeNext = true;
-            if (this.source.charAt(this.index + 1) === "\n") {
+            if (this.source.charAt(this.index + 1) === '\n') {
               this.index++;
             }
             this.index++;
@@ -599,7 +603,7 @@ export default class Tokenizer {
       } else if (isLineTerminator(chCode)) {
         this.hasLineTerminatorBeforeNext = true;
         this.index++;
-        if (chCode === 13 /* "\r" */ && this.source.charAt(this.index) === "\n") {
+        if (chCode === 13 /* "\r" */ && this.source.charAt(this.index) === '\n') {
           this.index++;
         }
         this.lineStart = this.index;
@@ -623,14 +627,14 @@ export default class Tokenizer {
           break;
         }
         // U+003E is ">"
-        if (this.source.charAt(this.index + 1) === "-" && this.source.charAt(this.index + 2) === ">") {
+        if (this.source.charAt(this.index + 1) === '-' && this.source.charAt(this.index + 2) === '>') {
           // "-->" is a single-line comment
           this.skipSingleLineComment(3);
         } else {
           break;
         }
       } else if (!this.moduleIsTheGoalSymbol && chCode === 60 /* "<" */) {
-        if (this.source.slice(this.index + 1, this.index + 4) === "!--") {
+        if (this.source.slice(this.index + 1, this.index + 4) === '!--') {
           this.skipSingleLineComment(4);
         } else {
           break;
@@ -658,8 +662,8 @@ export default class Tokenizer {
   }
 
   scanUnicode() {
-    if (this.source.charAt(this.index) === "{") {
-      //\u{HexDigits}
+    if (this.source.charAt(this.index) === '{') {
+      // \u{HexDigits}
       let i = this.index + 1;
       let hexDigits = 0, ch;
       while (i < this.source.length) {
@@ -668,13 +672,13 @@ export default class Tokenizer {
         if (hex === -1) {
           break;
         }
-        hexDigits = (hexDigits << 4) | hex;
+        hexDigits = hexDigits << 4 | hex;
         if (hexDigits > 0x10FFFF) {
           throw this.createILLEGAL();
         }
         i++;
       }
-      if (ch !== "}") {
+      if (ch !== '}') {
         throw this.createILLEGAL();
       }
       if (i === this.index + 1) {
@@ -684,7 +688,7 @@ export default class Tokenizer {
       this.index = i + 1;
       return hexDigits;
     } else {
-      //\uHex4Digits
+      // \uHex4Digits
       if (this.index + 4 > this.source.length) {
         return -1;
       }
@@ -710,7 +714,7 @@ export default class Tokenizer {
   }
 
   getEscapedIdentifier() {
-    let id = "";
+    let id = '';
     let check = isIdentifierStart;
 
     while (this.index < this.source.length) {
@@ -718,11 +722,11 @@ export default class Tokenizer {
       let code = ch.charCodeAt(0);
       let start = this.index;
       ++this.index;
-      if (ch === "\\") {
+      if (ch === '\\') {
         if (this.index >= this.source.length) {
           throw this.createILLEGAL();
         }
-        if (this.source.charAt(this.index) !== "u") {
+        if (this.source.charAt(this.index) !== 'u') {
           throw this.createILLEGAL();
         }
         ++this.index;
@@ -731,13 +735,13 @@ export default class Tokenizer {
           throw this.createILLEGAL();
         }
         ch = fromCodePoint(code);
-      } else if (0xD800 <= code && code <= 0xDBFF) {
+      } else if (code >= 0xD800 && code <= 0xDBFF) {
         if (this.index >= this.source.length) {
           throw this.createILLEGAL();
         }
         let lowSurrogateCode = this.source.charCodeAt(this.index);
         ++this.index;
-        if (!(0xDC00 <= lowSurrogateCode && lowSurrogateCode <= 0xDFFF)) {
+        if (!(lowSurrogateCode >= 0xDC00 && lowSurrogateCode <= 0xDFFF)) {
           throw this.createILLEGAL();
         }
         code = decodeUtf16(code, lowSurrogateCode);
@@ -764,7 +768,7 @@ export default class Tokenizer {
     while (i < l) {
       let ch = this.source.charAt(i);
       let code = ch.charCodeAt(0);
-      if (ch === "\\" || 0xD800 <= code && code <= 0xDBFF) {
+      if (ch === '\\' || code >= 0xD800 && code <= 0xDBFF) {
         // Go back and try the hard one.
         this.index = start;
         return this.getEscapedIdentifier();
@@ -785,7 +789,7 @@ export default class Tokenizer {
     let start = this.index;
 
     // Backslash (U+005C) starts an escaped character.
-    let id = this.source.charAt(this.index) === "\\" ? this.getEscapedIdentifier() : this.getIdentifier();
+    let id = this.source.charAt(this.index) === '\\' ? this.getEscapedIdentifier() : this.getIdentifier();
 
     // There is no keyword or literal with only one character.
     // Thus, it must be an identifier.
@@ -804,7 +808,7 @@ export default class Tokenizer {
   }
 
   getSlice(start, startLocation) {
-    return {text: this.source.slice(start, this.index), start, startLocation, end: this.index};
+    return { text: this.source.slice(start, this.index), start, startLocation, end: this.index };
   }
 
   scanPunctuatorHelper() {
@@ -812,64 +816,64 @@ export default class Tokenizer {
 
     switch (ch1) {
       // Check for most common single-character punctuators.
-      case ".":
+      case '.':
         let ch2 = this.source.charAt(this.index + 1);
-        if (ch2 !== ".") return TokenType.PERIOD;
+        if (ch2 !== '.') return TokenType.PERIOD;
         let ch3 = this.source.charAt(this.index + 2);
-        if (ch3 !== ".") return TokenType.PERIOD;
+        if (ch3 !== '.') return TokenType.PERIOD;
         return TokenType.ELLIPSIS;
-      case "(":
+      case '(':
         return TokenType.LPAREN;
-      case ")":
-      case ";":
-      case ",":
+      case ')':
+      case ';':
+      case ',':
         return ONE_CHAR_PUNCTUATOR[ch1.charCodeAt(0)];
-      case "{":
+      case '{':
         return TokenType.LBRACE;
-      case "}":
-      case "[":
-      case "]":
-      case ":":
-      case "?":
-      case "~":
+      case '}':
+      case '[':
+      case ']':
+      case ':':
+      case '?':
+      case '~':
         return ONE_CHAR_PUNCTUATOR[ch1.charCodeAt(0)];
       default:
         // "=" (U+003D) marks an assignment or comparison operator.
-        if (this.index + 1 < this.source.length && this.source.charAt(this.index + 1) === "=") {
+        if (this.index + 1 < this.source.length && this.source.charAt(this.index + 1) === '=') {
           switch (ch1) {
-            case "=":
-              if (this.index + 2 < this.source.length && this.source.charAt(this.index + 2) === "=") {
+            case '=':
+              if (this.index + 2 < this.source.length && this.source.charAt(this.index + 2) === '=') {
                 return TokenType.EQ_STRICT;
               }
               return TokenType.EQ;
-            case "!":
-              if (this.index + 2 < this.source.length && this.source.charAt(this.index + 2) === "=") {
+            case '!':
+              if (this.index + 2 < this.source.length && this.source.charAt(this.index + 2) === '=') {
                 return TokenType.NE_STRICT;
               }
               return TokenType.NE;
-            case "|":
+            case '|':
               return TokenType.ASSIGN_BIT_OR;
-            case "+":
+            case '+':
               return TokenType.ASSIGN_ADD;
-            case "-":
+            case '-':
               return TokenType.ASSIGN_SUB;
-            case "*":
+            case '*':
               return TokenType.ASSIGN_MUL;
-            case "<":
+            case '<':
               return TokenType.LTE;
-            case ">":
+            case '>':
               return TokenType.GTE;
-            case "/":
+            case '/':
               return TokenType.ASSIGN_DIV;
-            case "%":
+            case '%':
               return TokenType.ASSIGN_MOD;
-            case "^":
+            case '^':
               return TokenType.ASSIGN_BIT_XOR;
-            case "&":
+            case '&':
               return TokenType.ASSIGN_BIT_AND;
             // istanbul ignore next
             default:
-              break; //failed
+              break; // failed
           }
         }
     }
@@ -879,47 +883,47 @@ export default class Tokenizer {
       if (ch1 === ch2) {
         if (this.index + 2 < this.source.length) {
           let ch3 = this.source.charAt(this.index + 2);
-          if (ch1 === ">" && ch3 === ">") {
+          if (ch1 === '>' && ch3 === '>') {
             // 4-character punctuator: >>>=
-            if (this.index + 3 < this.source.length && this.source.charAt(this.index + 3) === "=") {
+            if (this.index + 3 < this.source.length && this.source.charAt(this.index + 3) === '=') {
               return TokenType.ASSIGN_SHR_UNSIGNED;
             }
             return TokenType.SHR_UNSIGNED;
           }
 
-          if (ch1 === "<" && ch3 === "=") {
+          if (ch1 === '<' && ch3 === '=') {
             return TokenType.ASSIGN_SHL;
           }
 
-          if (ch1 === ">" && ch3 === "=") {
+          if (ch1 === '>' && ch3 === '=') {
             return TokenType.ASSIGN_SHR;
           }
 
-          if (ch1 === "*" && ch3 === "=") {
+          if (ch1 === '*' && ch3 === '=') {
             return TokenType.ASSIGN_EXP;
           }
         }
         // Other 2-character punctuators: ++ -- << >> && ||
         switch (ch1) {
-          case "*":
+          case '*':
             return TokenType.EXP;
-          case "+":
+          case '+':
             return TokenType.INC;
-          case "-":
+          case '-':
             return TokenType.DEC;
-          case "<":
+          case '<':
             return TokenType.SHL;
-          case ">":
+          case '>':
             return TokenType.SHR;
-          case "&":
+          case '&':
             return TokenType.AND;
-          case "|":
+          case '|':
             return TokenType.OR;
           // istanbul ignore next
           default:
-            break; //failed
+            break; // failed
         }
-      } else if (ch1 === "=" && ch2 === ">") {
+      } else if (ch1 === '=' && ch2 === '>') {
         return TokenType.ARROW;
       }
     }
@@ -966,7 +970,7 @@ export default class Tokenizer {
 
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if (ch !== "0" && ch !== "1") {
+      if (ch !== '0' && ch !== '1') {
         break;
       }
       this.index++;
@@ -993,7 +997,7 @@ export default class Tokenizer {
   scanOctalLiteral(start, startLocation) {
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if ("0" <= ch && ch <= "7") {
+      if (ch >= '0' && ch <= '7') {
         this.index++;
       } else if (isIdentifierPart(ch.charCodeAt(0))) {
         throw this.createILLEGAL();
@@ -1020,9 +1024,9 @@ export default class Tokenizer {
 
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if ("0" <= ch && ch <= "7") {
+      if (ch >= '0' && ch <= '7') {
         this.index++;
-      } else if (ch === "8" || ch === "9") {
+      } else if (ch === '8' || ch === '9') {
         isOctal = false;
         this.index++;
       } else if (isIdentifierPart(ch.charCodeAt(0))) {
@@ -1059,20 +1063,20 @@ export default class Tokenizer {
     let startLocation = this.getLocation();
     let start = this.index;
 
-    if (ch === "0") {
+    if (ch === '0') {
       this.index++;
       if (this.index < this.source.length) {
         ch = this.source.charAt(this.index);
-        if (ch === "x" || ch === "X") {
+        if (ch === 'x' || ch === 'X') {
           this.index++;
           return this.scanHexLiteral(start, startLocation);
-        } else if (ch === "b" || ch === "B") {
+        } else if (ch === 'b' || ch === 'B') {
           this.index++;
           return this.scanBinaryLiteral(start, startLocation);
-        } else if (ch === "o" || ch === "O") {
+        } else if (ch === 'o' || ch === 'O') {
           this.index++;
           return this.scanOctalLiteral(start, startLocation);
-        } else if ("0" <= ch && ch <= "9") {
+        } else if (ch >= '0' && ch <= '9') {
           return this.scanLegacyOctalLiteral(start, startLocation);
         }
       } else {
@@ -1085,10 +1089,10 @@ export default class Tokenizer {
           noctal: false,
         };
       }
-    } else if (ch !== ".") {
+    } else if (ch !== '.') {
       // Must be "1".."9"
       ch = this.source.charAt(this.index);
-      while ("0" <= ch && ch <= "9") {
+      while (ch >= '0' && ch <= '9') {
         this.index++;
         if (this.index === this.source.length) {
           let slice = this.getSlice(start, startLocation);
@@ -1122,14 +1126,14 @@ export default class Tokenizer {
 
   eatDecimalLiteralSuffix() {
     let ch = this.source.charAt(this.index);
-    if (ch === ".") {
+    if (ch === '.') {
       this.index++;
       if (this.index === this.source.length) {
         return;
       }
 
       ch = this.source.charAt(this.index);
-      while ("0" <= ch && ch <= "9") {
+      while (ch >= '0' && ch <= '9') {
         this.index++;
         if (this.index === this.source.length) {
           return;
@@ -1139,14 +1143,14 @@ export default class Tokenizer {
     }
 
     // EOF not reached here
-    if (ch === "e" || ch === "E") {
+    if (ch === 'e' || ch === 'E') {
       this.index++;
       if (this.index === this.source.length) {
         throw this.createILLEGAL();
       }
 
       ch = this.source.charAt(this.index);
-      if (ch === "+" || ch === "-") {
+      if (ch === '+' || ch === '-') {
         this.index++;
         if (this.index === this.source.length) {
           throw this.createILLEGAL();
@@ -1154,8 +1158,8 @@ export default class Tokenizer {
         ch = this.source.charAt(this.index);
       }
 
-      if ("0" <= ch && ch <= "9") {
-        while ("0" <= ch && ch <= "9") {
+      if (ch >= '0' && ch <= '9') {
+        while (ch >= '0' && ch <= '9') {
           this.index++;
           if (this.index === this.source.length) {
             break;
@@ -1176,60 +1180,60 @@ export default class Tokenizer {
     let ch = this.source.charAt(this.index);
     if (!isLineTerminator(ch.charCodeAt(0))) {
       switch (ch) {
-        case "n":
-          str += "\n";
+        case 'n':
+          str += '\n';
           this.index++;
           break;
-        case "r":
-          str += "\r";
+        case 'r':
+          str += '\r';
           this.index++;
           break;
-        case "t":
-          str += "\t";
+        case 't':
+          str += '\t';
           this.index++;
           break;
-        case "u":
-        case "x":
+        case 'u':
+        case 'x':
           let unescaped;
           this.index++;
           if (this.index >= this.source.length) {
             throw this.createILLEGAL();
           }
-          unescaped = ch === "u" ? this.scanUnicode() : this.scanHexEscape2();
+          unescaped = ch === 'u' ? this.scanUnicode() : this.scanHexEscape2();
           if (unescaped < 0) {
             throw this.createILLEGAL();
           }
           str += fromCodePoint(unescaped);
           break;
-        case "b":
-          str += "\b";
+        case 'b':
+          str += '\b';
           this.index++;
           break;
-        case "f":
-          str += "\f";
+        case 'f':
+          str += '\f';
           this.index++;
           break;
-        case "v":
-          str += "\u000B";
+        case 'v':
+          str += '\u000B';
           this.index++;
           break;
         default:
-          if ("0" <= ch && ch <= "7") {
+          if (ch >= '0' && ch <= '7') {
             let octalStart = this.index;
             let octLen = 1;
             // 3 digits are only allowed when string starts
             // with 0, 1, 2, 3
-            if ("0" <= ch && ch <= "3") {
+            if (ch >= '0' && ch <= '3') {
               octLen = 0;
             }
             let code = 0;
-            while (octLen < 3 && "0" <= ch && ch <= "7") {
+            while (octLen < 3 && ch >= '0' && ch <= '7') {
               this.index++;
-              if (octLen > 0 || ch !== "0") {
+              if (octLen > 0 || ch !== '0') {
                 octal = this.source.slice(octalStart, this.index);
               }
               code *= 8;
-              code += ch - "0";
+              code += ch - '0';
               octLen++;
               if (this.index === this.source.length) {
                 throw this.createILLEGAL();
@@ -1237,7 +1241,7 @@ export default class Tokenizer {
               ch = this.source.charAt(this.index);
             }
             str += String.fromCharCode(code);
-          } else if (ch === "8" || ch === "9") {
+          } else if (ch === '8' || ch === '9') {
             throw this.createILLEGAL();
           } else {
             str += ch;
@@ -1246,7 +1250,7 @@ export default class Tokenizer {
       }
     } else {
       this.index++;
-      if (ch === "\r" && this.source.charAt(this.index) === "\n") {
+      if (ch === '\r' && this.source.charAt(this.index) === '\n') {
         this.index++;
       }
       this.lineStart = this.index;
@@ -1256,7 +1260,7 @@ export default class Tokenizer {
   }
   // 7.8.4 String Literals
   scanStringLiteral() {
-    let str = "";
+    let str = '';
 
     let quote = this.source.charAt(this.index);
     //  assert((quote === "\"" || quote === """), "String literal must starts with a quote")
@@ -1271,7 +1275,7 @@ export default class Tokenizer {
       if (ch === quote) {
         this.index++;
         return { type: TokenType.STRING, slice: this.getSlice(start, startLocation), str, octal };
-      } else if (ch === "\\") {
+      } else if (ch === '\\') {
         [str, octal] = this.scanStringEscape(str, octal);
       } else if (isLineTerminator(ch.charCodeAt(0))) {
         throw this.createILLEGAL();
@@ -1302,13 +1306,13 @@ export default class Tokenizer {
           this.index++;
           break;
         case 0x5C:  // \\
-        {
-          let octal = this.scanStringEscape("", null)[1];
-          if (octal != null) {
-            throw this.createILLEGAL();
+          {
+            let octal = this.scanStringEscape('', null)[1];
+            if (octal != null) {
+              throw this.createILLEGAL();
+            }
+            break;
           }
-          break;
-        }
         default:
           this.index++;
       }
@@ -1325,7 +1329,7 @@ export default class Tokenizer {
     let classMarker = false;
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if (ch === "\\") {
+      if (ch === '\\') {
         str += ch;
         this.index++;
         ch = this.source.charAt(this.index);
@@ -1339,18 +1343,16 @@ export default class Tokenizer {
         throw this.createError(ErrorMessages.UNTERMINATED_REGEXP);
       } else {
         if (classMarker) {
-          if (ch === "]") {
+          if (ch === ']') {
             classMarker = false;
           }
-        } else {
-          if (ch === "/") {
-            terminated = true;
-            str += ch;
-            this.index++;
-            break;
-          } else if (ch === "[") {
-            classMarker = true;
-          }
+        } else if (ch === '/') {
+          terminated = true;
+          str += ch;
+          this.index++;
+          break;
+        } else if (ch === '[') {
+          classMarker = true;
         }
         str += ch;
         this.index++;
@@ -1363,7 +1365,7 @@ export default class Tokenizer {
 
     while (this.index < this.source.length) {
       let ch = this.source.charAt(this.index);
-      if (ch === "\\") {
+      if (ch === '\\') {
         throw this.createError(ErrorMessages.INVALID_REGEXP_FLAGS);
       }
       if (!isIdentifierPart(ch.charCodeAt(0))) {
@@ -1428,14 +1430,14 @@ export default class Tokenizer {
         return this.scanTemplateElement();
       }
 
-      if (0x30 /* "0" */ <= charCode && charCode <= 0x39 /* "9" */) {
+      if (charCode /* "0" */ >= 0x30 && charCode <= 0x39 /* "9" */) {
         return this.scanNumericLiteral();
       }
 
       // Slash (/) U+002F can also start a regex.
       throw this.createILLEGAL();
     } else {
-      if (isIdentifierStart(charCode) || 0xD800 <= charCode && charCode <= 0xDBFF) {
+      if (isIdentifierStart(charCode) || charCode >= 0xD800 && charCode <= 0xDBFF) {
         return this.scanIdentifier();
       }
 

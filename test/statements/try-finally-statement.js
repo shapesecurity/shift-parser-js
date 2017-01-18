@@ -14,78 +14,78 @@
  * limitations under the License.
  */
 
-var stmt = require("../helpers").stmt;
-var testParse = require("../assertions").testParse;
+let stmt = require('../helpers').stmt;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("try-finally statement", function () {
-    testParse("try { } finally { cleanup(stuff) }", stmt,
+suite('Parser', function () {
+  suite('try-finally statement', function () {
+    testParse('try { } finally { cleanup(stuff) }', stmt,
       {
-        type: "TryFinallyStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryFinallyStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: null,
         finalizer: {
-          type: "Block",
+          type: 'Block',
           statements: [{
-            type: "ExpressionStatement",
+            type: 'ExpressionStatement',
             expression: {
-              type: "CallExpression",
-              callee: { type: "IdentifierExpression", name: "cleanup" },
-              arguments: [{ type: "IdentifierExpression", name: "stuff" }]
+              type: 'CallExpression',
+              callee: { type: 'IdentifierExpression', name: 'cleanup' },
+              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }]
             }
           }]
         }
       }
     );
-    testParse("try{}catch(a){}finally{}", stmt,
+    testParse('try{}catch(a){}finally{}', stmt,
       {
-        type: "TryFinallyStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryFinallyStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "a" },
-          body: { type: "Block", statements: [] }
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'a' },
+          body: { type: 'Block', statements: [] }
         },
-        finalizer: { type: "Block", statements: [] }
+        finalizer: { type: 'Block', statements: [] }
       }
     );
-    testParse("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }", stmt,
+    testParse('try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }', stmt,
       {
-        type: "TryFinallyStatement",
+        type: 'TryFinallyStatement',
         body: {
-          type: "Block",
+          type: 'Block',
           statements: [{
-            type: "ExpressionStatement",
+            type: 'ExpressionStatement',
             expression: {
-              type: "CallExpression",
-              callee: { type: "IdentifierExpression", name: "doThat" },
+              type: 'CallExpression',
+              callee: { type: 'IdentifierExpression', name: 'doThat' },
               arguments: []
             }
           }]
         },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "e" },
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'e' },
           body: {
-            type: "Block",
+            type: 'Block',
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "CallExpression",
-                callee: { type: "IdentifierExpression", name: "say" },
-                arguments: [{ type: "IdentifierExpression", name: "e" }]
+                type: 'CallExpression',
+                callee: { type: 'IdentifierExpression', name: 'say' },
+                arguments: [{ type: 'IdentifierExpression', name: 'e' }]
               }
             }]
           }
         },
         finalizer: {
-          type: "Block",
+          type: 'Block',
           statements: [{
-            type: "ExpressionStatement",
+            type: 'ExpressionStatement',
             expression: {
-              type: "CallExpression",
-              callee: { type: "IdentifierExpression", name: "cleanup" },
-              arguments: [{ type: "IdentifierExpression", name: "stuff" }]
+              type: 'CallExpression',
+              callee: { type: 'IdentifierExpression', name: 'cleanup' },
+              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }]
             }
           }]
         }

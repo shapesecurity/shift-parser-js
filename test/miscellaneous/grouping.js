@@ -14,121 +14,125 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var expr = require("../helpers").expr;
+let testParse = require('../assertions').testParse;
+let expr = require('../helpers').expr;
 
-suite("Parser", function () {
-  suite("grouping", function () {
+suite('Parser', function () {
+  suite('grouping', function () {
 
-    testParse("((((((((((((((((((((((((((((((((((((((((((((((((((0))))))))))))))))))))))))))))))))))))))))))))))))))", expr,
-      { type: "LiteralNumericExpression", value: 0 }
+    testParse('((((((((((((((((((((((((((((((((((((((((((((((((((0))))))))))))))))))))))))))))))))))))))))))))))))))',
+      expr,
+      { type: 'LiteralNumericExpression', value: 0 }
     );
 
-    testParse("(1 + 2 ) * 3", expr,
-      { type: "BinaryExpression",
-        operator: "*",
+    testParse('(1 + 2 ) * 3', expr,
+      { type: 'BinaryExpression',
+        operator: '*',
         left:
-          { type: "BinaryExpression",
-            operator: "+",
-            left: { type: "LiteralNumericExpression", value: 1 },
-            right: { type: "LiteralNumericExpression", value: 2 } },
-        right: { type: "LiteralNumericExpression", value: 3 } }
+        { type: 'BinaryExpression',
+          operator: '+',
+          left: { type: 'LiteralNumericExpression', value: 1 },
+          right: { type: 'LiteralNumericExpression', value: 2 } },
+        right: { type: 'LiteralNumericExpression', value: 3 } }
     );
 
-    testParse("(1) + (2  ) + 3", expr,
-      { type: "BinaryExpression",
-        operator: "+",
+    testParse('(1) + (2  ) + 3', expr,
+      { type: 'BinaryExpression',
+        operator: '+',
         left:
-          { type: "BinaryExpression",
-            operator: "+",
-            left: { type: "LiteralNumericExpression", value: 1 },
-            right: { type: "LiteralNumericExpression", value: 2 } },
-        right: { type: "LiteralNumericExpression", value: 3 } }
+        { type: 'BinaryExpression',
+          operator: '+',
+          left: { type: 'LiteralNumericExpression', value: 1 },
+          right: { type: 'LiteralNumericExpression', value: 2 } },
+        right: { type: 'LiteralNumericExpression', value: 3 } }
     );
 
-    testParse("4 + 5 << (6)", expr,
-      { type: "BinaryExpression",
-        operator: "<<",
+    testParse('4 + 5 << (6)', expr,
+      { type: 'BinaryExpression',
+        operator: '<<',
         left:
-          { type: "BinaryExpression",
-            operator: "+",
-            left: { type: "LiteralNumericExpression", value: 4 },
-            right: { type: "LiteralNumericExpression", value: 5 } },
-        right: { type: "LiteralNumericExpression", value: 6 } }
+        { type: 'BinaryExpression',
+          operator: '+',
+          left: { type: 'LiteralNumericExpression', value: 4 },
+          right: { type: 'LiteralNumericExpression', value: 5 } },
+        right: { type: 'LiteralNumericExpression', value: 6 } }
     );
 
 
-    testParse("(a) + (b)", expr,
+    testParse('(a) + (b)', expr,
       {
-        type: "BinaryExpression",
-        operator: "+",
-        left: { type: "IdentifierExpression", name: "a" },
-        right: { type: "IdentifierExpression", name: "b" }
+        type: 'BinaryExpression',
+        operator: '+',
+        left: { type: 'IdentifierExpression', name: 'a' },
+        right: { type: 'IdentifierExpression', name: 'b' }
       }
     );
 
-    testParse("(a)", expr,
-      { type: "IdentifierExpression", name: "a" }
+    testParse('(a)', expr,
+      { type: 'IdentifierExpression', name: 'a' }
     );
 
-    testParse("((a))", expr,
-      { type: "IdentifierExpression", name: "a" }
+    testParse('((a))', expr,
+      { type: 'IdentifierExpression', name: 'a' }
     );
 
-    testParse("((a))()", expr,
-      { type: "CallExpression", callee: { type: "IdentifierExpression", name: "a" }, arguments: [] }
+    testParse('((a))()', expr,
+      { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'a' }, arguments: [] }
     );
 
-    testParse("((a))((a))", expr,
+    testParse('((a))((a))', expr,
       {
-        type: "CallExpression",
-        callee: { type: "IdentifierExpression", name: "a" },
-        arguments: [{ type: "IdentifierExpression", name: "a" }]
+        type: 'CallExpression',
+        callee: { type: 'IdentifierExpression', name: 'a' },
+        arguments: [{ type: 'IdentifierExpression', name: 'a' }]
       }
     );
 
-    testParse("(a) = 0", expr,
+    testParse('(a) = 0', expr,
       {
-        type: "AssignmentExpression",
-        binding: { type: "AssignmentTargetIdentifier", name: "a" },
-        expression: { type: "LiteralNumericExpression", value: 0 }
+        type: 'AssignmentExpression',
+        binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        expression: { type: 'LiteralNumericExpression', value: 0 }
       }
     );
 
-    testParse("((a)) = 0", expr,
+    testParse('((a)) = 0', expr,
       {
-        type: "AssignmentExpression",
-        binding: { type: "AssignmentTargetIdentifier", name: "a" },
-        expression: { type: "LiteralNumericExpression", value: 0 }
+        type: 'AssignmentExpression',
+        binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        expression: { type: 'LiteralNumericExpression', value: 0 }
       }
     );
 
-    testParse("void (a)", expr,
-      { type: "UnaryExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
+    testParse('void (a)', expr,
+      { type: 'UnaryExpression', operator: 'void', operand: { type: 'IdentifierExpression', name: 'a' } }
     );
 
-    testParse("(void a)", expr,
-      { type: "UnaryExpression", operator: "void", operand: { type: "IdentifierExpression", name: "a" } }
+    testParse('(void a)', expr,
+      { type: 'UnaryExpression', operator: 'void', operand: { type: 'IdentifierExpression', name: 'a' } }
     );
 
-    testParse("(a++)", expr,
-      { type: "UpdateExpression", isPrefix: false, operand: { type: "AssignmentTargetIdentifier", name: "a" }, operator: "++" }
+    testParse('(a++)', expr,
+      { type: 'UpdateExpression', isPrefix: false,
+        operand: { type: 'AssignmentTargetIdentifier', name: 'a' }, operator: '++' }
     );
 
-    testParse("(a)++", expr,
-      { type: "UpdateExpression", isPrefix: false, operand: { type: "AssignmentTargetIdentifier", name: "a" }, operator: "++" }
+    testParse('(a)++', expr,
+      { type: 'UpdateExpression', isPrefix: false,
+        operand: { type: 'AssignmentTargetIdentifier', name: 'a' }, operator: '++' }
     );
 
-    testParse("(a)--", expr,
-      { type: "UpdateExpression", isPrefix: false, operand: { type: "AssignmentTargetIdentifier", name: "a" }, operator: "--" }
+    testParse('(a)--', expr,
+      { type: 'UpdateExpression', isPrefix: false,
+        operand: { type: 'AssignmentTargetIdentifier', name: 'a' }, operator: '--' }
     );
 
-    testParse("(a) ? (b) : (c)", expr,
+    testParse('(a) ? (b) : (c)', expr,
       {
-        type: "ConditionalExpression",
-        test: { type: "IdentifierExpression", name: "a" },
-        consequent: { type: "IdentifierExpression", name: "b" },
-        alternate: { type: "IdentifierExpression", name: "c" }
+        type: 'ConditionalExpression',
+        test: { type: 'IdentifierExpression', name: 'a' },
+        consequent: { type: 'IdentifierExpression', name: 'b' },
+        alternate: { type: 'IdentifierExpression', name: 'c' }
       }
     );
   });

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-var expr = require("../helpers").expr;
-var testParse = require("../assertions").testParse;
+let expr = require('../helpers').expr;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("this expression", function () {
+suite('Parser', function () {
+  suite('this expression', function () {
 
-    testParse("this\n", expr, { type: "ThisExpression" });
+    testParse('this\n', expr, { type: 'ThisExpression' });
 
   });
 });

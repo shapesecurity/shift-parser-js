@@ -14,46 +14,46 @@
  * limitations under the License.
  */
 
-var expr = require("../helpers").expr;
-var testParse = require("../assertions").testParse;
+let expr = require('../helpers').expr;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("conditional expression", function () {
+suite('Parser', function () {
+  suite('conditional expression', function () {
 
-    testParse("a?b:c", expr,
-      { type: "ConditionalExpression",
-        test: { type: "IdentifierExpression", name: "a" },
-        consequent: { type: "IdentifierExpression", name: "b" },
-        alternate: { type: "IdentifierExpression", name: "c" } }
+    testParse('a?b:c', expr,
+      { type: 'ConditionalExpression',
+        test: { type: 'IdentifierExpression', name: 'a' },
+        consequent: { type: 'IdentifierExpression', name: 'b' },
+        alternate: { type: 'IdentifierExpression', name: 'c' } }
     );
 
-    testParse("y ? 1 : 2", expr,
-      { type: "ConditionalExpression",
-        test: { type: "IdentifierExpression", name: "y" },
-        consequent: { type: "LiteralNumericExpression", value: 1 },
-        alternate: { type: "LiteralNumericExpression", value: 2 } }
+    testParse('y ? 1 : 2', expr,
+      { type: 'ConditionalExpression',
+        test: { type: 'IdentifierExpression', name: 'y' },
+        consequent: { type: 'LiteralNumericExpression', value: 1 },
+        alternate: { type: 'LiteralNumericExpression', value: 2 } }
     );
 
-    testParse("x && y ? 1 : 2", expr,
-      { type: "ConditionalExpression",
+    testParse('x && y ? 1 : 2', expr,
+      { type: 'ConditionalExpression',
         test:
-          { type: "BinaryExpression",
-            operator: "&&",
-            left: { type: "IdentifierExpression", name: "x" },
-            right: { type: "IdentifierExpression", name: "y" } },
-        consequent: { type: "LiteralNumericExpression", value: 1 },
-        alternate: { type: "LiteralNumericExpression", value: 2 } }
+        { type: 'BinaryExpression',
+          operator: '&&',
+          left: { type: 'IdentifierExpression', name: 'x' },
+          right: { type: 'IdentifierExpression', name: 'y' } },
+        consequent: { type: 'LiteralNumericExpression', value: 1 },
+        alternate: { type: 'LiteralNumericExpression', value: 2 } }
     );
 
-    testParse("x = (0) ? 1 : 2", expr,
+    testParse('x = (0) ? 1 : 2', expr,
       {
-        type: "AssignmentExpression",
-        binding: { type: "AssignmentTargetIdentifier", name: "x" },
+        type: 'AssignmentExpression',
+        binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
         expression: {
-          type: "ConditionalExpression",
-          test: { type: "LiteralNumericExpression", value: 0 },
-          consequent: { type: "LiteralNumericExpression", value: 1 },
-          alternate: { type: "LiteralNumericExpression", value: 2 }
+          type: 'ConditionalExpression',
+          test: { type: 'LiteralNumericExpression', value: 0 },
+          consequent: { type: 'LiteralNumericExpression', value: 1 },
+          alternate: { type: 'LiteralNumericExpression', value: 2 }
         }
       }
     );

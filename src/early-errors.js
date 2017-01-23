@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import reduce, {MonoidalReducer} from "shift-reducer";
-import {isRestrictedWord, isStrictModeReservedWord} from "./utils";
+import reduce, { MonoidalReducer } from 'shift-reducer';
+import { isRestrictedWord, isStrictModeReservedWord } from './utils';
 
-import {EarlyErrorState, EarlyError} from "./early-error-state";
-import {PatternAcceptor} from "./pattern-acceptor";
+import { EarlyErrorState, EarlyError } from './early-error-state';
+import { PatternAcceptor } from './pattern-acceptor';
 
-function isStrictFunctionBody({directives}) {
-  return directives.some(directive => directive.rawValue === "use strict");
+function isStrictFunctionBody({ directives }) {
+  return directives.some(directive => directive.rawValue === 'use strict');
 }
 
 function containsDuplicates(list) {
@@ -37,62 +37,62 @@ function containsDuplicates(list) {
 }
 
 function isLabelledFunction(node) {
-  return node.type === "LabeledStatement" &&
-    (node.body.type === "FunctionDeclaration" || isLabelledFunction(node.body));
+  return node.type === 'LabeledStatement' &&
+    (node.body.type === 'FunctionDeclaration' || isLabelledFunction(node.body));
 }
 
 function isIterationStatement(node) {
   switch (node.type) {
-    case "LabeledStatement":
+    case 'LabeledStatement':
       return isIterationStatement(node.body);
-    case "DoWhileStatement":
-    case "ForInStatement":
-    case "ForOfStatement":
-    case "ForStatement":
-    case "WhileStatement":
+    case 'DoWhileStatement':
+    case 'ForInStatement':
+    case 'ForOfStatement':
+    case 'ForStatement':
+    case 'WhileStatement':
       return true;
   }
   return false;
 }
 
 function isSpecialMethod(methodDefinition) {
-  if (methodDefinition.name.type !== "StaticPropertyName" || methodDefinition.name.value !== "constructor") {
+  if (methodDefinition.name.type !== 'StaticPropertyName' || methodDefinition.name.value !== 'constructor') {
     return false;
   }
   switch (methodDefinition.type) {
-    case "Getter":
-    case "Setter":
+    case 'Getter':
+    case 'Setter':
       return true;
-    case "Method":
+    case 'Method':
       return methodDefinition.isGenerator;
   }
   /* istanbul ignore next */
-  throw new Error("not reached");
+  throw new Error('not reached');
 }
 
 
 function enforceDuplicateConstructorMethods(node, s) {
   let ctors = node.elements.filter(e =>
     !e.isStatic &&
-    e.method.type === "Method" &&
+    e.method.type === 'Method' &&
     !e.method.isGenerator &&
-    e.method.name.type === "StaticPropertyName" &&
-    e.method.name.value === "constructor"
+    e.method.name.type === 'StaticPropertyName' &&
+    e.method.name.value === 'constructor'
   );
   if (ctors.length > 1) {
     ctors.slice(1).forEach(ctor => {
-      s = s.addError(new EarlyError(ctor, "Duplicate constructor method in class"));
+      s = s.addError(new EarlyError(ctor, 'Duplicate constructor method in class'));
     });
   }
   return s;
 }
 
-const SUPERCALL_ERROR = node => new EarlyError(node, `Calls to super must be in the "constructor" method of a class expression or class declaration that has a superclass`);
-const SUPERPROPERTY_ERROR = node => new EarlyError(node, `Member access on super must be in a method`);
+const SUPERCALL_ERROR = node => new EarlyError(node, 'Calls to super must be in the "constructor" method of a class expression or class declaration that has a superclass');
+const SUPERPROPERTY_ERROR = node => new EarlyError(node, 'Member access on super must be in a method');
 const DUPLICATE_BINDING = node => new EarlyError(node, `Duplicate binding ${JSON.stringify(node.name)}`);
-const FREE_CONTINUE = node => new EarlyError(node, "Continue statement must be nested within an iteration statement");
+const FREE_CONTINUE = node => new EarlyError(node, 'Continue statement must be nested within an iteration statement');
 const UNBOUND_CONTINUE = node => new EarlyError(node, `Continue statement must be nested within an iteration statement with label ${JSON.stringify(node.label)}`);
-const FREE_BREAK = node => new EarlyError(node, "Break statement must be nested within an iteration statement or a switch statement");
+const FREE_BREAK = node => new EarlyError(node, 'Break statement must be nested within an iteration statement or a switch statement');
 const UNBOUND_BREAK = node => new EarlyError(node, `Break statement must be nested within a statement with label ${JSON.stringify(node.label)}`);
 
 export class EarlyErrorChecker extends MonoidalReducer {
@@ -112,25 +112,25 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceArrowExpression(node, {params, body}) {
-    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
+  reduceArrowExpression(node, { params, body }) {
+    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === 'BindingIdentifier');
     params = params.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
-    if (node.body.type === "FunctionBody") {
+    if (node.body.type === 'FunctionBody') {
       body = body.enforceConflictingLexicallyDeclaredNames(params.lexicallyDeclaredNames, DUPLICATE_BINDING);
       if (isStrictFunctionBody(node.body)) {
         params = params.enforceStrictErrors();
         body = body.enforceStrictErrors();
       }
     }
-    body.yieldExpressions.forEach(function(node) {
-      body = body.addError(new EarlyError(node, "Concise arrow bodies must not contain yield expressions"));
+    body.yieldExpressions.forEach(function (node) {
+      body = body.addError(new EarlyError(node, 'Concise arrow bodies must not contain yield expressions'));
     });
-    params.yieldExpressions.forEach(function(node) {
-      params = params.addError(new EarlyError(node, "Arrow parameters must not contain yield expressions"));
+    params.yieldExpressions.forEach(function (node) {
+      params = params.addError(new EarlyError(node, 'Arrow parameters must not contain yield expressions'));
     });
-    let s = super.reduceArrowExpression(node, {params, body});
-    if (!isSimpleParameterList && node.body.type === "FunctionBody" && isStrictFunctionBody(node.body)) {
-      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+    let s = super.reduceArrowExpression(node, { params, body });
+    if (!isSimpleParameterList && node.body.type === 'FunctionBody' && isStrictFunctionBody(node.body)) {
+      s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
@@ -165,13 +165,13 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceCallExpression(node) {
     let s = super.reduceCallExpression(...arguments);
-    if (node.callee.type === "Super") {
+    if (node.callee.type === 'Super') {
       s = s.observeSuperCallExpression(node);
     }
     return s;
   }
 
-  reduceCatchClause(node, {binding, body}) {
+  reduceCatchClause(node, { binding, body }) {
     binding = binding.observeLexicalDeclaration();
     binding = binding.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     binding = binding.enforceConflictingLexicallyDeclaredNames(body.previousLexicallyDeclaredNames, DUPLICATE_BINDING);
@@ -184,12 +184,12 @@ export class EarlyErrorChecker extends MonoidalReducer {
         });
       }
     });
-    let s = super.reduceCatchClause(node, {binding, body});
+    let s = super.reduceCatchClause(node, { binding, body });
     s = s.observeLexicalBoundary();
     return s;
   }
 
-  reduceClassDeclaration(node, {name, super: _super, elements}) {
+  reduceClassDeclaration(node, { name, super: _super, elements }) {
     let s = name;
     let sElements = this.fold(elements);
     sElements = sElements.enforceStrictErrors();
@@ -209,15 +209,15 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceClassElement(node) {
     let s = super.reduceClassElement(...arguments);
     if (!node.isStatic && isSpecialMethod(node.method)) {
-      s = s.addError(new EarlyError(node, "Constructors cannot be generators, getters or setters"));
+      s = s.addError(new EarlyError(node, 'Constructors cannot be generators, getters or setters'));
     }
-    if (node.isStatic && node.method.name.type === "StaticPropertyName" && node.method.name.value === "prototype") {
-      s = s.addError(new EarlyError(node, "Static class methods cannot be named \"prototype\""));
+    if (node.isStatic && node.method.name.type === 'StaticPropertyName' && node.method.name.value === 'prototype') {
+      s = s.addError(new EarlyError(node, 'Static class methods cannot be named "prototype"'));
     }
     return s;
   }
 
-  reduceClassExpression(node, {name, super: _super, elements}) {
+  reduceClassExpression(node, { name, super: _super, elements }) {
     let s = node.name == null ? this.identity : name;
     let sElements = this.fold(elements);
     sElements = sElements.enforceStrictErrors();
@@ -240,7 +240,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceComputedMemberExpression(node) {
     let s = super.reduceComputedMemberExpression(...arguments);
-    if (node.object.type === "Super") {
+    if (node.object.type === 'Super') {
       s = s.observeSuperPropertyExpression(node);
     }
     return s;
@@ -257,7 +257,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceDoWhileStatement(node) {
     let s = super.reduceDoWhileStatement(...arguments);
     if (isLabelledFunction(node.body)) {
-      s = s.addError(new EarlyError(node.body, "The body of a do-while statement must not be a labeled function declaration"));
+      s = s.addError(new EarlyError(node.body, 'The body of a do-while statement must not be a labeled function declaration'));
     }
     s = s.clearFreeContinueStatements();
     s = s.clearFreeBreakStatements();
@@ -294,7 +294,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceExportDefault(node) {
     let s = super.reduceExportDefault(...arguments);
     s = s.functionDeclarationNamesAreLexical();
-    s = s.exportName("default", node);
+    s = s.exportName('default', node);
     return s;
   }
 
@@ -304,21 +304,21 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceForStatement(node, {init, test, update, body}) {
+  reduceForStatement(node, { init, test, update, body }) {
     if (init != null) {
       init = init.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
       init = init.enforceConflictingLexicallyDeclaredNames(body.varDeclaredNames, DUPLICATE_BINDING);
     }
-    let s = super.reduceForStatement(node, {init, test, update, body});
-    if (node.init != null && node.init.type === "VariableDeclaration" && node.init.kind === "const") {
+    let s = super.reduceForStatement(node, { init, test, update, body });
+    if (node.init != null && node.init.type === 'VariableDeclaration' && node.init.kind === 'const') {
       node.init.declarators.forEach(declarator => {
         if (declarator.init == null) {
-          s = s.addError(new EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
+          s = s.addError(new EarlyError(declarator, 'Constant lexical declarations must have an initialiser'));
         }
       });
     }
     if (isLabelledFunction(node.body)) {
-      s = s.addError(new EarlyError(node.body, "The body of a for statement must not be a labeled function declaration"));
+      s = s.addError(new EarlyError(node.body, 'The body of a for statement must not be a labeled function declaration'));
     }
     s = s.clearFreeContinueStatements();
     s = s.clearFreeBreakStatements();
@@ -326,12 +326,12 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceForInStatement(node, {left, right, body}) {
+  reduceForInStatement(node, { left, right, body }) {
     left = left.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     left = left.enforceConflictingLexicallyDeclaredNames(body.varDeclaredNames, DUPLICATE_BINDING);
-    let s = super.reduceForInStatement(node, {left, right, body});
+    let s = super.reduceForInStatement(node, { left, right, body });
     if (isLabelledFunction(node.body)) {
-      s = s.addError(new EarlyError(node.body, "The body of a for-in statement must not be a labeled function declaration"));
+      s = s.addError(new EarlyError(node.body, 'The body of a for-in statement must not be a labeled function declaration'));
     }
     s = s.clearFreeContinueStatements();
     s = s.clearFreeBreakStatements();
@@ -339,13 +339,13 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceForOfStatement(node, {left, right, body}) {
+  reduceForOfStatement(node, { left, right, body }) {
     left = left.recordForOfVars();
     left = left.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     left = left.enforceConflictingLexicallyDeclaredNames(body.varDeclaredNames, DUPLICATE_BINDING);
-    let s = super.reduceForOfStatement(node, {left, right, body});
+    let s = super.reduceForOfStatement(node, { left, right, body });
     if (isLabelledFunction(node.body)) {
-      s = s.addError(new EarlyError(node.body, "The body of a for-of statement must not be a labeled function declaration"));
+      s = s.addError(new EarlyError(node.body, 'The body of a for-of statement must not be a labeled function declaration'));
     }
     s = s.clearFreeContinueStatements();
     s = s.clearFreeBreakStatements();
@@ -369,10 +369,10 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceFunctionDeclaration(node, {name, params, body}) {
-    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
-    let addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
-    params.lexicallyDeclaredNames.forEachEntry((nodes/*, bindingName*/) => {
+  reduceFunctionDeclaration(node, { name, params, body }) {
+    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === 'BindingIdentifier');
+    let addError = !isSimpleParameterList || node.isGenerator ? 'addError' : 'addStrictError';
+    params.lexicallyDeclaredNames.forEachEntry((nodes/* , bindingName*/) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
           params = params[addError](DUPLICATE_BINDING(dupeNode));
@@ -385,8 +385,8 @@ export class EarlyErrorChecker extends MonoidalReducer {
     params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
     params = params.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
     if (node.isGenerator) {
-      params.yieldExpressions.forEach(function(node) {
-        params = params.addError(new EarlyError(node, "Generator parameters must not contain yield expressions"));
+      params.yieldExpressions.forEach(function (node) {
+        params = params.addError(new EarlyError(node, 'Generator parameters must not contain yield expressions'));
       });
     }
     params = params.clearNewTargetExpressions();
@@ -395,18 +395,18 @@ export class EarlyErrorChecker extends MonoidalReducer {
       params = params.enforceStrictErrors();
       body = body.enforceStrictErrors();
     }
-    let s = super.reduceFunctionDeclaration(node, {name, params, body});
+    let s = super.reduceFunctionDeclaration(node, { name, params, body });
     if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
-      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+      s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
     s = s.observeFunctionDeclaration();
     return s;
   }
 
-  reduceFunctionExpression(node, {name, params, body}) {
-    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
-    let addError = !isSimpleParameterList || node.isGenerator ? "addError" : "addStrictError";
+  reduceFunctionExpression(node, { name, params, body }) {
+    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === 'BindingIdentifier');
+    let addError = !isSimpleParameterList || node.isGenerator ? 'addError' : 'addStrictError';
     params.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
@@ -420,8 +420,8 @@ export class EarlyErrorChecker extends MonoidalReducer {
     params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
     params = params.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
     if (node.isGenerator) {
-      params.yieldExpressions.forEach(function(node) {
-        params = params.addError(new EarlyError(node, "Generator parameters must not contain yield expressions"));
+      params.yieldExpressions.forEach(function (node) {
+        params = params.addError(new EarlyError(node, 'Generator parameters must not contain yield expressions'));
       });
     }
     params = params.clearNewTargetExpressions();
@@ -430,9 +430,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       params = params.enforceStrictErrors();
       body = body.enforceStrictErrors();
     }
-    let s = super.reduceFunctionExpression(node, {name, params, body});
+    let s = super.reduceFunctionExpression(node, { name, params, body });
     if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
-      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+      s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearBoundNames();
     s = s.clearYieldExpressions();
@@ -440,14 +440,14 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceGetter(node, {name, body}) {
+  reduceGetter(node, { name, body }) {
     body = body.enforceSuperCallExpressions(SUPERCALL_ERROR);
     body = body.clearSuperPropertyExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
       body = body.enforceStrictErrors();
     }
-    let s = super.reduceGetter(node, {name, body});
+    let s = super.reduceGetter(node, { name, body });
     s = s.observeVarBoundary();
     return s;
   }
@@ -460,22 +460,22 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceIfStatement(node, {test, consequent, alternate}) {
+  reduceIfStatement(node, { test, consequent, alternate }) {
     if (isLabelledFunction(node.consequent)) {
-      consequent = consequent.addError(new EarlyError(node.consequent, "The consequent of an if statement must not be a labeled function declaration"));
+      consequent = consequent.addError(new EarlyError(node.consequent, 'The consequent of an if statement must not be a labeled function declaration'));
     }
     if (node.alternate != null && isLabelledFunction(node.alternate)) {
-      alternate = alternate.addError(new EarlyError(node.alternate, "The alternate of an if statement must not be a labeled function declaration"));
+      alternate = alternate.addError(new EarlyError(node.alternate, 'The alternate of an if statement must not be a labeled function declaration'));
     }
-    if (node.consequent.type === "FunctionDeclaration") {
-      consequent = consequent.addStrictError(new EarlyError(node.consequent, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+    if (node.consequent.type === 'FunctionDeclaration') {
+      consequent = consequent.addStrictError(new EarlyError(node.consequent, 'FunctionDeclarations in IfStatements are disallowed in strict mode'));
       consequent = consequent.observeLexicalBoundary();
     }
-    if (node.alternate != null && node.alternate.type === "FunctionDeclaration") {
-      alternate = alternate.addStrictError(new EarlyError(node.alternate, "FunctionDeclarations in IfStatements are disallowed in strict mode"));
+    if (node.alternate != null && node.alternate.type === 'FunctionDeclaration') {
+      alternate = alternate.addStrictError(new EarlyError(node.alternate, 'FunctionDeclarations in IfStatements are disallowed in strict mode'));
       alternate = alternate.observeLexicalBoundary();
     }
-    return super.reduceIfStatement(node, {test, consequent, alternate});
+    return super.reduceIfStatement(node, { test, consequent, alternate });
   }
 
   reduceImport() {
@@ -492,14 +492,14 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceLabeledStatement(node) {
     let s = super.reduceLabeledStatement(...arguments);
-    if (node.label === "yield") {
+    if (node.label === 'yield') {
       s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(node.label)} must not be in label position in strict mode`));
     }
     if (s.usedLabelNames.indexOf(node.label) >= 0) {
       s = s.addError(new EarlyError(node, `Label ${JSON.stringify(node.label)} has already been declared`));
     }
-    if (node.body.type === "FunctionDeclaration") {
-      s = s.addStrictError(new EarlyError(node, "Labeled FunctionDeclarations are disallowed in strict mode"));
+    if (node.body.type === 'FunctionDeclaration') {
+      s = s.addStrictError(new EarlyError(node, 'Labeled FunctionDeclarations are disallowed in strict mode'));
     }
     s = isIterationStatement(node.body)
       ? s.observeIterationLabel(node.label)
@@ -510,17 +510,17 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceLiteralRegExpExpression(node) {
     let s = this.identity;
     // NOTE: the RegExp pattern acceptor is disabled until we have more confidence in its correctness (more tests)
-    //if (!PatternAcceptor.test(node.pattern, node.flags.indexOf("u") >= 0)) {
+    // if (!PatternAcceptor.test(node.pattern, node.flags.indexOf("u") >= 0)) {
     //  s = s.addError(new EarlyError(node, "Invalid regular expression pattern"));
-    //}
+    // }
     return s;
   }
 
-  reduceMethod(node, {name, params, body}) {
-    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === "BindingIdentifier");
+  reduceMethod(node, { name, params, body }) {
+    let isSimpleParameterList = node.params.rest == null && node.params.items.every(i => i.type === 'BindingIdentifier');
     params = params.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     body = body.enforceConflictingLexicallyDeclaredNames(params.lexicallyDeclaredNames, DUPLICATE_BINDING);
-    if (node.name.type === "StaticPropertyName" && node.name.value === "constructor") {
+    if (node.name.type === 'StaticPropertyName' && node.name.value === 'constructor') {
       body = body.observeConstructorMethod();
       params = params.observeConstructorMethod();
     } else {
@@ -528,8 +528,8 @@ export class EarlyErrorChecker extends MonoidalReducer {
       params = params.enforceSuperCallExpressions(SUPERCALL_ERROR);
     }
     if (node.isGenerator) {
-      params.yieldExpressions.forEach(function(node) {
-        params = params.addError(new EarlyError(node, "Generator parameters must not contain yield expressions"));
+      params.yieldExpressions.forEach(function (node) {
+        params = params.addError(new EarlyError(node, 'Generator parameters must not contain yield expressions'));
       });
     }
     body = body.clearSuperPropertyExpressions();
@@ -540,9 +540,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       params = params.enforceStrictErrors();
       body = body.enforceStrictErrors();
     }
-    let s = super.reduceMethod(node, {name, params, body});
+    let s = super.reduceMethod(node, { name, params, body });
     if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
-      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+      s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
     s = s.observeVarBoundary();
@@ -569,7 +569,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       }
     });
     s.newTargetExpressions.forEach(node => {
-      s = s.addError(new EarlyError(node, "new.target must be within function (but not arrow expression) code"));
+      s = s.addError(new EarlyError(node, 'new.target must be within function (but not arrow expression) code'));
     });
     s = s.enforceFreeContinueStatementErrors(FREE_CONTINUE);
     s = s.enforceFreeLabeledContinueStatementErrors(UNBOUND_CONTINUE);
@@ -588,9 +588,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceObjectExpression(node) {
     let s = super.reduceObjectExpression(...arguments);
     s = s.enforceSuperCallExpressionsInConstructorMethod(SUPERCALL_ERROR);
-    let protos = node.properties.filter(p => p.type === "DataProperty" && p.name.type === "StaticPropertyName" && p.name.value === "__proto__");
+    let protos = node.properties.filter(p => p.type === 'DataProperty' && p.name.type === 'StaticPropertyName' && p.name.value === '__proto__');
     protos.slice(1).forEach(n => {
-      s = s.addError(new EarlyError(n, "Duplicate __proto__ property in object literal not allowed"));
+      s = s.addError(new EarlyError(n, 'Duplicate __proto__ property in object literal not allowed'));
     });
     return s;
   }
@@ -603,8 +603,8 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceUnaryExpression(node) {
     let s = super.reduceUnaryExpression(...arguments);
-    if (node.operator === "delete" && node.operand.type === "IdentifierExpression") {
-      s = s.addStrictError(new EarlyError(node, "Identifier expressions must not be deleted in strict mode"));
+    if (node.operator === 'delete' && node.operand.type === 'IdentifierExpression') {
+      s = s.addStrictError(new EarlyError(node, 'Identifier expressions must not be deleted in strict mode'));
     }
     return s;
   }
@@ -614,7 +614,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     s = s.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     s = s.enforceConflictingLexicallyDeclaredNames(s.varDeclaredNames, DUPLICATE_BINDING);
     s.newTargetExpressions.forEach(node => {
-      s = s.addError(new EarlyError(node, "new.target must be within function (but not arrow expression) code"));
+      s = s.addError(new EarlyError(node, 'new.target must be within function (but not arrow expression) code'));
     });
     s = s.enforceFreeContinueStatementErrors(FREE_CONTINUE);
     s = s.enforceFreeLabeledContinueStatementErrors(UNBOUND_CONTINUE);
@@ -628,8 +628,8 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceSetter(node, {name, param, body}) {
-    let isSimpleParameterList = node.param.type === "BindingIdentifier";
+  reduceSetter(node, { name, param, body }) {
+    let isSimpleParameterList = node.param.type === 'BindingIdentifier';
     param = param.observeLexicalDeclaration();
     param = param.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     body = body.enforceConflictingLexicallyDeclaredNames(param.lexicallyDeclaredNames, DUPLICATE_BINDING);
@@ -643,9 +643,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
       param = param.enforceStrictErrors();
       body = body.enforceStrictErrors();
     }
-    let s = super.reduceSetter(node, {name, param, body});
+    let s = super.reduceSetter(node, { name, param, body });
     if (!isSimpleParameterList && isStrictFunctionBody(node.body)) {
-      s = s.addError(new EarlyError(node, "Functions with non-simple parameter lists may not contain a \"use strict\" directive"));
+      s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.observeVarBoundary();
     return s;
@@ -653,13 +653,13 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceStaticMemberExpression(node) {
     let s = super.reduceStaticMemberExpression(...arguments);
-    if (node.object.type === "Super") {
+    if (node.object.type === 'Super') {
       s = s.observeSuperPropertyExpression(node);
     }
     return s;
   }
 
-  reduceSwitchStatement(node, {discriminant, cases}) {
+  reduceSwitchStatement(node, { discriminant, cases }) {
     let sCases = this.fold(cases);
     sCases = sCases.functionDeclarationNamesAreLexical();
     sCases = sCases.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
@@ -670,7 +670,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
-  reduceSwitchStatementWithDefault(node, {discriminant, preDefaultCases, defaultCase, postDefaultCases}) {
+  reduceSwitchStatementWithDefault(node, { discriminant, preDefaultCases, defaultCase, postDefaultCases }) {
     let sCases = this.append(defaultCase, this.append(this.fold(preDefaultCases), this.fold(postDefaultCases)));
     sCases = sCases.functionDeclarationNamesAreLexical();
     sCases = sCases.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
@@ -684,17 +684,17 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceVariableDeclaration(node) {
     let s = super.reduceVariableDeclaration(...arguments);
     switch (node.kind) {
-      case "const":
-      case "let": {
+      case 'const':
+      case 'let': {
         s = s.observeLexicalDeclaration();
-        if (s.lexicallyDeclaredNames.has("let")) {
-          s.lexicallyDeclaredNames.get("let").forEach(n => {
-            s = s.addError(new EarlyError(n, "Lexical declarations must not have a binding named \"let\""));
+        if (s.lexicallyDeclaredNames.has('let')) {
+          s.lexicallyDeclaredNames.get('let').forEach(n => {
+            s = s.addError(new EarlyError(n, 'Lexical declarations must not have a binding named "let"'));
           });
         }
         break;
       }
-      case "var":
+      case 'var':
         s = s.observeVarDeclaration();
         break;
     }
@@ -703,10 +703,10 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceVariableDeclarationStatement(node) {
     let s = super.reduceVariableDeclarationStatement(...arguments);
-    if (node.declaration.kind === "const") {
+    if (node.declaration.kind === 'const') {
       node.declaration.declarators.forEach(declarator => {
         if (declarator.init == null) {
-          s = s.addError(new EarlyError(declarator, "Constant lexical declarations must have an initialiser"));
+          s = s.addError(new EarlyError(declarator, 'Constant lexical declarations must have an initialiser'));
         }
       });
     }
@@ -716,7 +716,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceWhileStatement(node) {
     let s = super.reduceWhileStatement(...arguments);
     if (isLabelledFunction(node.body)) {
-      s = s.addError(new EarlyError(node.body, "The body of a while statement must not be a labeled function declaration"));
+      s = s.addError(new EarlyError(node.body, 'The body of a while statement must not be a labeled function declaration'));
     }
     s = s.clearFreeContinueStatements().clearFreeBreakStatements();
     return s;
@@ -725,9 +725,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceWithStatement(node) {
     let s = super.reduceWithStatement(...arguments);
     if (isLabelledFunction(node.body)) {
-      s = s.addError(new EarlyError(node.body, "The body of a with statement must not be a labeled function declaration"));
+      s = s.addError(new EarlyError(node.body, 'The body of a with statement must not be a labeled function declaration'));
     }
-    s = s.addStrictError(new EarlyError(node, "Strict mode code must not include a with statement"));
+    s = s.addStrictError(new EarlyError(node, 'Strict mode code must not include a with statement'));
     return s;
   }
 

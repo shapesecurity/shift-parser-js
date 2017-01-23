@@ -14,44 +14,44 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("expression statement", function () {
+suite('Parser', function () {
+  suite('expression statement', function () {
 
-    testParse("x", stmt,
-      { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", name: "x" } }
+    testParse('x', stmt,
+      { type: 'ExpressionStatement',
+        expression: { type: 'IdentifierExpression', name: 'x' } }
     );
 
-    testParse("x, y", stmt,
-      { type: "ExpressionStatement",
+    testParse('x, y', stmt,
+      { type: 'ExpressionStatement',
         expression:
-          { type: "BinaryExpression",
-            operator: ",",
-            left: { type: "IdentifierExpression", name: "x" },
-            right: { type: "IdentifierExpression", name: "y" } } }
+        { type: 'BinaryExpression',
+          operator: ',',
+          left: { type: 'IdentifierExpression', name: 'x' },
+          right: { type: 'IdentifierExpression', name: 'y' } } }
     );
 
-    testParse("\\u0061", stmt,
-      { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", name: "a" } }
+    testParse('\\u0061', stmt,
+      { type: 'ExpressionStatement',
+        expression: { type: 'IdentifierExpression', name: 'a' } }
     );
 
-    testParse("a\\u0061", stmt,
-      { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", name: "aa" } }
+    testParse('a\\u0061', stmt,
+      { type: 'ExpressionStatement',
+        expression: { type: 'IdentifierExpression', name: 'aa' } }
     );
 
-    testParse("\\u0061a", stmt,
-      { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", name: "aa" } }
+    testParse('\\u0061a', stmt,
+      { type: 'ExpressionStatement',
+        expression: { type: 'IdentifierExpression', name: 'aa' } }
     );
 
-    testParse("\\u0061a ", stmt,
-      { type: "ExpressionStatement",
-        expression: { type: "IdentifierExpression", name: "aa" } }
+    testParse('\\u0061a ', stmt,
+      { type: 'ExpressionStatement',
+        expression: { type: 'IdentifierExpression', name: 'aa' } }
     );
 
   });

@@ -3,6 +3,8 @@ language: node_js
 script:
   - curl https://raw.githubusercontent.com/shapesecurity/CLA/master/cla-travis.sh | bash
   - npm run build
+  - npm run coverage
+  - npm run report
   - npm test
 node_js:
   - "4"

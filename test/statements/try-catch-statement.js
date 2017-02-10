@@ -14,52 +14,52 @@
  * limitations under the License.
  */
 
-var stmt = require("../helpers").stmt;
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
+let stmt = require('../helpers').stmt;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
 
-suite("Parser", function () {
-  suite("try-catch statement", function () {
-    testParse("try{}catch(a){}", stmt,
+suite('Parser', function () {
+  suite('try-catch statement', function () {
+    testParse('try{}catch(a){}', stmt,
       {
-        type: "TryCatchStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "a" },
-          body: { type: "Block", statements: [] }
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'a' },
+          body: { type: 'Block', statements: [] }
         }
       }
     );
-    testParse("try { } catch (e) { }", stmt,
+    testParse('try { } catch (e) { }', stmt,
       {
-        type: "TryCatchStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "e" },
-          body: { type: "Block", statements: [] }
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'e' },
+          body: { type: 'Block', statements: [] }
         }
       }
     );
 
-    testParse("try { } catch (e) { let a; }", stmt,
+    testParse('try { } catch (e) { let a; }', stmt,
       {
-        type: "TryCatchStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "e" },
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'e' },
           body: {
-            type: "Block",
+            type: 'Block',
             statements: [{
-              type: "VariableDeclarationStatement",
+              type: 'VariableDeclarationStatement',
               declaration: {
-                type: "VariableDeclaration",
-                kind: "let",
+                type: 'VariableDeclaration',
+                kind: 'let',
                 declarators: [{
-                  type: "VariableDeclarator",
-                  binding: { type: "BindingIdentifier", name: "a" },
+                  type: 'VariableDeclarator',
+                  binding: { type: 'BindingIdentifier', name: 'a' },
                   init: null
                 }]
               }
@@ -69,74 +69,74 @@ suite("Parser", function () {
       }
     );
 
-    testParse("try { } catch (eval) { }", stmt,
+    testParse('try { } catch (eval) { }', stmt,
       {
-        type: "TryCatchStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "eval" },
-          body: { type: "Block", statements: [] }
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'eval' },
+          body: { type: 'Block', statements: [] }
         }
       }
     );
-    testParse("try { } catch (arguments) { }", stmt,
+    testParse('try { } catch (arguments) { }', stmt,
       {
-        type: "TryCatchStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "arguments" },
-          body: { type: "Block", statements: [] }
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'arguments' },
+          body: { type: 'Block', statements: [] }
         }
       }
     );
-    testParse("try { } catch (e) { say(e) }", stmt,
+    testParse('try { } catch (e) { say(e) }', stmt,
       {
-        type: "TryCatchStatement",
-        body: { type: "Block", statements: [] },
+        type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "e" },
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'e' },
           body: {
-            type: "Block",
+            type: 'Block',
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "CallExpression",
-                callee: { type: "IdentifierExpression", name: "say" },
-                arguments: [{ type: "IdentifierExpression", name: "e" }]
+                type: 'CallExpression',
+                callee: { type: 'IdentifierExpression', name: 'say' },
+                arguments: [{ type: 'IdentifierExpression', name: 'e' }]
               }
             }]
           }
         }
       }
     );
-    testParse("try { doThat(); } catch (e) { say(e) }", stmt,
+    testParse('try { doThat(); } catch (e) { say(e) }', stmt,
       {
-        type: "TryCatchStatement",
+        type: 'TryCatchStatement',
         body: {
-          type: "Block",
+          type: 'Block',
           statements: [{
-            type: "ExpressionStatement",
+            type: 'ExpressionStatement',
             expression: {
-              type: "CallExpression",
-              callee: { type: "IdentifierExpression", name: "doThat" },
+              type: 'CallExpression',
+              callee: { type: 'IdentifierExpression', name: 'doThat' },
               arguments: []
             }
           }]
         },
         catchClause: {
-          type: "CatchClause",
-          binding: { type: "BindingIdentifier", name: "e" },
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'e' },
           body: {
-            type: "Block",
+            type: 'Block',
             statements: [{
-              type: "ExpressionStatement",
+              type: 'ExpressionStatement',
               expression: {
-                type: "CallExpression",
-                callee: { type: "IdentifierExpression", name: "say" },
-                arguments: [{ type: "IdentifierExpression", name: "e" }]
+                type: 'CallExpression',
+                callee: { type: 'IdentifierExpression', name: 'say' },
+                arguments: [{ type: 'IdentifierExpression', name: 'e' }]
               }
             }]
           }
@@ -144,6 +144,6 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("try {} catch ((e)) {}", "Unexpected token \"(\"");
+    testParseFailure('try {} catch ((e)) {}', 'Unexpected token "("');
   });
 });

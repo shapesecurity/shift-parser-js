@@ -14,166 +14,166 @@
  * limitations under the License.
  */
 
-var stmt = require("../helpers").stmt;
-var expr = require("../helpers").expr;
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
+let stmt = require('../helpers').stmt;
+let expr = require('../helpers').expr;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
 
-suite("Parser", function () {
-  suite("new.target expression", function () {
+suite('Parser', function () {
+  suite('new.target expression', function () {
 
-    testParse("function f() { new.target; }", stmt,
-      { type: "FunctionDeclaration",
+    testParse('function f() { new.target; }', stmt,
+      { type: 'FunctionDeclaration',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "f" },
-        params: { type: "FormalParameters", items: [], rest: null },
+        name: { type: 'BindingIdentifier', name: 'f' },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
-          statements: [{ type: "ExpressionStatement", expression: { type: "NewTargetExpression" } }]
+          statements: [{ type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' } }]
         }
       }
     );
 
-    testParse("function f(a = new.target){}", stmt,
-      { type: "FunctionDeclaration",
+    testParse('function f(a = new.target){}', stmt,
+      { type: 'FunctionDeclaration',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "f" },
+        name: { type: 'BindingIdentifier', name: 'f' },
         params: {
-          type: "FormalParameters",
+          type: 'FormalParameters',
           items: [{
-            type: "BindingWithDefault",
-            binding: { type: "BindingIdentifier", name: "a" },
-            init: { type: "NewTargetExpression" }
+            type: 'BindingWithDefault',
+            binding: { type: 'BindingIdentifier', name: 'a' },
+            init: { type: 'NewTargetExpression' }
           }],
           rest: null
         },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("(function f(a = new.target){})", expr,
-      { type: "FunctionExpression",
+    testParse('(function f(a = new.target){})', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "f" },
+        name: { type: 'BindingIdentifier', name: 'f' },
         params: {
-          type: "FormalParameters",
+          type: 'FormalParameters',
           items: [{
-            type: "BindingWithDefault",
-            binding: { type: "BindingIdentifier", name: "a" },
-            init: { type: "NewTargetExpression" }
+            type: 'BindingWithDefault',
+            binding: { type: 'BindingIdentifier', name: 'a' },
+            init: { type: 'NewTargetExpression' }
           }],
           rest: null
         },
-        body: { type: "FunctionBody", directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] }
       }
     );
 
-    testParse("({ set m(a = new.target){} })", expr,
-      { type: "ObjectExpression",
+    testParse('({ set m(a = new.target){} })', expr,
+      { type: 'ObjectExpression',
         properties: [{
-          type: "Setter",
-          name: { type: "StaticPropertyName", value: "m" },
+          type: 'Setter',
+          name: { type: 'StaticPropertyName', value: 'm' },
           param: {
-            type: "BindingWithDefault",
-            binding: { type: "BindingIdentifier", name: "a" },
-            init: { type: "NewTargetExpression" }
+            type: 'BindingWithDefault',
+            binding: { type: 'BindingIdentifier', name: 'a' },
+            init: { type: 'NewTargetExpression' }
           },
-          body: { type: "FunctionBody", directives: [], statements: [] }
+          body: { type: 'FunctionBody', directives: [], statements: [] }
         }]
       }
     );
 
-    testParse("({ m(a = new.target){} })", expr,
-      { type: "ObjectExpression",
+    testParse('({ m(a = new.target){} })', expr,
+      { type: 'ObjectExpression',
         properties: [{
-          type: "Method",
+          type: 'Method',
           isGenerator: false,
-          name: { type: "StaticPropertyName", value: "m" },
+          name: { type: 'StaticPropertyName', value: 'm' },
           params: {
-            type: "FormalParameters",
+            type: 'FormalParameters',
             items: [{
-              type: "BindingWithDefault",
-              binding: { type: "BindingIdentifier", name: "a" },
-              init: { type: "NewTargetExpression" }
+              type: 'BindingWithDefault',
+              binding: { type: 'BindingIdentifier', name: 'a' },
+              init: { type: 'NewTargetExpression' }
             }],
             rest: null
           },
-          body: { type: "FunctionBody", directives: [], statements: [] }
+          body: { type: 'FunctionBody', directives: [], statements: [] }
         }]
       }
     );
 
-    testParse("({ get m(){ new.target } })", expr,
-      { type: "ObjectExpression",
+    testParse('({ get m(){ new.target } })', expr,
+      { type: 'ObjectExpression',
         properties: [{
-          type: "Getter",
-          name: { type: "StaticPropertyName", value: "m" },
-          body: { type: "FunctionBody", directives: [], statements: [{
-            type: "ExpressionStatement", expression: { type: "NewTargetExpression" }
+          type: 'Getter',
+          name: { type: 'StaticPropertyName', value: 'm' },
+          body: { type: 'FunctionBody', directives: [], statements: [{
+            type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' }
           }] }
         }]
       }
     );
 
-    testParse("function f() { new.\\u0074arget; }", stmt,
-      { type: "FunctionDeclaration",
+    testParse('function f() { new.\\u0074arget; }', stmt,
+      { type: 'FunctionDeclaration',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "f" },
-        params: { type: "FormalParameters", items: [], rest: null },
+        name: { type: 'BindingIdentifier', name: 'f' },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
-          statements: [{ type: "ExpressionStatement", expression: { type: "NewTargetExpression" } }]
+          statements: [{ type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' } }]
         }
       }
     );
 
-    testParse("function f() { new new.target; }", stmt,
-      { type: "FunctionDeclaration",
+    testParse('function f() { new new.target; }', stmt,
+      { type: 'FunctionDeclaration',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "f" },
-        params: { type: "FormalParameters", items: [], rest: null },
+        name: { type: 'BindingIdentifier', name: 'f' },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
           statements: [{
-            type: "ExpressionStatement",
-            expression: { type: "NewExpression", callee: { type: "NewTargetExpression" }, arguments: [] }
+            type: 'ExpressionStatement',
+            expression: { type: 'NewExpression', callee: { type: 'NewTargetExpression' }, arguments: [] }
           }]
         }
       }
     );
 
-    testParse("function f() { new.target(); }", stmt,
-      { type: "FunctionDeclaration",
+    testParse('function f() { new.target(); }', stmt,
+      { type: 'FunctionDeclaration',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "f" },
-        params: { type: "FormalParameters", items: [], rest: null },
+        name: { type: 'BindingIdentifier', name: 'f' },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
           statements: [{
-            type: "ExpressionStatement",
-            expression: { type: "CallExpression", callee: { type: "NewTargetExpression" }, arguments: [] }
+            type: 'ExpressionStatement',
+            expression: { type: 'CallExpression', callee: { type: 'NewTargetExpression' }, arguments: [] }
           }]
         }
       }
     );
 
-    testParse("function f() { new[\"target\"]; }", stmt,
-      { type: "FunctionDeclaration",
+    testParse('function f() { new["target"]; }', stmt,
+      { type: 'FunctionDeclaration',
         isGenerator: false,
-        name: { type: "BindingIdentifier", name: "f" },
-        params: { type: "FormalParameters", items: [], rest: null },
+        name: { type: 'BindingIdentifier', name: 'f' },
+        params: { type: 'FormalParameters', items: [], rest: null },
         body: {
-          type: "FunctionBody",
+          type: 'FunctionBody',
           directives: [],
           statements: [{
-            type: "ExpressionStatement",
+            type: 'ExpressionStatement',
             expression: {
-              type: "NewExpression",
-              callee: { type: "ArrayExpression", elements: [{ type: "LiteralStringExpression", value: "target" }] },
+              type: 'NewExpression',
+              callee: { type: 'ArrayExpression', elements: [{ type: 'LiteralStringExpression', value: 'target' }] },
               arguments: []
             }
           }]
@@ -181,8 +181,8 @@ suite("Parser", function () {
       }
     );
 
-    testParseFailure("function f() { new.anythingElse; }", "Unexpected identifier");
-    testParseFailure("function f() { new..target; }", "Unexpected token \".\"");
+    testParseFailure('function f() { new.anythingElse; }', 'Unexpected identifier');
+    testParseFailure('function f() { new..target; }', 'Unexpected token "."');
 
   });
 });

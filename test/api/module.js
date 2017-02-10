@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-var testParseModule = require("../assertions").testParseModule;
-var testParseModuleFailure = require("../assertions").testParseModuleFailure;
+let testParseModule = require('../assertions').testParseModule;
+let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 
 function id(x) {
   return x;
 }
 
-suite("Parser", function () {
-  suite("module", function () {
-    testParseModule("", id, { type: "Module", directives: [], items: [] });
+suite('Parser', function () {
+  suite('module', function () {
+    testParseModule('', id, { type: 'Module', directives: [], items: [] });
 
-    testParseModuleFailure("/*", "Unexpected end of input");
+    testParseModuleFailure('/*', 'Unexpected end of input');
   });
 });

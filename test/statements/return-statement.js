@@ -14,80 +14,80 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
-var expr = require("../helpers").expr;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let expr = require('../helpers').expr;
 
-suite("Parser", function () {
-  suite("return statement", function () {
-    testParse("(function(){ return })", expr,
-      { type: "FunctionExpression",
+suite('Parser', function () {
+  suite('return statement', function () {
+    testParse('(function(){ return })', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [
-          { type: "ReturnStatement", expression: null },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [
+          { type: 'ReturnStatement', expression: null },
         ] }
       }
     );
-    testParse("(function(){ return; })", expr,
-      { type: "FunctionExpression",
+    testParse('(function(){ return; })', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [
-          { type: "ReturnStatement", expression: null },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [
+          { type: 'ReturnStatement', expression: null },
         ] }
       }
     );
-    testParse("(function(){ return x; })", expr,
-      { type: "FunctionExpression",
+    testParse('(function(){ return x; })', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [
-          { type: "ReturnStatement", expression: { type: "IdentifierExpression", name: "x" } },
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [
+          { type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'x' } },
         ] }
       }
     );
-    testParse("(function(){ return x * y })", expr,
-      { type: "FunctionExpression",
+    testParse('(function(){ return x * y })', expr,
+      { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
-        params: { type: "FormalParameters", items: [], rest: null },
-        body: { type: "FunctionBody", directives: [], statements: [
-          { type: "ReturnStatement",
+        params: { type: 'FormalParameters', items: [], rest: null },
+        body: { type: 'FunctionBody', directives: [], statements: [
+          { type: 'ReturnStatement',
             expression: {
-              type: "BinaryExpression",
-              operator: "*",
-              left: { type: "IdentifierExpression", name: "x" },
-              right: { type: "IdentifierExpression", name: "y" }
+              type: 'BinaryExpression',
+              operator: '*',
+              left: { type: 'IdentifierExpression', name: 'x' },
+              right: { type: 'IdentifierExpression', name: 'y' }
             }
           },
         ] }
       }
     );
 
-    testParse("_ => { return 0; }", expr,
-      { type: "ArrowExpression",
+    testParse('_ => { return 0; }', expr,
+      { type: 'ArrowExpression',
         params:
-          { type: "FormalParameters",
-            items: [{ type: "BindingIdentifier", name: "_"}],
-            rest: null
-          },
+        { type: 'FormalParameters',
+          items: [{ type: 'BindingIdentifier', name: '_' }],
+          rest: null
+        },
         body:
-          { type: "FunctionBody",
-            directives: [],
-            statements: [
-              { type: "ReturnStatement", expression: { type: "LiteralNumericExpression", value: 0 } },
-            ]
-          }
+        { type: 'FunctionBody',
+          directives: [],
+          statements: [
+              { type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
+          ]
+        }
       }
     );
 
-    testParseFailure("return;", "Illegal return statement");
-    testParseFailure("{ return; }", "Illegal return statement");
-    testParseFailure("if (false) { return; }", "Illegal return statement");
+    testParseFailure('return;', 'Illegal return statement');
+    testParseFailure('{ return; }', 'Illegal return statement');
+    testParseFailure('if (false) { return; }', 'Illegal return statement');
 
   });
 });

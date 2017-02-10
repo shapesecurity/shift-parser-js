@@ -14,184 +14,185 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var testParseFailure = require("../assertions").testParseFailure;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("for in statement", function () {
+suite('Parser', function () {
+  suite('for in statement', function () {
 
-    testParse("for(x in list) process(x);", stmt,
-      { type: "ForInStatement",
+    testParse('for(x in list) process(x);', stmt,
+      { type: 'ForInStatement',
         body:
-          { type: "ExpressionStatement",
-            expression:
-              { type: "CallExpression",
-                callee: { type: "IdentifierExpression", name: "process" },
-                arguments:
-                  [ { type: "IdentifierExpression", name: "x" } ] } },
-        left: { type: "AssignmentTargetIdentifier", name: "x" },
-        right: { type: "IdentifierExpression", name: "list" } }
+        { type: 'ExpressionStatement',
+          expression:
+          { type: 'CallExpression',
+            callee: { type: 'IdentifierExpression', name: 'process' },
+            arguments:
+                  [{ type: 'IdentifierExpression', name: 'x' }] } },
+        left: { type: 'AssignmentTargetIdentifier', name: 'x' },
+        right: { type: 'IdentifierExpression', name: 'list' } }
     );
 
-    testParse("for (var x in list) process(x);", stmt,
+    testParse('for (var x in list) process(x);', stmt,
       {
-        type: "ForInStatement",
+        type: 'ForInStatement',
         left: {
-          type: "VariableDeclaration",
-          kind: "var",
-          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+          type: 'VariableDeclaration',
+          kind: 'var',
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
         },
-        right: { type: "IdentifierExpression", name: "list" },
+        right: { type: 'IdentifierExpression', name: 'list' },
         body: {
-          type: "ExpressionStatement",
+          type: 'ExpressionStatement',
           expression: {
-            type: "CallExpression",
-            callee: { type: "IdentifierExpression", name: "process" },
-            arguments: [{ type: "IdentifierExpression", name: "x" }]
+            type: 'CallExpression',
+            callee: { type: 'IdentifierExpression', name: 'process' },
+            arguments: [{ type: 'IdentifierExpression', name: 'x' }]
           }
         }
       }
     );
 
-    testParse("for (let x in list) process(x);", stmt,
+    testParse('for (let x in list) process(x);', stmt,
       {
-        type: "ForInStatement",
+        type: 'ForInStatement',
         left: {
-          type: "VariableDeclaration",
-          kind: "let",
-          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "x" }, init: null }]
+          type: 'VariableDeclaration',
+          kind: 'let',
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
         },
-        right: { type: "IdentifierExpression", name: "list" },
+        right: { type: 'IdentifierExpression', name: 'list' },
         body: {
-          type: "ExpressionStatement",
+          type: 'ExpressionStatement',
           expression: {
-            type: "CallExpression",
-            callee: { type: "IdentifierExpression", name: "process" },
-            arguments: [{ type: "IdentifierExpression", name: "x" }]
+            type: 'CallExpression',
+            callee: { type: 'IdentifierExpression', name: 'process' },
+            arguments: [{ type: 'IdentifierExpression', name: 'x' }]
           }
         }
       }
     );
 
-    testParse("for(var a in b);", stmt,
+    testParse('for(var a in b);', stmt,
       {
-        type: "ForInStatement",
+        type: 'ForInStatement',
         left: {
-          type: "VariableDeclaration",
-          kind: "var",
-          declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+          type: 'VariableDeclaration',
+          kind: 'var',
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
         },
-        right: { type: "IdentifierExpression", name: "b" },
-        body: { type: "EmptyStatement" }
+        right: { type: 'IdentifierExpression', name: 'b' },
+        body: { type: 'EmptyStatement' }
       }
     );
 
-    testParse("for(a in b);", stmt,
-      { type: "ForInStatement",
-        body: { type: "EmptyStatement" },
-        left: { type: "AssignmentTargetIdentifier", name: "a" },
-        right: { type: "IdentifierExpression", name: "b" } }
+    testParse('for(a in b);', stmt,
+      { type: 'ForInStatement',
+        body: { type: 'EmptyStatement' },
+        left: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        right: { type: 'IdentifierExpression', name: 'b' } }
     );
 
-    testParse("for(a in b);", stmt,
+    testParse('for(a in b);', stmt,
       {
-        type: "ForInStatement",
-        left: { type: "AssignmentTargetIdentifier", name: "a" },
-        right: { type: "IdentifierExpression", name: "b" },
-        body: { type: "EmptyStatement" }
+        type: 'ForInStatement',
+        left: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        right: { type: 'IdentifierExpression', name: 'b' },
+        body: { type: 'EmptyStatement' }
       }
     );
 
-    testParse("for(a.b in c);", stmt,
+    testParse('for(a.b in c);', stmt,
       {
-        type: "ForInStatement",
-        left: { type: "StaticMemberAssignmentTarget", object: { type: "IdentifierExpression", name: "a" }, property: "b" },
-        right: { type: "IdentifierExpression", name: "c" },
-        body: { type: "EmptyStatement" }
+        type: 'ForInStatement',
+        left: { type: 'StaticMemberAssignmentTarget',
+          object: { type: 'IdentifierExpression', name: 'a' }, property: 'b' },
+        right: { type: 'IdentifierExpression', name: 'c' },
+        body: { type: 'EmptyStatement' }
       }
     );
 
-    testParse("for(let of in of);", stmt, {
-      type: "ForInStatement",
+    testParse('for(let of in of);', stmt, {
+      type: 'ForInStatement',
       left: {
-        type: "VariableDeclaration",
-        kind: "let",
-        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "of" }, init: null }]
+        type: 'VariableDeclaration',
+        kind: 'let',
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'of' }, init: null }]
       },
-      right: { type: "IdentifierExpression", name: "of" },
-      body: { type: "EmptyStatement" }
+      right: { type: 'IdentifierExpression', name: 'of' },
+      body: { type: 'EmptyStatement' }
     });
 
-    testParse("for(const a in b);", stmt, {
-      type: "ForInStatement",
+    testParse('for(const a in b);', stmt, {
+      type: 'ForInStatement',
       left: {
-        type: "VariableDeclaration",
-        kind: "const",
-        declarators: [{ type: "VariableDeclarator", binding: { type: "BindingIdentifier", name: "a" }, init: null }]
+        type: 'VariableDeclaration',
+        kind: 'const',
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
       },
-      right: { type: "IdentifierExpression", name: "b" },
-      body: { type: "EmptyStatement" }
+      right: { type: 'IdentifierExpression', name: 'b' },
+      body: { type: 'EmptyStatement' }
     });
 
-    testParse("for({a=0} in b);", stmt, {
-      type: "ForInStatement",
+    testParse('for({a=0} in b);', stmt, {
+      type: 'ForInStatement',
       left: {
-        type: "ObjectAssignmentTarget",
+        type: 'ObjectAssignmentTarget',
         properties: [{
-          type: "AssignmentTargetPropertyIdentifier",
-          binding: { type: "AssignmentTargetIdentifier", name: "a" },
-          init: { type: "LiteralNumericExpression", value: 0 } }]
+          type: 'AssignmentTargetPropertyIdentifier',
+          binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+          init: { type: 'LiteralNumericExpression', value: 0 } }]
       },
-      right: { type: "IdentifierExpression", name: "b" },
-      body: { type: "EmptyStatement" }
+      right: { type: 'IdentifierExpression', name: 'b' },
+      body: { type: 'EmptyStatement' }
     });
 
-    testParse("for([{a=0}] in b);", stmt, {
-      type: "ForInStatement",
+    testParse('for([{a=0}] in b);', stmt, {
+      type: 'ForInStatement',
       left: {
-        type: "ArrayAssignmentTarget",
+        type: 'ArrayAssignmentTarget',
         rest: null,
         elements: [{
-          type: "ObjectAssignmentTarget",
+          type: 'ObjectAssignmentTarget',
           properties: [{
-            type: "AssignmentTargetPropertyIdentifier",
-            binding: { type: "AssignmentTargetIdentifier", name: "a" },
-            init: { type: "LiteralNumericExpression", value: 0 } }]
-        }]},
-      right: { type: "IdentifierExpression", name: "b" },
-      body: { type: "EmptyStatement" }
+            type: 'AssignmentTargetPropertyIdentifier',
+            binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+            init: { type: 'LiteralNumericExpression', value: 0 } }]
+        }] },
+      right: { type: 'IdentifierExpression', name: 'b' },
+      body: { type: 'EmptyStatement' }
     });
 
-    testParse("for(let [a=b in c] in null);", stmt, {
-      type: "ForInStatement",
+    testParse('for(let [a=b in c] in null);', stmt, {
+      type: 'ForInStatement',
       left: {
-        type: "VariableDeclaration",
-        kind: "let",
-        declarators: [{ type: "VariableDeclarator", binding: {
-          type: "ArrayBinding",
+        type: 'VariableDeclaration',
+        kind: 'let',
+        declarators: [{ type: 'VariableDeclarator', binding: {
+          type: 'ArrayBinding',
           elements: [{
-            type: "BindingWithDefault",
-            binding: { type: "BindingIdentifier", name: "a" },
+            type: 'BindingWithDefault',
+            binding: { type: 'BindingIdentifier', name: 'a' },
             init: {
-              type: "BinaryExpression",
-              left: { type: "IdentifierExpression", name: "b" },
-              operator: "in",
-              right: { type: "IdentifierExpression", name: "c" }
+              type: 'BinaryExpression',
+              left: { type: 'IdentifierExpression', name: 'b' },
+              operator: 'in',
+              right: { type: 'IdentifierExpression', name: 'c' }
             }
           }],
           rest: null
         }, init: null }]
       },
-      right: { type: "LiteralNullExpression" },
-      body: { type: "EmptyStatement" }
+      right: { type: 'LiteralNullExpression' },
+      body: { type: 'EmptyStatement' }
     });
 
-    testParseFailure("for(let a = 0 in b);", "Invalid variable declaration in for-in statement");
-    testParseFailure("for(const a = 0 in b);", "Invalid variable declaration in for-in statement");
-    testParseFailure("for(let ? b : c in 0);", "Invalid left-hand side in for-in");
-    
-    testParseFailure("for(({a}) in 0);", "Invalid left-hand side in for-in");
-    testParseFailure("for(([a]) in 0);", "Invalid left-hand side in for-in");
+    testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('for(let ? b : c in 0);', 'Invalid left-hand side in for-in');
+
+    testParseFailure('for(({a}) in 0);', 'Invalid left-hand side in for-in');
+    testParseFailure('for(([a]) in 0);', 'Invalid left-hand side in for-in');
   });
 });

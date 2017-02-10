@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import {} from "es6-map/implement";
-import MultiMap from "multimap";
+import {} from 'es6-map/implement';
+import MultiMap from 'multimap';
 
 // FIXME: remove this when collections/multi-map is working
-MultiMap.prototype.addEach = function(otherMap) {
+MultiMap.prototype.addEach = function (otherMap) {
   otherMap.forEachEntry((v, k) => {
     this.set.apply(this, [k].concat(v));
   });
@@ -236,7 +236,7 @@ export class EarlyErrorState {
   }
 
   enforceDuplicateLexicallyDeclaredNames(createError) {
-    this.lexicallyDeclaredNames.forEachEntry((nodes/*, bindingName*/) => {
+    this.lexicallyDeclaredNames.forEachEntry((nodes/* , bindingName*/) => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
           this.addError(createError(dupeNode));
@@ -258,7 +258,7 @@ export class EarlyErrorState {
   }
 
   observeFunctionDeclaration() {
-    this.observeVarBoundary()
+    this.observeVarBoundary();
     this.functionDeclarationNames.addEach(this.boundNames);
     this.boundNames = new MultiMap;
     return this;
@@ -377,9 +377,9 @@ export class EarlyErrorState {
 
 identity = new EarlyErrorState;
 Object.getOwnPropertyNames(EarlyErrorState.prototype).forEach(methodName => {
-  if (methodName === "constructor") return;
+  if (methodName === 'constructor') return;
   Object.defineProperty(identity, methodName, {
-    value: function() {
+    value: function () {
       return EarlyErrorState.prototype[methodName].apply(new EarlyErrorState, arguments);
     },
     enumerable: false,

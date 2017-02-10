@@ -14,67 +14,67 @@
  * limitations under the License.
  */
 
-var stmt = require("../helpers").stmt;
-var testParse = require("../assertions").testParse;
+let stmt = require('../helpers').stmt;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("do while statement", function () {
+suite('Parser', function () {
+  suite('do while statement', function () {
 
-    testParse("do keep(); while (true);", stmt,
-      { type: "DoWhileStatement",
+    testParse('do keep(); while (true);', stmt,
+      { type: 'DoWhileStatement',
         body:
-          { type: "ExpressionStatement",
-            expression:
-              { type: "CallExpression",
-                callee: { type: "IdentifierExpression", name: "keep" },
-                arguments: [] } },
-        test: { type: "LiteralBooleanExpression", value: true } }
+        { type: 'ExpressionStatement',
+          expression:
+          { type: 'CallExpression',
+            callee: { type: 'IdentifierExpression', name: 'keep' },
+            arguments: [] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
     );
 
-    testParse("do continue; while(1);", stmt,
-      { type: "DoWhileStatement",
-        body: { type: "ContinueStatement", label: null },
-        test: { type: "LiteralNumericExpression", value: 1 } }
+    testParse('do continue; while(1);', stmt,
+      { type: 'DoWhileStatement',
+        body: { type: 'ContinueStatement', label: null },
+        test: { type: 'LiteralNumericExpression', value: 1 } }
     );
 
-    testParse("do ; while (true)", stmt,
-      { type: "DoWhileStatement",
-        body: { type: "EmptyStatement" },
-        test: { type: "LiteralBooleanExpression", value: true } }
+    testParse('do ; while (true)', stmt,
+      { type: 'DoWhileStatement',
+        body: { type: 'EmptyStatement' },
+        test: { type: 'LiteralBooleanExpression', value: true } }
     );
 
-    testParse("do {} while (true)", stmt,
-      { type: "DoWhileStatement",
+    testParse('do {} while (true)', stmt,
+      { type: 'DoWhileStatement',
         body:
-          { type: "BlockStatement",
-            block: { type: "Block", statements: [] } },
-            test: { type: "LiteralBooleanExpression", value: true } }
+        { type: 'BlockStatement',
+          block: { type: 'Block', statements: [] } },
+        test: { type: 'LiteralBooleanExpression', value: true } }
     );
 
-    testParse("{do ; while(false); false}", stmt,
+    testParse('{do ; while(false); false}', stmt,
       {
-        type: "BlockStatement",
+        type: 'BlockStatement',
         block: {
-          type: "Block",
+          type: 'Block',
           statements: [{
-            type: "DoWhileStatement",
-            body: { type: "EmptyStatement" },
-            test: { type: "LiteralBooleanExpression", value: false }
-          }, { type: "ExpressionStatement", expression: { type: "LiteralBooleanExpression", value: false } }]
+            type: 'DoWhileStatement',
+            body: { type: 'EmptyStatement' },
+            test: { type: 'LiteralBooleanExpression', value: false }
+          }, { type: 'ExpressionStatement', expression: { type: 'LiteralBooleanExpression', value: false } }]
         }
       }
     );
 
-    testParse("{do ; while(false) false}", stmt,
+    testParse('{do ; while(false) false}', stmt,
       {
-        type: "BlockStatement",
+        type: 'BlockStatement',
         block: {
-          type: "Block",
+          type: 'Block',
           statements: [{
-            type: "DoWhileStatement",
-            body: { type: "EmptyStatement" },
-            test: { type: "LiteralBooleanExpression", value: false }
-          }, { type: "ExpressionStatement", expression: { type: "LiteralBooleanExpression", value: false } }]
+            type: 'DoWhileStatement',
+            body: { type: 'EmptyStatement' },
+            test: { type: 'LiteralBooleanExpression', value: false }
+          }, { type: 'ExpressionStatement', expression: { type: 'LiteralBooleanExpression', value: false } }]
         }
       }
     );

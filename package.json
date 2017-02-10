@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test --compilers js:babel-core/register",
+    "lint": "eslint src test",
     "build": "babel --source-maps-inline --out-dir dist src",
     "prepublish": "rm -rf dist/* && npm update && npm run build",
     "benchmark": "node benchmark",

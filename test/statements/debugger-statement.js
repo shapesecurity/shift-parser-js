@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-var stmt = require("../helpers").stmt;
-var testParse = require("../assertions").testParse;
+let stmt = require('../helpers').stmt;
+let testParse = require('../assertions').testParse;
 
-suite("Parser", function () {
-  suite("debugger statement", function () {
+suite('Parser', function () {
+  suite('debugger statement', function () {
 
-    testParse("debugger", stmt, { type: "DebuggerStatement" });
-    testParse("debugger;", stmt, { type: "DebuggerStatement" });
+    testParse('debugger', stmt, { type: 'DebuggerStatement' });
+    testParse('debugger;', stmt, { type: 'DebuggerStatement' });
 
   });
 });

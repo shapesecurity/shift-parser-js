@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {keyword, code} from "esutils";
+import { keyword, code } from 'esutils';
 
 const { isReservedWordES6, isRestrictedWord } = keyword;
 const { isIdentifierStartES6, isIdentifierPartES6, isWhiteSpace, isLineTerminator, isDecimalDigit } = code;
@@ -34,13 +34,13 @@ export function isStrictModeReservedWord(id) {
 }
 
 export function getHexValue(rune) {
-  if ("0" <= rune && rune <= "9") {
+  if (rune >= '0' && rune <= '9') {
     return rune.charCodeAt(0) - 48;
   }
-  if ("a" <= rune && rune <= "f") {
+  if (rune >= 'a' && rune <= 'f') {
     return rune.charCodeAt(0) - 87;
   }
-  if ("A" <= rune && rune <= "F") {
+  if (rune >= 'A' && rune <= 'F') {
     return rune.charCodeAt(0) - 55;
   }
   return -1;

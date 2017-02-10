@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-var expect = require("expect.js");
-var ShiftParser = require("../../");
+let expect = require('expect.js');
+let ShiftParser = require('../../');
 
-suite("API", function () {
-  test("should exist", function () {
-    expect(ShiftParser.default).to.be.a("function");
-    expect(ShiftParser.default("")).to.be.an("object");
+suite('API', function () {
+  test('should exist', function () {
+    expect(ShiftParser.default).to.be.a('function');
+    expect(ShiftParser.default('')).to.be.an('object');
   });
 
-  test("early error checker exists", function () {
+  test('early error checker exists', function () {
     expect(ShiftParser.EarlyErrorChecker).to.be.ok();
-    expect(ShiftParser.EarlyErrorChecker.check).to.be.a("function");
+    expect(ShiftParser.EarlyErrorChecker.check).to.be.a('function');
   });
 
-  function withLoc(x, loc) {
-    x.loc = loc;
-    return x;
-  }
+  // function withLoc(x, loc) {
+  //   x.loc = loc;
+  //   return x;
+  // }
 
   function span(si, sl, sc, ei, el, ec) {
     return {
@@ -40,15 +40,15 @@ suite("API", function () {
     };
   }
 
-  test("script for location information", function () {
-    var rv = ShiftParser.parseScriptWithLocation("0", { earlyErrors: true });
+  test('script for location information', function () {
+    let rv = ShiftParser.parseScriptWithLocation('0', { earlyErrors: true });
     expect(rv.tree).to.eql(
       {
-        type: "Script",
+        type: 'Script',
         directives: [],
         statements: [{
-          type: "ExpressionStatement",
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          type: 'ExpressionStatement',
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }]
       }
     );
@@ -58,15 +58,15 @@ suite("API", function () {
     expect(rv.locations.get(rv.tree.statements[0].expression)).to.eql(span(0, 1, 0, 1, 1, 1));
   });
 
-  test("module for location information", function () {
-    var rv = ShiftParser.parseModuleWithLocation("0", { earlyErrors: true });
+  test('module for location information', function () {
+    let rv = ShiftParser.parseModuleWithLocation('0', { earlyErrors: true });
     expect(rv.tree).to.eql(
       {
-        type: "Module",
+        type: 'Module',
         directives: [],
         items: [{
-          type: "ExpressionStatement",
-          expression: { type: "LiteralNumericExpression", value: 0 }
+          type: 'ExpressionStatement',
+          expression: { type: 'LiteralNumericExpression', value: 0 }
         }]
       }
     );
@@ -77,27 +77,27 @@ suite("API", function () {
   });
 
   function parseModule(name) {
-    var source = require("fs").readFileSync(require.resolve(name), "utf-8");
-    var tree = ShiftParser.parseModuleWithLocation(source, {earlyErrors: true}).tree;
+    let source = require('fs').readFileSync(require.resolve(name), 'utf-8');
+    ShiftParser.parseModuleWithLocation(source, { earlyErrors: true }).tree;
   }
 
   function parseScript(name) {
-    var source = require("fs").readFileSync(require.resolve(name), "utf-8");
-    var tree = ShiftParser.parseScriptWithLocation(source, {earlyErrors: true}).tree;
+    let source = require('fs').readFileSync(require.resolve(name), 'utf-8');
+    ShiftParser.parseScriptWithLocation(source, { earlyErrors: true }).tree;
   }
 
-  test("location sanity test", function () {
-    parseModule("everything.js/es2015-module");
-    parseScript("everything.js/es2015-script");
+  test('location sanity test', function () {
+    parseModule('everything.js/es2015-module');
+    parseScript('everything.js/es2015-script');
   });
 
-  test("self parsing", function () {
+  test('self parsing', function () {
     parseScript(__filename);
-    parseModule("../../src/utils");
-    parseModule("../../src/errors");
-    parseModule("../../src/parser");
-    parseModule("../../src/tokenizer");
-    parseModule("../../src/index");
+    parseModule('../../src/utils');
+    parseModule('../../src/errors');
+    parseModule('../../src/parser');
+    parseModule('../../src/tokenizer');
+    parseModule('../../src/index');
   });
 
 });

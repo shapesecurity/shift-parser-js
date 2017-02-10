@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
+let testParse = require('../assertions').testParse;
 
 function id(x) {
   return x;
 }
 
-suite("Parser", function () {
-  suite("Comments", function () {
-    testParse(" /**/", id, { type: "Script", directives: [], statements: [] });
-    testParse(" /****/", id, { type: "Script", directives: [], statements: [] });
-    testParse(" /**\n\r\r\n**/", id, {
-      type: "Script", directives: [], statements: [] }
+suite('Parser', function () {
+  suite('Comments', function () {
+    testParse(' /**/', id, { type: 'Script', directives: [], statements: [] });
+    testParse(' /****/', id, { type: 'Script', directives: [], statements: [] });
+    testParse(' /**\n\r\r\n**/', id, {
+      type: 'Script', directives: [], statements: [] }
     );
-    testParse(" //\n", id, { type: "Script", directives: [], statements: [] });
-    testParse("<!-- foo", id, { type: "Script", directives: [], statements: [] });
-    testParse("--> comment", id, { type: "Script", directives: [], statements: [] });
-    testParse("<!-- comment", id, { type: "Script", directives: [], statements: [] });
-    testParse(" \t --> comment", id, {
-      type: "Script",
+    testParse(' //\n', id, { type: 'Script', directives: [], statements: [] });
+    testParse('<!-- foo', id, { type: 'Script', directives: [], statements: [] });
+    testParse('--> comment', id, { type: 'Script', directives: [], statements: [] });
+    testParse('<!-- comment', id, { type: 'Script', directives: [], statements: [] });
+    testParse(' \t --> comment', id, {
+      type: 'Script',
       directives: [], statements: [] }
     );
-    testParse(" \t /* block comment */  --> comment", id, {
-      type: "Script",
+    testParse(' \t /* block comment */  --> comment', id, {
+      type: 'Script',
       directives: [], statements: [] }
     );
-    testParse("/* block comment */--> comment", id, {
-      type: "Script",
+    testParse('/* block comment */--> comment', id, {
+      type: 'Script',
       directives: [], statements: [] }
     );
   });

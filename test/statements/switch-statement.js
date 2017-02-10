@@ -14,62 +14,62 @@
  * limitations under the License.
  */
 
-var testParse = require("../assertions").testParse;
-var stmt = require("../helpers").stmt;
+let testParse = require('../assertions').testParse;
+let stmt = require('../helpers').stmt;
 
-suite("Parser", function () {
-  suite("switch statement", function () {
+suite('Parser', function () {
+  suite('switch statement', function () {
 
-    testParse("switch (x) {}", stmt,
-      { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", name: "x" },
+    testParse('switch (x) {}', stmt,
+      { type: 'SwitchStatement',
+        discriminant: { type: 'IdentifierExpression', name: 'x' },
         cases: [] }
     );
 
-    testParse("switch(a){case 1:}", stmt,
-      { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", name: "a" },
+    testParse('switch(a){case 1:}', stmt,
+      { type: 'SwitchStatement',
+        discriminant: { type: 'IdentifierExpression', name: 'a' },
         cases:
-          [ { type: "SwitchCase",
-              test: { type: "LiteralNumericExpression", value: 1 },
-              consequent: [] } ] }
+        [{ type: 'SwitchCase',
+          test: { type: 'LiteralNumericExpression', value: 1 },
+          consequent: [] }] }
     );
 
-    testParse("switch (answer) { case 0: hi(); break; }", stmt,
-      { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", name: "answer" },
+    testParse('switch (answer) { case 0: hi(); break; }', stmt,
+      { type: 'SwitchStatement',
+        discriminant: { type: 'IdentifierExpression', name: 'answer' },
         cases:
-          [ { type: "SwitchCase",
-              test: { type: "LiteralNumericExpression", value: 0 },
-              consequent:
-                [ { type: "ExpressionStatement",
-                    expression:
-                      { type: "CallExpression",
-                        callee: { type: "IdentifierExpression", name: "hi" },
-                        arguments: [] } },
-                  { type: "BreakStatement", label: null } ] } ] }
+        [{ type: 'SwitchCase',
+          test: { type: 'LiteralNumericExpression', value: 0 },
+          consequent:
+          [{ type: 'ExpressionStatement',
+            expression:
+            { type: 'CallExpression',
+              callee: { type: 'IdentifierExpression', name: 'hi' },
+              arguments: [] } },
+                  { type: 'BreakStatement', label: null }] }] }
     );
 
-    testParse("switch (answer) { case 0: let a; }", stmt,
-      { type: "SwitchStatement",
-        discriminant: { type: "IdentifierExpression", name: "answer" },
+    testParse('switch (answer) { case 0: let a; }', stmt,
+      { type: 'SwitchStatement',
+        discriminant: { type: 'IdentifierExpression', name: 'answer' },
         cases:
-          [ { type: "SwitchCase",
-              test: { type: "LiteralNumericExpression", value: 0 },
-              consequent:
-                [ { type: "VariableDeclarationStatement",
-                    declaration:
-                    { type: "VariableDeclaration",
-                      kind: "let",
-                      declarators: [
-                        { type: "VariableDeclarator",
-                          binding:
-                          { type: "BindingIdentifier", name: "a" },
-                          init: null
-                        } ]
-                    }
-                } ]
-          } ]
-      } );
+        [{ type: 'SwitchCase',
+          test: { type: 'LiteralNumericExpression', value: 0 },
+          consequent:
+          [{ type: 'VariableDeclarationStatement',
+            declaration:
+            { type: 'VariableDeclaration',
+              kind: 'let',
+              declarators: [
+                { type: 'VariableDeclarator',
+                  binding:
+                          { type: 'BindingIdentifier', name: 'a' },
+                  init: null
+                }]
+            }
+          }]
+        }]
+      });
   });
 });

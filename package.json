@@ -13,12 +13,14 @@
     "dist"
   ],
   "scripts": {
-    "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test --compilers js:babel-core/register",
+    "test": "chmod u=rx test/run-mocha-tests.sh && ./test/run-mocha-tests.sh",
     "build": "babel --source-maps-inline --out-dir dist src",
     "prepublish": "rm -rf dist/* && npm update && npm run build",
     "benchmark": "node benchmark",
     "profile": "node --prof profile.js && node-tick-processor",
-    "cjsify": "npm run build && cjsify dist/index.js --no-node --export Shift --output dist/shift.js"
+    "cjsify": "npm run build && cjsify dist/index.js --no-node --export Shift --output dist/shift.js",
+    "instrument": "istanbul instrument --output istanbul test",
+    "report": "istanbul report text"
   },
   "dependencies": {
     "es6-map": "^0.1.1",
@@ -38,6 +40,7 @@
     "esprima": "2.5.0",
     "everything.js": "1.0.3",
     "expect.js": "0.3.1",
+    "istanbul": "0.4.5",
     "microtime": "^2.0.0",
     "mocha": "2.3.4",
     "shift-spec": "^2016.0.0",

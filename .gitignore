@@ -1,6 +1,6 @@
 .idea
 *.iml
 node_modules/
-coverage/
+istanbul/
 dist/
 shift-parser.js

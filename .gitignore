@@ -4,3 +4,4 @@ node_modules/
 coverage/
 dist/
 shift-parser.js
+.nyc_output/

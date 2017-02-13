@@ -13,7 +13,9 @@
     "dist"
   ],
   "scripts": {
+    "clean": "rm -rf dist coverage .nyc_output",
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test --compilers js:babel-core/register",
+    "coverage": "nyc --check-coverage --branches 83 --functions 88 --lines 95 --statements 92 npm test",
     "lint": "eslint src test",
     "build": "babel --source-maps-inline --out-dir dist src",
     "prepublish": "rm -rf dist/* && npm update && npm run build",
@@ -41,6 +43,7 @@
     "expect.js": "0.3.1",
     "microtime": "^2.0.0",
     "mocha": "2.3.4",
+    "nyc": "10.1.2",
     "shift-spec": "^2016.0.0",
     "test262-parser-tests": "0.0.1",
     "tick": "0.1.1",

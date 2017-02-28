@@ -103,6 +103,9 @@ suite('test262', () => {
       // https://github.com/shapesecurity/shift-parser-js/issues/307
       '594.script.js', '596.script.js', '597.script.js', '598.script.js',
 
+      // https://github.com/tc39/test262-parser-tests/issues/6
+      '135.script.js',
+
       // causes Syntax Errors in the test script
       '599.script.js', '600.script.js', '601.script.js', '602.script.js'
     ];

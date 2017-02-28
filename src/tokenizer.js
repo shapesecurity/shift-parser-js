@@ -87,6 +87,7 @@ export const TokenType = {
   NOT: { klass: TokenClass.Punctuator, name: '!' },
   BIT_NOT: { klass: TokenClass.Punctuator, name: '~' },
   AWAIT: { klass: TokenClass.Keyword, name: 'await' },
+  ENUM: { klass: TokenClass.Keyword, name: 'enum' },
   DELETE: { klass: TokenClass.Keyword, name: 'delete' },
   TYPEOF: { klass: TokenClass.Keyword, name: 'typeof' },
   VOID: { klass: TokenClass.Keyword, name: 'void' },
@@ -372,6 +373,8 @@ export default class Tokenizer {
           case 'e':
             if (Tokenizer.cse3(id, 'l', 's', 'e')) {
               return TokenType.ELSE;
+            } else if (Tokenizer.cse3(id, 'n', 'u', 'm')) {
+              return TokenType.ENUM;
             }
             break;
           case 'c':

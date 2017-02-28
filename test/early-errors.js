@@ -870,9 +870,9 @@ suite('Parser', function () {
 
     // Annex B 3.4
     // The above rules are only applied when parsing code that is not strict mode code
-    testEarlyError('\'use strict\'; if (0) function f(){}', ErrorMessages.ILLEGALA_FUNC_DECL_IF);
-    testEarlyError('\'use strict\'; if (0) function f(){} else;', ErrorMessages.ILLEGALA_FUNC_DECL_IF);
-    testEarlyError('\'use strict\'; if (0); else function f(){}', ErrorMessages.ILLEGALA_FUNC_DECL_IF);
+    testEarlyError('\'use strict\'; if (0) function f(){}', ErrorMessages.ILLEGAL_FUNC_DECL_IF);
+    testEarlyError('\'use strict\'; if (0) function f(){} else;', ErrorMessages.ILLEGAL_FUNC_DECL_IF);
+    testEarlyError('\'use strict\'; if (0); else function f(){}', ErrorMessages.ILLEGAL_FUNC_DECL_IF);
 
     // Annex B 3.5 (13.14.1)
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs

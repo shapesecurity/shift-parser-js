@@ -126,6 +126,18 @@ export class GenericParser extends Tokenizer {
     return this.lookahead.type === subType;
   }
 
+  matchIdentifier() {
+    switch (this.lookahead.type) {
+      case TokenType.IDENTIFIER:
+      case TokenType.LET:
+      case TokenType.YIELD:
+        return true;
+      case TokenType.ESCAPED_KEYWORD:
+        return this.lookahead.value === 'let' || this.lookahead.value === 'yield';
+    }
+    return false;
+  }
+
   eat(tokenType) {
     if (this.lookahead.type === tokenType) {
       return this.lex();
@@ -263,7 +275,7 @@ export class GenericParser extends Tokenizer {
 
   parseImportSpecifier() {
     let startState = this.startNode(), name;
-    if (this.match(TokenType.IDENTIFIER) || this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
+    if (this.matchIdentifier()) {
       name = this.parseIdentifier();
       if (!this.eatContextualKeyword('as')) {
         return this.finishNode(new AST.ImportSpecifier({
@@ -307,21 +319,18 @@ export class GenericParser extends Tokenizer {
   parseImportDeclaration() {
     let startState = this.startNode(), defaultBinding = null, moduleSpecifier;
     this.expect(TokenType.IMPORT);
-    switch (this.lookahead.type) {
-      case TokenType.STRING:
-        moduleSpecifier = this.lex().str;
+    if (this.match(TokenType.STRING)) {
+      moduleSpecifier = this.lex().str;
+      this.consumeSemicolon();
+      return this.finishNode(new AST.Import({ defaultBinding: null, namedImports: [], moduleSpecifier }), startState);
+    }
+    if (this.matchIdentifier()) {
+      defaultBinding = this.parseBindingIdentifier();
+      if (!this.eat(TokenType.COMMA)) {
+        let decl = new AST.Import({ defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() });
         this.consumeSemicolon();
-        return this.finishNode(new AST.Import({ defaultBinding: null, namedImports: [], moduleSpecifier }), startState);
-      case TokenType.IDENTIFIER:
-      case TokenType.YIELD:
-      case TokenType.LET:
-        defaultBinding = this.parseBindingIdentifier();
-        if (!this.eat(TokenType.COMMA)) {
-          let decl = new AST.Import({ defaultBinding, namedImports: [], moduleSpecifier: this.parseFromClause() });
-          this.consumeSemicolon();
-          return this.finishNode(decl, startState);
-        }
-        break;
+        return this.finishNode(decl, startState);
+      }
     }
     if (this.match(TokenType.MUL)) {
       let decl = new AST.ImportNamespace({
@@ -447,9 +456,7 @@ export class GenericParser extends Tokenizer {
       let lexerState = this.saveLexerState();
       this.lex();
       if (
-        this.match(TokenType.IDENTIFIER) ||
-        this.match(TokenType.YIELD) ||
-        this.match(TokenType.LET) ||
+        this.matchIdentifier() ||
         this.match(TokenType.LBRACE) ||
         this.match(TokenType.LBRACK)
       ) {
@@ -571,7 +578,7 @@ export class GenericParser extends Tokenizer {
     }
 
     let label = null;
-    if (this.match(TokenType.IDENTIFIER) || this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
+    if (this.matchIdentifier()) {
       label = this.parseIdentifier();
     }
 
@@ -589,7 +596,7 @@ export class GenericParser extends Tokenizer {
     }
 
     let label = null;
-    if (this.match(TokenType.IDENTIFIER) || this.match(TokenType.YIELD) || this.match(TokenType.LET)) {
+    if (this.matchIdentifier()) {
       label = this.parseIdentifier();
     }
 
@@ -1188,6 +1195,9 @@ export class GenericParser extends Tokenizer {
   }
 
   lookaheadAssignmentExpression() {
+    if (this.matchIdentifier()) {
+      return true;
+    }
     switch (this.lookahead.type) {
       case TokenType.ADD:
       case TokenType.ASSIGN_DIV:
@@ -1198,9 +1208,7 @@ export class GenericParser extends Tokenizer {
       case TokenType.DIV:
       case TokenType.FALSE:
       case TokenType.FUNCTION:
-      case TokenType.IDENTIFIER:
       case TokenType.INC:
-      case TokenType.LET:
       case TokenType.LBRACE:
       case TokenType.LBRACK:
       case TokenType.LPAREN:
@@ -1215,7 +1223,6 @@ export class GenericParser extends Tokenizer {
       case TokenType.TRUE:
       case TokenType.TYPEOF:
       case TokenType.VOID:
-      case TokenType.YIELD:
       case TokenType.TEMPLATE:
         return true;
     }
@@ -1600,11 +1607,10 @@ export class GenericParser extends Tokenizer {
 
     let startState = this.startNode();
 
+    if (this.matchIdentifier()) {
+      return this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);
+    }
     switch (this.lookahead.type) {
-      case TokenType.IDENTIFIER:
-      case TokenType.YIELD:
-      case TokenType.LET:
-        return this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);
       case TokenType.STRING:
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.parseStringLiteral();
@@ -1697,8 +1703,10 @@ export class GenericParser extends Tokenizer {
   }
 
   parseIdentifier() {
-    let type = this.lookahead.type;
-    if (type === TokenType.IDENTIFIER || type === TokenType.YIELD && !this.allowYieldExpression || type === TokenType.LET) {
+    if (this.lookahead.value === 'yield' && this.allowYieldExpression) {
+      throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    }
+    if (this.matchIdentifier()) {
       return this.lex().value;
     }
     throw this.createUnexpected(this.lookahead);
@@ -1958,10 +1966,10 @@ export class GenericParser extends Tokenizer {
             init,
           }), startState);
         } else if (!this.match(TokenType.COLON)) {
-          if (token.type !== TokenType.IDENTIFIER && token.type !== TokenType.YIELD && token.type !== TokenType.LET) {
-            throw this.createUnexpected(token);
+          if (token.type === TokenType.IDENTIFIER || token.value === 'let' || token.value === 'yield') {
+            return this.finishNode(new AST.ShorthandProperty({ name: new AST.IdentifierExpression({ name: methodOrKey.value }) }), startState);
           }
-          return this.finishNode(new AST.ShorthandProperty({ name: new AST.IdentifierExpression({ name: methodOrKey.value }) }), startState);
+          throw this.createUnexpected(token);
         }
     }
 
@@ -2219,9 +2227,10 @@ export class GenericParser extends Tokenizer {
 
   parseBindingProperty() {
     let startState = this.startNode();
+    let isIdentifier = this.matchIdentifier();
     let token = this.lookahead;
     let { name, binding } = this.parsePropertyName();
-    if ((token.type === TokenType.IDENTIFIER || token.type === TokenType.LET || token.type === TokenType.YIELD) && name.type === 'StaticPropertyName') {
+    if (isIdentifier && name.type === 'StaticPropertyName') {
       if (!this.match(TokenType.COLON)) {
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {
@@ -2229,8 +2238,8 @@ export class GenericParser extends Tokenizer {
           let expr = this.parseAssignmentExpression();
           defaultValue = expr;
           this.allowYieldExpression = previousAllowYieldExpression;
-        } else if (token.type === TokenType.YIELD && this.allowYieldExpression) {
-          throw this.createUnexpected(token);
+        } else if (token.value === 'yield' && this.allowYieldExpression) {
+          throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
         }
         return this.finishNode(new AST.BindingPropertyIdentifier({
           binding,
@@ -2262,15 +2271,18 @@ export class GenericParser extends Tokenizer {
   }
 
   parseBindingTarget() {
+    if (this.matchIdentifier()) {
+      return this.parseBindingIdentifier();
+    }
     switch (this.lookahead.type) {
-      case TokenType.IDENTIFIER:
-      case TokenType.LET:
-      case TokenType.YIELD:
-        return this.parseBindingIdentifier();
       case TokenType.LBRACK:
         return this.parseArrayBinding();
       case TokenType.LBRACE:
         return this.parseObjectBinding();
+      case TokenType.ESCAPED_KEYWORD:
+        if (this.lookahead.value === 'let' || this.lookahead.value === 'yield') {
+          return this.parseBindingIdentifier();
+        }
     }
     throw this.createUnexpected(this.lookahead);
   }

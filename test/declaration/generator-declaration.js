@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
+let ErrorMessages = require('../../dist/errors.js').ErrorMessages;
 
 function id(x) {
   return x;
@@ -134,18 +135,18 @@ suite('Parser', function () {
     );
 
     testParseFailure('label: function* a(){}', 'Unexpected token "*"');
-    testParseFailure('function*g(yield){}', 'Unexpected token "yield"');
-    testParseFailure('function*g({yield}){}', 'Unexpected token "yield"');
-    testParseFailure('function*g([yield]){}', 'Unexpected token "yield"');
-    testParseFailure('function*g({a: yield}){}', 'Unexpected token "yield"');
-    testParseFailure('function*g(yield = 0){}', 'Unexpected token "yield"');
-    testParseFailure('function*g(){ var yield; }', 'Unexpected token "yield"');
-    testParseFailure('function*g(){ var yield = 1; }', 'Unexpected token "yield"');
-    testParseFailure('function*g(){ function yield(){}; }', 'Unexpected token "yield"');
+    testParseFailure('function*g(yield){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g({yield}){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g([yield]){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g({a: yield}){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g(yield = 0){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g(){ var yield; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g(){ var yield = 1; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g(){ function yield(){}; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
 
-    testParseFailure('function*g() { var yield; }', 'Unexpected token "yield"');
-    testParseFailure('function*g() { let yield; }', 'Unexpected token "yield"');
-    testParseFailure('function*g() { try {} catch (yield) {} }', 'Unexpected token "yield"');
+    testParseFailure('function*g() { var yield; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { let yield; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { try {} catch (yield) {} }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
 
   });
 });

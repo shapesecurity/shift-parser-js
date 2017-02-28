@@ -127,6 +127,7 @@ export const TokenType = {
   IDENTIFIER: { klass: TokenClass.Ident, name: '' },
   CONST: { klass: TokenClass.Keyword, name: 'const' },
   TEMPLATE: { klass: TokenClass.TemplateElement, name: '' },
+  ESCAPED_KEYWORD: { klass: TokenClass.Keyword, name: '' },
   ILLEGAL: { klass: TokenClass.Illegal, name: '' },
 };
 
@@ -244,6 +245,9 @@ export default class Tokenizer {
       case TokenClass.Ident:
         return this.createError(ErrorMessages.UNEXPECTED_IDENTIFIER);
       case TokenClass.Keyword:
+        if (token.type === TokenType.ESCAPED_KEYWORD) {
+          return this.createError(ErrorMessages.UNEXPECTED_ESCAPED_KEYWORD);
+        }
         return this.createError(ErrorMessages.UNEXPECTED_TOKEN, token.slice.text);
       case TokenClass.NumericLiteral:
         return this.createError(ErrorMessages.UNEXPECTED_NUMBER);
@@ -791,12 +795,15 @@ export default class Tokenizer {
     // Backslash (U+005C) starts an escaped character.
     let id = this.source.charAt(this.index) === '\\' ? this.getEscapedIdentifier() : this.getIdentifier();
 
-    // There is no keyword or literal with only one character.
-    // Thus, it must be an identifier.
     let slice = this.getSlice(start, startLocation);
     slice.text = id;
+    let hasEscape = this.index - start !== id.length;
 
-    return { type: this.getKeyword(id), value: id, slice: slice };
+    let type = this.getKeyword(id);
+    if (hasEscape && type !== TokenType.IDENTIFIER) {
+      type = TokenType.ESCAPED_KEYWORD;
+    }
+    return { type, value: id, slice };
   }
 
   getLocation() {

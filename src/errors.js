@@ -21,6 +21,7 @@ export const ErrorMessages = {
   UNEXPECTED_ILLEGAL_TOKEN(id) {
     return `Unexpected ${JSON.stringify(id)}`;
   },
+  UNEXPECTED_ESCAPED_KEYWORD: 'Unexpected escaped keyword',
   UNEXPECTED_NUMBER: 'Unexpected number',
   UNEXPECTED_STRING: 'Unexpected string',
   UNEXPECTED_IDENTIFIER: 'Unexpected identifier',
@@ -91,6 +92,7 @@ export const ErrorMessages = {
   ILLEGAL_YIELD_EXPRESSIONS(paramType) {
     return `${paramType} parameters must not contain yield expressions`;
   },
+  ILLEGAL_YIELD_IDENTIFIER: '"yield" may not be used as an identifier in this context',
   DUPLICATE_CONSTRUCTOR: 'Duplicate constructor method in class',
   ILLEGAL_CONSTRUCTORS: 'Constructors cannot be generators, getters or setters',
   ILLEGAL_STATIC_CLASS_NAME: 'Static class methods cannot be named "prototype"',
@@ -103,6 +105,6 @@ export const ErrorMessages = {
   },
   DUPLICATE_PROPTO_PROP: 'Duplicate __proto__ property in object literal not allowed',
   ILLEGAL_LABEL_FUNC_DECLARATION: 'Labeled FunctionDeclarations are disallowed in strict mode',
-  ILLEGALA_FUNC_DECL_IF: 'FunctionDeclarations in IfStatements are disallowed in strict mode',
+  ILLEGAL_FUNC_DECL_IF: 'FunctionDeclarations in IfStatements are disallowed in strict mode',
   ILLEGAL_USE_STRICT: 'Functions with non-simple parameter lists may not contain a "use strict" directive'
 };

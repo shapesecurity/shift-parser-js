@@ -191,6 +191,15 @@ suite('Parser', function () {
     testEarlyError('\'use strict\'; +public;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('public'));
     testEarlyError('\'use strict\'; +static;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('static'));
     testEarlyError('\'use strict\'; +yield;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('yield'));
+    testEarlyError('\'use strict\'; implements:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('implements'));
+    testEarlyError('\'use strict\'; interface:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('interface'));
+    testEarlyError('\'use strict\'; let:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('let'));
+    testEarlyError('\'use strict\'; package:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('package'));
+    testEarlyError('\'use strict\'; private:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('private'));
+    testEarlyError('\'use strict\'; protected:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('protected'));
+    testEarlyError('\'use strict\'; public:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('public'));
+    testEarlyError('\'use strict\'; static:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('static'));
+    testEarlyError('\'use strict\'; yield:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('yield'));
     testEarlyError('function a(yield){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
     testEarlyError('function a(){ \'use strict\'; function a(a=yield){}}',
       ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('yield'));

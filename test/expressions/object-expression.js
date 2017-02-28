@@ -85,6 +85,16 @@ suite('Parser', function () {
         }]
       }
     );
+    testParse('({ enum: 0 })', expr,
+      {
+        type: 'ObjectExpression',
+        properties: [{
+          type: 'DataProperty',
+          name: { type: 'StaticPropertyName', value: 'enum' },
+          expression: { type: 'LiteralNumericExpression', value: 0 }
+        }]
+      }
+    );
     testParse('({ "answer": 0 })', expr,
       {
         type: 'ObjectExpression',

@@ -492,7 +492,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceLabeledStatement(node) {
     let s = super.reduceLabeledStatement(...arguments);
-    if (node.label === 'yield') {
+    if (node.label === 'yield' || isStrictModeReservedWord(node.label)) {
       s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(node.label)} must not be in label position in strict mode`));
     }
     if (s.usedLabelNames.indexOf(node.label) >= 0) {

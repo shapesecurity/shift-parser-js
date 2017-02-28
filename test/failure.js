@@ -189,7 +189,7 @@ suite('Parser', function () {
     testParseFailure('do { x } *', 'Unexpected token "*"');
     testParseFailure('var', 'Unexpected end of input');
     testParseFailure('const', 'Unexpected token "const"');
-    testParseFailure('a enum', 'Unexpected identifier');
+    testParseFailure('a b', 'Unexpected identifier');
     testParseFailure('{ ;  ;  ', 'Unexpected end of input');
     testParseFailure('({get +:3})', 'Unexpected token "+"');
     testParseFailure('({get +:3})', 'Unexpected token "+"');
@@ -211,5 +211,6 @@ suite('Parser', function () {
     testParseFailure('"use strict"; function f(){01;}', 'Unexpected legacy octal integer literal');
     testParseFailure('/./a', 'Invalid regular expression flag \'a\'');
     testParseFailure('/./ii', 'Duplicate regular expression flag \'i\'');
+    testParseFailure('enum : 0', 'Unexpected token "enum"');
   });
 });

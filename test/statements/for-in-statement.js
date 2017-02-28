@@ -194,5 +194,8 @@ suite('Parser', function () {
 
     testParseFailure('for(({a}) in 0);', 'Invalid left-hand side in for-in');
     testParseFailure('for(([a]) in 0);', 'Invalid left-hand side in for-in');
+
+    testParseFailure('for(var a in b, c);', 'Unexpected token ","');
+    testParseFailure('for(a in b, c);', 'Unexpected token ","');
   });
 });

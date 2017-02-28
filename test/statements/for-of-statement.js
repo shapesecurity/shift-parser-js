@@ -155,5 +155,8 @@ suite('Parser', function () {
 
     testParseFailure('for(({a}) of 0);', 'Invalid left-hand side in for-of');
     testParseFailure('for(([a]) of 0);', 'Invalid left-hand side in for-of');
+
+    testParseFailure('for(var a of b, c);', 'Unexpected token ","');
+    testParseFailure('for(a of b, c);', 'Unexpected token ","');
   });
 });

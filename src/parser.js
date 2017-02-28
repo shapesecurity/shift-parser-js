@@ -2279,10 +2279,6 @@ export class GenericParser extends Tokenizer {
         return this.parseArrayBinding();
       case TokenType.LBRACE:
         return this.parseObjectBinding();
-      case TokenType.ESCAPED_KEYWORD:
-        if (this.lookahead.value === 'let' || this.lookahead.value === 'yield') {
-          return this.parseBindingIdentifier();
-        }
     }
     throw this.createUnexpected(this.lookahead);
   }

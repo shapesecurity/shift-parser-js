@@ -1958,6 +1958,9 @@ export class GenericParser extends Tokenizer {
         return methodOrKey;
       case 'identifier':
         if (this.eat(TokenType.ASSIGN)) {
+          if (this.allowYieldExpression && token.value === 'yield') {
+            throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+          }
           // CoverInitializedName
           let init = this.isolateCoverGrammar(this.parseAssignmentExpression);
           this.firstExprError = this.createErrorWithLocation(startLocation, ErrorMessages.ILLEGAL_PROPERTY);
@@ -1966,6 +1969,9 @@ export class GenericParser extends Tokenizer {
             init,
           }), startState);
         } else if (!this.match(TokenType.COLON)) {
+          if (this.allowYieldExpression && token.value === 'yield') {
+            throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+          }
           if (token.type === TokenType.IDENTIFIER || token.value === 'let' || token.value === 'yield') {
             return this.finishNode(new AST.ShorthandProperty({ name: new AST.IdentifierExpression({ name: methodOrKey.value }) }), startState);
           }
@@ -2232,14 +2238,15 @@ export class GenericParser extends Tokenizer {
     let { name, binding } = this.parsePropertyName();
     if (isIdentifier && name.type === 'StaticPropertyName') {
       if (!this.match(TokenType.COLON)) {
+        if (this.allowYieldExpression && token.value === 'yield') {
+          throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+        }
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {
           let previousAllowYieldExpression = this.allowYieldExpression;
           let expr = this.parseAssignmentExpression();
           defaultValue = expr;
           this.allowYieldExpression = previousAllowYieldExpression;
-        } else if (token.value === 'yield' && this.allowYieldExpression) {
-          throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
         }
         return this.finishNode(new AST.BindingPropertyIdentifier({
           binding,

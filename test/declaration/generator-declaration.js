@@ -89,6 +89,22 @@ suite('Parser', function () {
         expression: { type: 'LiteralNumericExpression', value: 0 }
       });
 
+    testParse('function* a(){({yield:a}=0)}', function (p) {
+      return stmt(p).body.statements[0].expression;
+    },
+      {
+        type: 'AssignmentExpression',
+        binding: {
+          type: 'ObjectAssignmentTarget',
+          properties: [{
+            type: 'AssignmentTargetPropertyProperty',
+            name: { type: 'StaticPropertyName', value: 'yield' },
+            binding: { type: 'AssignmentTargetIdentifier', name: 'a' }
+          }]
+        },
+        expression: { type: 'LiteralNumericExpression', value: 0 }
+      });
+
     testParse('function* a() {} function a() {}', id,
       {
         type: 'Script',
@@ -147,6 +163,13 @@ suite('Parser', function () {
     testParseFailure('function*g() { var yield; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { let yield; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { try {} catch (yield) {} }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
-
+    testParseFailure('function*g() { ({yield}); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { ({yield} = 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { var {yield} = 0; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { for ({yield} in 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { ({yield = 0}); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { ({yield = 0} = 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { var {yield = 0} = 0; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { for ({yield = 0} in 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
   });
 });

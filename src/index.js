@@ -18,19 +18,6 @@ import { GenericParser } from './parser';
 import { JsError } from './tokenizer';
 import { EarlyErrorChecker } from './early-errors';
 
-function markLocation(node, location) {
-  node.loc = {
-    start: location,
-    end: {
-      line: this.lastLine + 1,
-      column: this.lastIndex - this.lastLineStart,
-      offset: this.lastIndex,
-    },
-    source: null,
-  };
-  return node;
-}
-
 class ParserWithLocation extends GenericParser {
   constructor(source) {
     super(source);

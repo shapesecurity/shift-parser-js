@@ -1117,9 +1117,10 @@ export class GenericParser extends Tokenizer {
         return new AST.BindingPropertyProperty({ name: node.name, binding: this.targetToBinding(node.binding) });
       case 'AssignmentTargetWithDefault':
         return new AST.BindingWithDefault({ binding: this.targetToBinding(node.binding), init: node.init });
-      default:
-        throw new Error('Not reached');
     }
+
+    // istanbul ignore next
+    throw new Error('Not reached');
   }
 
   transformDestructuring(node) {
@@ -1157,8 +1158,6 @@ export class GenericParser extends Tokenizer {
         break;
       case 'IdentifierExpression':
         return this.copyNode(node, new AST.AssignmentTargetIdentifier({ name: node.name }));
-      case 'AssignmentExpression':
-        throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 
       case 'StaticPropertyName':
         return this.copyNode(node, new AST.AssignmentTargetIdentifier({ name: node.value }));
@@ -1893,17 +1892,12 @@ export class GenericParser extends Tokenizer {
     this.expect(TokenType.RBRACK);
 
     if (rest) {
-      if (!this.isAssignmentTarget) {
-        throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
-      }
+      // No need to check isAssignmentTarget: the only way to have something we know is a rest element is if we have ...Object/ArrayAssignmentTarget, which implies we have a firstExprError; as such, if isAssignmentTarget were false, we'd've thrown above before setting rest.
       return this.finishNode(new AST.ArrayAssignmentTarget({
         elements: exprs.map(e => e && this.transformDestructuringWithDefault(e)),
         rest,
       }), startState);
     } else if (this.firstExprError) {
-      if (!this.isAssignmentTarget) {
-        throw this.firstExprError;
-      }
       let last = exprs[exprs.length - 1];
       if (last != null && last.type === 'SpreadElement') {
         return this.finishNode(new AST.ArrayAssignmentTarget({

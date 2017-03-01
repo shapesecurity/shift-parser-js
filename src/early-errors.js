@@ -18,22 +18,9 @@ import reduce, { MonoidalReducer } from 'shift-reducer';
 import { isRestrictedWord, isStrictModeReservedWord } from './utils';
 
 import { EarlyErrorState, EarlyError } from './early-error-state';
-import { PatternAcceptor } from './pattern-acceptor';
 
 function isStrictFunctionBody({ directives }) {
   return directives.some(directive => directive.rawValue === 'use strict');
-}
-
-function containsDuplicates(list) {
-  let uniqs = [];
-  for (let i = 0, l = list.length; i < l; ++i) {
-    let item = list[i];
-    if (uniqs.indexOf(item) >= 0) {
-      return true;
-    }
-    uniqs.push(item);
-  }
-  return false;
 }
 
 function isLabelledFunction(node) {
@@ -122,9 +109,6 @@ export class EarlyErrorChecker extends MonoidalReducer {
         body = body.enforceStrictErrors();
       }
     }
-    body.yieldExpressions.forEach(function (node) {
-      body = body.addError(new EarlyError(node, 'Concise arrow bodies must not contain yield expressions'));
-    });
     params.yieldExpressions.forEach(function (node) {
       params = params.addError(new EarlyError(node, 'Arrow parameters must not contain yield expressions'));
     });

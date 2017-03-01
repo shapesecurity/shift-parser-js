@@ -100,7 +100,7 @@ suite('test262', () => {
       // https://github.com/shapesecurity/shift-parser-js/issues/323
       '589.script.js', '590.script.js', '591.script.js', '592.script.js', '593.script.js',
 
-      // https://github.com/shapesecurity/shift-parser-js/issues/307
+      // https://github.com/tc39/test262-parser-tests/issues/7
       '594.script.js', '596.script.js', '597.script.js', '598.script.js',
 
       // https://github.com/tc39/test262-parser-tests/issues/6

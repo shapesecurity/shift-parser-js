@@ -103,5 +103,6 @@ export const ErrorMessages = {
   DUPLICATE_PROPTO_PROP: 'Duplicate __proto__ property in object literal not allowed',
   ILLEGAL_LABEL_FUNC_DECLARATION: 'Labeled FunctionDeclarations are disallowed in strict mode',
   ILLEGAL_FUNC_DECL_IF: 'FunctionDeclarations in IfStatements are disallowed in strict mode',
-  ILLEGAL_USE_STRICT: 'Functions with non-simple parameter lists may not contain a "use strict" directive'
+  ILLEGAL_USE_STRICT: 'Functions with non-simple parameter lists may not contain a "use strict" directive',
+  ILLEGAL_EXPORTED_NAME: 'Exported variables from the current module must be identifiers',
 };

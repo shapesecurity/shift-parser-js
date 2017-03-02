@@ -18,7 +18,6 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
-let testLocationSanity = require('../helpers').testLocationSanity;
 
 suite('Parser', function () {
   suite('class expression', function () {
@@ -322,18 +321,5 @@ suite('Parser', function () {
     testParseFailure('(class extends !a {})', 'Unexpected token "!"');
     testParseFailure('(class [a] {})', 'Unexpected token "["');
     testParseFailure('(class {[a,b](){}})', 'Unexpected token ","');
-
-    testLocationSanity('(class {})');
-    testLocationSanity('(class A {})');
-    testLocationSanity('(class A extends A{})');
-    testLocationSanity('(class extends A{})');
-    testLocationSanity('(class {a(){}})');
-    testLocationSanity('(class {[a](){}})');
-    testLocationSanity('(class {[a+b](){}})');
-    testLocationSanity('(class {get [a+b](){}})');
-    testLocationSanity('(class {set [a+b]([a]){}})');
-    testLocationSanity('(class {[a](){};})');
-    testLocationSanity('(class {[a](){};;})');
-    testLocationSanity('(class {static [a](){};;})');
   });
 });

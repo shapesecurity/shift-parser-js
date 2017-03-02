@@ -358,5 +358,6 @@ suite('Parser', function () {
     testParseModuleFailure('export function () {}', 'Unexpected token "("');
     testParseModuleFailure('export default default', 'Unexpected token "default"');
     testParseModuleFailure('export default function', 'Unexpected end of input');
+    testParseModuleFailure('export {with as a}', 'Exported variables from the current module must be identifiers');
   });
 });

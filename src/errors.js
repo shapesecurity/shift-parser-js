@@ -104,5 +104,5 @@ export const ErrorMessages = {
   ILLEGAL_LABEL_FUNC_DECLARATION: 'Labeled FunctionDeclarations are disallowed in strict mode',
   ILLEGAL_FUNC_DECL_IF: 'FunctionDeclarations in IfStatements are disallowed in strict mode',
   ILLEGAL_USE_STRICT: 'Functions with non-simple parameter lists may not contain a "use strict" directive',
-  ILLEGAL_EXPORTED_NAME: 'Exported variables from the current module must be identifiers',
+  ILLEGAL_EXPORTED_NAME: 'Names of variables used in an export specifier from the current module must be identifiers',
 };

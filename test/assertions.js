@@ -1,7 +1,7 @@
 let expect = require('expect.js');
 let parse = require('../').parseScriptWithLocation;
 let parseModule = require('../').parseModuleWithLocation;
-// let locationSanityCheck = require('./helpers').locationSanityCheck;
+let locationSanityCheck = require('./helpers').locationSanityCheck;
 let schemaCheck = require('./helpers').schemaCheck;
 let SHIFT_SPEC = require('shift-spec').default;
 let Parser = require('../dist/parser').GenericParser;
@@ -11,9 +11,9 @@ exports.testParse = function testParse(program, accessor, expected) {
   let args = arguments.length;
   test(program, function () {
     expect(args).to.be(testParse.length);
-    let tree = parse(program).tree;
+    let {tree, locations} = parse(program)
     schemaCheck(tree, SHIFT_SPEC.Script);
-//    locationSanityCheck(tree);
+    locationSanityCheck(tree, locations);
     expect(accessor(parse(program, { earlyErrors: false }).tree)).to.eql(expected);
   });
 };
@@ -22,9 +22,9 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
   let args = arguments.length;
   test(program, function () {
     expect(args).to.be(testParseModule.length);
-    let tree = parseModule(program).tree;
+    let {tree, locations} = parseModule(program)
     schemaCheck(tree, SHIFT_SPEC.Module);
-//    locationSanityCheck(tree);
+    locationSanityCheck(tree, locations);
     expect(accessor(parseModule(program, { earlyErrors: false }).tree)).to.eql(expected);
   });
 };

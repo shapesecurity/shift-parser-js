@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Shape Security, Inc.
+ * Copyright 2017 Shape Security, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 let expect = require('expect.js');
 let SHIFT_SPEC = require('shift-spec').default;
+let reduce = require('shift-reducer').default;
 
 function stmt(program) {
   return program.statements[0];
@@ -109,97 +110,71 @@ function schemaCheck(node, spec) {
   });
 }
 
-// let LT = -1, EQ = 0, GT = 1;
-
-// function sourceLocationCompare(loc1, loc2) {
-//   if (loc1.offset < loc2.offset) {
-//     if (loc1.line < loc2.line || loc1.line === loc2.line && loc1.column < loc2.column) {
-//       return LT;
-//     }
-//   } else if (loc1.offset === loc2.offset) {
-//     if (loc1.line === loc2.line && loc1.column === loc2.column) {
-//       return EQ;
-//     }
-//   } else if (loc1.line > loc2.line || loc1.line === loc2.line && loc1.column > loc2.column) {
-//     return GT;
-//   }
-//   expect().fail('inconsistent location information.');
-// }
-
-// function expectSourceSpanContains(parent, loc) {
-//   if (sourceLocationCompare(parent.start, loc.start) > EQ || sourceLocationCompare(parent.end, loc.end) < EQ) {
-//     expect().fail('Parent does not include child');
-//   }
-// }
-
 function moduleItem(mod) {
   return mod.items[0];
 }
 
-// function checkLocation(loc) {
-//   if (!loc) {
-//     expect().fail('Node has no location');
-//   }
-//   if (loc.start.column < 0 ||
-//     loc.start.line < 0 ||
-//     loc.start.offset < 0 ||
-//     loc.end.column < 0 ||
-//     loc.end.line < 0 ||
-//     loc.end.offset < 0) {
-//     expect().fail('Illegal location information');
-//   }
-// }
-
-function testLocationSanity() {
-  return;
+function checkSanity(range, child) {
+  if (Array.isArray(child)) {
+    let lower = range.min;
+    for (let item of child) {
+      if (child.min < lower) {
+        throw new Error('list-lower out of order');
+      }
+      lower = child.max;
+    }
+    if (lower > range.max) {
+      throw new Error('list-upper out of order');
+    }
+  } else if (child !== null) {
+    if (child.min < range.min || child.max > range.max) {
+      throw new Error('child exceeds parent');
+    }
+  }
 }
 
-// function locationSanityCheck(node, parentSpan, prevLocation) {
-//   return; // todo move to side-table style location and check this in testParse etc
-  // let loc = node.loc;
+function locationSanityCheck(tree, locations) {
+  let rangeChecker = {};
 
-  // checkLocation(node.loc);
+  for (let typeName of Object.keys(SHIFT_SPEC)) {
+    rangeChecker[`reduce${typeName}`] = function(node, children) {
+      if (!locations.has(node)) {
+        if (node.type === 'BindingIdentifier' && node.name === '*default*') {
+          // the artificial BindingIdentifier for export default unnamed function/class has no location information.
+          return null;
+        }
+        throw new Error(`${node.type} missing location information`);
+      }
+      let loc = locations.get(node);
 
-  // let compareEnds = sourceLocationCompare(node.loc.start, node.loc.end);
-  // if (compareEnds === GT) {
-  //   expect().fail('Location information indicates that the node has negative length');
-  // }
+      let ret = { min: loc.start.offset, max: loc.end.offset };
+      if (ret.min >= ret.max) {
+        if (ret.min === ret.max) {
+          // The only legitimately empty nodes are empty scripts/modules.
+          if (node.type === 'Script' && node.directives.length === 0 && node.statements.length === 0) {
+            return null;
+          }
+          if (node.type === 'Module' && node.items.length === 0 && ret.min === 0 && ret.max === 0) {
+            return null;
+          }
+        }
+        throw new Error('min >= max');
+      }
+      if (children) {
+        for (let childName of Object.keys(children)) {
+          checkSanity(ret, children[childName]);
+        }
+      }
+      return ret;
+    }
+  }
 
-  // if (prevLocation) {
-  //   if (sourceLocationCompare(prevLocation, loc.start) > EQ) {
-  //     expect().fail('Nodes overlap');
-  //   }
-  // }
-  // if (parentSpan) {
-  //   expectSourceSpanContains(parentSpan, loc);
-  // }
-  // let last = null;
-  // let spec = SHIFT_SPEC[node.type].fields;
-  // for (let i = 0; i < spec.length; i++) {
-  //   let field = spec[i];
-  //   if (node[field.name] === null) return;
-  //   // *default* BindingIdentifier nodes don't have a representation in the program text
-  //   if (node[field.name].type === 'BindingIdentifier' && node[field.name].name === '*default*') {
-  //     return;
-  //   }
-  //   if (typeof node[field.name].type === 'string') {  // subnode
-  //     locationSanityCheck(node[field.name], loc, last);
-  //     last = node[field.name].loc.end;
-  //   } else if (Array.isArray(node[field.name])) {
-  //     let childList = node[field.name];
-  //     for (let j = 0; j < childList.length; j++) {
-  //       let child = childList[j];
-  //       if (!child) return;
-  //       locationSanityCheck(child, loc, last);
-  //       last = child.loc.end;
-  //     }
-  //   }
-  // }
-// }
+  reduce(rangeChecker, tree);
+}
+
 
 exports.moduleItem = moduleItem;
 exports.expr = expr;
 exports.stmt = stmt;
-// exports.locationSanityCheck = locationSanityCheck;
-exports.testLocationSanity = testLocationSanity;
+exports.locationSanityCheck = locationSanityCheck;
 exports.schemaCheck = schemaCheck;

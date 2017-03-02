@@ -22,6 +22,7 @@ import * as AST from 'shift-ast';
 
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = 'CoverParenthesizedExpressionAndArrowParameterList';
+const EXPORT_UNKNOWN_SPECIFIER = 'ExportNameOfUnknownType';
 
 const Precedence = {
   Sequence: 0,
@@ -355,7 +356,7 @@ export class GenericParser extends Tokenizer {
 
   parseExportSpecifier() {
     let startState = this.startNode();
-    let name = this.parseIdentifierName();
+    let name = this.finishNode({ type: EXPORT_UNKNOWN_SPECIFIER, isIdentifier: this.matchIdentifier(), value: this.parseIdentifierName() }, startState);
     if (this.eatContextualKeyword('as')) {
       let exportedName = this.parseIdentifierName();
       return this.finishNode({ name, exportedName }, startState);
@@ -386,19 +387,25 @@ export class GenericParser extends Tokenizer {
         decl = new AST.ExportAllFrom({ moduleSpecifier: this.parseFromClause() });
         this.consumeSemicolon();
         break;
-      case TokenType.LBRACE:
+      case TokenType.LBRACE: {
         // export ExportClause FromClause ;
         // export ExportClause ;
         let namedExports = this.parseExportClause();
         let moduleSpecifier = null;
         if (this.matchContextualKeyword('from')) {
           moduleSpecifier = this.parseFromClause();
-          decl = new AST.ExportFrom({ namedExports: namedExports.map(e => new AST.ExportFromSpecifier(e)), moduleSpecifier });
+          decl = new AST.ExportFrom({ namedExports: namedExports.map(e => this.copyNode(e, new AST.ExportFromSpecifier({ name: e.name.value, exportedName: e.exportedName }))), moduleSpecifier });
         } else {
-          decl = new AST.ExportLocals({ namedExports: namedExports.map(({ name, exportedName }) => new AST.ExportLocalSpecifier({ name: new AST.IdentifierExpression({ name }), exportedName })) });
+          namedExports.forEach(({name}) => {
+            if (!name.isIdentifier) {
+              throw this.createError(ErrorMessages.ILLEGAL_EXPORTED_NAME);
+            }
+          });
+          decl = new AST.ExportLocals({ namedExports: namedExports.map(e => this.copyNode(e, new AST.ExportLocalSpecifier({ name: this.copyNode(e.name, new AST.IdentifierExpression({ name: e.name.value })), exportedName: e.exportedName }))) });
         }
         this.consumeSemicolon();
         break;
+      }
       case TokenType.CLASS:
         // export ClassDeclaration
         decl = new AST.Export({ declaration: this.parseClass({ isExpr: false, inDefault: false }) });
@@ -1106,17 +1113,17 @@ export class GenericParser extends Tokenizer {
 
     switch (node.type) {
       case 'AssignmentTargetIdentifier':
-        return new AST.BindingIdentifier({ name: node.name });
+        return this.copyNode(node, new AST.BindingIdentifier({ name: node.name }));
       case 'ArrayAssignmentTarget':
-        return new AST.ArrayBinding({ elements: node.elements.map(e => this.targetToBinding(e)), rest: this.targetToBinding(node.rest) });
+        return this.copyNode(node, new AST.ArrayBinding({ elements: node.elements.map(e => this.targetToBinding(e)), rest: this.targetToBinding(node.rest) }));
       case 'ObjectAssignmentTarget':
-        return new AST.ObjectBinding({ properties: node.properties.map(p => this.targetToBinding(p)) });
+        return this.copyNode(node, new AST.ObjectBinding({ properties: node.properties.map(p => this.targetToBinding(p)) }));
       case 'AssignmentTargetPropertyIdentifier':
-        return new AST.BindingPropertyIdentifier({ binding: this.targetToBinding(node.binding), init: node.init });
+        return this.copyNode(node, new AST.BindingPropertyIdentifier({ binding: this.targetToBinding(node.binding), init: node.init }));
       case 'AssignmentTargetPropertyProperty':
-        return new AST.BindingPropertyProperty({ name: node.name, binding: this.targetToBinding(node.binding) });
+        return this.copyNode(node, new AST.BindingPropertyProperty({ name: node.name, binding: this.targetToBinding(node.binding) }));
       case 'AssignmentTargetWithDefault':
-        return new AST.BindingWithDefault({ binding: this.targetToBinding(node.binding), init: node.init });
+        return this.copyNode(node, new AST.BindingWithDefault({ binding: this.targetToBinding(node.binding), init: node.init }));
     }
 
     // istanbul ignore next
@@ -1343,6 +1350,8 @@ export class GenericParser extends Tokenizer {
   }
 
   parseExponentiationExpression() {
+    let startState = this.startNode();
+
     let leftIsParenthesized = this.lookahead.type === TokenType.LPAREN;
     let left = this.parseUnaryExpression();
     if (this.lookahead.type !== TokenType.EXP) {
@@ -1356,7 +1365,7 @@ export class GenericParser extends Tokenizer {
     this.isBindingElement = this.isAssignmentTarget = false;
 
     let right = this.isolateCoverGrammar(this.parseExponentiationExpression);
-    return new AST.BinaryExpression({ left, operator: '**', right });
+    return this.finishNode(new AST.BinaryExpression({ left, operator: '**', right }), startState);
   }
 
   parseUnaryExpression() {
@@ -1967,7 +1976,7 @@ export class GenericParser extends Tokenizer {
             throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
           }
           if (token.type === TokenType.IDENTIFIER || token.value === 'let' || token.value === 'yield') {
-            return this.finishNode(new AST.ShorthandProperty({ name: new AST.IdentifierExpression({ name: methodOrKey.value }) }), startState);
+            return this.finishNode(new AST.ShorthandProperty({ name: this.finishNode(new AST.IdentifierExpression({ name: methodOrKey.value }), startState) }), startState);
           }
           throw this.createUnexpected(token);
         }

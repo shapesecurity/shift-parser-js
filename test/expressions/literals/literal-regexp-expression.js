@@ -16,6 +16,7 @@
 
 let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
+let testParseFailure = require('../../assertions').testParseFailure;
 
 suite('Parser', function () {
   suite('literal regexp expression', function () {
@@ -102,5 +103,11 @@ suite('Parser', function () {
     // NOTE: The {0,} here is not a quantifier! It is just a regular atom.
     testParse('/(?!.){0,}?/u', expr, { type: 'LiteralRegExpExpression', pattern: '(?!.){0,}?',
       global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: true });
+
+    testParseFailure('/(?:)/gg', 'Duplicate regular expression flag \'g\'');
+    testParseFailure('/(?:)/ii', 'Duplicate regular expression flag \'i\'');
+    testParseFailure('/(?:)/mm', 'Duplicate regular expression flag \'m\'');
+    testParseFailure('/(?:)/yy', 'Duplicate regular expression flag \'y\'');
+    testParseFailure('/(?:)/uu', 'Duplicate regular expression flag \'u\'');
   });
 });

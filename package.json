@@ -15,7 +15,7 @@
   "scripts": {
     "clean": "rm -rf dist coverage .nyc_output",
     "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test --compilers js:babel-core/register",
-    "coverage": "npm run build -- --plugins=istanbul && nyc --check-coverage --branches 83 --functions 87 --lines 94 --statements 92 npm test",
+    "coverage": "npm run build -- --plugins=istanbul && nyc --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 npm test",
     "lint": "eslint src test",
     "build": "babel --out-dir dist src",
     "prepublish": "rm -rf dist/* && npm update && npm run build",

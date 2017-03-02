@@ -76,9 +76,6 @@ export const ErrorMessages = {
     return `Continue statement must be nested within an iteration statement with label ${JSON.stringify(id)}`;
   },
   ILLEGAL_CONTINUE_WITHOUT_ITERATION: 'Continue statement must be nested within an iteration statement',
-  ILLEGAL_STMT_WITHOUT_ITERATION(stmt) {
-    return `${stmt} statement must be nested within an iteration statement`;
-  },
   ILLEGAL_BREAK_WITHOUT_ITERATION_OR_SWITCH:
     'Break statement must be nested within an iteration statement or a switch statement',
   ILLEGAL_WITH_STRICT_MODE: 'Strict mode code must not include a with statement',

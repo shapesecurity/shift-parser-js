@@ -280,6 +280,52 @@ suite('Parser', function () {
         expression: { type: 'LiteralNumericExpression', value: 0 }
       });
 
+      testParse('[a = 0, ...{b = 0}] = 0', expr, {
+        type: 'AssignmentExpression',
+        binding: {
+          type: 'ArrayAssignmentTarget',
+          elements: [
+            {
+              type: 'AssignmentTargetWithDefault',
+              binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+              init: { type: 'LiteralNumericExpression', value: 0 }
+            },
+          ],
+          rest: {
+            type: 'ObjectAssignmentTarget',
+            properties: [{
+              type: 'AssignmentTargetPropertyIdentifier',
+              binding: { type: 'AssignmentTargetIdentifier', name: 'b' },
+              init: { type: 'LiteralNumericExpression', value: 0 }
+            }]
+          },
+        },
+        expression: { type: 'LiteralNumericExpression', value: 0 }
+      });
+
+      testParse('[{a=0}, ...b] = 0', expr, {
+        type: 'AssignmentExpression',
+        binding: {
+          type: 'ArrayAssignmentTarget',
+          elements: [
+            {
+              type: 'ObjectAssignmentTarget',
+              properties: [{
+                type: 'AssignmentTargetPropertyIdentifier',
+                binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+                init: { type: 'LiteralNumericExpression', value: 0 }
+              }]
+            }
+          ],
+          rest: {
+            type: 'AssignmentTargetIdentifier',
+            name: 'b'
+          },
+        },
+        expression: { type: 'LiteralNumericExpression', value: 0 }
+      });
+
+
       testParseFailure('[x] += 0', 'Invalid left-hand side in assignment');
       testParseFailure('[, x, ...y,] = 0', 'Invalid left-hand side in assignment');
       testParseFailure('[...x, ...y] = 0', 'Invalid left-hand side in assignment');

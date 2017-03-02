@@ -1,12 +1,12 @@
 import fs from 'fs';
-import { parseModule } from '../../';
-import { parseScript } from '../../';
+import { parseScriptWithLocation, parseModuleWithLocation } from '../../';
+import { locationSanityCheck } from '../helpers';
 import expect from 'expect.js';
 
 let scriptDir = 'node_modules/test262-parser-tests';
 
 function parse(src, isModule, earlyErrors) {
-  (isModule ? parseModule : parseScript)(src, { earlyErrors });
+  return (isModule ? parseModuleWithLocation : parseScriptWithLocation)(src, { earlyErrors });
 }
 
 suite('test262', () => {
@@ -24,18 +24,19 @@ suite('test262', () => {
     fs.readdirSync(`${scriptDir}/pass`)
       .filter(item => passExcludes.indexOf(item) === -1)
       .forEach(f => {
-        let passTree, passExplicitTree;
+        let passTree, passLocations, passExplicitTree;
         let passTestDir = `${scriptDir}/pass/${f}`;
         let passExplicitTestDir = `${scriptDir}/pass-explicit/${f}`;
         test(`does not throw error and generates same tree[${f}]`, () => {
           let passSrc = fs.readFileSync(passTestDir, 'utf8');
           expect(function parsePass() {
-            passTree = parse(passSrc, f.match('.module.js'), true);
+            ({tree: passTree, locations: passLocations} = parse(passSrc, f.match('.module.js'), true));
           }).to.not.throwError();
+          locationSanityCheck(passTree, passLocations);
 
           let passExplicitSrc = fs.readFileSync(passExplicitTestDir, 'utf8');
           expect(function parsePassExplicit() {
-            passExplicitTree = parse(passExplicitSrc, f.match('.module.js'), true);
+            passExplicitTree = parse(passExplicitSrc, f.match('.module.js'), true).tree;
           }).to.not.throwError();
 
           expect.eql(passTree, passExplicitTree);

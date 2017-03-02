@@ -149,12 +149,14 @@ function locationSanityCheck(tree, locations) {
 
       let ret = { min: loc.start.offset, max: loc.end.offset };
       if (ret.min >= ret.max) {
-        // The only legitimately empty nodes are empty scripts/modules.
-        if (node.type === 'Script' && node.directives.length === 0 && node.statements.length === 0) {
-          return null;
-        }
-        if (node.type === 'Module' && node.items.length === 0) {
-          return null;
+        if (ret.min === ret.max) {
+          // The only legitimately empty nodes are empty scripts/modules.
+          if (node.type === 'Script' && node.directives.length === 0 && node.statements.length === 0) {
+            return null;
+          }
+          if (node.type === 'Module' && node.items.length === 0 && ret.min === 0 && ret.max === 0) {
+            return null;
+          }
         }
         throw new Error('min >= max');
       }

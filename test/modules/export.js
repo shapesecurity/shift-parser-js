@@ -41,6 +41,12 @@ suite('Parser', function () {
       moduleSpecifier: 'a'
     });
 
+    testExportDecl('export {with} from "a"', {
+      type: 'ExportFrom',
+      namedExports: [{ type: 'ExportFromSpecifier', name: 'with', exportedName: null }],
+      moduleSpecifier: 'a'
+    });
+
     testExportDecl('export {a,} from "a"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }],
@@ -60,6 +66,12 @@ suite('Parser', function () {
     testExportDecl('export {a as b} from "a"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: 'b' }],
+      moduleSpecifier: 'a'
+    });
+
+    testExportDecl('export {with as a} from "a"', {
+      type: 'ExportFrom',
+      namedExports: [{ type: 'ExportFromSpecifier', name: 'with', exportedName: 'a' }],
       moduleSpecifier: 'a'
     });
 

@@ -159,8 +159,8 @@ function locationSanityCheck(tree, locations) {
         throw new Error('min >= max');
       }
       if (children) {
-        for (let child of Object.values(children)) {
-          checkSanity(ret, child);
+        for (let childName of Object.keys(children)) {
+          checkSanity(ret, children[childName]);
         }
       }
       return ret;

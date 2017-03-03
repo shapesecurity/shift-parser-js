@@ -28,11 +28,6 @@ suite('API', function () {
     expect(ShiftParser.EarlyErrorChecker.check).to.be.a('function');
   });
 
-  // function withLoc(x, loc) {
-  //   x.loc = loc;
-  //   return x;
-  // }
-
   function span(si, sl, sc, ei, el, ec) {
     return {
       start: { line: sl, column: sc, offset: si },
@@ -78,12 +73,16 @@ suite('API', function () {
 
   function parseModule(name) {
     let source = require('fs').readFileSync(require.resolve(name), 'utf-8');
-    ShiftParser.parseModuleWithLocation(source, { earlyErrors: true }).tree;
+    let tree = ShiftParser.parseModule(source, { earlyErrors: true });
+    let tree2 = ShiftParser.parseModule(source, { earlyErrors: false });
+    expect.eql(tree, tree2);
   }
 
   function parseScript(name) {
     let source = require('fs').readFileSync(require.resolve(name), 'utf-8');
-    ShiftParser.parseScriptWithLocation(source, { earlyErrors: true }).tree;
+    let tree = ShiftParser.parseScript(source, { earlyErrors: true });
+    let tree2 = ShiftParser.parseScript(source, { earlyErrors: false });
+    expect.eql(tree, tree2);
   }
 
   test('location sanity test', function () {

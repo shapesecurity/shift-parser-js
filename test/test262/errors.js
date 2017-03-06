@@ -19,7 +19,10 @@ suite('test262', () => {
       '970.script.js',
 
       // https://github.com/shapesecurity/shift-parser-js/issues/311
-      '1012.script.js'
+      '1012.script.js',
+
+      // https://github.com/tc39/test262-parser-tests/issues/12
+      '1252.script.js',
     ];
     fs.readdirSync(`${scriptDir}/pass`)
       .filter(item => passExcludes.indexOf(item) === -1)

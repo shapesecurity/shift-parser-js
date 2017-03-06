@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Shape Security, Inc.
+ * Copyright 2017 Shape Security, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,81 @@
  * limitations under the License.
  */
 
-import { keyword, code } from 'esutils';
+import { whitespaceArray, idStartLargeRegex, idStartBool, idContinueLargeRegex, idContinueBool } from './unicode';
 
-const { isReservedWordES6, isRestrictedWord } = keyword;
-const { isIdentifierStartES6, isIdentifierPartES6, isWhiteSpace, isLineTerminator, isDecimalDigit } = code;
 
-export {
-  isRestrictedWord,
-  isIdentifierStartES6 as isIdentifierStart,
-  isIdentifierPartES6 as isIdentifierPart,
-  isWhiteSpace,
-  isLineTerminator,
-  isDecimalDigit,
-};
+const strictReservedWords = new Set([
+  'null',
+  'true',
+  'false',
 
+  'implements',
+  'interface',
+  'package',
+  'private',
+  'protected',
+  'public',
+  'static',
+  'let',
+
+  'if',
+  'in',
+  'do',
+  'var',
+  'for',
+  'new',
+  'try',
+  'this',
+  'else',
+  'case',
+  'void',
+  'with',
+  'enum',
+  'while',
+  'break',
+  'catch',
+  'throw',
+  'const',
+  'yield',
+  'class',
+  'super',
+  'return',
+  'typeof',
+  'delete',
+  'switch',
+  'export',
+  'import',
+  'default',
+  'finally',
+  'extends',
+  'function',
+  'continue',
+  'debugger',
+  'instanceof',
+]);
 
 export function isStrictModeReservedWord(id) {
-  return isReservedWordES6(id, true);
+  return strictReservedWords.has(id);
+}
+
+export function isWhiteSpace(ch) {
+  return ch === 0x20 || ch === 0x09 || ch === 0x0B || ch === 0x0C || ch === 0xA0 || ch > 0x167F && whitespaceArray.indexOf(ch) !== -1;
+}
+
+export function isLineTerminator(ch) {
+  return ch === 0x0A || ch === 0x0D || ch === 0x2028 || ch === 0x2029;
+}
+
+export function isIdentifierStart(ch) {
+  return ch < 128 ? idStartBool[ch] : idStartLargeRegex.test(String.fromCodePoint(ch));
+}
+
+export function isIdentifierPart(ch) {
+  return ch < 128 ? idContinueBool[ch] : idContinueLargeRegex.test(String.fromCodePoint(ch));
+}
+
+export function isDecimalDigit(ch) {
+  return ch >= 48 && ch <= 57;
 }
 
 export function getHexValue(rune) {

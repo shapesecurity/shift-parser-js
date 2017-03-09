@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { whitespaceArray, idStartLargeRegex, idStartBool, idContinueLargeRegex, idContinueBool } from './unicode';
+import { whitespaceArray, whitespaceBool, idStartLargeRegex, idStartBool, idContinueLargeRegex, idContinueBool } from './unicode';
 
 
 const strictReservedWords = new Set([
@@ -72,7 +72,7 @@ export function isStrictModeReservedWord(id) {
 }
 
 export function isWhiteSpace(ch) {
-  return ch === 0x20 || ch === 0x09 || ch === 0x0B || ch === 0x0C || ch === 0xA0 || ch > 0x167F && whitespaceArray.indexOf(ch) !== -1;
+  return ch < 128 ? whitespaceBool[ch] : ch === 0xA0 || ch > 0x167F && whitespaceArray.indexOf(ch) !== -1;
 }
 
 export function isLineTerminator(ch) {

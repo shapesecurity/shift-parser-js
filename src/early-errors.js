@@ -15,7 +15,7 @@
  */
 
 import reduce, { MonoidalReducer } from 'shift-reducer';
-import { isRestrictedWord, isStrictModeReservedWord } from './utils';
+import { isStrictModeReservedWord } from './utils';
 
 import { EarlyErrorState, EarlyError } from './early-error-state';
 
@@ -93,7 +93,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceAssignmentTargetIdentifier(node) {
     let s = this.identity;
-    if (isRestrictedWord(node.name) || isStrictModeReservedWord(node.name)) {
+    if (node.name === 'eval' || node.name === 'arguments' || isStrictModeReservedWord(node.name)) {
       s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(node.name)} must not be in binding position in strict mode`));
     }
     return s;
@@ -123,7 +123,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceBindingIdentifier(node) {
     let s = this.identity;
-    if (isRestrictedWord(node.name) || isStrictModeReservedWord(node.name)) {
+    if (node.name === 'eval' || node.name === 'arguments' || isStrictModeReservedWord(node.name)) {
       s = s.addStrictError(new EarlyError(node, `The identifier ${JSON.stringify(node.name)} must not be in binding position in strict mode`));
     }
     s = s.bindName(node.name, node);

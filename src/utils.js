@@ -17,7 +17,7 @@
 import { whitespaceArray, whitespaceBool, idStartLargeRegex, idStartBool, idContinueLargeRegex, idContinueBool } from './unicode';
 
 
-const strictReservedWords = new Set([
+const strictReservedWords = [
   'null',
   'true',
   'false',
@@ -65,10 +65,10 @@ const strictReservedWords = new Set([
   'continue',
   'debugger',
   'instanceof',
-]);
+];
 
 export function isStrictModeReservedWord(id) {
-  return strictReservedWords.has(id);
+  return strictReservedWords.indexOf(id) !== -1;
 }
 
 export function isWhiteSpace(ch) {

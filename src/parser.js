@@ -1041,7 +1041,17 @@ export class GenericParser extends Tokenizer {
 
     let previousYield = this.allowYieldExpression;
     this.allowYieldExpression = false;
-    let body = this.match(TokenType.LBRACE) ? this.parseFunctionBody() : this.parseAssignmentExpression();
+
+    let body;
+    if (this.match(TokenType.LBRACE)) {
+      let previousAllowIn = this.allowIn;
+      this.allowIn = true;
+      body = this.parseFunctionBody();
+      this.allowIn = previousAllowIn;
+    } else {
+      body = this.parseAssignmentExpression();
+    }
+
     this.allowYieldExpression = previousYield;
     return this.finishNode(new AST.ArrowExpression({ params: paramsNode, body }), startState);
   }

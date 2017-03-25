@@ -188,14 +188,38 @@ suite('Parser', function () {
       body: { type: 'EmptyStatement' }
     });
 
+    testParse('for(var a in b, c);', stmt, {
+      type: 'ForInStatement',
+      left: {
+        type: 'VariableDeclaration',
+        kind: 'var',
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
+      },
+      right: {
+        type: 'BinaryExpression',
+        operator: ',',
+        left: { type: 'IdentifierExpression', name: 'b' },
+        right: { type: 'IdentifierExpression', name: 'c' },
+      },
+      body: { type: 'EmptyStatement' }
+    });
+    testParse('for(a in b, c);', stmt, {
+      type: 'ForInStatement',
+      left: { type: 'AssignmentTargetIdentifier', name: 'a' },
+      right: {
+        type: 'BinaryExpression',
+        operator: ',',
+        left: { type: 'IdentifierExpression', name: 'b' },
+        right: { type: 'IdentifierExpression', name: 'c' },
+      },
+      body: { type: 'EmptyStatement' }
+    });
+
     testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('for(let ? b : c in 0);', 'Invalid left-hand side in for-in');
 
     testParseFailure('for(({a}) in 0);', 'Invalid left-hand side in for-in');
     testParseFailure('for(([a]) in 0);', 'Invalid left-hand side in for-in');
-
-    testParseFailure('for(var a in b, c);', 'Unexpected token ","');
-    testParseFailure('for(a in b, c);', 'Unexpected token ","');
   });
 });

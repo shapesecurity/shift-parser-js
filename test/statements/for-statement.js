@@ -261,6 +261,28 @@ suite('Parser', function () {
         update: null }
     );
 
+    testParse('for (() => { this in null };;);', stmt,
+      { type: 'ForStatement',
+        init: {
+          type: 'ArrowExpression',
+          params: { type: 'FormalParameters', items: [], rest: null },
+          body: { type: 'FunctionBody', directives: [], statements: [
+            { type: 'ExpressionStatement',
+              expression: {
+                type: 'BinaryExpression',
+                operator: 'in',
+                left: { type: 'ThisExpression' },
+                right: { type: 'LiteralNullExpression' }
+              }
+            }
+          ] }
+        },
+        body: { type: 'EmptyStatement' },
+        test: null,
+        update: null }
+    );
+
+
     testParseFailure('for({a=0};;);', 'Illegal property initializer');
   });
 });

@@ -663,7 +663,7 @@ export class GenericParser extends Tokenizer {
             }
             ctor = AST.ForInStatement;
             this.lex();
-            right = this.parseAssignmentExpression();
+            right = this.parseExpression();
           } else {
             if (init.declarators[0].init != null) {
               throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_OF);
@@ -703,10 +703,16 @@ export class GenericParser extends Tokenizer {
           if (startsWithLet && this.matchContextualKeyword('of')) {
             throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
           }
-          let ctor = this.match(TokenType.IN) ? AST.ForInStatement : AST.ForOfStatement;
-
-          this.lex();
-          right = this.parseAssignmentExpression();
+          let ctor;
+          if (this.match(TokenType.IN)) {
+            ctor = AST.ForInStatement;
+            this.lex();
+            right = this.parseExpression();
+          } else {
+            ctor = AST.ForOfStatement;
+            this.lex();
+            right = this.parseAssignmentExpression();
+          }
 
           return new ctor({ left: this.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() });
         } else {

@@ -62,7 +62,19 @@ suite('Parser', function () {
 
   });
 
-  testParse('[a, ...(b=c)]', expr, {
+  testParse('[a, ...b=c]', expr, {
+    type: 'ArrayExpression',
+    elements: [{ type: 'IdentifierExpression', name: 'a' }, {
+      type: 'SpreadElement',
+      expression: {
+        type: 'AssignmentExpression',
+        binding: { type: 'AssignmentTargetIdentifier', name: 'b' },
+        expression: { type: 'IdentifierExpression', name: 'c' }
+      }
+    }]
+  });
+
+  testParse('([a, ...b=c])', expr, {
     type: 'ArrayExpression',
     elements: [{ type: 'IdentifierExpression', name: 'a' }, {
       type: 'SpreadElement',

@@ -1892,6 +1892,9 @@ export class GenericParser extends Tokenizer {
             rest = expr;
             break;
           }
+          if (expr.type !== 'ArrayExpression' && expr.type !== 'ObjectExpression' && !isValidSimpleAssignmentTarget(expr)) {
+            this.isBindingElement = this.isAssignmentTarget = false;
+          }
           expr = this.finishNode(new AST.SpreadElement({ expression: expr }), elementStartState);
           if (!this.match(TokenType.RBRACK)) {
             this.isBindingElement = this.isAssignmentTarget = false;

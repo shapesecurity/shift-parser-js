@@ -29,6 +29,16 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
   });
 };
 
+exports.testParseSuccess = function testParseSuccess(program) {
+  let args = arguments.length;
+  test(program, function () {
+    expect(args).to.be(testParseSuccess.length);
+    let {tree, locations} = parse(program)
+    schemaCheck(tree, SHIFT_SPEC.Script);
+    locationSanityCheck(tree, locations);
+  });
+};
+
 exports.testParseFailure = function testParseFailure(source, message) {
   let args = arguments.length;
   test('Expect failure in Script: ' + source, function () {

@@ -16,6 +16,7 @@
 
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let testParseSuccess = require('../assertions').testParseSuccess;
 let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
 
@@ -310,6 +311,9 @@ suite('Parser', function () {
         }
       }]
     });
+
+    testParseSuccess('({ a(){ (class {[super.a](){}}); } })');
+    testParseSuccess('class A extends Object { constructor(){ (class {[super()](){}}); } }');
 
     testParseFailure('(class {a:0})', 'Only methods are allowed in classes');
     testParseFailure('(class {a=0})', 'Only methods are allowed in classes');

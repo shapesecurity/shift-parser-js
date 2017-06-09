@@ -725,6 +725,7 @@ suite('Parser', function () {
     //   3. Return HasDirectSuper of constructor.
     testEarlyError('class A { constructor() { super(); } }', ErrorMessages.INVALID_CALL_TO_SUPER);
     testEarlyError('class A { constructor() { {{ (( super() )); }} } }', ErrorMessages.INVALID_CALL_TO_SUPER);
+    testEarlyError('class A { constructor() { (class {[super()](){}}); } }', ErrorMessages.INVALID_CALL_TO_SUPER);
     // It is a Syntax Error if PrototypePropertyNameList of ClassElementList contains more than
     // one occurrence of "constructor".
     testEarlyError('class A { constructor(){} constructor(){} }', ErrorMessages.DUPLICATE_CONSTRUCTOR);
@@ -764,6 +765,8 @@ suite('Parser', function () {
     // However, such function code does not include ArrowFunction function code.
     testEarlyError('super()', ErrorMessages.INVALID_CALL_TO_SUPER);
     testEarlyError('super.a', ErrorMessages.ILLEGAL_ACCESS_SUPER_MEMBER);
+    testEarlyError('(class {[super()](){}});', ErrorMessages.INVALID_CALL_TO_SUPER);
+    testEarlyError('(class {[super.a](){}});', ErrorMessages.ILLEGAL_ACCESS_SUPER_MEMBER);
     // It is a Syntax Error if StatementList Contains NewTarget unless the source code containing
     // NewTarget is eval code that is being processed by a direct eval that is contained in function code.
     // However, such function code does not include ArrowFunction function code.

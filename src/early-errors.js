@@ -182,8 +182,6 @@ export class EarlyErrorChecker extends MonoidalReducer {
       s = this.append(s, _super);
       sElements = sElements.clearSuperCallExpressionsInConstructorMethod();
     }
-    sElements = sElements.enforceSuperCallExpressions(SUPERCALL_ERROR);
-    sElements = sElements.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
     s = this.append(s, sElements);
     s = enforceDuplicateConstructorMethods(node, s);
     s = s.observeLexicalDeclaration();
@@ -210,8 +208,6 @@ export class EarlyErrorChecker extends MonoidalReducer {
       s = this.append(s, _super);
       sElements = sElements.clearSuperCallExpressionsInConstructorMethod();
     }
-    sElements = sElements.enforceSuperCallExpressions(SUPERCALL_ERROR);
-    sElements = sElements.enforceSuperPropertyExpressions(SUPERPROPERTY_ERROR);
     s = this.append(s, sElements);
     s = enforceDuplicateConstructorMethods(node, s);
     s = s.clearBoundNames();

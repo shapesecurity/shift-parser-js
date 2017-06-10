@@ -314,6 +314,8 @@ suite('Parser', function () {
 
     testParseSuccess('({ a(){ (class {[super.a](){}}); } })');
     testParseSuccess('class A extends Object { constructor(){ (class {[super()](){}}); } }');
+    testParseSuccess('class A extends Object { constructor(a = super()){} }');
+    testParseSuccess('class A { b(c = super.d){} }');
 
     testParseFailure('(class {a:0})', 'Only methods are allowed in classes');
     testParseFailure('(class {a=0})', 'Only methods are allowed in classes');

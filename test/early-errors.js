@@ -767,6 +767,7 @@ suite('Parser', function () {
     testEarlyError('super.a', ErrorMessages.ILLEGAL_ACCESS_SUPER_MEMBER);
     testEarlyError('(class {[super()](){}});', ErrorMessages.INVALID_CALL_TO_SUPER);
     testEarlyError('(class {[super.a](){}});', ErrorMessages.ILLEGAL_ACCESS_SUPER_MEMBER);
+    testEarlyError('(class {a(b = super()){}});', ErrorMessages.INVALID_CALL_TO_SUPER);
     // It is a Syntax Error if StatementList Contains NewTarget unless the source code containing
     // NewTarget is eval code that is being processed by a direct eval that is contained in function code.
     // However, such function code does not include ArrowFunction function code.

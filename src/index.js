@@ -22,6 +22,7 @@ class ParserWithLocation extends GenericParser {
   constructor(source) {
     super(source);
     this.locations = new WeakMap;
+    this.commentSpans = [];
   }
 
   startNode() {
@@ -39,6 +40,35 @@ class ParserWithLocation extends GenericParser {
   copyNode(src, dest) {
     this.locations.set(dest, this.locations.get(src)); // todo check undefined
     return dest;
+  }
+
+  skipSingleLineComment(offset) {
+    // We're actually extending the *tokenizer*, here.
+    let start = {
+      line: this.line + 1,
+      column: this.index - this.lineStart,
+      offset: this.index,
+    };
+    super.skipSingleLineComment(offset);
+    this.commentSpans.push([start, {
+      line: this.line + 1,
+      column: this.index - this.lineStart,
+      offset: this.index,
+    }]);
+  }
+
+  skipMultiLineComment() {
+    let start = {
+      line: this.line + 1,
+      column: this.index - this.lineStart,
+      offset: this.index,
+    };
+    super.skipMultiLineComment();
+    this.commentSpans.push([start, {
+      line: this.line + 1,
+      column: this.index - this.lineStart,
+      offset: this.index,
+    }]);
   }
 }
 
@@ -71,7 +101,7 @@ function generateInterfaceWithLocation(parsingFunctionName) {
         throw new JsError(offset, line, column, message);
       }
     }
-    return { tree, locations: parser.locations };
+    return { tree, locations: parser.locations, commentSpans: parser.commentSpans };
   };
 }
 

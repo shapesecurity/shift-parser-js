@@ -1,6 +1,6 @@
 {
   "name": "shift-parser",
-  "version": "5.0.7",
+  "version": "5.1.0",
   "description": "ECMAScript parser that produces a Shift format AST",
   "author": "Shape Security",
   "homepage": "https://github.com/shapesecurity/shift-parser-js",

@@ -71,6 +71,50 @@ suite('API', function () {
     expect(rv.locations.get(rv.tree.items[0].expression)).to.eql(span(0, 1, 0, 1, 1, 1));
   });
 
+  test('script for comment locations', function () {
+    let source = `
+      // a comment
+      '//not a comment';
+      --> a comment
+      a + /* a comment */ b
+      <!-- a comment
+      \`/*not a comment*/ \${ 0/* a template comment */ } \`
+      // a comment`; // That does not have a trailing linebreak is important.
+    let rv = ShiftParser.parseScriptWithLocation(source);
+
+    const commentStrings = [];
+    for (let i = 0; i < rv.commentSpans.length; ++i) {
+      const [start, end] = rv.commentSpans[i];
+      commentStrings.push(source.substring(start.offset, end.offset));
+    }
+    expect(commentStrings).to.eql([
+      '// a comment\n',
+      '--> a comment\n',
+      '/* a comment */',
+      '<!-- a comment\n',
+      '/* a template comment */',
+      '// a comment',
+    ]);
+  });
+
+  test('module for comment locations', function () {
+    let source = `
+      // a comment
+      '// not a comment';
+      a <!-- b
+      `; // Note that '<!-- b' is *not* a comment.
+    let rv = ShiftParser.parseModuleWithLocation(source);
+
+    const commentStrings = [];
+    for (let i = 0; i < rv.commentSpans.length; ++i) {
+      const [start, end] = rv.commentSpans[i];
+      commentStrings.push(source.substring(start.offset, end.offset));
+    }
+    expect(commentStrings).to.eql([
+      '// a comment\n',
+    ]);
+  });
+
   function parseModule(name) {
     let source = require('fs').readFileSync(require.resolve(name), 'utf-8');
     let tree = ShiftParser.parseModule(source, { earlyErrors: true });

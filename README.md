@@ -47,9 +47,10 @@ Location information is available in environments which support `WeakMap` via an
 
 ```js
 let {parseScriptWithLocation, parseModuleWithLocation} = require("shift-parser");
-let {tree, locations} = parseScriptWithLocation("2 + 3");
+let {tree, locations, commentSpans} = parseScriptWithLocation("2 + 3 /* = 5 */");
 let threeNode = tree.statements[0].expression.right;
 locations.get(threeNode); // { start: { line: 1, column: 4, offset: 4 }, end: { line: 1, column: 5, offset: 5 } }
+commentSpans; // [ [ { line: 1, column: 6, offset: 6 }, { line: 1, column: 15, offset: 15 } ] ]
 ```
 
 

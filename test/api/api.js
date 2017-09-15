@@ -76,24 +76,33 @@ suite('API', function () {
       // a comment
       '//not a comment';
       --> a comment
-      a + /* a comment */ b
-      <!-- a comment
+      a + /* a comment
+      */ <!-- a comment
       \`/*not a comment*/ \${ 0/* a template comment */ } \`
-      // a comment`; // That does not have a trailing linebreak is important.
+      // a comment`; // That this does not have a trailing linebreak is important.
     let rv = ShiftParser.parseScriptWithLocation(source);
 
     const commentStrings = [];
-    for (let i = 0; i < rv.commentSpans.length; ++i) {
-      const [start, end] = rv.commentSpans[i];
+    for (let i = 0; i < rv.comments.length; ++i) {
+      const { start, end } = rv.comments[i];
       commentStrings.push(source.substring(start.offset, end.offset));
     }
     expect(commentStrings).to.eql([
       '// a comment\n',
       '--> a comment\n',
-      '/* a comment */',
+      '/* a comment\n      */',
       '<!-- a comment\n',
       '/* a template comment */',
       '// a comment',
+    ]);
+
+    expect(rv.comments.map(({ type, text }) => ({ type, text }))).to.eql([
+      { type: 'SingleLine', text: ' a comment' },
+      { type: 'HTMLClose', text: ' a comment' },
+      { type: 'MultiLine', text: ' a comment\n      ' },
+      { type: 'HTMLOpen', text: ' a comment' },
+      { type: 'MultiLine', text: ' a template comment ' },
+      { type: 'SingleLine', text: ' a comment' },
     ]);
   });
 
@@ -106,12 +115,16 @@ suite('API', function () {
     let rv = ShiftParser.parseModuleWithLocation(source);
 
     const commentStrings = [];
-    for (let i = 0; i < rv.commentSpans.length; ++i) {
-      const [start, end] = rv.commentSpans[i];
+    for (let i = 0; i < rv.comments.length; ++i) {
+      const { start, end } = rv.comments[i];
       commentStrings.push(source.substring(start.offset, end.offset));
     }
     expect(commentStrings).to.eql([
       '// a comment\n',
+    ]);
+
+    expect(rv.comments.map(({ type, text }) => ({ type, text }))).to.eql([
+      { type: 'SingleLine', text: ' a comment' },
     ]);
   });
 

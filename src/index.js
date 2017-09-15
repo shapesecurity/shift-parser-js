@@ -17,12 +17,13 @@
 import { GenericParser } from './parser';
 import { JsError } from './tokenizer';
 import { EarlyErrorChecker } from './early-errors';
+import { isLineTerminator } from './utils';
 
 class ParserWithLocation extends GenericParser {
   constructor(source) {
     super(source);
     this.locations = new WeakMap;
-    this.commentSpans = [];
+    this.comments = [];
   }
 
   startNode() {
@@ -44,31 +45,45 @@ class ParserWithLocation extends GenericParser {
 
   skipSingleLineComment(offset) {
     // We're actually extending the *tokenizer*, here.
-    let start = {
+    const start = {
       line: this.line + 1,
       column: this.index - this.lineStart,
       offset: this.index,
     };
+    const c = this.source[this.index];
+    const type = c === '/' ? 'SingleLine' : c === '<' ? 'HTMLOpen' : 'HTMLClose';
+
     super.skipSingleLineComment(offset);
-    this.commentSpans.push([start, {
+
+    const end = {
       line: this.line + 1,
       column: this.index - this.lineStart,
       offset: this.index,
-    }]);
+    };
+    const trailingLineTerminatorCharacters = this.source[this.index - 2] === '\r' ? 2 : isLineTerminator(this.source.charCodeAt(this.index - 1)) ? 1 : 0;
+    const text = this.source.substring(start.offset + offset, end.offset - trailingLineTerminatorCharacters);
+
+    this.comments.push({ text, type, start, end });
   }
 
   skipMultiLineComment() {
-    let start = {
+    const start = {
       line: this.line + 1,
       column: this.index - this.lineStart,
       offset: this.index,
     };
+    const type = 'MultiLine';
+
     super.skipMultiLineComment();
-    this.commentSpans.push([start, {
+
+    const end = {
       line: this.line + 1,
       column: this.index - this.lineStart,
       offset: this.index,
-    }]);
+    };
+    const text = this.source.substring(start.offset + 2, end.offset - 2);
+
+    this.comments.push({ text, type, start, end });
   }
 }
 
@@ -101,7 +116,7 @@ function generateInterfaceWithLocation(parsingFunctionName) {
         throw new JsError(offset, line, column, message);
       }
     }
-    return { tree, locations: parser.locations, commentSpans: parser.commentSpans };
+    return { tree, locations: parser.locations, comments: parser.comments };
   };
 }
 

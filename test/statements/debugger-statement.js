@@ -17,8 +17,8 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('debugger statement', function () {
+suite('Parser', () => {
+  suite('debugger statement', () => {
 
     testParse('debugger', stmt, { type: 'DebuggerStatement' });
     testParse('debugger;', stmt, { type: 'DebuggerStatement' });

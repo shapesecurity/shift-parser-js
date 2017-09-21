@@ -18,8 +18,8 @@ let testParseFailure = require('./assertions').testParseFailure;
 let testParseModuleFailure = require('./assertions').testParseModuleFailure;
 
 // TODO: make sense of this file
-suite('Parser', function () {
-  suite('syntax errors', function () {
+suite('Parser', () => {
+  suite('syntax errors', () => {
 
     testParseFailure('/*', 'Unexpected end of input');
     testParseFailure('/*\r', 'Unexpected end of input');

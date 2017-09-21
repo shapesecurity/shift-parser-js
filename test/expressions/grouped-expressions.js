@@ -19,8 +19,8 @@ let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('grouped expressions', function () {
+suite('Parser', () => {
+  suite('grouped expressions', () => {
     // grouped expression that can be binding element and assignment target
     testParse('(a)', expr, { type: 'IdentifierExpression', name: 'a' });
 
@@ -32,21 +32,21 @@ suite('Parser', function () {
       type: 'BinaryExpression',
       left: { type: 'LiteralNumericExpression', value: 0 },
       operator: ',',
-      right: { type: 'IdentifierExpression', name: 'a' }
+      right: { type: 'IdentifierExpression', name: 'a' },
     });
 
     testParse('(a, 0)', expr, {
       type: 'BinaryExpression',
       left: { type: 'IdentifierExpression', name: 'a' },
       operator: ',',
-      right: { type: 'LiteralNumericExpression', value: 0 }
+      right: { type: 'LiteralNumericExpression', value: 0 },
     });
 
     testParse('(a,a)', expr, {
       type: 'BinaryExpression',
       left: { type: 'IdentifierExpression', name: 'a' },
       operator: ',',
-      right: { type: 'IdentifierExpression', name: 'a' }
+      right: { type: 'IdentifierExpression', name: 'a' },
     });
 
     testParse('((a,a),(a,a))', expr, {
@@ -55,15 +55,15 @@ suite('Parser', function () {
         type: 'BinaryExpression',
         left: { type: 'IdentifierExpression', name: 'a' },
         operator: ',',
-        right: { type: 'IdentifierExpression', name: 'a' }
+        right: { type: 'IdentifierExpression', name: 'a' },
       },
       operator: ',',
       right: {
         type: 'BinaryExpression',
         left: { type: 'IdentifierExpression', name: 'a' },
         operator: ',',
-        right: { type: 'IdentifierExpression', name: 'a' }
-      }
+        right: { type: 'IdentifierExpression', name: 'a' },
+      },
     });
 
     testParse('((((((((((((((((((((((((((((((((((((((((a))))))))))))))))))))))))))))))))))))))))', expr,

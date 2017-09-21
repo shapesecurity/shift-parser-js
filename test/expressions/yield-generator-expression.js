@@ -19,23 +19,23 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('yield', function () {
+suite('Parser', () => {
+  suite('yield', () => {
     function yd(p) {
-      return stmt(p).body.statements.map(function (es) {
+      return stmt(p).body.statements.map(es => {
         return es.expression;
       });
     }
 
     testParse('function*a(){yield*a}', yd, [{
       type: 'YieldGeneratorExpression',
-      expression: { type: 'IdentifierExpression', name: 'a' }
+      expression: { type: 'IdentifierExpression', name: 'a' },
     }]);
     testParse('function a(){yield*a}', yd, [{
       type: 'BinaryExpression',
       operator: '*',
       left: { type: 'IdentifierExpression', name: 'yield' },
-      right: { type: 'IdentifierExpression', name: 'a' }
+      right: { type: 'IdentifierExpression', name: 'a' },
     }]);
 
     testParseFailure('function *a(){yield\n*a}', 'Unexpected token "*"');

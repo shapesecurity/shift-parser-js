@@ -18,9 +18,9 @@ let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('object binding', function () {
-    suite('assignment', function () {
+suite('Parser', () => {
+  suite('object binding', () => {
+    suite('assignment', () => {
       testParse('({x} = 0)', expr,
         {
           type: 'AssignmentExpression',
@@ -29,10 +29,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyIdentifier',
               binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-              init: null
-            }]
+              init: null,
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -44,10 +44,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyIdentifier',
               binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-              init: null
-            }]
+              init: null,
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -59,11 +59,11 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyIdentifier',
               binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-              init: null
+              init: null,
             }, { type: 'AssignmentTargetPropertyIdentifier',
-              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }, init: null }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }, init: null }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -75,11 +75,11 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyIdentifier',
               binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-              init: null
+              init: null,
             }, { type: 'AssignmentTargetPropertyIdentifier',
-              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }, init: null }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }, init: null }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -91,10 +91,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'ComputedPropertyName', expression: { type: 'IdentifierExpression', name: 'a' } },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'a' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 1 }
+          expression: { type: 'LiteralNumericExpression', value: 1 },
         }
       );
 
@@ -106,10 +106,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyIdentifier',
               binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 1 }
+          expression: { type: 'LiteralNumericExpression', value: 1 },
         }
       );
 
@@ -121,10 +121,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyIdentifier',
               binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 1 }
+          expression: { type: 'LiteralNumericExpression', value: 1 },
         }
       );
 
@@ -137,10 +137,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: 'x' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'y' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -152,10 +152,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: 'x' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'y' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -167,10 +167,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: 'var' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'x' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -182,10 +182,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: 'x' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'y' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -197,10 +197,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: 'x' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'y' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -212,10 +212,10 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: '0' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'y' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'y' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -227,14 +227,14 @@ suite('Parser', function () {
             properties: [{
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: '0' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'x' }
+              binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
             }, {
               type: 'AssignmentTargetPropertyProperty',
               name: { type: 'StaticPropertyName', value: '1' },
-              binding: { type: 'AssignmentTargetIdentifier', name: 'x' }
-            }]
+              binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
 
@@ -249,11 +249,11 @@ suite('Parser', function () {
               binding: {
                 type: 'AssignmentTargetWithDefault',
                 binding: { type: 'AssignmentTargetIdentifier', name: 'y' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
-              }
-            }]
+                init: { type: 'LiteralNumericExpression', value: 0 },
+              },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 1 }
+          expression: { type: 'LiteralNumericExpression', value: 1 },
         }
       );
 
@@ -271,12 +271,12 @@ suite('Parser', function () {
                 init: {
                   type: 'AssignmentExpression',
                   binding: { type: 'AssignmentTargetIdentifier', name: 'z' },
-                  expression: { type: 'LiteralNumericExpression', value: 0 }
-                }
-              }
-            }]
+                  expression: { type: 'LiteralNumericExpression', value: 0 },
+                },
+              },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 1 }
+          expression: { type: 'LiteralNumericExpression', value: 1 },
         }
       );
 
@@ -293,13 +293,13 @@ suite('Parser', function () {
                 binding: {
                   type: 'ArrayAssignmentTarget',
                   elements: [{ type: 'AssignmentTargetIdentifier', name: 'y' }],
-                  rest: null
+                  rest: null,
                 },
-                init: { type: 'LiteralNumericExpression', value: 0 }
-              }
-            }]
+                init: { type: 'LiteralNumericExpression', value: 0 },
+              },
+            }],
           },
-          expression: { type: 'LiteralNumericExpression', value: 1 }
+          expression: { type: 'LiteralNumericExpression', value: 1 },
         }
       );
 
@@ -312,11 +312,11 @@ suite('Parser', function () {
               {
                 type: 'AssignmentTargetPropertyProperty',
                 name: { type: 'StaticPropertyName', value: 'a' },
-                binding: { type: 'AssignmentTargetIdentifier', name: 'let' }
-              }
-            ]
+                binding: { type: 'AssignmentTargetIdentifier', name: 'let' },
+              },
+            ],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         });
 
       testParse('({let} = 0);', expr,
@@ -328,11 +328,11 @@ suite('Parser', function () {
               {
                 type: 'AssignmentTargetPropertyIdentifier',
                 binding: { type: 'AssignmentTargetIdentifier', name: 'let' },
-                init: null
-              }
-            ]
+                init: null,
+              },
+            ],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         });
 
       testParse('({a:yield} = 0);', expr,
@@ -344,11 +344,11 @@ suite('Parser', function () {
               {
                 type: 'AssignmentTargetPropertyProperty',
                 name: { type: 'StaticPropertyName', value: 'a' },
-                binding: { type: 'AssignmentTargetIdentifier', name: 'yield' }
-              }
-            ]
+                binding: { type: 'AssignmentTargetIdentifier', name: 'yield' },
+              },
+            ],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         });
 
       testParse('({yield} = 0);', expr,
@@ -360,11 +360,11 @@ suite('Parser', function () {
               {
                 type: 'AssignmentTargetPropertyIdentifier',
                 binding: { type: 'AssignmentTargetIdentifier', name: 'yield' },
-                init: null
-              }
-            ]
+                init: null,
+              },
+            ],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         });
 
       testParse('({yield = 0} = 0);', expr,
@@ -376,11 +376,11 @@ suite('Parser', function () {
               {
                 type: 'AssignmentTargetPropertyIdentifier',
                 binding: { type: 'AssignmentTargetIdentifier', name: 'yield' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
-              }
-            ]
+                init: { type: 'LiteralNumericExpression', value: 0 },
+              },
+            ],
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         });
 
       testParse('(function*() { [...{ x = yield }] = 0; })', expr,
@@ -404,14 +404,14 @@ suite('Parser', function () {
                     properties: [{
                       type: 'AssignmentTargetPropertyIdentifier',
                       binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-                      init: { type: 'YieldExpression', expression: null }
-                    }]
-                  }
+                      init: { type: 'YieldExpression', expression: null },
+                    }],
+                  },
                 },
-                expression: { type: 'LiteralNumericExpression', value: 0 }
-              }
-            }]
-          }
+                expression: { type: 'LiteralNumericExpression', value: 0 },
+              },
+            }],
+          },
         }
       );
 

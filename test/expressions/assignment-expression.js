@@ -18,41 +18,41 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
 
-suite('Parser', function () {
-  suite('assignment expression', function () {
+suite('Parser', () => {
+  suite('assignment expression', () => {
     testParse('a=0;', expr,
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('(a)=(0);', expr,
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x = 0', expr,
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('eval = 0', expr,
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'eval' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('arguments = 0', expr,
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'arguments' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x *= 0', expr,
@@ -60,7 +60,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '*=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x.x *= 0', expr,
@@ -69,7 +69,7 @@ suite('Parser', function () {
         operator: '*=',
         binding: { type: 'StaticMemberAssignmentTarget',
           object: { type: 'IdentifierExpression', name: 'x' }, property: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x /= 0', expr,
@@ -77,7 +77,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '/=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x %= 0', expr,
@@ -85,7 +85,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '%=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x **= 0', expr,
@@ -93,7 +93,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '**=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x += 0', expr,
@@ -101,7 +101,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '+=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x -= 0', expr,
@@ -109,7 +109,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '-=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x <<= 0', expr,
@@ -117,7 +117,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '<<=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x >>= 0', expr,
@@ -125,7 +125,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '>>=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x >>>= 0', expr,
@@ -133,7 +133,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '>>>=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x &= 0', expr,
@@ -141,7 +141,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '&=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x ^= 0', expr,
@@ -149,7 +149,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '^=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
     testParse('x |= 0', expr,
@@ -157,7 +157,7 @@ suite('Parser', function () {
         type: 'CompoundAssignmentExpression',
         operator: '|=',
         binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -167,9 +167,9 @@ suite('Parser', function () {
         binding: {
           type: 'ComputedMemberAssignmentTarget',
           object: { type: 'IdentifierExpression', name: 'eval' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -179,9 +179,9 @@ suite('Parser', function () {
         binding: {
           type: 'ComputedMemberAssignmentTarget',
           object: { type: 'IdentifierExpression', name: 'arguments' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -189,7 +189,7 @@ suite('Parser', function () {
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParse('((((((((((((((((((((((((((((((((((((((((a.a)))))))))))))))))))))))))))))))))))))))) = 0', expr,
@@ -197,7 +197,7 @@ suite('Parser', function () {
         type: 'AssignmentExpression',
         binding: { type: 'StaticMemberAssignmentTarget',
           object: { type: 'IdentifierExpression', name: 'a' }, property: 'a' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParse('[0].length = 0', expr,
@@ -208,12 +208,12 @@ suite('Parser', function () {
           object: {
             type: 'ArrayExpression',
             elements: [
-              { type: 'LiteralNumericExpression', value: 0 }
-            ]
+              { type: 'LiteralNumericExpression', value: 0 },
+            ],
           },
-          property: 'length'
+          property: 'length',
         },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParse('([0].length) = 0', expr,
@@ -224,12 +224,12 @@ suite('Parser', function () {
           object: {
             type: 'ArrayExpression',
             elements: [
-              { type: 'LiteralNumericExpression', value: 0 }
-            ]
+              { type: 'LiteralNumericExpression', value: 0 },
+            ],
           },
-          property: 'length'
+          property: 'length',
         },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParse('(a**b).c=0', expr,
@@ -241,11 +241,11 @@ suite('Parser', function () {
             type: 'BinaryExpression',
             left: { type: 'IdentifierExpression', name: 'a' },
             operator: '**',
-            right: { type: 'IdentifierExpression', name: 'b' }
+            right: { type: 'IdentifierExpression', name: 'b' },
           },
-          property: 'c'
+          property: 'c',
         },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParseFailure('(({a})=0);', 'Invalid left-hand side in assignment');

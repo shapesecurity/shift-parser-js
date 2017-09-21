@@ -17,8 +17,8 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('do while statement', function () {
+suite('Parser', () => {
+  suite('do while statement', () => {
 
     testParse('do keep(); while (true);', stmt,
       { type: 'DoWhileStatement',
@@ -59,9 +59,9 @@ suite('Parser', function () {
           statements: [{
             type: 'DoWhileStatement',
             body: { type: 'EmptyStatement' },
-            test: { type: 'LiteralBooleanExpression', value: false }
-          }, { type: 'ExpressionStatement', expression: { type: 'LiteralBooleanExpression', value: false } }]
-        }
+            test: { type: 'LiteralBooleanExpression', value: false },
+          }, { type: 'ExpressionStatement', expression: { type: 'LiteralBooleanExpression', value: false } }],
+        },
       }
     );
 
@@ -73,9 +73,9 @@ suite('Parser', function () {
           statements: [{
             type: 'DoWhileStatement',
             body: { type: 'EmptyStatement' },
-            test: { type: 'LiteralBooleanExpression', value: false }
-          }, { type: 'ExpressionStatement', expression: { type: 'LiteralBooleanExpression', value: false } }]
-        }
+            test: { type: 'LiteralBooleanExpression', value: false },
+          }, { type: 'ExpressionStatement', expression: { type: 'LiteralBooleanExpression', value: false } }],
+        },
       }
     );
   });

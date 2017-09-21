@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 
-suite('Parser', function () {
-  suite('computed member expression', function () {
+suite('Parser', () => {
+  suite('computed member expression', () => {
 
     testParse('a[b, c]', expr,
       { type: 'ComputedMemberExpression',
@@ -42,9 +42,9 @@ suite('Parser', function () {
         binding: {
           type: 'ComputedMemberAssignmentTarget',
           object: { type: 'IdentifierExpression', name: 'a' },
-          expression: { type: 'IdentifierExpression', name: 'b' }
+          expression: { type: 'IdentifierExpression', name: 'b' },
         },
-        expression: { type: 'IdentifierExpression', name: 'b' }
+        expression: { type: 'IdentifierExpression', name: 'b' },
       });
 
     testParse('(a[b]||(c[d]=e))', expr,
@@ -53,7 +53,7 @@ suite('Parser', function () {
         left: {
           type: 'ComputedMemberExpression',
           object: { type: 'IdentifierExpression', name: 'a' },
-          expression: { type: 'IdentifierExpression', name: 'b' }
+          expression: { type: 'IdentifierExpression', name: 'b' },
         },
         operator: '||',
         right: {
@@ -61,10 +61,10 @@ suite('Parser', function () {
           binding: {
             type: 'ComputedMemberAssignmentTarget',
             object: { type: 'IdentifierExpression', name: 'c' },
-            expression: { type: 'IdentifierExpression', name: 'd' }
+            expression: { type: 'IdentifierExpression', name: 'd' },
           },
-          expression: { type: 'IdentifierExpression', name: 'e' }
-        }
+          expression: { type: 'IdentifierExpression', name: 'e' },
+        },
       });
 
     testParse('a&&(b=c)&&(d=e)', expr, {
@@ -76,15 +76,15 @@ suite('Parser', function () {
         right: {
           type: 'AssignmentExpression',
           binding: { type: 'AssignmentTargetIdentifier', name: 'b' },
-          expression: { type: 'IdentifierExpression', name: 'c' }
-        }
+          expression: { type: 'IdentifierExpression', name: 'c' },
+        },
       },
       operator: '&&',
       right: {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'd' },
-        expression: { type: 'IdentifierExpression', name: 'e' }
-      }
+        expression: { type: 'IdentifierExpression', name: 'e' },
+      },
 
     });
   });

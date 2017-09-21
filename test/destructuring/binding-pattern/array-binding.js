@@ -18,9 +18,9 @@ let stmt = require('../../helpers').stmt;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('array binding', function () {
-    suite('variable declarator', function () {
+suite('Parser', () => {
+  suite('array binding', () => {
+    suite('variable declarator', () => {
       testParse('var [,a] = 0;', stmt,
         {
           type: 'VariableDeclarationStatement',
@@ -32,11 +32,11 @@ suite('Parser', function () {
               binding: {
                 type: 'ArrayBinding',
                 elements: [null, { type: 'BindingIdentifier', name: 'a' }],
-                rest: null
+                rest: null,
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -51,11 +51,11 @@ suite('Parser', function () {
               binding: {
                 type: 'ArrayBinding',
                 elements: [{ type: 'BindingIdentifier', name: 'a' }],
-                rest: null
+                rest: null,
               },
-              init: { type: 'ArrayExpression', elements: [{ type: 'LiteralNumericExpression', value: 1 }] }
-            }]
-          }
+              init: { type: 'ArrayExpression', elements: [{ type: 'LiteralNumericExpression', value: 1 }] },
+            }],
+          },
         }
       );
 
@@ -72,13 +72,13 @@ suite('Parser', function () {
                 elements: [{
                   type: 'ArrayBinding',
                   elements: [{ type: 'BindingIdentifier', name: 'a' }],
-                  rest: null
+                  rest: null,
                 }],
-                rest: null
+                rest: null,
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -91,17 +91,17 @@ suite('Parser', function () {
             declarators: [{
               type: 'VariableDeclarator',
               binding: { type: 'BindingIdentifier', name: 'a' },
-              init: null
+              init: null,
             }, {
               type: 'VariableDeclarator',
               binding: {
                 type: 'ArrayBinding',
                 elements: [{ type: 'BindingIdentifier', name: 'a' }],
-                rest: null
+                rest: null,
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -116,11 +116,11 @@ suite('Parser', function () {
               binding: {
                 type: 'ArrayBinding',
                 elements: [{ type: 'BindingIdentifier', name: 'a' }, { type: 'BindingIdentifier', name: 'a' }],
-                rest: null
+                rest: null,
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -135,11 +135,11 @@ suite('Parser', function () {
               binding: {
                 type: 'ArrayBinding',
                 elements: [{ type: 'BindingIdentifier', name: 'a' }],
-                rest: { type: 'BindingIdentifier', name: 'a' }
+                rest: { type: 'BindingIdentifier', name: 'a' },
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -147,7 +147,7 @@ suite('Parser', function () {
       testParseFailure('var ([x]) = 0', 'Unexpected token "("');
     });
 
-    suite('formal parameter', function () {
+    suite('formal parameter', () => {
       // passing cases are tested in other function test cases.
       testParseFailure('([a.b]) => 0', 'Illegal arrow function parameter list');
       testParseFailure('function a([a.b]) {}', 'Unexpected token "."');
@@ -159,7 +159,7 @@ suite('Parser', function () {
       testParseFailure('({set a([a.b]){}})', 'Unexpected token "."');
     });
 
-    suite('catch clause', function () {
+    suite('catch clause', () => {
       testParse('try {} catch ([e]) {}', stmt,
         {
           type: 'TryCatchStatement',
@@ -167,8 +167,8 @@ suite('Parser', function () {
           catchClause: {
             type: 'CatchClause',
             binding: { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'e' }], rest: null },
-            body: { type: 'Block', statements: [] }
-          }
+            body: { type: 'Block', statements: [] },
+          },
         }
       );
 
@@ -181,10 +181,10 @@ suite('Parser', function () {
             binding: {
               type: 'ArrayBinding',
               elements: [{ type: 'BindingIdentifier', name: 'e' }],
-              rest: { type: 'BindingIdentifier', name: 'a' }
+              rest: { type: 'BindingIdentifier', name: 'a' },
             },
-            body: { type: 'Block', statements: [] }
-          }
+            body: { type: 'Block', statements: [] },
+          },
         }
       );
 

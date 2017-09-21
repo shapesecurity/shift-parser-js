@@ -17,8 +17,8 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('try-finally statement', function () {
+suite('Parser', () => {
+  suite('try-finally statement', () => {
     testParse('try { } finally { cleanup(stuff) }', stmt,
       {
         type: 'TryFinallyStatement',
@@ -31,10 +31,10 @@ suite('Parser', function () {
             expression: {
               type: 'CallExpression',
               callee: { type: 'IdentifierExpression', name: 'cleanup' },
-              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }]
-            }
-          }]
-        }
+              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }],
+            },
+          }],
+        },
       }
     );
     testParse('try{}catch(a){}finally{}', stmt,
@@ -44,9 +44,9 @@ suite('Parser', function () {
         catchClause: {
           type: 'CatchClause',
           binding: { type: 'BindingIdentifier', name: 'a' },
-          body: { type: 'Block', statements: [] }
+          body: { type: 'Block', statements: [] },
         },
-        finalizer: { type: 'Block', statements: [] }
+        finalizer: { type: 'Block', statements: [] },
       }
     );
     testParse('try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }', stmt,
@@ -59,9 +59,9 @@ suite('Parser', function () {
             expression: {
               type: 'CallExpression',
               callee: { type: 'IdentifierExpression', name: 'doThat' },
-              arguments: []
-            }
-          }]
+              arguments: [],
+            },
+          }],
         },
         catchClause: {
           type: 'CatchClause',
@@ -73,10 +73,10 @@ suite('Parser', function () {
               expression: {
                 type: 'CallExpression',
                 callee: { type: 'IdentifierExpression', name: 'say' },
-                arguments: [{ type: 'IdentifierExpression', name: 'e' }]
-              }
-            }]
-          }
+                arguments: [{ type: 'IdentifierExpression', name: 'e' }],
+              },
+            }],
+          },
         },
         finalizer: {
           type: 'Block',
@@ -85,10 +85,10 @@ suite('Parser', function () {
             expression: {
               type: 'CallExpression',
               callee: { type: 'IdentifierExpression', name: 'cleanup' },
-              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }]
-            }
-          }]
-        }
+              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }],
+            },
+          }],
+        },
       }
     );
   });

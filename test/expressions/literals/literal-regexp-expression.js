@@ -18,8 +18,8 @@ let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('literal regexp expression', function () {
+suite('Parser', () => {
+  suite('literal regexp expression', () => {
     // Regular Expression Literals
     testParse('/a/', expr, { type: 'LiteralRegExpExpression', pattern: 'a',
       global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: false });
@@ -76,7 +76,7 @@ suite('Parser', function () {
       type: 'StaticMemberExpression',
       object: { type: 'LiteralRegExpExpression', pattern: '0', global: true,
         ignoreCase: false, multiLine: false, sticky: false, unicode: false },
-      property: 'test'
+      property: 'test',
     });
 
     // valid only if Annex B.1.4 is implemented

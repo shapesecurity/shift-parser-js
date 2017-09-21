@@ -17,15 +17,15 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('new expression', function () {
+suite('Parser', () => {
+  suite('new expression', () => {
 
     testParse('new a(b,c)', expr,
       { type: 'NewExpression',
         callee: { type: 'IdentifierExpression', name: 'a' },
         arguments:
         [{ type: 'IdentifierExpression', name: 'b' },
-            { type: 'IdentifierExpression', name: 'c' }] }
+          { type: 'IdentifierExpression', name: 'c' }] }
     );
 
     testParse('new Button', expr,
@@ -69,7 +69,7 @@ suite('Parser', function () {
       {
         type: 'NewExpression',
         callee: { type: 'IdentifierExpression', name: 'f' },
-        arguments: [{ type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'a' } }]
+        arguments: [{ type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'a' } }],
       }
     );
     testParse('new f(...a = b)', expr,
@@ -81,9 +81,9 @@ suite('Parser', function () {
           expression: {
             type: 'AssignmentExpression',
             binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-            expression: { type: 'IdentifierExpression', name: 'b' }
-          }
-        }]
+            expression: { type: 'IdentifierExpression', name: 'b' },
+          },
+        }],
       }
     );
     testParse('new f(...a, ...b)', expr,
@@ -92,8 +92,8 @@ suite('Parser', function () {
         callee: { type: 'IdentifierExpression', name: 'f' },
         arguments: [{
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'a' }
-        }, { type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'b' } }]
+          expression: { type: 'IdentifierExpression', name: 'a' },
+        }, { type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'b' } }],
       }
     );
     testParse('new f(a, ...b, c)', expr,
@@ -102,8 +102,8 @@ suite('Parser', function () {
         callee: { type: 'IdentifierExpression', name: 'f' },
         arguments: [{ type: 'IdentifierExpression', name: 'a' }, {
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'b' }
-        }, { type: 'IdentifierExpression', name: 'c' }]
+          expression: { type: 'IdentifierExpression', name: 'b' },
+        }, { type: 'IdentifierExpression', name: 'c' }],
       }
     );
     testParse('new f(...a, b, ...c)', expr,
@@ -112,11 +112,11 @@ suite('Parser', function () {
         callee: { type: 'IdentifierExpression', name: 'f' },
         arguments: [{
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'a' }
+          expression: { type: 'IdentifierExpression', name: 'a' },
         }, { type: 'IdentifierExpression', name: 'b' }, {
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'c' }
-        }]
+          expression: { type: 'IdentifierExpression', name: 'c' },
+        }],
       }
     );
     testParse('new(a in b)', expr,
@@ -126,9 +126,9 @@ suite('Parser', function () {
           type: 'BinaryExpression',
           left: { type: 'IdentifierExpression', name: 'a' },
           operator: 'in',
-          right: { type: 'IdentifierExpression', name: 'b' }
+          right: { type: 'IdentifierExpression', name: 'b' },
         },
-        arguments: []
+        arguments: [],
       }
     );
   });

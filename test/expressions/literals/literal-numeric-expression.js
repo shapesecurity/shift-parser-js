@@ -19,8 +19,8 @@ let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 let testParseModuleFailure = require('../../assertions').testParseModuleFailure;
 
-suite('Parser', function () {
-  suite('literal numeric expression', function () {
+suite('Parser', () => {
+  suite('literal numeric expression', () => {
 
     testParse('0', expr, { type: 'LiteralNumericExpression', value: 0 });
     testParse('0;', expr, { type: 'LiteralNumericExpression', value: 0 });

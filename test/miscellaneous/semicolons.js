@@ -26,8 +26,8 @@ let items = function (mod) {
   return mod.items;
 };
 
-suite('Parser', function () {
-  suite('semicolons after statements are consumed', function () {
+suite('Parser', () => {
+  suite('semicolons after statements are consumed', () => {
 
     testParse('0\n;', stmts,
       [{ type: 'ExpressionStatement',
@@ -146,7 +146,7 @@ suite('Parser', function () {
 
   });
 
-  suite('semicolons after imports & exports are consumed as appropriate', function () {
+  suite('semicolons after imports & exports are consumed as appropriate', () => {
 
     testParseModule('import "a"\n;', items,
       [{ type: 'Import', defaultBinding: null, namedImports: [], moduleSpecifier: 'a' }]
@@ -189,7 +189,7 @@ suite('Parser', function () {
 
   });
 
-  suite('semicolons after export declarations are not consumed', function () {
+  suite('semicolons after export declarations are not consumed', () => {
 
     testParseModule('export function f(){}\n;', items,
       [{ type: 'Export', declaration:
@@ -198,7 +198,7 @@ suite('Parser', function () {
         name: { type: 'BindingIdentifier', name: 'f' },
         params: { type: 'FormalParameters', items: [], rest: null },
         body: { type: 'FunctionBody', directives: [], statements: [] } } },
-        { type: 'EmptyStatement' }]
+      { type: 'EmptyStatement' }]
     );
 
     testParseModule('export class A {}\n;', items,
@@ -207,7 +207,7 @@ suite('Parser', function () {
         name: { type: 'BindingIdentifier', name: 'A' },
         super: null,
         elements: [] } },
-        { type: 'EmptyStatement' }]
+      { type: 'EmptyStatement' }]
     );
 
   });

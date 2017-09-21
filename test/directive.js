@@ -29,12 +29,12 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('directives', function () {
+suite('Parser', () => {
+  suite('directives', () => {
     testParse('"Hello"', directives, [{ type: 'Directive', rawValue: 'Hello' }]);
     testParse('"\\n\\r\\t\\v\\b\\f\\\\\\\'\\"\\0"', directives, [{
       type: 'Directive',
-      rawValue: '\\n\\r\\t\\v\\b\\f\\\\\\\'\\"\\0'
+      rawValue: '\\n\\r\\t\\v\\b\\f\\\\\\\'\\"\\0',
     }]);
     testParse('"\\u0061"', directives, [{ type: 'Directive', rawValue: '\\u0061' }]);
     testParse('"\\x61"', directives, [{ type: 'Directive', rawValue: '\\x61' }]);
@@ -62,9 +62,9 @@ suite('Parser', function () {
           statements: [{
             type: 'WithStatement',
             object: { type: 'IdentifierExpression', name: 'i' },
-            body: { type: 'EmptyStatement' }
-          }]
-        }
+            body: { type: 'EmptyStatement' },
+          }],
+        },
       }
     );
     testParse('(function () { \'use\\nstrict\'; with (i); })', expr,
@@ -78,9 +78,9 @@ suite('Parser', function () {
           statements: [{
             type: 'WithStatement',
             object: { type: 'IdentifierExpression', name: 'i' },
-            body: { type: 'EmptyStatement' }
-          }]
-        }
+            body: { type: 'EmptyStatement' },
+          }],
+        },
       }
     );
 
@@ -92,8 +92,8 @@ suite('Parser', function () {
         body: {
           type: 'FunctionBody',
           directives: [{ type: 'Directive', rawValue: 'use strict' }],
-          statements: [{ type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }]
-        }
+          statements: [{ type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }],
+        },
       }
     );
     testParse('(function() {\'use strict\';return 0;});', expr,
@@ -104,8 +104,8 @@ suite('Parser', function () {
         body: {
           type: 'FunctionBody',
           directives: [{ type: 'Directive', rawValue: 'use strict' }],
-          statements: [{ type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }]
-        }
+          statements: [{ type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }],
+        },
       }
     );
     testParse('(function a() {\'use strict\';return 0;});', expr,
@@ -116,8 +116,8 @@ suite('Parser', function () {
         body: {
           type: 'FunctionBody',
           directives: [{ type: 'Directive', rawValue: 'use strict' }],
-          statements: [{ type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }]
-        }
+          statements: [{ type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }],
+        },
       }
     );
 
@@ -126,7 +126,7 @@ suite('Parser', function () {
         type: 'BinaryExpression',
         operator: '+',
         left: { type: 'LiteralStringExpression', value: 'use strict' },
-        right: { type: 'LiteralNumericExpression', value: 0 }
+        right: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -134,7 +134,7 @@ suite('Parser', function () {
     testParseModule('"use strict";', id,
       { type: 'Module',
         directives: [{ type: 'Directive', rawValue: 'use strict' }],
-        items: []
+        items: [],
       }
     );
 

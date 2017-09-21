@@ -1,8 +1,8 @@
 module.exports = {
   extends: 'eslint:recommended',
   env: {
-    es6: false,
-    node: true,
+    es6: true,
+    node: false,
     browser: false,
   },
   parser: 'babel-eslint',
@@ -10,14 +10,13 @@ module.exports = {
     ecmaVersion: 6,
     sourceType: 'module',
   },
-  plugins: [
-    'flowtype',
-  ],
+  plugins: [],
   rules: {
+    'arrow-parens': ['error', 'as-needed'],
     'array-bracket-spacing': ['error', 'never'],
     'brace-style': ['error', '1tbs'],
     'camelcase': 'error',
-    'comma-dangle': 'off',
+    'comma-dangle': ['error', 'always-multiline'],
     'comma-spacing': ['error', { before: false, after: true }],
     'comma-style': ['error', 'last'],
     'computed-property-spacing': ['error', 'never'],
@@ -36,6 +35,7 @@ module.exports = {
     'no-caller': 'error',
     'no-catch-shadow': 'error',
     'no-console': 'warn',
+    'no-constant-condition': ['error', { "checkLoops": false }],
     'no-else-return': 'error',
     'no-empty': ['error', { allowEmptyCatch: true }],
     'no-eval': 'error',
@@ -51,6 +51,7 @@ module.exports = {
     'no-mixed-spaces-and-tabs': 'error',
     'no-multi-spaces': 'error',
     'no-multiple-empty-lines': ['error', { max: 2 }],
+    'no-negated-condition': 'error',
     'no-param-reassign': 'warn',
     'no-redeclare': 'error',
     'no-return-assign': 'error',
@@ -71,6 +72,8 @@ module.exports = {
     'no-warning-comments': 'off',
     'no-with': 'error',
     'object-curly-spacing': ['error', 'always'],
+    'object-shorthand': ['error', 'always'],
+    'prefer-arrow-callback': ['error'],
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
     'semi-spacing': ['error', { before: false, after: true }],
@@ -86,4 +89,3 @@ module.exports = {
     'yoda': ['error', 'never'],
   },
 };
-

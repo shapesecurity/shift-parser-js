@@ -21,8 +21,8 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('module', function () {
+suite('Parser', () => {
+  suite('module', () => {
     testParseModule('', id, { type: 'Module', directives: [], items: [] });
 
     testParseModuleFailure('/*', 'Unexpected end of input');

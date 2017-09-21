@@ -49,7 +49,7 @@ class ParserWithLocation extends GenericParser {
     if (node.type === 'TemplateExpression') {
       // Adjust TemplateElements to not include surrounding backticks or braces
       for (let i = 0; i < node.elements.length; i += 2) {
-        const endAdjustment = (i < node.elements.length - 1) ? 2 : 1; // discard '${' or '`' respectively
+        const endAdjustment = i < node.elements.length - 1 ? 2 : 1; // discard '${' or '`' respectively
         const element = node.elements[i];
         const location = this.locations.get(element);
         this.locations.set(element, {
@@ -122,8 +122,7 @@ function generateInterface(parsingFunctionName) {
       let errors = EarlyErrorChecker.check(tree);
       // for now, just throw the first error; we will handle multiple errors later
       if (errors.length > 0) {
-        let { node, message } = errors[0];
-        throw new JsError(0, 1, 0, message);
+        throw new JsError(0, 1, 0, errors[0].message);
       }
     }
     return tree;

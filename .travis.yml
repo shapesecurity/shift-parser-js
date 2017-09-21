@@ -4,9 +4,11 @@ script:
   - curl https://raw.githubusercontent.com/shapesecurity/CLA/master/cla-travis.sh | bash
   - npm run build
   - npm run coverage
+  - npm run lint
 node_js:
   - "4"
   - "6"
+  - "8"
 # the following config is needed for the "microtime" native node module
 env:
   - CXX=g++-4.8

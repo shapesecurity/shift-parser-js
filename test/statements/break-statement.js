@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('break statement', function () {
+suite('Parser', () => {
+  suite('break statement', () => {
 
     testParse('while (true) { break }', stmt,
       { type: 'WhileStatement',

@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('empty expression', function () {
+suite('Parser', () => {
+  suite('empty expression', () => {
 
     testParse(';', stmt, { type: 'EmptyStatement' });
 

@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('switch statement', function () {
+suite('Parser', () => {
+  suite('switch statement', () => {
 
     testParse('switch (x) {}', stmt,
       { type: 'SwitchStatement',
@@ -47,7 +47,7 @@ suite('Parser', function () {
             { type: 'CallExpression',
               callee: { type: 'IdentifierExpression', name: 'hi' },
               arguments: [] } },
-                  { type: 'BreakStatement', label: null }] }] }
+          { type: 'BreakStatement', label: null }] }] }
     );
 
     testParse('switch (answer) { case 0: let a; }', stmt,
@@ -65,11 +65,11 @@ suite('Parser', function () {
                 { type: 'VariableDeclarator',
                   binding:
                           { type: 'BindingIdentifier', name: 'a' },
-                  init: null
-                }]
-            }
-          }]
-        }]
+                  init: null,
+                }],
+            },
+          }],
+        }],
       });
   });
 });

@@ -260,6 +260,8 @@ export default class Tokenizer {
         return this.createError(ErrorMessages.UNEXPECTED_STRING);
       // the other token classes are RegularExpression and Illegal, but they cannot reach here
     }
+    // istanbul ignore next
+    throw new Error('Unreachable: unexpected token of class ' + token.type.klass);
   }
 
   createError(message, ...params) {
@@ -555,7 +557,7 @@ export default class Tokenizer {
       let chCode = this.source.charCodeAt(this.index);
       if (chCode < 0x80) {
         switch (chCode) {
-          case 42:  // "*"
+          case 42: // "*"
             // Block comment ends with "*/".
             if (this.source.charAt(this.index + 1) === '/') {
               this.index = this.index + 2;
@@ -563,7 +565,7 @@ export default class Tokenizer {
             }
             this.index++;
             break;
-          case 10:  // "\n"
+          case 10: // "\n"
             isLineStart = true;
             this.hasLineTerminatorBeforeNext = true;
             this.index++;
@@ -694,30 +696,29 @@ export default class Tokenizer {
       }
       this.index = i + 1;
       return hexDigits;
-    } else {
-      // \uHex4Digits
-      if (this.index + 4 > this.source.length) {
-        return -1;
-      }
-      let r1 = getHexValue(this.source.charAt(this.index));
-      if (r1 === -1) {
-        return -1;
-      }
-      let r2 = getHexValue(this.source.charAt(this.index + 1));
-      if (r2 === -1) {
-        return -1;
-      }
-      let r3 = getHexValue(this.source.charAt(this.index + 2));
-      if (r3 === -1) {
-        return -1;
-      }
-      let r4 = getHexValue(this.source.charAt(this.index + 3));
-      if (r4 === -1) {
-        return -1;
-      }
-      this.index += 4;
-      return r1 << 12 | r2 << 8 | r3 << 4 | r4;
     }
+    // \uHex4Digits
+    if (this.index + 4 > this.source.length) {
+      return -1;
+    }
+    let r1 = getHexValue(this.source.charAt(this.index));
+    if (r1 === -1) {
+      return -1;
+    }
+    let r2 = getHexValue(this.source.charAt(this.index + 1));
+    if (r2 === -1) {
+      return -1;
+    }
+    let r3 = getHexValue(this.source.charAt(this.index + 2));
+    if (r3 === -1) {
+      return -1;
+    }
+    let r4 = getHexValue(this.source.charAt(this.index + 3));
+    if (r4 === -1) {
+      return -1;
+    }
+    this.index += 4;
+    return r1 << 12 | r2 << 8 | r3 << 4 | r4;
   }
 
   getEscapedIdentifier() {
@@ -834,12 +835,13 @@ export default class Tokenizer {
 
     switch (ch1) {
       // Check for most common single-character punctuators.
-      case '.':
+      case '.': {
         let ch2 = this.source.charAt(this.index + 1);
         if (ch2 !== '.') return TokenType.PERIOD;
         let ch3 = this.source.charAt(this.index + 2);
         if (ch3 !== '.') return TokenType.PERIOD;
         return TokenType.ELLIPSIS;
+      }
       case '(':
         return TokenType.LPAREN;
       case ')':
@@ -1068,7 +1070,7 @@ export default class Tokenizer {
 
     return {
       type: TokenType.NUMBER,
-      slice: slice,
+      slice,
       value: parseInt(slice.text.substr(1), 8),
       octal: true,
       noctal: !isOctal,
@@ -1196,7 +1198,14 @@ export default class Tokenizer {
       throw this.createILLEGAL();
     }
     let ch = this.source.charAt(this.index);
-    if (!isLineTerminator(ch.charCodeAt(0))) {
+    if (isLineTerminator(ch.charCodeAt(0))) {
+      this.index++;
+      if (ch === '\r' && this.source.charAt(this.index) === '\n') {
+        this.index++;
+      }
+      this.lineStart = this.index;
+      this.line++;
+    } else {
       switch (ch) {
         case 'n':
           str += '\n';
@@ -1211,7 +1220,7 @@ export default class Tokenizer {
           this.index++;
           break;
         case 'u':
-        case 'x':
+        case 'x': {
           let unescaped;
           this.index++;
           if (this.index >= this.source.length) {
@@ -1223,6 +1232,7 @@ export default class Tokenizer {
           }
           str += fromCodePoint(unescaped);
           break;
+        }
         case 'b':
           str += '\b';
           this.index++;
@@ -1266,13 +1276,6 @@ export default class Tokenizer {
             this.index++;
           }
       }
-    } else {
-      this.index++;
-      if (ch === '\r' && this.source.charAt(this.index) === '\n') {
-        this.index++;
-      }
-      this.lineStart = this.index;
-      this.line++;
     }
     return [str, octal];
   }
@@ -1318,7 +1321,7 @@ export default class Tokenizer {
           return { type: TokenType.TEMPLATE, tail: true, slice: this.getSlice(start, startLocation) };
         }
         case 0x24: { // $
-          if (this.source.charCodeAt(this.index + 1) === 0x7B) {  // {
+          if (this.source.charCodeAt(this.index + 1) === 0x7B) { // {
             this.index += 2;
             return { type: TokenType.TEMPLATE, tail: false, slice: this.getSlice(start, startLocation) };
           }

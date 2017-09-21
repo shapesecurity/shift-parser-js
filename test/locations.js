@@ -20,7 +20,7 @@ const { parseScriptWithLocation, parseModuleWithLocation } = require('../');
 class LocationHelper {
   constructor(src, { isModule = false } = {}) {
     this.src = src;
-    ({ tree: this.tree, locations: this.locations} = (isModule ? parseModuleWithLocation : parseScriptWithLocation)(src));
+    ({ tree: this.tree, locations: this.locations } = (isModule ? parseModuleWithLocation : parseScriptWithLocation)(src));
     this.assertText(this.tree, src);
   }
 
@@ -38,27 +38,27 @@ class LocationHelper {
   }
 }
 
-suite('Locations', function () {
-  test('simple', function () {
-    const helper = new LocationHelper(` a  + 1.  .b ;   `);
+suite('Locations', () => {
+  test('simple', () => {
+    const helper = new LocationHelper(' a  + 1.  .b ;   ');
 
     const statement = helper.tree.statements[0];
-    helper.assertText(statement, `a  + 1.  .b ;`);
+    helper.assertText(statement, 'a  + 1.  .b ;');
 
     const expr = statement.expression;
-    helper.assertText(expr, `a  + 1.  .b`);
+    helper.assertText(expr, 'a  + 1.  .b');
 
     const left = expr.left;
-    helper.assertText(left, `a`);
+    helper.assertText(left, 'a');
 
     const right = expr.right;
-    helper.assertText(right, `1.  .b`);
+    helper.assertText(right, '1.  .b');
 
     const object = right.object;
-    helper.assertText(object, `1.`);
+    helper.assertText(object, '1.');
   });
 
-  test('simple template', function () {
+  test('simple template', () => {
     const helper = new LocationHelper('`foo`;');
 
     const statement = helper.tree.statements[0];
@@ -71,7 +71,7 @@ suite('Locations', function () {
     helper.assertText(element, 'foo');
   });
 
-  test('complex template', function () {
+  test('complex template', () => {
     const helper = new LocationHelper('`foo ${ 0 } bar ${ 1 } baz`;');
 
     const statement = helper.tree.statements[0];
@@ -96,7 +96,7 @@ suite('Locations', function () {
     helper.assertText(element, ' baz');
   });
 
-  test('template with simple linebreak', function () {
+  test('template with simple linebreak', () => {
     const helper = new LocationHelper('`a\nb`;');
 
     const statement = helper.tree.statements[0];
@@ -118,7 +118,7 @@ suite('Locations', function () {
     });
   });
 
-  test('template with windows linebreak', function () {
+  test('template with windows linebreak', () => {
     const helper = new LocationHelper('`a\r\nb`;');
 
     const statement = helper.tree.statements[0];
@@ -140,7 +140,7 @@ suite('Locations', function () {
     });
   });
 
-  test('template with multiple linebreaks', function () {
+  test('template with multiple linebreaks', () => {
     const helper = new LocationHelper('`a\n\r\u2028\u2029b`;');
 
     const statement = helper.tree.statements[0];
@@ -162,7 +162,7 @@ suite('Locations', function () {
     });
   });
 
-  test('arrow params', function () {
+  test('arrow params', () => {
     let helper = new LocationHelper('(a, b) => 0');
     let arrow = helper.tree.statements[0].expression;
     helper.assertText(arrow, '(a, b) => 0');
@@ -179,7 +179,7 @@ suite('Locations', function () {
 
   });
 
-  test('function params', function () {
+  test('function params', () => {
     let helper = new LocationHelper('function f( ){}');
     let params = helper.tree.statements[0].params;
     helper.assertText(params, '');
@@ -198,7 +198,7 @@ suite('Locations', function () {
     helper.assertText(params, 'a , ...b');
   });
 
-  test('group', function () {
+  test('group', () => {
     const helper = new LocationHelper('(0, 1);');
 
     const statement = helper.tree.statements[0];
@@ -208,7 +208,7 @@ suite('Locations', function () {
     helper.assertText(expr, '0, 1');
   });
 
-  test('spread', function () {
+  test('spread', () => {
     const helper = new LocationHelper('f( ...a );\n[ ...b ];');
 
     let statement = helper.tree.statements[0];
@@ -230,7 +230,7 @@ suite('Locations', function () {
     helper.assertText(spread, '...b');
   });
 
-  test('function body', function () {
+  test('function body', () => {
     const helper = new LocationHelper('  function f(){ \n }  ');
 
     const declaration = helper.tree.statements[0];
@@ -243,7 +243,7 @@ suite('Locations', function () {
     }); // i.e. right after the opening brace
   });
 
-  test('export default', function() {
+  test('export default', () => {
     const helper = new LocationHelper('  export default function(){}  ', { isModule: true });
 
     const exp = helper.tree.items[0];
@@ -254,5 +254,5 @@ suite('Locations', function () {
 
     const binding = declaration.name;
     expect(helper.locations.has(binding)).to.be.false;
-  })
+  });
 });

@@ -18,12 +18,12 @@ let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 let expr = require('../helpers').expr;
 
-suite('Parser', function () {
+suite('Parser', () => {
   let emptyBody = { type: 'FunctionBody', directives: [], statements: [] };
 
-  suite('yield', function () {
+  suite('yield', () => {
     function yd(p) {
-      return stmt(p).body.statements.map(function (es) {
+      return stmt(p).body.statements.map(es => {
         return es.expression;
       });
     }
@@ -34,7 +34,7 @@ suite('Parser', function () {
 
     testParse('function*a(){yield\na}', yd, [{
       type: 'YieldExpression',
-      expression: null
+      expression: null,
     }, { type: 'IdentifierExpression', name: 'a' }]);
 
     // yield as an Identifier cannot show up in body of a generator or in strict mode.
@@ -45,8 +45,8 @@ suite('Parser', function () {
           type: 'Setter',
           name: { type: 'StaticPropertyName', value: 'a' },
           param: { type: 'BindingIdentifier', name: 'yield' },
-          body: emptyBody
-        }]
+          body: emptyBody,
+        }],
       });
 
     testParse('function *a(){yield 0}', yde, { type: 'LiteralNumericExpression', value: 0 });
@@ -58,32 +58,32 @@ suite('Parser', function () {
     testParse('function *a(){yield+0}', yde, {
       type: 'UnaryExpression',
       operator: '+',
-      operand: { type: 'LiteralNumericExpression', value: 0 }
+      operand: { type: 'LiteralNumericExpression', value: 0 },
     });
     testParse('function *a(){yield-0}', yde, {
       type: 'UnaryExpression',
       operator: '-',
-      operand: { type: 'LiteralNumericExpression', value: 0 }
+      operand: { type: 'LiteralNumericExpression', value: 0 },
     });
     testParse('function *a(){yield delete 0}', yde, {
       type: 'UnaryExpression',
       operator: 'delete',
-      operand: { type: 'LiteralNumericExpression', value: 0 }
+      operand: { type: 'LiteralNumericExpression', value: 0 },
     });
     testParse('function *a(){yield typeof 0}', yde, {
       type: 'UnaryExpression',
       operator: 'typeof',
-      operand: { type: 'LiteralNumericExpression', value: 0 }
+      operand: { type: 'LiteralNumericExpression', value: 0 },
     });
     testParse('function *a(){yield void 0}', yde, {
       type: 'UnaryExpression',
       operator: 'void',
-      operand: { type: 'LiteralNumericExpression', value: 0 }
+      operand: { type: 'LiteralNumericExpression', value: 0 },
     });
     testParse('function *a(){yield ~0}', yde, {
       type: 'UnaryExpression',
       operator: '~',
-      operand: { type: 'LiteralNumericExpression', value: 0 }
+      operand: { type: 'LiteralNumericExpression', value: 0 },
     });
     testParse('function *a(){yield 2e308}', yde, { type: 'LiteralInfinityExpression' });
     testParse('function *a(){yield(0)}', yde, { type: 'LiteralNumericExpression', value: 0 });
@@ -108,33 +108,33 @@ suite('Parser', function () {
     };
     testParse('function *a(){({get b(){yield}})}', accessor, {
       type: 'IdentifierExpression',
-      name: 'yield'
+      name: 'yield',
     });
     testParse('function *a(){({set b(c){yield}})}', accessor, {
       type: 'IdentifierExpression',
-      name: 'yield'
+      name: 'yield',
     });
     testParse('function *a(){({b(){yield}})}', accessor, {
       type: 'IdentifierExpression',
-      name: 'yield'
+      name: 'yield',
     });
-    testParse('function a(){({*[yield](){}})}', function (p) {
+    testParse('function a(){({*[yield](){}})}', p => {
       return stmt(p).body.statements[0].expression.properties[0].name.expression;
     }, {
       type: 'IdentifierExpression',
-      name: 'yield'
+      name: 'yield',
     });
-    testParse('function *a(){({*[yield](){}})}', function (p) {
+    testParse('function *a(){({*[yield](){}})}', p => {
       return stmt(p).body.statements[0].expression.properties[0].name.expression;
     }, {
       type: 'YieldExpression',
-      expression: null
+      expression: null,
     });
-    testParse('function *a(){({set b(yield){}})}', function (p) {
+    testParse('function *a(){({set b(yield){}})}', p => {
       return stmt(p).body.statements[0].expression.properties[0].param;
     }, {
       type: 'BindingIdentifier',
-      name: 'yield'
+      name: 'yield',
     });
 
   });

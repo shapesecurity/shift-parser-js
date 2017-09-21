@@ -32,13 +32,13 @@ suite('test262', () => {
         let passExplicitTestDir = `${scriptDir}/pass-explicit/${f}`;
         test(`does not throw error and generates same tree[${f}]`, () => {
           let passSrc = fs.readFileSync(passTestDir, 'utf8');
-          expect(function parsePass() {
-            ({tree: passTree, locations: passLocations} = parse(passSrc, f.match('.module.js'), true));
+          expect(() => {
+            ({ tree: passTree, locations: passLocations } = parse(passSrc, f.match('.module.js'), true));
           }).to.not.throwError();
           locationSanityCheck(passTree, passLocations);
 
           let passExplicitSrc = fs.readFileSync(passExplicitTestDir, 'utf8');
-          expect(function parsePassExplicit() {
+          expect(() => {
             passExplicitTree = parse(passExplicitSrc, f.match('.module.js'), true).tree;
           }).to.not.throwError();
 
@@ -60,7 +60,7 @@ suite('test262', () => {
       '149.script.js',
       '151.script.js',
       '248.script.js',
-      '519.script.js'
+      '519.script.js',
     ];
     fs.readdirSync(failTestDir)
       .filter(item => failExcludes.indexOf(item) === -1)
@@ -111,19 +111,19 @@ suite('test262', () => {
       '135.script.js',
 
       // causes Syntax Errors in the test script
-      '599.script.js', '600.script.js', '601.script.js', '602.script.js'
+      '599.script.js', '600.script.js', '601.script.js', '602.script.js',
     ];
     let earlyErrorsTestDir = `${scriptDir}/early`;
     fs.readdirSync(earlyErrorsTestDir)
       .filter(item => earlyExcludes.indexOf(item) === -1)
       .forEach(f => {
         let src = fs.readFileSync(`${earlyErrorsTestDir}/${f}`, 'utf8');
-        test(`does not throw error with earlyErrors false[${f}]`, function () {
+        test(`does not throw error with earlyErrors false[${f}]`, () => {
           expect(() => {
             parse(src, f.match('.module.js'), false);
           }).to.not.throwError();
         });
-        test(`throws error with earlyErrors true[${f}]`, function () {
+        test(`throws error with earlyErrors true[${f}]`, () => {
           expect(() => {
             parse(src, f.match('.module.js'), true);
           }).to.throwError();

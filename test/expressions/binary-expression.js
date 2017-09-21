@@ -18,8 +18,8 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
 
-suite('Parser', function () {
-  suite('binary expression', function () {
+suite('Parser', () => {
+  suite('binary expression', () => {
     testParse('1+2;', expr,
       { type: 'BinaryExpression',
         operator: '+',
@@ -92,7 +92,7 @@ suite('Parser', function () {
           left: { type: 'IdentifierExpression', name: 'x' },
           right: { type: 'IdentifierExpression', name: 'y' } },
         right: { type: 'IdentifierExpression', name: 'z' } }
-     );
+    );
 
     testParse('x + y * z', expr,
       { type: 'BinaryExpression',

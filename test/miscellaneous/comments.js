@@ -20,8 +20,8 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('Comments', function () {
+suite('Parser', () => {
+  suite('Comments', () => {
     testParse(' /**/', id, { type: 'Script', directives: [], statements: [] });
     testParse(' /****/', id, { type: 'Script', directives: [], statements: [] });
     testParse(' /**\n\r\r\n**/', id, {

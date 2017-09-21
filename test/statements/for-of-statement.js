@@ -18,15 +18,15 @@ let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('for of statement', function () {
+suite('Parser', () => {
+  suite('for of statement', () => {
     testParse('for (var x of list) process(x);', stmt,
       {
         type: 'ForOfStatement',
         left: {
           type: 'VariableDeclaration',
           kind: 'var',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }],
         },
         right: { type: 'IdentifierExpression', name: 'list' },
         body: {
@@ -34,9 +34,9 @@ suite('Parser', function () {
           expression: {
             type: 'CallExpression',
             callee: { type: 'IdentifierExpression', name: 'process' },
-            arguments: [{ type: 'IdentifierExpression', name: 'x' }]
-          }
-        }
+            arguments: [{ type: 'IdentifierExpression', name: 'x' }],
+          },
+        },
       }
     );
 
@@ -46,10 +46,10 @@ suite('Parser', function () {
         left: {
           type: 'VariableDeclaration',
           kind: 'var',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
         },
         right: { type: 'IdentifierExpression', name: 'b' },
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -58,7 +58,7 @@ suite('Parser', function () {
         type: 'ForOfStatement',
         left: { type: 'AssignmentTargetIdentifier', name: 'a' },
         right: { type: 'IdentifierExpression', name: 'b' },
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -73,13 +73,13 @@ suite('Parser', function () {
             binding: {
               type: 'ArrayBinding',
               elements: [{ type: 'BindingIdentifier', name: 'a' }],
-              rest: null
+              rest: null,
             },
-            init: null
-          }]
+            init: null,
+          }],
         },
         right: { type: 'IdentifierExpression', name: 'b' },
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -92,11 +92,11 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'of' },
-            init: null
-          }]
+            init: null,
+          }],
         },
         right: { type: 'IdentifierExpression', name: 'b' },
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -109,11 +109,11 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: null
-          }]
+            init: null,
+          }],
         },
         right: { type: 'IdentifierExpression', name: 'b' },
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -124,10 +124,10 @@ suite('Parser', function () {
         properties: [{
           type: 'AssignmentTargetPropertyIdentifier',
           binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-          init: { type: 'LiteralNumericExpression', value: 0 } }]
+          init: { type: 'LiteralNumericExpression', value: 0 } }],
       },
       right: { type: 'IdentifierExpression', name: 'b' },
-      body: { type: 'EmptyStatement' }
+      body: { type: 'EmptyStatement' },
     });
 
     testParse('for([{a=0}] of b);', stmt, {
@@ -140,10 +140,10 @@ suite('Parser', function () {
           properties: [{
             type: 'AssignmentTargetPropertyIdentifier',
             binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-            init: { type: 'LiteralNumericExpression', value: 0 } }]
+            init: { type: 'LiteralNumericExpression', value: 0 } }],
         }] },
       right: { type: 'IdentifierExpression', name: 'b' },
-      body: { type: 'EmptyStatement' }
+      body: { type: 'EmptyStatement' },
     });
 
     testParseFailure('for(let of 0);', 'Unexpected number');

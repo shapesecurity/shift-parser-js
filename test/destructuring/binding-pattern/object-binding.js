@@ -19,9 +19,9 @@ let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('object binding', function () {
-    suite('variable declarator', function () {
+suite('Parser', () => {
+  suite('object binding', () => {
+    suite('variable declarator', () => {
       testParse('var {a} = 0;', stmt,
         {
           type: 'VariableDeclarationStatement',
@@ -35,12 +35,12 @@ suite('Parser', function () {
                 properties: [{
                   type: 'BindingPropertyIdentifier',
                   binding: { type: 'BindingIdentifier', name: 'a' },
-                  init: null
-                }]
+                  init: null,
+                }],
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -59,14 +59,14 @@ suite('Parser', function () {
                   properties: [{
                     type: 'BindingPropertyIdentifier',
                     binding: { type: 'BindingIdentifier', name: 'a' },
-                    init: { type: 'LiteralNumericExpression', value: 0 }
-                  }]
+                    init: { type: 'LiteralNumericExpression', value: 0 },
+                  }],
                 }],
-                rest: null
+                rest: null,
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -85,18 +85,18 @@ suite('Parser', function () {
                   properties: [{
                     type: 'BindingPropertyProperty',
                     name: { type: 'StaticPropertyName', value: '__proto__' },
-                    binding: { type: 'BindingIdentifier', name: 'a' }
+                    binding: { type: 'BindingIdentifier', name: 'a' },
                   }, {
                     type: 'BindingPropertyProperty',
                     name: { type: 'StaticPropertyName', value: '__proto__' },
-                    binding: { type: 'BindingIdentifier', name: 'b' }
-                  }]
+                    binding: { type: 'BindingIdentifier', name: 'b' },
+                  }],
                 }],
-                rest: null
+                rest: null,
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -113,7 +113,7 @@ suite('Parser', function () {
                 properties: [{
                   type: 'BindingPropertyIdentifier',
                   binding: { type: 'BindingIdentifier', name: 'a' },
-                  init: null
+                  init: null,
                 }, {
                   type: 'BindingPropertyProperty',
                   name: { type: 'StaticPropertyName', value: 'x' },
@@ -122,14 +122,14 @@ suite('Parser', function () {
                     properties: [{
                       type: 'BindingPropertyProperty',
                       name: { type: 'StaticPropertyName', value: 'y' },
-                      binding: { type: 'BindingIdentifier', name: 'a' }
-                    }]
-                  }
-                }]
+                      binding: { type: 'BindingIdentifier', name: 'a' },
+                    }],
+                  },
+                }],
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -142,7 +142,7 @@ suite('Parser', function () {
             declarators: [{
               type: 'VariableDeclarator',
               binding: { type: 'BindingIdentifier', name: 'a' },
-              init: null
+              init: null,
             }, {
               type: 'VariableDeclarator',
               binding: {
@@ -155,14 +155,14 @@ suite('Parser', function () {
                     properties: [{
                       type: 'BindingPropertyProperty',
                       name: { type: 'StaticPropertyName', value: 'y' },
-                      binding: { type: 'BindingIdentifier', name: 'a' }
-                    }]
-                  }
-                }]
+                      binding: { type: 'BindingIdentifier', name: 'a' },
+                    }],
+                  },
+                }],
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
@@ -180,25 +180,25 @@ suite('Parser', function () {
                   {
                     type: 'BindingPropertyIdentifier',
                     binding: { type: 'BindingIdentifier', name: 'let' },
-                    init: null
+                    init: null,
                   },
                   {
                     type: 'BindingPropertyIdentifier',
                     binding: { type: 'BindingIdentifier', name: 'yield' },
-                    init: null
-                  }
-                ]
+                    init: null,
+                  },
+                ],
               },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         }
       );
 
       testParseFailure('var {a: b.c} = 0;', 'Unexpected token "."');
     });
 
-    suite('formal parameter', function () {
+    suite('formal parameter', () => {
       testParse('(a, b, [c]) => 0', expr, {
         type: 'ArrowExpression',
         params: {
@@ -207,11 +207,11 @@ suite('Parser', function () {
             { type: 'BindingIdentifier', name: 'a' },
             { type: 'BindingIdentifier', name: 'b' },
             { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'c' }], rest: null }],
-          rest: null
+          rest: null,
         },
         body: {
-          type: 'LiteralNumericExpression', value: 0
-        }
+          type: 'LiteralNumericExpression', value: 0,
+        },
       });
 
       // other passing cases are tested in other function test cases.
@@ -226,7 +226,7 @@ suite('Parser', function () {
 
     });
 
-    suite('catch clause', function () {
+    suite('catch clause', () => {
       testParse('try {} catch ({e}) {}', stmt,
         {
           type: 'TryCatchStatement',
@@ -238,11 +238,11 @@ suite('Parser', function () {
               properties: [{
                 type: 'BindingPropertyIdentifier',
                 binding: { type: 'BindingIdentifier', name: 'e' },
-                init: null
-              }]
+                init: null,
+              }],
             },
-            body: { type: 'Block', statements: [] }
-          }
+            body: { type: 'Block', statements: [] },
+          },
         }
       );
 
@@ -257,11 +257,11 @@ suite('Parser', function () {
               properties: [{
                 type: 'BindingPropertyIdentifier',
                 binding: { type: 'BindingIdentifier', name: 'e' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
-              }]
+                init: { type: 'LiteralNumericExpression', value: 0 },
+              }],
             },
-            body: { type: 'Block', statements: [] }
-          }
+            body: { type: 'Block', statements: [] },
+          },
         }
       );
 

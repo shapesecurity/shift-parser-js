@@ -23,15 +23,15 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('generator declaration', function () {
+suite('Parser', () => {
+  suite('generator declaration', () => {
 
     testParse('function* a(){}', stmt,
       { type: 'FunctionDeclaration',
         isGenerator: true,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -43,8 +43,8 @@ suite('Parser', function () {
         body: {
           type: 'FunctionBody',
           directives: [],
-          statements: [{ type: 'ExpressionStatement', expression: { type: 'YieldExpression', expression: null } }]
-        }
+          statements: [{ type: 'ExpressionStatement', expression: { type: 'YieldExpression', expression: null } }],
+        },
       }
     );
 
@@ -58,9 +58,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{
             type: 'ExpressionStatement',
-            expression: { type: 'YieldExpression', expression: { type: 'IdentifierExpression', name: 'a' } }
-          }]
-        }
+            expression: { type: 'YieldExpression', expression: { type: 'IdentifierExpression', name: 'a' } },
+          }],
+        },
       }
     );
 
@@ -69,41 +69,41 @@ suite('Parser', function () {
         isGenerator: true,
         name: { type: 'BindingIdentifier', name: 'yield' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
-    testParse('function* a(){({[yield]:a}=0)}', function (p) {
+    testParse('function* a(){({[yield]:a}=0)}', p => {
       return stmt(p).body.statements[0].expression;
     },
-      {
-        type: 'AssignmentExpression',
-        binding: {
-          type: 'ObjectAssignmentTarget',
-          properties: [{
-            type: 'AssignmentTargetPropertyProperty',
-            name: { type: 'ComputedPropertyName', expression: { type: 'YieldExpression', expression: null } },
-            binding: { type: 'AssignmentTargetIdentifier', name: 'a' }
-          }]
-        },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
-      });
+    {
+      type: 'AssignmentExpression',
+      binding: {
+        type: 'ObjectAssignmentTarget',
+        properties: [{
+          type: 'AssignmentTargetPropertyProperty',
+          name: { type: 'ComputedPropertyName', expression: { type: 'YieldExpression', expression: null } },
+          binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        }],
+      },
+      expression: { type: 'LiteralNumericExpression', value: 0 },
+    });
 
-    testParse('function* a(){({yield:a}=0)}', function (p) {
+    testParse('function* a(){({yield:a}=0)}', p => {
       return stmt(p).body.statements[0].expression;
     },
-      {
-        type: 'AssignmentExpression',
-        binding: {
-          type: 'ObjectAssignmentTarget',
-          properties: [{
-            type: 'AssignmentTargetPropertyProperty',
-            name: { type: 'StaticPropertyName', value: 'yield' },
-            binding: { type: 'AssignmentTargetIdentifier', name: 'a' }
-          }]
-        },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
-      });
+    {
+      type: 'AssignmentExpression',
+      binding: {
+        type: 'ObjectAssignmentTarget',
+        properties: [{
+          type: 'AssignmentTargetPropertyProperty',
+          name: { type: 'StaticPropertyName', value: 'yield' },
+          binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+        }],
+      },
+      expression: { type: 'LiteralNumericExpression', value: 0 },
+    });
 
     testParse('function* a() {} function a() {}', id,
       {
@@ -114,14 +114,14 @@ suite('Parser', function () {
           isGenerator: true,
           name: { type: 'BindingIdentifier', name: 'a' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
         }, {
           type: 'FunctionDeclaration',
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: 'a' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -138,15 +138,15 @@ suite('Parser', function () {
             isGenerator: true,
             name: { type: 'BindingIdentifier', name: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
           }, {
             type: 'FunctionDeclaration',
             isGenerator: false,
             name: { type: 'BindingIdentifier', name: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }]
-        }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          }],
+        },
       }
     );
 

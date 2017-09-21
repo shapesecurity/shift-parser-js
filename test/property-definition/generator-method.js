@@ -18,9 +18,9 @@ let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 
 
-suite('Parser', function () {
+suite('Parser', () => {
 
-  suite('generator method', function () {
+  suite('generator method', () => {
 
     testParse('({*a(){}})', expr, {
       type: 'ObjectExpression',
@@ -29,8 +29,8 @@ suite('Parser', function () {
         isGenerator: true,
         name: { type: 'StaticPropertyName', value: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }]
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      }],
     });
 
     testParse('({*yield(){}})', expr, {
@@ -40,8 +40,8 @@ suite('Parser', function () {
         isGenerator: true,
         name: { type: 'StaticPropertyName', value: 'yield' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }]
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      }],
     });
 
     testParse('({*[yield](){}})', expr, {
@@ -51,8 +51,8 @@ suite('Parser', function () {
         isGenerator: true,
         name: { type: 'ComputedPropertyName', expression: { type: 'IdentifierExpression', name: 'yield' } },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }]
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      }],
     });
 
   });

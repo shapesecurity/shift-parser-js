@@ -17,8 +17,8 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('static member expression', function () {
+suite('Parser', () => {
+  suite('static member expression', () => {
     testParse('a.b', expr,
       { type: 'StaticMemberExpression', object: { type: 'IdentifierExpression', name: 'a' }, property: 'b' }
     );
@@ -26,7 +26,7 @@ suite('Parser', function () {
       {
         type: 'StaticMemberExpression',
         object: { type: 'StaticMemberExpression', object: { type: 'IdentifierExpression', name: 'a' }, property: 'b' },
-        property: 'c'
+        property: 'c',
       }
     );
     testParse('a.$._.B0', expr,
@@ -37,11 +37,11 @@ suite('Parser', function () {
           object: {
             type: 'StaticMemberExpression',
             object: { type: 'IdentifierExpression', name: 'a' },
-            property: '$'
+            property: '$',
           },
-          property: '_'
+          property: '_',
         },
-        property: 'B0'
+        property: 'B0',
       }
     );
     testParse('a.if', expr,

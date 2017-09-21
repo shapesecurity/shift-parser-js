@@ -18,8 +18,8 @@ let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('try-catch statement', function () {
+suite('Parser', () => {
+  suite('try-catch statement', () => {
     testParse('try{}catch(a){}', stmt,
       {
         type: 'TryCatchStatement',
@@ -27,8 +27,8 @@ suite('Parser', function () {
         catchClause: {
           type: 'CatchClause',
           binding: { type: 'BindingIdentifier', name: 'a' },
-          body: { type: 'Block', statements: [] }
-        }
+          body: { type: 'Block', statements: [] },
+        },
       }
     );
     testParse('try { } catch (e) { }', stmt,
@@ -38,8 +38,8 @@ suite('Parser', function () {
         catchClause: {
           type: 'CatchClause',
           binding: { type: 'BindingIdentifier', name: 'e' },
-          body: { type: 'Block', statements: [] }
-        }
+          body: { type: 'Block', statements: [] },
+        },
       }
     );
 
@@ -60,12 +60,12 @@ suite('Parser', function () {
                 declarators: [{
                   type: 'VariableDeclarator',
                   binding: { type: 'BindingIdentifier', name: 'a' },
-                  init: null
-                }]
-              }
-            }]
-          }
-        }
+                  init: null,
+                }],
+              },
+            }],
+          },
+        },
       }
     );
 
@@ -76,8 +76,8 @@ suite('Parser', function () {
         catchClause: {
           type: 'CatchClause',
           binding: { type: 'BindingIdentifier', name: 'eval' },
-          body: { type: 'Block', statements: [] }
-        }
+          body: { type: 'Block', statements: [] },
+        },
       }
     );
     testParse('try { } catch (arguments) { }', stmt,
@@ -87,8 +87,8 @@ suite('Parser', function () {
         catchClause: {
           type: 'CatchClause',
           binding: { type: 'BindingIdentifier', name: 'arguments' },
-          body: { type: 'Block', statements: [] }
-        }
+          body: { type: 'Block', statements: [] },
+        },
       }
     );
     testParse('try { } catch (e) { say(e) }', stmt,
@@ -105,11 +105,11 @@ suite('Parser', function () {
               expression: {
                 type: 'CallExpression',
                 callee: { type: 'IdentifierExpression', name: 'say' },
-                arguments: [{ type: 'IdentifierExpression', name: 'e' }]
-              }
-            }]
-          }
-        }
+                arguments: [{ type: 'IdentifierExpression', name: 'e' }],
+              },
+            }],
+          },
+        },
       }
     );
     testParse('try { doThat(); } catch (e) { say(e) }', stmt,
@@ -122,9 +122,9 @@ suite('Parser', function () {
             expression: {
               type: 'CallExpression',
               callee: { type: 'IdentifierExpression', name: 'doThat' },
-              arguments: []
-            }
-          }]
+              arguments: [],
+            },
+          }],
         },
         catchClause: {
           type: 'CatchClause',
@@ -136,11 +136,11 @@ suite('Parser', function () {
               expression: {
                 type: 'CallExpression',
                 callee: { type: 'IdentifierExpression', name: 'say' },
-                arguments: [{ type: 'IdentifierExpression', name: 'e' }]
-              }
-            }]
-          }
-        }
+                arguments: [{ type: 'IdentifierExpression', name: 'e' }],
+              },
+            }],
+          },
+        },
       }
     );
 

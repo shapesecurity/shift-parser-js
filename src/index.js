@@ -46,7 +46,7 @@ class ParserWithLocation extends GenericParser {
         const location = this.locations.get(element);
         this.locations.set(element, {
           start: { line: location.start.line, column: location.start.column + 1, offset: location.start.offset + 1 }, // discard '}' or '`'
-          end: { line: location.end.line, column: location.end.line - endAdjustment, offset: location.end.offset - endAdjustment },
+          end: { line: location.end.line, column: location.end.column - endAdjustment, offset: location.end.offset - endAdjustment },
         });
       }
     }

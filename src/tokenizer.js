@@ -1313,24 +1313,42 @@ export default class Tokenizer {
     while (this.index < this.source.length) {
       let ch = this.source.charCodeAt(this.index);
       switch (ch) {
-        case 0x60:  // `
+        case 0x60: { // `
           this.index++;
           return { type: TokenType.TEMPLATE, tail: true, slice: this.getSlice(start, startLocation) };
-        case 0x24:  // $
+        }
+        case 0x24: { // $
           if (this.source.charCodeAt(this.index + 1) === 0x7B) {  // {
             this.index += 2;
             return { type: TokenType.TEMPLATE, tail: false, slice: this.getSlice(start, startLocation) };
           }
           this.index++;
           break;
-        case 0x5C:  // \\
-          {
-            let octal = this.scanStringEscape('', null)[1];
-            if (octal != null) {
-              throw this.createILLEGAL();
-            }
-            break;
+        }
+        case 0x5C: { // \\
+          let octal = this.scanStringEscape('', null)[1];
+          if (octal != null) {
+            throw this.createILLEGAL();
           }
+          break;
+        }
+        case 0x0D: { // \r
+          this.line++;
+          this.index++;
+          if (this.index < this.source.length && this.source.charAt(this.index) === '\n') {
+            this.index++;
+          }
+          this.lineStart = this.index;
+          break;
+        }
+        case 0x0A: // \r
+        case 0x2028:
+        case 0x2029: {
+          this.line++;
+          this.index++;
+          this.lineStart = this.index;
+          break;
+        }
         default:
           this.index++;
       }

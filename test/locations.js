@@ -32,6 +32,10 @@ class LocationHelper {
   assertText(node, text) {
     expect(this.getText(node)).to.eql(text);
   }
+
+  assertLocation(node, location) {
+    expect(this.locations.get(node)).to.eql(location);
+  }
 }
 
 suite('Locations', function () {
@@ -90,5 +94,71 @@ suite('Locations', function () {
 
     element = expr.elements[4];
     helper.assertText(element, ' baz');
+  });
+
+  test('template with simple linebreak', function () {
+    const helper = new LocationHelper('`a\nb`;');
+
+    const statement = helper.tree.statements[0];
+    helper.assertLocation(statement, {
+      start: { line: 1, column: 0, offset: 0 },
+      end: { line: 2, column: 3, offset: 6 },
+    });
+
+    const expr = statement.expression;
+    helper.assertLocation(expr, {
+      start: { line: 1, column: 0, offset: 0 },
+      end: { line: 2, column: 2, offset: 5 },
+    });
+
+    const element = expr.elements[0];
+    helper.assertLocation(element, {
+      start: { line: 1, column: 1, offset: 1 },
+      end: { line: 2, column: 1, offset: 4 },
+    });
+  });
+
+  test('template with windows linebreak', function () {
+    const helper = new LocationHelper('`a\r\nb`;');
+
+    const statement = helper.tree.statements[0];
+    helper.assertLocation(statement, {
+      start: { line: 1, column: 0, offset: 0 },
+      end: { line: 2, column: 3, offset: 7 },
+    });
+
+    const expr = statement.expression;
+    helper.assertLocation(expr, {
+      start: { line: 1, column: 0, offset: 0 },
+      end: { line: 2, column: 2, offset: 6 },
+    });
+
+    const element = expr.elements[0];
+    helper.assertLocation(element, {
+      start: { line: 1, column: 1, offset: 1 },
+      end: { line: 2, column: 1, offset: 5 },
+    });
+  });
+
+  test('template with multiple linebreaks', function () {
+    const helper = new LocationHelper('`a\n\r\u2028\u2029b`;');
+
+    const statement = helper.tree.statements[0];
+    helper.assertLocation(statement, {
+      start: { line: 1, column: 0, offset: 0 },
+      end: { line: 5, column: 3, offset: 9 },
+    });
+
+    const expr = statement.expression;
+    helper.assertLocation(expr, {
+      start: { line: 1, column: 0, offset: 0 },
+      end: { line: 5, column: 2, offset: 8 },
+    });
+
+    const element = expr.elements[0];
+    helper.assertLocation(element, {
+      start: { line: 1, column: 1, offset: 1 },
+      end: { line: 5, column: 1, offset: 7 },
+    });
   });
 });

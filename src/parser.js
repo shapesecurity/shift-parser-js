@@ -18,7 +18,7 @@ import { ErrorMessages } from './errors';
 
 import Tokenizer, { TokenClass, TokenType } from './tokenizer';
 
-import * as AST from 'shift-ast';
+import * as AST from 'shift-ast/checked';
 
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = 'CoverParenthesizedExpressionAndArrowParameterList';
@@ -1024,8 +1024,7 @@ export class GenericParser extends Tokenizer {
     return left;
   }
 
-  parseArrowExpressionTail(head, startState) {
-    // Convert param list.
+  finishArrowParams(head) {
     let { params = null, rest = null } = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
       if (head.type === 'IdentifierExpression') {
@@ -1035,7 +1034,11 @@ export class GenericParser extends Tokenizer {
       }
     }
 
-    let paramsNode = this.finishNode(new AST.FormalParameters({ items: params, rest }), startState);
+    return this.copyNode(head, new AST.FormalParameters({ items: params, rest }));
+  }
+
+  parseArrowExpressionTail(params, startState) {
+    // Convert param list.
 
     let arrow = this.expect(TokenType.ARROW);
 
@@ -1053,7 +1056,7 @@ export class GenericParser extends Tokenizer {
     }
 
     this.allowYieldExpression = previousYield;
-    return this.finishNode(new AST.ArrowExpression({ params: paramsNode, body }), startState);
+    return this.finishNode(new AST.ArrowExpression({ params, body }), startState);
   }
 
   parseAssignmentExpression() {
@@ -1073,7 +1076,7 @@ export class GenericParser extends Tokenizer {
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
       this.isBindingElement = this.isAssignmentTarget = false;
       this.firstExprError = null;
-      return this.parseArrowExpressionTail(expr, startState);
+      return this.parseArrowExpressionTail(this.finishArrowParams(expr), startState);
     }
 
     let isAssignmentOperator = false;
@@ -1780,24 +1783,28 @@ export class GenericParser extends Tokenizer {
     //  3. Parameter list of arrow function
     let rest = null;
     let start = this.expect(TokenType.LPAREN);
-    if (this.eat(TokenType.RPAREN)) {
-      this.ensureArrow();
-      this.isBindingElement = this.isAssignmentTarget = false;
-      return {
+    let postParenStartState = this.startNode();
+    if (this.match(TokenType.RPAREN)) {
+      let paramsNode = this.finishNode({
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
         rest: null,
-      };
-    } else if (this.eat(TokenType.ELLIPSIS)) {
-      rest = this.parseBindingTarget();
-      this.expect(TokenType.RPAREN);
+      }, postParenStartState);
+      this.lex();
       this.ensureArrow();
       this.isBindingElement = this.isAssignmentTarget = false;
-      return {
+      return paramsNode;
+    } else if (this.eat(TokenType.ELLIPSIS)) {
+      rest = this.parseBindingTarget();
+      let paramsNode = this.finishNode({
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
         rest,
-      };
+      }, postParenStartState);
+      this.expect(TokenType.RPAREN);
+      this.ensureArrow();
+      this.isBindingElement = this.isAssignmentTarget = false;
+      return paramsNode;
     }
 
 
@@ -1842,6 +1849,8 @@ export class GenericParser extends Tokenizer {
       }
     }
 
+    const paramsNode = this.finishNode({ type: ARROW_EXPRESSION_PARAMS, params, rest }, postParenStartState);
+
     this.expect(TokenType.RPAREN);
 
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
@@ -1850,7 +1859,7 @@ export class GenericParser extends Tokenizer {
       }
 
       this.isBindingElement = false;
-      return { type: ARROW_EXPRESSION_PARAMS, params, rest };
+      return paramsNode;
     } else {
       // Ensure assignment pattern:
       if (rest) {
@@ -2334,9 +2343,9 @@ export class GenericParser extends Tokenizer {
   }
 
   parseParams() {
-    let startState = this.startNode();
-
     this.expect(TokenType.LPAREN);
+
+    let startState = this.startNode();
 
     let items = [], rest = null;
     if (!this.match(TokenType.RPAREN)) {
@@ -2351,8 +2360,10 @@ export class GenericParser extends Tokenizer {
       }
     }
 
+    let params = this.finishNode(new AST.FormalParameters({ items, rest }), startState);
+
     this.expect(TokenType.RPAREN);
 
-    return this.finishNode(new AST.FormalParameters({ items, rest }), startState);
+    return params;
   }
 }

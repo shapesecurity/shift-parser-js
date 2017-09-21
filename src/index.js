@@ -33,7 +33,7 @@ class ParserWithLocation extends GenericParser {
   finishNode(node, start) {
     if (node.type === 'Script' || node.type === 'Module') {
       this.locations.set(node, {
-        start: { line: 0, column: 0, offset: 0 },
+        start: { line: 1, column: 0, offset: 0 },
         end: this.getLocation(),
       });
       return node;
@@ -49,6 +49,11 @@ class ParserWithLocation extends GenericParser {
           end: { line: location.end.line, column: location.end.column - endAdjustment, offset: location.end.offset - endAdjustment },
         });
       }
+    } else if (node.type === 'FormalParameters' && node.items.length === 0 && node.rest === null) {
+      // Special case: formal parameters which contains no nodes span no tokens, so the usual logic of "start of first contained token through end of last contained token" doesn't work. We choose to define it to start and end immediately after the opening parenthesis.
+      const endLocation = this.getLastTokenEndLocation();
+      this.locations.set(node, { start: endLocation, end: endLocation });
+      return node;
     }
     this.locations.set(node, {
       start,

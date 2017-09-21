@@ -31,9 +31,36 @@ class ParserWithLocation extends GenericParser {
   }
 
   finishNode(node, start) {
+    if (node.type === 'Script' || node.type === 'Module') {
+      this.locations.set(node, {
+        start: { line: 1, column: 0, offset: 0 },
+        end: this.getLocation(),
+      });
+      return node;
+    }
+    if (
+      node.type === 'FunctionBody' && node.directives.length === 0 && node.statements.length === 0
+      || node.type === 'FormalParameters' && node.items.length === 0 && node.rest === null) {
+      // Special case: formal parameters or function bodies which contain no nodes span no tokens, so the usual logic of "start of first contained token through end of last contained token" doesn't work. We choose to define it to start and end immediately after the opening parenthesis or brace.
+      const endLocation = this.getLastTokenEndLocation();
+      this.locations.set(node, { start: endLocation, end: endLocation });
+      return node;
+    }
+    if (node.type === 'TemplateExpression') {
+      // Adjust TemplateElements to not include surrounding backticks or braces
+      for (let i = 0; i < node.elements.length; i += 2) {
+        const endAdjustment = (i < node.elements.length - 1) ? 2 : 1; // discard '${' or '`' respectively
+        const element = node.elements[i];
+        const location = this.locations.get(element);
+        this.locations.set(element, {
+          start: { line: location.start.line, column: location.start.column + 1, offset: location.start.offset + 1 }, // discard '}' or '`'
+          end: { line: location.end.line, column: location.end.column - endAdjustment, offset: location.end.offset - endAdjustment },
+        });
+      }
+    }
     this.locations.set(node, {
       start,
-      end: this.getLocation()
+      end: this.getLastTokenEndLocation(),
     });
     return node;
   }

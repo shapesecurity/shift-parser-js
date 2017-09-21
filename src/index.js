@@ -38,6 +38,18 @@ class ParserWithLocation extends GenericParser {
       });
       return node;
     }
+    if (node.type === 'TemplateExpression') {
+      // Adjust TemplateElements to not include surrounding backticks or braces
+      for (let i = 0; i < node.elements.length; i += 2) {
+        const endAdjustment = (i < node.elements.length - 1) ? 2 : 1; // discard '${' or '`' respectively
+        const element = node.elements[i];
+        const location = this.locations.get(element);
+        this.locations.set(element, {
+          start: { line: location.start.line, column: location.start.column + 1, offset: location.start.offset + 1 }, // discard '}' or '`'
+          end: { line: location.end.line, column: location.end.line - endAdjustment, offset: location.end.offset - endAdjustment },
+        });
+      }
+    }
     this.locations.set(node, {
       start,
       end: this.getLastTokenEndLocation(),

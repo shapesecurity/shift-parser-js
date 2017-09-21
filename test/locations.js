@@ -21,6 +21,7 @@ class LocationHelper {
   constructor(src, { isModule = false } = {}) {
     this.src = src;
     ({ tree: this.tree, locations: this.locations} = parseScriptWithLocation(src));
+    this.assertText(this.tree, src);
   }
 
   getText(node) {
@@ -36,7 +37,6 @@ class LocationHelper {
 suite('Locations', function () {
   test('simple', function () {
     const helper = new LocationHelper(` a  + 1.  .b ;   `);
-    helper.assertText(helper.tree, helper.src);
 
     const statement = helper.tree.statements[0];
     helper.assertText(statement, `a  + 1.  .b ;`);
@@ -52,5 +52,43 @@ suite('Locations', function () {
 
     const object = right.object;
     helper.assertText(object, `1.`);
+  });
+
+  test('simple template', function () {
+    const helper = new LocationHelper('`foo`;');
+
+    const statement = helper.tree.statements[0];
+    helper.assertText(statement, '`foo`;');
+
+    const expr = statement.expression;
+    helper.assertText(expr, '`foo`');
+
+    const element = expr.elements[0];
+    helper.assertText(element, 'foo');
+  });
+
+  test('complex template', function () {
+    const helper = new LocationHelper('`foo ${ 0 } bar ${ 1 } baz`;');
+
+    const statement = helper.tree.statements[0];
+    helper.assertText(statement, '`foo ${ 0 } bar ${ 1 } baz`;');
+
+    const expr = statement.expression;
+    helper.assertText(expr, '`foo ${ 0 } bar ${ 1 } baz`');
+
+    let element = expr.elements[0];
+    helper.assertText(element, 'foo ');
+
+    element = expr.elements[1];
+    helper.assertText(element, '0');
+
+    element = expr.elements[2];
+    helper.assertText(element, ' bar ');
+
+    element = expr.elements[3];
+    helper.assertText(element, '1');
+
+    element = expr.elements[4];
+    helper.assertText(element, ' baz');
   });
 });

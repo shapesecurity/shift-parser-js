@@ -18,7 +18,7 @@ import { ErrorMessages } from './errors';
 
 import Tokenizer, { TokenClass, TokenType } from './tokenizer';
 
-import * as AST from 'shift-ast/checked';
+import * as AST from 'shift-ast';
 
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = 'CoverParenthesizedExpressionAndArrowParameterList';

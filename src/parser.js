@@ -215,7 +215,6 @@ export class GenericParser extends Tokenizer {
   }
 
   parseFunctionBody() {
-
     let oldInFunctionBody = this.inFunctionBody;
     let oldModule = this.module;
     let oldStrict = this.strict;

@@ -20,7 +20,7 @@ const { parseScriptWithLocation, parseModuleWithLocation } = require('../');
 class LocationHelper {
   constructor(src, { isModule = false } = {}) {
     this.src = src;
-    ({ tree: this.tree, locations: this.locations} = parseScriptWithLocation(src));
+    ({ tree: this.tree, locations: this.locations} = (isModule ? parseModuleWithLocation : parseScriptWithLocation)(src));
     this.assertText(this.tree, src);
   }
 
@@ -242,4 +242,17 @@ suite('Locations', function () {
       end: { line: 1, column: 15, offset: 15 },
     }); // i.e. right after the opening brace
   });
+
+  test('export default', function() {
+    const helper = new LocationHelper('  export default function(){}  ', { isModule: true });
+
+    const exp = helper.tree.items[0];
+    helper.assertText(exp, 'export default function(){}');
+
+    const declaration = exp.body;
+    helper.assertText(declaration, 'function(){}');
+
+    const binding = declaration.name;
+    expect(helper.locations.has(binding)).to.be.false;
+  })
 });

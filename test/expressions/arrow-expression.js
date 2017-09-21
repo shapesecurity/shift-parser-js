@@ -18,20 +18,20 @@ let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('arrow expression', function () {
+suite('Parser', () => {
+  suite('arrow expression', () => {
 
     testParse('(()=>0)', expr,
       { type: 'ArrowExpression',
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
     testParse('() => 0', expr,
       { type: 'ArrowExpression',
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -40,16 +40,16 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: { type: 'BindingIdentifier', name: 'a' }
+          rest: { type: 'BindingIdentifier', name: 'a' },
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
     testParse('() => {}', expr,
       { type: 'ArrowExpression',
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -58,9 +58,9 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [{ type: 'BindingIdentifier', name: 'a' }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -70,11 +70,11 @@ suite('Parser', function () {
         { type: 'FormalParameters',
           items:
           [
-                { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null }
+            { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -83,9 +83,9 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [{ type: 'BindingIdentifier', name: 'a' }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -100,13 +100,13 @@ suite('Parser', function () {
               properties: [{
                 type: 'BindingPropertyIdentifier',
                 binding: { type: 'BindingIdentifier', name: 'a' },
-                init: null
-              }]
-            }
+                init: null,
+              }],
+            },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -115,9 +115,9 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: { type: 'BindingIdentifier', name: 'a' }
+          rest: { type: 'BindingIdentifier', name: 'a' },
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -126,9 +126,9 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: { type: 'ArrayBinding', elements: [], rest: null }
+          rest: { type: 'ArrayBinding', elements: [], rest: null },
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -137,9 +137,9 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [{ type: 'BindingIdentifier', name: 'a' }],
-          rest: { type: 'ArrayBinding', elements: [], rest: null }
+          rest: { type: 'ArrayBinding', elements: [], rest: null },
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -148,17 +148,17 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: null
+          rest: null,
         },
         body:
         { type: 'ArrowExpression',
           params:
           { type: 'FormalParameters',
             items: [],
-            rest: null
+            rest: null,
           },
-          body: { type: 'LiteralNumericExpression', value: 0 }
-        }
+          body: { type: 'LiteralNumericExpression', value: 0 },
+        },
       }
     );
 
@@ -169,9 +169,9 @@ suite('Parser', function () {
         left: {
           type: 'ArrowExpression',
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'LiteralNumericExpression', value: 0 }
+          body: { type: 'LiteralNumericExpression', value: 0 },
         },
-        right: { type: 'LiteralNumericExpression', value: 1 }
+        right: { type: 'LiteralNumericExpression', value: 1 },
       });
 
     testParse('() => 0 + 1', expr,
@@ -179,14 +179,14 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: null
+          rest: null,
         },
         body: {
           type: 'BinaryExpression',
           operator: '+',
           left: { type: 'LiteralNumericExpression', value: 0 },
-          right: { type: 'LiteralNumericExpression', value: 1 }
-        }
+          right: { type: 'LiteralNumericExpression', value: 1 },
+        },
       }
     );
 
@@ -197,16 +197,16 @@ suite('Parser', function () {
           items:
           [
             { type: 'BindingIdentifier', name: 'a' },
-            { type: 'BindingIdentifier', name: 'b' }
+            { type: 'BindingIdentifier', name: 'b' },
           ],
-          rest: null
+          rest: null,
         },
         body: {
           type: 'BinaryExpression',
           operator: '+',
           left: { type: 'LiteralNumericExpression', value: 0 },
-          right: { type: 'LiteralNumericExpression', value: 1 }
-        }
+          right: { type: 'LiteralNumericExpression', value: 1 },
+        },
       }
     );
 
@@ -216,17 +216,17 @@ suite('Parser', function () {
         { type: 'FormalParameters',
           items:
           [
-                { type: 'BindingIdentifier', name: 'a' },
-                { type: 'BindingIdentifier', name: 'b' }
+            { type: 'BindingIdentifier', name: 'a' },
+            { type: 'BindingIdentifier', name: 'b' },
           ],
-          rest: { type: 'BindingIdentifier', name: 'c' }
+          rest: { type: 'BindingIdentifier', name: 'c' },
         },
         body: {
           type: 'BinaryExpression',
           operator: '+',
           left: { type: 'LiteralNumericExpression', value: 0 },
-          right: { type: 'LiteralNumericExpression', value: 1 }
-        }
+          right: { type: 'LiteralNumericExpression', value: 1 },
+        },
       }
     );
 
@@ -236,8 +236,8 @@ suite('Parser', function () {
         body: {
           type: 'AssignmentExpression',
           binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        },
       }
     );
 
@@ -250,30 +250,30 @@ suite('Parser', function () {
           body:
           { type: 'ArrowExpression',
             params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'c' }], rest: null },
-            body: { type: 'LiteralNumericExpression', value: 0 }
-          }
-        }
+            body: { type: 'LiteralNumericExpression', value: 0 },
+          },
+        },
       }
     );
 
     testParse('(x)=>{\'use strict\';}', expr,
       { type: 'ArrowExpression',
         params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'x' }], rest: null },
-        body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] }
+        body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] },
       }
     );
 
     testParse('eval => \'use strict\'', expr,
       { type: 'ArrowExpression',
         params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'eval' }], rest: null },
-        body: { type: 'LiteralStringExpression', value: 'use strict' }
+        body: { type: 'LiteralStringExpression', value: 'use strict' },
       }
     );
 
     testParse('\'use strict\';(x)=>0', expr,
       { type: 'ArrowExpression',
         params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'x' }], rest: null },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -286,15 +286,15 @@ suite('Parser', function () {
             properties: [{
               type: 'BindingPropertyIdentifier',
               binding: { type: 'BindingIdentifier', name: 'x' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
           }, {
             type: 'ObjectBinding',
-            properties: []
+            properties: [],
           }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParse('([x=0], [])=>0', expr,
@@ -307,17 +307,17 @@ suite('Parser', function () {
             elements: [{
               type: 'BindingWithDefault',
               binding: { type: 'BindingIdentifier', name: 'x' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
+              init: { type: 'LiteralNumericExpression', value: 0 },
             }],
-            rest: null
+            rest: null,
           }, {
             type: 'ArrayBinding',
             elements: [],
-            rest: null
+            rest: null,
           }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParse('(a, {x = 0})=>0', expr,
@@ -333,14 +333,14 @@ suite('Parser', function () {
                 {
                   type: 'BindingPropertyIdentifier',
                   binding: { type: 'BindingIdentifier', name: 'x' },
-                  init: { type: 'LiteralNumericExpression', value: 0 }
-                }
-              ]
+                  init: { type: 'LiteralNumericExpression', value: 0 },
+                },
+              ],
             },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       });
 
     testParse('({x = 0}, {y = 0}, {z = 0})=>0', expr, {
@@ -353,37 +353,37 @@ suite('Parser', function () {
             {
               type: 'BindingPropertyIdentifier',
               binding: { type: 'BindingIdentifier', name: 'x' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }
-          ]
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            },
+          ],
         }, {
           type: 'ObjectBinding',
           properties: [
             {
               type: 'BindingPropertyIdentifier',
               binding: { type: 'BindingIdentifier', name: 'y' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }
-          ]
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            },
+          ],
         }, {
           type: 'ObjectBinding',
           properties: [
             {
               type: 'BindingPropertyIdentifier',
               binding: { type: 'BindingIdentifier', name: 'z' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }
-          ]
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            },
+          ],
         }],
-        'rest': null
+        'rest': null,
       },
-      body: { type: 'LiteralNumericExpression', value: 0 }
+      body: { type: 'LiteralNumericExpression', value: 0 },
     });
 
     testParse('yield => 0', expr,
       { type: 'ArrowExpression',
         params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'yield' }], rest: null },
-        body: { type: 'LiteralNumericExpression', value: 0 }
+        body: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 

@@ -20,8 +20,8 @@ let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('identifier expression', function () {
+suite('Parser', () => {
+  suite('identifier expression', () => {
 
     testParse('x', expr,
       { type: 'IdentifierExpression', name: 'x' }
@@ -37,7 +37,7 @@ suite('Parser', function () {
     testParseModuleFailure('await', 'Unexpected token "await"');
     testParseModuleFailure('function f() { var await }', 'Unexpected token "await"');
 
-    suite('let used as identifier expression', function () {
+    suite('let used as identifier expression', () => {
 
       testParse('let', expr,
         { type: 'IdentifierExpression', name: 'let' }
@@ -61,7 +61,7 @@ suite('Parser', function () {
           init: { type: 'IdentifierExpression', name: 'let' },
           test: null,
           update: null,
-          body: { type: 'EmptyStatement' }
+          body: { type: 'EmptyStatement' },
         }
       );
 
@@ -70,7 +70,7 @@ suite('Parser', function () {
           init: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'let' }, arguments: [] },
           test: null,
           update: null,
-          body: { type: 'EmptyStatement' }
+          body: { type: 'EmptyStatement' },
         }
       );
 
@@ -82,10 +82,10 @@ suite('Parser', function () {
             declarators: [{
               type: 'VariableDeclarator',
               binding: { name: 'yield', type: 'BindingIdentifier' },
-              init: null
+              init: null,
             }] },
           right: { type: 'LiteralNumericExpression', value: 0 },
-          body: { type: 'EmptyStatement' }
+          body: { type: 'EmptyStatement' },
         }
       );
 
@@ -94,7 +94,7 @@ suite('Parser', function () {
           left: { type: 'StaticMemberAssignmentTarget',
             object: { type: 'IdentifierExpression', name: 'let' }, property: 'let' },
           right: { type: 'LiteralNumericExpression', value: 0 },
-          body: { type: 'EmptyStatement' }
+          body: { type: 'EmptyStatement' },
         }
       );
 
@@ -103,7 +103,7 @@ suite('Parser', function () {
       testParseFailure('for(let.a of 0);', 'Invalid left-hand side in for-of');
     });
 
-    suite('unicode identifier', function () {
+    suite('unicode identifier', () => {
       // Unicode
       testParse('日本語', expr,
         { type: 'IdentifierExpression', name: '日本語' }

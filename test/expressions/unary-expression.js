@@ -17,8 +17,8 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('non-destructive unary expressions', function () {
+suite('Parser', () => {
+  suite('non-destructive unary expressions', () => {
 
     testParse('!a', expr,
       { type: 'UnaryExpression',
@@ -32,9 +32,9 @@ suite('Parser', function () {
         operand: {
           type: 'AssignmentExpression',
           binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-          expression: { type: 'IdentifierExpression', name: 'b' }
+          expression: { type: 'IdentifierExpression', name: 'b' },
         },
-        operator: '!'
+        operator: '!',
       }
     );
 

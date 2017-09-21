@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('switch with default statement', function () {
+suite('Parser', () => {
+  suite('switch with default statement', () => {
 
     testParse('switch(a){case 1:default:case 2:}', stmt,
       { type: 'SwitchStatementWithDefault',
@@ -68,7 +68,7 @@ suite('Parser', function () {
             { type: 'CallExpression',
               callee: { type: 'IdentifierExpression', name: 'hi' },
               arguments: [] } },
-                  { type: 'BreakStatement', label: null }] }],
+          { type: 'BreakStatement', label: null }] }],
         defaultCase: { type: 'SwitchDefault', consequent: [{ type: 'BreakStatement', label: null }] },
         postDefaultCases: [] }
     );

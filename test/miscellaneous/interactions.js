@@ -23,8 +23,8 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('interactions', function () {
+suite('Parser', () => {
+  suite('interactions', () => {
     // LiteralNumericExpression and StaticMemberExpression
 
     testParse('0 .toString', expr,
@@ -51,7 +51,7 @@ suite('Parser', function () {
       {
         type: 'CallExpression',
         callee: { type: 'StaticMemberExpression', object: { type: 'IdentifierExpression', name: 'a' }, property: 'b' },
-        arguments: [{ type: 'IdentifierExpression', name: 'b' }, { type: 'IdentifierExpression', name: 'c' }]
+        arguments: [{ type: 'IdentifierExpression', name: 'b' }, { type: 'IdentifierExpression', name: 'c' }],
       }
     );
 
@@ -63,7 +63,7 @@ suite('Parser', function () {
           expression: { type: 'IdentifierExpression', name: 'b' } },
         arguments:
         [{ type: 'IdentifierExpression', name: 'b' },
-           { type: 'IdentifierExpression', name: 'c' }] }
+          { type: 'IdentifierExpression', name: 'c' }] }
     );
 
 
@@ -73,9 +73,9 @@ suite('Parser', function () {
         callee: {
           type: 'StaticMemberExpression',
           object: { type: 'NewExpression', callee: { type: 'IdentifierExpression', name: 'foo' }, arguments: [] },
-          property: 'bar'
+          property: 'bar',
         },
-        arguments: []
+        arguments: [],
       }
     );
 
@@ -95,9 +95,9 @@ suite('Parser', function () {
         callee: {
           type: 'StaticMemberExpression',
           object: { type: 'IdentifierExpression', name: 'foo' },
-          property: 'bar'
+          property: 'bar',
         },
-        arguments: []
+        arguments: [],
       }
     );
 
@@ -107,9 +107,9 @@ suite('Parser', function () {
         callee: {
           type: 'StaticMemberExpression',
           object: { type: 'NewExpression', callee: { type: 'IdentifierExpression', name: 'foo' }, arguments: [] },
-          property: 'bar'
+          property: 'bar',
         },
-        arguments: []
+        arguments: [],
       }
     );
 
@@ -119,9 +119,9 @@ suite('Parser', function () {
         object: {
           type: 'ComputedMemberExpression',
           object: { type: 'IdentifierExpression', name: 'a' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         },
-        property: 'b'
+        property: 'b',
       }
     );
 
@@ -131,9 +131,9 @@ suite('Parser', function () {
         object: {
           type: 'CallExpression',
           callee: { type: 'IdentifierExpression', name: 'a' },
-          arguments: [{ type: 'LiteralNumericExpression', value: 0 }]
+          arguments: [{ type: 'LiteralNumericExpression', value: 0 }],
         },
-        property: 'b'
+        property: 'b',
       }
     );
 
@@ -147,16 +147,16 @@ suite('Parser', function () {
             object: {
               type: 'CallExpression',
               callee: { type: 'IdentifierExpression', name: 'a' },
-              arguments: [{ type: 'LiteralNumericExpression', value: 0 }]
+              arguments: [{ type: 'LiteralNumericExpression', value: 0 }],
             },
-            property: 'b'
+            property: 'b',
           },
           arguments: [{ type: 'LiteralNumericExpression', value: 14 }, {
             type: 'LiteralNumericExpression',
-            value: 3
-          }, { type: 'LiteralNumericExpression', value: 77 }]
+            value: 3,
+          }, { type: 'LiteralNumericExpression', value: 77 }],
         },
-        property: 'c'
+        property: 'c',
       }
     );
 
@@ -168,11 +168,11 @@ suite('Parser', function () {
           object: {
             type: 'StaticMemberExpression',
             object: { type: 'IdentifierExpression', name: 'a' },
-            property: 'b'
+            property: 'b',
           },
-          property: 'c'
+          property: 'c',
         },
-        arguments: [{ type: 'LiteralNumericExpression', value: 2014 }]
+        arguments: [{ type: 'LiteralNumericExpression', value: 2014 }],
       }
     );
 
@@ -257,7 +257,7 @@ suite('Parser', function () {
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        expression: { type: 'IdentifierExpression', name: 'b' }
+        expression: { type: 'IdentifierExpression', name: 'b' },
       }
     );
 
@@ -413,15 +413,15 @@ suite('Parser', function () {
                   declarators: [{
                     type: 'VariableDeclarator',
                     binding: { type: 'BindingIdentifier', name: 'version' },
-                    init: { type: 'LiteralNumericExpression', value: 1 }
-                  }]
-                }
-              }]
-            }
+                    init: { type: 'LiteralNumericExpression', value: 1 },
+                  }],
+                },
+              }],
+            },
           },
-          property: 'call'
+          property: 'call',
         },
-        arguments: [{ type: 'ThisExpression' }]
+        arguments: [{ type: 'ThisExpression' }],
       }
     );
 
@@ -446,15 +446,15 @@ suite('Parser', function () {
                   declarators: [{
                     type: 'VariableDeclarator',
                     binding: { type: 'BindingIdentifier', name: 'version' },
-                    init: { type: 'LiteralNumericExpression', value: 1 }
-                  }]
-                }
-              }]
-            }
+                    init: { type: 'LiteralNumericExpression', value: 1 },
+                  }],
+                },
+              }],
+            },
           },
-          property: 'call'
+          property: 'call',
         },
-        arguments: [{ type: 'ThisExpression' }]
+        arguments: [{ type: 'ThisExpression' }],
       }
     );
     testParse('function f() { /* infinite */ while (true) { } /* bar */ var each; }', stmt,
@@ -468,7 +468,7 @@ suite('Parser', function () {
           statements: [{
             type: 'WhileStatement',
             test: { type: 'LiteralBooleanExpression', value: true },
-            body: { type: 'BlockStatement', block: { type: 'Block', statements: [] } }
+            body: { type: 'BlockStatement', block: { type: 'Block', statements: [] } },
           }, {
             type: 'VariableDeclarationStatement',
             declaration: {
@@ -477,11 +477,11 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'each' },
-                init: null
-              }]
-            }
-          }]
-        }
+                init: null,
+              }],
+            },
+          }],
+        },
       }
     );
 
@@ -508,9 +508,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: { type: 'LiteralNumericExpression', value: 1 }
-          }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 1 },
+          }],
+        },
       }
     );
 
@@ -557,19 +557,19 @@ suite('Parser', function () {
                         elements: [
                           { type: 'StaticMemberAssignmentTarget',
                             object: { type: 'Super' },
-                            property: 'b'
-                          }
+                            property: 'b',
+                          },
                         ],
-                        rest: null
+                        rest: null,
                       },
-                      expression: { type: 'IdentifierExpression', name: 'c' }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        ]
+                      expression: { type: 'IdentifierExpression', name: 'c' },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
       }
     );
 
@@ -600,19 +600,19 @@ suite('Parser', function () {
                             binding:
                             { type: 'ComputedMemberAssignmentTarget',
                               object: { type: 'Super' },
-                              expression: { type: 'IdentifierExpression', name: 'c' }
-                            }
-                          }
-                        ]
+                              expression: { type: 'IdentifierExpression', name: 'c' },
+                            },
+                          },
+                        ],
                       },
-                      expression: { type: 'IdentifierExpression', name: 'd' }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        ]
+                      expression: { type: 'IdentifierExpression', name: 'd' },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
       }
     );
 
@@ -630,10 +630,10 @@ suite('Parser', function () {
             expression: {
               type: 'ArrowExpression',
               params: { type: 'FormalParameters', items: [], rest: null },
-              body: { type: 'IdentifierExpression', name: 'yield' }
-            }
-          }]
-        }
+              body: { type: 'IdentifierExpression', name: 'yield' },
+            },
+          }],
+        },
       }
     );
 
@@ -665,12 +665,12 @@ suite('Parser', function () {
               name: null,
               super: {
                 type: 'YieldExpression',
-                expression: null
+                expression: null,
               },
-              elements: []
-            }
-          }]
-        }
+              elements: [],
+            },
+          }],
+        },
       }
     );
 
@@ -697,19 +697,19 @@ suite('Parser', function () {
                   isGenerator: false,
                   name: {
                     type: 'ComputedPropertyName',
-                    expression: { type: 'YieldExpression', expression: null }
+                    expression: { type: 'YieldExpression', expression: null },
                   },
                   params: { type: 'FormalParameters', items: [], rest: null },
                   body: {
                     type: 'FunctionBody',
                     directives: [],
-                    statements: []
-                  }
-                }
-              }]
-            }
-          }]
-        }
+                    statements: [],
+                  },
+                },
+              }],
+            },
+          }],
+        },
       }
     );
 

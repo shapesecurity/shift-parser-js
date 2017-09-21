@@ -19,8 +19,8 @@ let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('variable declaration statement', function () {
+suite('Parser', () => {
+  suite('variable declaration statement', () => {
     // Variable Statement
     testParse('var x', stmt,
       {
@@ -28,8 +28,8 @@ suite('Parser', function () {
         declaration: {
           type: 'VariableDeclaration',
           kind: 'var',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
-        }
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }],
+        },
       }
     );
     testParse('var a;', stmt,
@@ -38,8 +38,8 @@ suite('Parser', function () {
         declaration: {
           type: 'VariableDeclaration',
           kind: 'var',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
-        }
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
+        },
       }
     );
     testParse('var x, y;', stmt,
@@ -51,9 +51,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: null
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'y' }, init: null }]
-        }
+            init: null,
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'y' }, init: null }],
+        },
       }
     );
     testParse('var x = 0', stmt,
@@ -65,9 +65,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
+        },
       }
     );
     testParse('var eval = 0, arguments = 1', stmt,
@@ -79,13 +79,13 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'eval' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
+            init: { type: 'LiteralNumericExpression', value: 0 },
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'arguments' },
-            init: { type: 'LiteralNumericExpression', value: 1 }
-          }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 1 },
+          }],
+        },
       }
     );
     testParse('var x = 0, y = 1, z = 2', stmt,
@@ -97,17 +97,17 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
+            init: { type: 'LiteralNumericExpression', value: 0 },
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'y' },
-            init: { type: 'LiteralNumericExpression', value: 1 }
+            init: { type: 'LiteralNumericExpression', value: 1 },
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'z' },
-            init: { type: 'LiteralNumericExpression', value: 2 }
-          }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 2 },
+          }],
+        },
       }
     );
     testParse('var implements, interface, package', stmt,
@@ -119,13 +119,13 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'implements' },
-            init: null
+            init: null,
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'interface' },
-            init: null
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'package' }, init: null }]
-        }
+            init: null,
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'package' }, init: null }],
+        },
       }
     );
     testParse('var private, protected, public', stmt,
@@ -137,13 +137,13 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'private' },
-            init: null
+            init: null,
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'protected' },
-            init: null
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'public' }, init: null }]
-        }
+            init: null,
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'public' }, init: null }],
+        },
       }
     );
     testParse('var yield;', stmt,
@@ -155,9 +155,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'yield' },
-            init: null
-          }]
-        }
+            init: null,
+          }],
+        },
       }
     );
 
@@ -167,8 +167,8 @@ suite('Parser', function () {
         declaration: {
           type: 'VariableDeclaration',
           kind: 'var',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'let' }, init: null }]
-        }
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'let' }, init: null }],
+        },
       }
     );
 
@@ -179,8 +179,8 @@ suite('Parser', function () {
         declaration: {
           type: 'VariableDeclaration',
           kind: 'let',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
-        }
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }],
+        },
       }
     );
     testParse('{ let x }', stmt,
@@ -196,11 +196,11 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'x' },
-                init: null
-              }]
-            }
-          }]
-        }
+                init: null,
+              }],
+            },
+          }],
+        },
       }
     );
     testParse('{ let x = 0 }', stmt,
@@ -216,11 +216,11 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'x' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
-              }]
-            }
-          }]
-        }
+                init: { type: 'LiteralNumericExpression', value: 0 },
+              }],
+            },
+          }],
+        },
       }
     );
     testParse('{ let x = 0, y = 1, z = 2 }', stmt,
@@ -236,19 +236,19 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'x' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
+                init: { type: 'LiteralNumericExpression', value: 0 },
               }, {
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'y' },
-                init: { type: 'LiteralNumericExpression', value: 1 }
+                init: { type: 'LiteralNumericExpression', value: 1 },
               }, {
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'z' },
-                init: { type: 'LiteralNumericExpression', value: 2 }
-              }]
-            }
-          }]
-        }
+                init: { type: 'LiteralNumericExpression', value: 2 },
+              }],
+            },
+          }],
+        },
       }
     );
 
@@ -262,9 +262,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: null
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }]
-        }
+            init: null,
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }],
+        },
       }
     );
     testParse('let x, x\uDB40\uDDD5;', stmt,
@@ -276,9 +276,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: null
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }]
-        }
+            init: null,
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }],
+        },
       }
     );
     testParse('let xǕ, x\\u{E01D5}', stmt,
@@ -290,9 +290,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x\u01D5' },
-            init: null
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }]
-        }
+            init: null,
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }],
+        },
       }
     );
     testParse('let x\u01D5, x\\u{E01D5}', stmt,
@@ -304,9 +304,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x\u01D5' },
-            init: null
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }]
-        }
+            init: null,
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x\uDB40\uDDD5' }, init: null }],
+        },
       }
     );
 
@@ -324,11 +324,11 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'x' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
-              }]
-            }
-          }]
-        }
+                init: { type: 'LiteralNumericExpression', value: 0 },
+              }],
+            },
+          }],
+        },
       }
     );
     testParse('{ const x = 0, y = 1, z = 2 }', stmt,
@@ -344,19 +344,19 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'x' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
+                init: { type: 'LiteralNumericExpression', value: 0 },
               }, {
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'y' },
-                init: { type: 'LiteralNumericExpression', value: 1 }
+                init: { type: 'LiteralNumericExpression', value: 1 },
               }, {
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'z' },
-                init: { type: 'LiteralNumericExpression', value: 2 }
-              }]
-            }
-          }]
-        }
+                init: { type: 'LiteralNumericExpression', value: 2 },
+              }],
+            },
+          }],
+        },
       }
     );
     testParse('var static;', stmt,
@@ -368,9 +368,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'static' },
-            init: null
-          }]
-        }
+            init: null,
+          }],
+        },
       }
     );
 
@@ -378,7 +378,7 @@ suite('Parser', function () {
       {
         type: 'ComputedMemberExpression',
         object: { type: 'IdentifierExpression', name: 'let' },
-        expression: { type: 'IdentifierExpression', name: 'a' }
+        expression: { type: 'IdentifierExpression', name: 'a' },
       }
     );
 

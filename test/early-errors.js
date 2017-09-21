@@ -22,10 +22,10 @@ let testEarlyError = require('./assertions').testEarlyError;
 let testModuleEarlyError = require('./assertions').testModuleEarlyError;
 let ErrorMessages = require('../dist/errors.js').ErrorMessages;
 
-suite('Parser', function () {
+suite('Parser', () => {
 
   // these *would* be early errors, but we have no way to represent them in our AST
-  suite('early grammar errors', function () {
+  suite('early grammar errors', () => {
 
     // 12.2.5.1
     // Always throw a Syntax Error if code matches this production.
@@ -104,7 +104,7 @@ suite('Parser', function () {
 
   });
 
-  suite('early tokenisation errors', function () {
+  suite('early tokenisation errors', () => {
 
     // 11.6.1.1
     // It is a Syntax Error if SV(UnicodeEscapeSequence) is neither the UTF16Encoding (10.1.1) of a single Unicode code
@@ -128,7 +128,7 @@ suite('Parser', function () {
 
   });
 
-  suite('early errors', function () {
+  suite('early errors', () => {
 
     // 12.1.1
     // It is a Syntax Error if the code matched by this production is contained in strict code and the StringValue of
@@ -908,9 +908,9 @@ suite('Parser', function () {
     testEarlyError('({a([]){\'use strict\'}})', ErrorMessages.ILLEGAL_USE_STRICT);
   });
 
-  suite('early error locations', function () {
+  suite('early error locations', () => {
 
-    test('location disabled', function () {
+    test('location disabled', () => {
       try {
         parse('super()', { earlyErrors: true });
         expect().fail();
@@ -929,7 +929,7 @@ suite('Parser', function () {
       }
     });
 
-    test('location enabled', function () {
+    test('location enabled', () => {
       try {
         parseWithLocation('super()', { earlyErrors: true });
         expect().fail();

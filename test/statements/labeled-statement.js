@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('labeled statement', function () {
+suite('Parser', () => {
+  suite('labeled statement', () => {
 
     testParse('start: for (;;) break start', stmt,
       { type: 'LabeledStatement',

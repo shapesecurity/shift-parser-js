@@ -18,16 +18,16 @@ let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('property name', function () {
+suite('Parser', () => {
+  suite('property name', () => {
     testParse('({0x0:0})', expr,
       {
         type: 'ObjectExpression',
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: '0' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
 
@@ -37,8 +37,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: '' + 1 / 0 },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
 
@@ -48,8 +48,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'b' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
     testParse('({set c(x) {}})', expr,
@@ -59,8 +59,8 @@ suite('Parser', function () {
           type: 'Setter',
           name: { type: 'StaticPropertyName', value: 'c' },
           param: { type: 'BindingIdentifier', name: 'x' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -70,8 +70,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: '__proto__' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
 
@@ -81,8 +81,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: '__proto__' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -93,8 +93,8 @@ suite('Parser', function () {
           type: 'Setter',
           name: { type: 'StaticPropertyName', value: '__proto__' },
           param: { type: 'BindingIdentifier', name: 'x' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -104,13 +104,13 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: '__proto__' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
         }, {
           type: 'Setter',
           name: { type: 'StaticPropertyName', value: '__proto__' },
           param: { type: 'BindingIdentifier', name: 'x' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -125,11 +125,11 @@ suite('Parser', function () {
               type: 'BinaryExpression',
               operator: '+',
               left: { type: 'LiteralStringExpression', value: 'nUmBeR' },
-              right: { type: 'LiteralNumericExpression', value: 9 }
-            }
+              right: { type: 'LiteralNumericExpression', value: 9 },
+            },
           },
-          expression: { type: 'LiteralStringExpression', value: 'nein' }
-        }]
+          expression: { type: 'LiteralStringExpression', value: 'nein' },
+        }],
       }
     );
 
@@ -144,11 +144,11 @@ suite('Parser', function () {
               type: 'BinaryExpression',
               operator: '*',
               left: { type: 'LiteralNumericExpression', value: 2 },
-              right: { type: 'LiteralNumericExpression', value: 308 }
-            }
+              right: { type: 'LiteralNumericExpression', value: 308 },
+            },
           },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
 
@@ -163,10 +163,10 @@ suite('Parser', function () {
               type: 'BinaryExpression',
               operator: '+',
               left: { type: 'LiteralNumericExpression', value: 6 },
-              right: { type: 'LiteralNumericExpression', value: 3 }
-            }
+              right: { type: 'LiteralNumericExpression', value: 3 },
+            },
           },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
         }, {
           type: 'Setter',
           name: {
@@ -175,12 +175,12 @@ suite('Parser', function () {
               type: 'BinaryExpression',
               operator: '/',
               left: { type: 'LiteralNumericExpression', value: 5 },
-              right: { type: 'LiteralNumericExpression', value: 4 }
-            }
+              right: { type: 'LiteralNumericExpression', value: 4 },
+            },
           },
           param: { type: 'BindingIdentifier', name: 'x' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -196,12 +196,12 @@ suite('Parser', function () {
               type: 'BinaryExpression',
               operator: '+',
               left: { type: 'LiteralNumericExpression', value: 6 },
-              right: { type: 'LiteralNumericExpression', value: 3 }
-            }
+              right: { type: 'LiteralNumericExpression', value: 3 },
+            },
           },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -213,8 +213,8 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'StaticPropertyName', value: '3' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -226,8 +226,8 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'StaticPropertyName', value: 'moo' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -242,12 +242,12 @@ suite('Parser', function () {
             type: 'FormalParameters',
             items: [{ type: 'BindingIdentifier', name: 'that' }, {
               type: 'BindingIdentifier',
-              name: 'little'
+              name: 'little',
             }, { type: 'BindingIdentifier', name: 'piggy' }],
-            rest: null
+            rest: null,
           },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 

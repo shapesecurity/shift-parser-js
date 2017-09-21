@@ -18,14 +18,14 @@ let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('call expression', function () {
+suite('Parser', () => {
+  suite('call expression', () => {
     testParse('a(b,c)', expr,
       { type: 'CallExpression',
         callee: { type: 'IdentifierExpression', name: 'a' },
         arguments:
         [{ type: 'IdentifierExpression', name: 'b' },
-            { type: 'IdentifierExpression', name: 'c' }] }
+          { type: 'IdentifierExpression', name: 'c' }] }
     );
 
     testParse('foo(bar, baz)', expr,
@@ -33,7 +33,7 @@ suite('Parser', function () {
         callee: { type: 'IdentifierExpression', name: 'foo' },
         arguments:
         [{ type: 'IdentifierExpression', name: 'bar' },
-            { type: 'IdentifierExpression', name: 'baz' }] }
+          { type: 'IdentifierExpression', name: 'baz' }] }
     );
 
     testParse('(    foo  )()', expr,
@@ -47,7 +47,7 @@ suite('Parser', function () {
       {
         type: 'CallExpression',
         callee: { type: 'IdentifierExpression', name: 'f' },
-        arguments: [{ type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'a' } }]
+        arguments: [{ type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'a' } }],
       }
     );
     testParse('f(...a = b)', expr,
@@ -59,9 +59,9 @@ suite('Parser', function () {
           expression: {
             type: 'AssignmentExpression',
             binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-            expression: { type: 'IdentifierExpression', name: 'b' }
-          }
-        }]
+            expression: { type: 'IdentifierExpression', name: 'b' },
+          },
+        }],
       }
     );
     testParse('f(...a, ...b)', expr,
@@ -70,8 +70,8 @@ suite('Parser', function () {
         callee: { type: 'IdentifierExpression', name: 'f' },
         arguments: [{
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'a' }
-        }, { type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'b' } }]
+          expression: { type: 'IdentifierExpression', name: 'a' },
+        }, { type: 'SpreadElement', expression: { type: 'IdentifierExpression', name: 'b' } }],
       }
     );
     testParse('f(a, ...b, c)', expr,
@@ -80,8 +80,8 @@ suite('Parser', function () {
         callee: { type: 'IdentifierExpression', name: 'f' },
         arguments: [{ type: 'IdentifierExpression', name: 'a' }, {
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'b' }
-        }, { type: 'IdentifierExpression', name: 'c' }]
+          expression: { type: 'IdentifierExpression', name: 'b' },
+        }, { type: 'IdentifierExpression', name: 'c' }],
       }
     );
     testParse('f(...a, b, ...c)', expr,
@@ -90,25 +90,25 @@ suite('Parser', function () {
         callee: { type: 'IdentifierExpression', name: 'f' },
         arguments: [{
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'a' }
+          expression: { type: 'IdentifierExpression', name: 'a' },
         }, { type: 'IdentifierExpression', name: 'b' }, {
           type: 'SpreadElement',
-          expression: { type: 'IdentifierExpression', name: 'c' }
-        }]
+          expression: { type: 'IdentifierExpression', name: 'c' },
+        }],
       }
     );
     testParse('f(....0)', expr,
       {
         type: 'CallExpression',
         callee: { type: 'IdentifierExpression', name: 'f' },
-        arguments: [{ type: 'SpreadElement', expression: { type: 'LiteralNumericExpression', value: 0 } }]
+        arguments: [{ type: 'SpreadElement', expression: { type: 'LiteralNumericExpression', value: 0 } }],
       }
     );
     testParse('f(.0)', expr,
       {
         type: 'CallExpression',
         callee: { type: 'IdentifierExpression', name: 'f' },
-        arguments: [{ type: 'LiteralNumericExpression', value: 0 }]
+        arguments: [{ type: 'LiteralNumericExpression', value: 0 }],
       }
     );
 

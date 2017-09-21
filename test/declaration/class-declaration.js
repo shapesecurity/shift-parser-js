@@ -18,13 +18,13 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('class declaration', function () {
+suite('Parser', () => {
+  suite('class declaration', () => {
     testParse('class A{}', stmt, {
       type: 'ClassDeclaration',
       name: { type: 'BindingIdentifier', name: 'A' },
       super: null,
-      elements: []
+      elements: [],
     });
     testParseFailure('class {}', 'Unexpected token "{"');
     testParseFailure('class extends A{}', 'Unexpected token "extends"');

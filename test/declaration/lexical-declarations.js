@@ -18,16 +18,16 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('declarations', function () {
+suite('Parser', () => {
+  suite('declarations', () => {
     testParse('let a', stmt,
       {
         type: 'VariableDeclarationStatement',
         declaration: {
           type: 'VariableDeclaration',
           kind: 'let',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
-        }
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
+        },
       }
     );
 
@@ -44,11 +44,11 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'a' },
-                init: null
-              }]
-            }
-          }]
-        }
+                init: null,
+              }],
+            },
+          }],
+        },
       });
 
     // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token \"let\"");
@@ -61,9 +61,9 @@ suite('Parser', function () {
           declaration: {
             type: 'VariableDeclaration',
             kind: 'var',
-            declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
-          }
-        }
+            declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
+          },
+        },
       });
 
     testParseFailure('while(true) let a', 'Unexpected token "let"');

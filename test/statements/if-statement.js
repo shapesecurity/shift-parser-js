@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('if statement', function () {
+suite('Parser', () => {
+  suite('if statement', () => {
 
     testParse('if (morning) goodMorning()', stmt,
       { type: 'IfStatement',
@@ -43,10 +43,10 @@ suite('Parser', function () {
             isGenerator: false,
             name: null,
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
         },
-        alternate: null
+        alternate: null,
       }
     );
 
@@ -62,11 +62,11 @@ suite('Parser', function () {
             declarators: [{
               type: 'VariableDeclarator',
               binding: { type: 'BindingIdentifier', name: 'x' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
-          }
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
+          },
         },
-        alternate: null
+        alternate: null,
       }
     );
 

@@ -17,8 +17,8 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('with statement', function () {
+suite('Parser', () => {
+  suite('with statement', () => {
 
     testParse('with(1);', stmt,
       { type: 'WithStatement',

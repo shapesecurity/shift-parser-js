@@ -19,8 +19,8 @@ let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('new.target expression', function () {
+suite('Parser', () => {
+  suite('new.target expression', () => {
 
     testParse('function f() { new.target; }', stmt,
       { type: 'FunctionDeclaration',
@@ -30,8 +30,8 @@ suite('Parser', function () {
         body: {
           type: 'FunctionBody',
           directives: [],
-          statements: [{ type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' } }]
-        }
+          statements: [{ type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' } }],
+        },
       }
     );
 
@@ -44,11 +44,11 @@ suite('Parser', function () {
           items: [{
             type: 'BindingWithDefault',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'NewTargetExpression' }
+            init: { type: 'NewTargetExpression' },
           }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -61,11 +61,11 @@ suite('Parser', function () {
           items: [{
             type: 'BindingWithDefault',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'NewTargetExpression' }
+            init: { type: 'NewTargetExpression' },
           }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -77,10 +77,10 @@ suite('Parser', function () {
           param: {
             type: 'BindingWithDefault',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'NewTargetExpression' }
+            init: { type: 'NewTargetExpression' },
           },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -95,12 +95,12 @@ suite('Parser', function () {
             items: [{
               type: 'BindingWithDefault',
               binding: { type: 'BindingIdentifier', name: 'a' },
-              init: { type: 'NewTargetExpression' }
+              init: { type: 'NewTargetExpression' },
             }],
-            rest: null
+            rest: null,
           },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -110,9 +110,9 @@ suite('Parser', function () {
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'm' },
           body: { type: 'FunctionBody', directives: [], statements: [{
-            type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' }
-          }] }
-        }]
+            type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' },
+          }] },
+        }],
       }
     );
 
@@ -124,8 +124,8 @@ suite('Parser', function () {
         body: {
           type: 'FunctionBody',
           directives: [],
-          statements: [{ type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' } }]
-        }
+          statements: [{ type: 'ExpressionStatement', expression: { type: 'NewTargetExpression' } }],
+        },
       }
     );
 
@@ -139,9 +139,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{
             type: 'ExpressionStatement',
-            expression: { type: 'NewExpression', callee: { type: 'NewTargetExpression' }, arguments: [] }
-          }]
-        }
+            expression: { type: 'NewExpression', callee: { type: 'NewTargetExpression' }, arguments: [] },
+          }],
+        },
       }
     );
 
@@ -155,9 +155,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{
             type: 'ExpressionStatement',
-            expression: { type: 'CallExpression', callee: { type: 'NewTargetExpression' }, arguments: [] }
-          }]
-        }
+            expression: { type: 'CallExpression', callee: { type: 'NewTargetExpression' }, arguments: [] },
+          }],
+        },
       }
     );
 
@@ -174,10 +174,10 @@ suite('Parser', function () {
             expression: {
               type: 'NewExpression',
               callee: { type: 'ArrayExpression', elements: [{ type: 'LiteralStringExpression', value: 'target' }] },
-              arguments: []
-            }
-          }]
-        }
+              arguments: [],
+            },
+          }],
+        },
       }
     );
 

@@ -18,8 +18,8 @@ let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('for statement', function () {
+suite('Parser', () => {
+  suite('for statement', () => {
 
     testParse('for(x, y;;);', stmt,
       { type: 'ForStatement',
@@ -39,11 +39,11 @@ suite('Parser', function () {
         init: {
           type: 'AssignmentExpression',
           binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         },
         test: null,
         update: null,
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -56,12 +56,12 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
         },
         test: null,
         update: null,
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -74,12 +74,12 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
         },
         test: null,
         update: null,
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -92,16 +92,16 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'x' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
+            init: { type: 'LiteralNumericExpression', value: 0 },
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'y' },
-            init: { type: 'LiteralNumericExpression', value: 1 }
-          }]
+            init: { type: 'LiteralNumericExpression', value: 1 },
+          }],
         },
         test: null,
         update: null,
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -168,11 +168,11 @@ suite('Parser', function () {
         init: {
           type: 'VariableDeclaration',
           kind: 'var',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
         },
         test: { type: 'IdentifierExpression', name: 'b' },
         update: { type: 'IdentifierExpression', name: 'c' },
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -185,12 +185,12 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
         },
         test: { type: 'IdentifierExpression', name: 'b' },
         update: { type: 'IdentifierExpression', name: 'c' },
-        body: { type: 'EmptyStatement' }
+        body: { type: 'EmptyStatement' },
       }
     );
 
@@ -203,8 +203,8 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
         },
         test: null,
         update: null,
@@ -220,12 +220,12 @@ suite('Parser', function () {
                 declarators: [{
                   type: 'VariableDeclarator',
                   binding: { type: 'BindingIdentifier', name: 'a' },
-                  init: null
-                }]
-              }
-            }]
-          }
-        }
+                  init: null,
+                }],
+              },
+            }],
+          },
+        },
       }
     );
 
@@ -243,7 +243,7 @@ suite('Parser', function () {
         init: {
           type: 'VariableDeclaration',
           kind: 'let',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'of' }, init: null }]
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'of' }, init: null }],
         },
         test: null,
         update: null }
@@ -255,7 +255,7 @@ suite('Parser', function () {
         init: {
           type: 'VariableDeclaration',
           kind: 'let',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }]
+          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
         },
         test: null,
         update: null }
@@ -272,10 +272,10 @@ suite('Parser', function () {
                 type: 'BinaryExpression',
                 operator: 'in',
                 left: { type: 'ThisExpression' },
-                right: { type: 'LiteralNullExpression' }
-              }
-            }
-          ] }
+                right: { type: 'LiteralNullExpression' },
+              },
+            },
+          ] },
         },
         body: { type: 'EmptyStatement' },
         test: null,

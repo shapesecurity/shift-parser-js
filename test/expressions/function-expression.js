@@ -19,15 +19,15 @@ let stmt = require('../helpers').stmt;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('function expression', function () {
+suite('Parser', () => {
+  suite('function expression', () => {
 
     testParse('(function(){})', expr,
       { type: 'FunctionExpression',
         isGenerator: false,
         name: null,
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -41,12 +41,12 @@ suite('Parser', function () {
           directives: [],
           statements: [{
             type: 'ExpressionStatement',
-            expression: { type: 'IdentifierExpression', name: 'y' }
+            expression: { type: 'IdentifierExpression', name: 'y' },
           }, {
             type: 'ExpressionStatement',
-            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] }
-          }]
-        }
+            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] },
+          }],
+        },
       }
     );
 
@@ -55,7 +55,7 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'eval' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -64,7 +64,7 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'arguments' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -76,12 +76,12 @@ suite('Parser', function () {
         { type: 'FormalParameters',
           items:
           [
-                { type: 'BindingIdentifier', name: 'y' },
-                { type: 'BindingIdentifier', name: 'z' }
+            { type: 'BindingIdentifier', name: 'y' },
+            { type: 'BindingIdentifier', name: 'z' },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -96,12 +96,12 @@ suite('Parser', function () {
             {
               type: 'BindingWithDefault',
               binding: { type: 'BindingIdentifier', name: 'a' },
-              init: { type: 'IdentifierExpression', name: 'b' }
-            }
+              init: { type: 'IdentifierExpression', name: 'b' },
+            },
           ],
           rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -112,9 +112,9 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: { type: 'BindingIdentifier', name: 'a' }
+          rest: { type: 'BindingIdentifier', name: 'a' },
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -125,9 +125,9 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [{ type: 'BindingIdentifier', name: 'a' }],
-          rest: { type: 'BindingIdentifier', name: 'b' }
+          rest: { type: 'BindingIdentifier', name: 'b' },
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -144,13 +144,13 @@ suite('Parser', function () {
               properties: [{
                 type: 'BindingPropertyIdentifier',
                 binding: { type: 'BindingIdentifier', name: 'a' },
-                init: null
-              }]
-            }
+                init: null,
+              }],
+            },
           ],
           rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -167,17 +167,17 @@ suite('Parser', function () {
               properties: [{
                 type: 'BindingPropertyProperty',
                 name: { type: 'StaticPropertyName', value: 'a' },
-                binding: { type: 'BindingIdentifier', name: 'x' }
+                binding: { type: 'BindingIdentifier', name: 'x' },
               }, {
                 type: 'BindingPropertyProperty',
                 name: { type: 'StaticPropertyName', value: 'a' },
-                binding: { type: 'BindingIdentifier', name: 'y' }
-              }]
-            }
+                binding: { type: 'BindingIdentifier', name: 'y' },
+              }],
+            },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -189,11 +189,11 @@ suite('Parser', function () {
         { type: 'FormalParameters',
           items:
           [
-                { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null }
+            { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -210,13 +210,13 @@ suite('Parser', function () {
               properties: [{
                 type: 'BindingPropertyIdentifier',
                 binding: { type: 'BindingIdentifier', name: 'a' },
-                init: { type: 'LiteralNumericExpression', value: 0 }
-              }]
-            }
+                init: { type: 'LiteralNumericExpression', value: 0 },
+              }],
+            },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -237,11 +237,11 @@ suite('Parser', function () {
               body: {
                 type: 'FunctionBody',
                 directives: [],
-                statements: [{ type: 'LabeledStatement', label: 'label', body: { type: 'EmptyStatement' } }]
-              }
-            }
-          }
-        }
+                statements: [{ type: 'LabeledStatement', label: 'label', body: { type: 'EmptyStatement' } }],
+              },
+            },
+          },
+        },
       }
     );
 
@@ -253,9 +253,9 @@ suite('Parser', function () {
         params: {
           type: 'FormalParameters',
           items: [{ type: 'ArrayBinding', elements: [], rest: null }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       });
 
     testParse('function* g(){ (function yield(){}); }', stmt,
@@ -275,9 +275,9 @@ suite('Parser', function () {
               name: { type: 'BindingIdentifier', name: 'yield' },
               params: { type: 'FormalParameters', items: [], rest: null },
               body: { type: 'FunctionBody', directives: [], statements: [] },
-            }
-          }]
-        }
+            },
+          }],
+        },
       }
     );
 
@@ -298,9 +298,9 @@ suite('Parser', function () {
               name: { type: 'BindingIdentifier', name: 'yield' },
               params: { type: 'FormalParameters', items: [], rest: null },
               body: { type: 'FunctionBody', directives: [], statements: [] },
-            }
-          }]
-        }
+            },
+          }],
+        },
       }
     );
 

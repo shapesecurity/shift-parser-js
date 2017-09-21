@@ -17,8 +17,8 @@
 let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 
-suite('Parser', function () {
-  suite('literal null expression', function () {
+suite('Parser', () => {
+  suite('literal null expression', () => {
 
     testParse('null', expr, { type: 'LiteralNullExpression' });
     testParse('null;', expr, { type: 'LiteralNullExpression' });

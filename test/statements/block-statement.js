@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('block statement', function () {
+suite('Parser', () => {
+  suite('block statement', () => {
 
     testParse('{ foo }', stmt,
       { type: 'BlockStatement',

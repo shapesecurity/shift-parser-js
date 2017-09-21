@@ -24,8 +24,8 @@ function testImportDecl(code, tree) {
   testParseModule(code, moduleItem, tree);
 }
 
-suite('Parser', function () {
-  suite('import declaration', function () {
+suite('Parser', () => {
+  suite('import declaration', () => {
 
     testImportDecl('import \'a\'', { type: 'Import', defaultBinding: null, namedImports: [], moduleSpecifier: 'a' });
 
@@ -35,7 +35,7 @@ suite('Parser', function () {
         type: 'ImportNamespace',
         defaultBinding: null,
         namespaceBinding: { type: 'BindingIdentifier', name: 'a' },
-        moduleSpecifier: 'a'
+        moduleSpecifier: 'a',
       });
 
     testImportDecl(
@@ -44,7 +44,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namedImports: [],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -53,7 +53,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namedImports: [],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -66,7 +66,7 @@ suite('Parser', function () {
         type: 'ImportNamespace',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namespaceBinding: { type: 'BindingIdentifier', name: 'b' },
-        moduleSpecifier: 'a'
+        moduleSpecifier: 'a',
       });
 
     testImportDecl(
@@ -75,7 +75,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namedImports: [{ type: 'ImportSpecifier', name: null, binding: { type: 'BindingIdentifier', name: 'b' } }],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -84,7 +84,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namedImports: [{ type: 'ImportSpecifier', name: 'b', binding: { type: 'BindingIdentifier', name: 'c' } }],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -95,9 +95,9 @@ suite('Parser', function () {
         namedImports: [{
           type: 'ImportSpecifier',
           name: 'function',
-          binding: { type: 'BindingIdentifier', name: 'c' }
+          binding: { type: 'BindingIdentifier', name: 'c' },
         }],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -106,7 +106,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namedImports: [{ type: 'ImportSpecifier', name: null, binding: { type: 'BindingIdentifier', name: 'as' } }],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -115,7 +115,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namedImports: [{ type: 'ImportSpecifier', name: 'as', binding: { type: 'BindingIdentifier', name: 'c' } }],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -124,7 +124,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: null,
         namedImports: [{ type: 'ImportSpecifier', name: 'as', binding: { type: 'BindingIdentifier', name: 'as' } }],
-        moduleSpecifier: 'as'
+        moduleSpecifier: 'as',
       });
 
     testImportDecl(
@@ -133,7 +133,7 @@ suite('Parser', function () {
         type: 'Import',
         defaultBinding: { type: 'BindingIdentifier', name: 'a' },
         namedImports: [{ type: 'ImportSpecifier', name: null, binding: { type: 'BindingIdentifier', name: 'b' } }],
-        moduleSpecifier: 'c'
+        moduleSpecifier: 'c',
       });
 
     testImportDecl(
@@ -144,9 +144,9 @@ suite('Parser', function () {
         namedImports: [{
           type: 'ImportSpecifier',
           name: null,
-          binding: { type: 'BindingIdentifier', name: 'b' }
+          binding: { type: 'BindingIdentifier', name: 'b' },
         }, { type: 'ImportSpecifier', name: null, binding: { type: 'BindingIdentifier', name: 'c' } }],
-        moduleSpecifier: 'd'
+        moduleSpecifier: 'd',
       });
 
     testImportDecl(
@@ -157,9 +157,9 @@ suite('Parser', function () {
         namedImports: [{
           type: 'ImportSpecifier',
           name: null,
-          binding: { type: 'BindingIdentifier', name: 'b' }
+          binding: { type: 'BindingIdentifier', name: 'b' },
         }, { type: 'ImportSpecifier', name: null, binding: { type: 'BindingIdentifier', name: 'c' } }],
-        moduleSpecifier: 'd'
+        moduleSpecifier: 'd',
       });
 
     testParseFailure('import \'a\'', 'Unexpected token "import"');

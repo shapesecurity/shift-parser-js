@@ -17,8 +17,8 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('destructive unary expressions', function () {
+suite('Parser', () => {
+  suite('destructive unary expressions', () => {
 
     testParse('++a', expr,
       { type: 'UpdateExpression',

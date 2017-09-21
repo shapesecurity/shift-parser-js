@@ -17,8 +17,8 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('object expression', function () {
+suite('Parser', () => {
+  suite('object expression', () => {
 
     testParse('({})', expr, { type: 'ObjectExpression', properties: [] });
 
@@ -40,8 +40,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'answer' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
 
@@ -51,8 +51,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'if' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
     testParse('({ true: 0 })', expr,
@@ -61,8 +61,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'true' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
     testParse('({ false: 0 })', expr,
@@ -71,8 +71,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'false' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
     testParse('({ null: 0 })', expr,
@@ -81,8 +81,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'null' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
     testParse('({ enum: 0 })', expr,
@@ -91,8 +91,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'enum' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
     testParse('({ "answer": 0 })', expr,
@@ -101,8 +101,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'answer' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }],
       }
     );
     testParse('({ x: 1, x: 2 })', expr,
@@ -111,12 +111,12 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'x' },
-          expression: { type: 'LiteralNumericExpression', value: 1 }
+          expression: { type: 'LiteralNumericExpression', value: 1 },
         }, {
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'x' },
-          expression: { type: 'LiteralNumericExpression', value: 2 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 2 },
+        }],
       }
     );
 
@@ -129,9 +129,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'm_width' } }]
-          }
-        }]
+            statements: [{ type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'm_width' } }],
+          },
+        }],
       }
     );
     testParse('({ get undef() {} })', expr,
@@ -140,8 +140,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'undef' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
     testParse('({ get if() {} })', expr,
@@ -150,8 +150,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'if' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -161,8 +161,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'true' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -172,8 +172,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'false' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -183,8 +183,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'null' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -194,8 +194,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'undef' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -205,8 +205,8 @@ suite('Parser', function () {
         properties: [{
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: '10' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -220,9 +220,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }]
-          }
-        }]
+            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }],
+          },
+        }],
       }
     );
 
@@ -236,9 +236,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }]
-          }
-        }]
+            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }],
+          },
+        }],
       }
     );
 
@@ -252,9 +252,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }]
-          }
-        }]
+            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }],
+          },
+        }],
       }
     );
 
@@ -268,9 +268,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }]
-          }
-        }]
+            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }],
+          },
+        }],
       }
     );
 
@@ -284,9 +284,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }]
-          }
-        }]
+            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }],
+          },
+        }],
       }
     );
 
@@ -300,9 +300,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }]
-          }
-        }]
+            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }],
+          },
+        }],
       }
     );
 
@@ -316,9 +316,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }]
-          }
-        }]
+            statements: [{ type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'w' } }],
+          },
+        }],
       }
     );
 
@@ -328,8 +328,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'get' },
-          expression: { type: 'LiteralNumericExpression', value: 2 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 2 },
+        }],
       }
     );
     testParse('({ set: 2 })', expr,
@@ -338,8 +338,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'set' },
-          expression: { type: 'LiteralNumericExpression', value: 2 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 2 },
+        }],
       }
     );
     testParse('({ __proto__: 2 })', expr,
@@ -348,8 +348,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: '__proto__' },
-          expression: { type: 'LiteralNumericExpression', value: 2 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 2 },
+        }],
       }
     );
     testParse('({"__proto__": 2 })', expr,
@@ -358,8 +358,8 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: '__proto__' },
-          expression: { type: 'LiteralNumericExpression', value: 2 }
-        }]
+          expression: { type: 'LiteralNumericExpression', value: 2 },
+        }],
       }
     );
 
@@ -372,8 +372,8 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'width' } }]
-          }
+            statements: [{ type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'width' } }],
+          },
         }, {
           type: 'Setter',
           name: { type: 'StaticPropertyName', value: 'width' },
@@ -381,9 +381,9 @@ suite('Parser', function () {
           body: {
             type: 'FunctionBody',
             directives: [],
-            statements: [{ type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'width' } }]
-          }
-        }]
+            statements: [{ type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'width' } }],
+          },
+        }],
       }
     );
 
@@ -393,17 +393,17 @@ suite('Parser', function () {
         properties: [{
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'a' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
+          expression: { type: 'LiteralNumericExpression', value: 0 },
         }, {
           type: 'Getter',
           name: { type: 'StaticPropertyName', value: 'b' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
         }, {
           type: 'Setter',
           name: { type: 'StaticPropertyName', value: '3' },
           param: { type: 'BindingIdentifier', name: 'd' },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -428,8 +428,8 @@ suite('Parser', function () {
         properties: [{ type: 'ShorthandProperty', name: { type: 'IdentifierExpression', name: 'a' } }, {
           type: 'DataProperty',
           name: { type: 'StaticPropertyName', value: 'b' },
-          expression: { type: 'LiteralNumericExpression', value: 0 }
-        }, { type: 'ShorthandProperty', name: { type: 'IdentifierExpression', name: 'c' } }]
+          expression: { type: 'LiteralNumericExpression', value: 0 },
+        }, { type: 'ShorthandProperty', name: { type: 'IdentifierExpression', name: 'c' } }],
       }
     );
 
@@ -437,7 +437,7 @@ suite('Parser', function () {
       {
         type: 'ObjectExpression',
         properties: [{ type: 'ShorthandProperty', name: { type: 'IdentifierExpression', name: 'a' } },
-          { type: 'ShorthandProperty', name: { type: 'IdentifierExpression', name: 'b' } }]
+          { type: 'ShorthandProperty', name: { type: 'IdentifierExpression', name: 'b' } }],
       }
     );
 
@@ -449,8 +449,8 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'StaticPropertyName', value: 'a' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -473,12 +473,12 @@ suite('Parser', function () {
                 declarators: [{
                   type: 'VariableDeclarator',
                   binding: { type: 'BindingIdentifier', name: 'a' },
-                  init: null
-                }]
-              }
-            }]
-          }
-        }]
+                  init: null,
+                }],
+              },
+            }],
+          },
+        }],
       }
     );
 
@@ -490,8 +490,8 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'StaticPropertyName', value: 'a' },
           params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'b' }], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -505,10 +505,10 @@ suite('Parser', function () {
           params: {
             type: 'FormalParameters',
             items: [{ type: 'BindingIdentifier', name: 'b' }],
-            rest: { type: 'BindingIdentifier', name: 'c' }
+            rest: { type: 'BindingIdentifier', name: 'c' },
           },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -522,10 +522,10 @@ suite('Parser', function () {
           params: {
             type: 'FormalParameters',
             items: [{ type: 'BindingIdentifier', name: 'b' }, { type: 'BindingIdentifier', name: 'c' }],
-            rest: null
+            rest: null,
           },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -539,7 +539,7 @@ suite('Parser', function () {
           params: {
             type: 'FormalParameters',
             items: [{ type: 'BindingIdentifier', name: 'b' }, { type: 'BindingIdentifier', name: 'c' }],
-            rest: null
+            rest: null,
           },
           body: {
             type: 'FunctionBody',
@@ -552,12 +552,12 @@ suite('Parser', function () {
                 declarators: [{
                   type: 'VariableDeclarator',
                   binding: { type: 'BindingIdentifier', name: 'd' },
-                  init: null
-                }]
-              }
-            }]
-          }
-        }]
+                  init: null,
+                }],
+              },
+            }],
+          },
+        }],
       }
     );
 
@@ -567,8 +567,8 @@ suite('Parser', function () {
         type: 'Setter',
         name: { type: 'StaticPropertyName', value: 'a' },
         param: { type: 'BindingIdentifier', name: 'eval' },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }]
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      }],
     });
 
     testParse('({ set a([{b = 0}]){}, })', expr, {
@@ -583,13 +583,13 @@ suite('Parser', function () {
             properties: [{
               type: 'BindingPropertyIdentifier',
               binding: { type: 'BindingIdentifier', name: 'b' },
-              init: { type: 'LiteralNumericExpression', value: 0 }
-            }]
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            }],
           }],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }]
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      }],
     });
 
   });

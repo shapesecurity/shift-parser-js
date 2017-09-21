@@ -17,8 +17,8 @@
 let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 
-suite('Parser', function () {
-  suite('literal infinity expression', function () {
+suite('Parser', () => {
+  suite('literal infinity expression', () => {
 
     testParse('2e308', expr, { type: 'LiteralInfinityExpression' });
 

@@ -21,8 +21,8 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('script', function () {
+suite('Parser', () => {
+  suite('script', () => {
     testParse('', id, { type: 'Script', directives: [], statements: [] });
     testParse(' ', id, { type: 'Script', directives: [], statements: [] });
     testParseFailure('/*', 'Unexpected end of input');

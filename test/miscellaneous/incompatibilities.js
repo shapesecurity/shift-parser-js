@@ -25,10 +25,10 @@ function moduleExpr(m) {
   return m.items[0].expression;
 }
 
-suite('Parser', function () {
+suite('Parser', () => {
 
   // programs that parse according to ES3 but either fail or parse differently according to ES5
-  suite('ES5 backward incompatibilities', function () {
+  suite('ES5 backward incompatibilities', () => {
     // ES3: zero-width non-breaking space is allowed in an identifier
     // ES5: zero-width non-breaking space is a whitespace character
     testParseFailure('_\uFEFF_', 'Unexpected identifier');
@@ -40,7 +40,7 @@ suite('Parser', function () {
 
 
   // programs where we choose to diverge from the ES5 specification
-  suite('ES5 divergences', function () {
+  suite('ES5 divergences', () => {
     // ES5: assignment to computed member expression
     // ES6: variable declaration statement
     testParse('let[a] = b;', stmt,
@@ -52,9 +52,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null },
-            init: { type: 'IdentifierExpression', name: 'b' }
-          }]
-        }
+            init: { type: 'IdentifierExpression', name: 'b' },
+          }],
+        },
       }
     );
 
@@ -67,9 +67,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null },
-            init: { type: 'IdentifierExpression', name: 'b' }
-          }]
-        }
+            init: { type: 'IdentifierExpression', name: 'b' },
+          }],
+        },
       }
     );
 
@@ -85,16 +85,16 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'BindingIdentifier', name: 'f' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }]
-        }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          }],
+        },
       }
     );
   });
 
 
   // programs that parse according to ES5 but either fail or parse differently according to ES6
-  suite('ES6 backward incompatibilities', function () {
+  suite('ES6 backward incompatibilities', () => {
     // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
     // ES6: yield has been moved from the future reserved words list to the keywords list
     testParse('var yield = function yield(){};', stmt,
@@ -111,10 +111,10 @@ suite('Parser', function () {
               isGenerator: false,
               name: { type: 'BindingIdentifier', name: 'yield' },
               params: { type: 'FormalParameters', items: [], rest: null },
-              body: { type: 'FunctionBody', directives: [], statements: [] }
-            }
-          }]
-        }
+              body: { type: 'FunctionBody', directives: [], statements: [] },
+            },
+          }],
+        },
       }
     );
 
@@ -137,12 +137,12 @@ suite('Parser', function () {
                 declarators: [{
                   type: 'VariableDeclarator',
                   binding: { type: 'BindingIdentifier', name: 'e' },
-                  init: { type: 'LiteralNumericExpression', value: 0 }
-                }]
-              }
-            }]
-          }
-        }
+                  init: { type: 'LiteralNumericExpression', value: 0 },
+                }],
+              },
+            }],
+          },
+        },
       }
     );
 
@@ -168,52 +168,52 @@ suite('Parser', function () {
       left: {
         type: 'VariableDeclaration',
         kind: 'var',
-        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }],
       },
       right: {
         type: 'ArrayExpression',
-        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }]
+        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }],
       },
-      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }
+      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
     });
     testParse('for(let x in [1,2]) 0', stmt, {
       type: 'ForInStatement',
       left: {
         type: 'VariableDeclaration',
         kind: 'let',
-        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }],
       },
       right: {
         type: 'ArrayExpression',
-        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }]
+        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }],
       },
-      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }
+      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
     });
     testParse('for(var x of [1,2]) 0', stmt, {
       type: 'ForOfStatement',
       left: {
         type: 'VariableDeclaration',
         kind: 'var',
-        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }],
       },
       right: {
         type: 'ArrayExpression',
-        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }]
+        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }],
       },
-      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }
+      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
     });
     testParse('for(let x of [1,2]) 0', stmt, {
       type: 'ForOfStatement',
       left: {
         type: 'VariableDeclaration',
         kind: 'let',
-        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }]
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'x' }, init: null }],
       },
       right: {
         type: 'ArrayExpression',
-        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }]
+        elements: [{ type: 'LiteralNumericExpression', value: 1 }, { type: 'LiteralNumericExpression', value: 2 }],
       },
-      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } }
+      body: { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
     });
 
     // ES5: allows unicode escape sequences in regular expression flags
@@ -245,8 +245,8 @@ suite('Parser', function () {
           type: 'UnaryExpression',
           operator: '!',
           operand: { type: 'UpdateExpression', isPrefix: true, operator: '--',
-            operand: { type: 'AssignmentTargetIdentifier', name: 'b' } }
-        }
+            operand: { type: 'AssignmentTargetIdentifier', name: 'b' } },
+        },
       }
     );
 

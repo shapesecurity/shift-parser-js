@@ -19,8 +19,8 @@ let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 
-suite('Parser', function () {
-  suite('automatic semicolon insertion', function () {
+suite('Parser', () => {
+  suite('automatic semicolon insertion', () => {
 
     testParse('{ x\n++y }', stmt,
       { type: 'BlockStatement',
@@ -65,15 +65,15 @@ suite('Parser', function () {
               declarators: [{
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'x' },
-                init: { type: 'LiteralNumericExpression', value: 14 }
+                init: { type: 'LiteralNumericExpression', value: 14 },
               }, {
                 type: 'VariableDeclarator',
                 binding: { type: 'BindingIdentifier', name: 'y' },
-                init: { type: 'LiteralNumericExpression', value: 3 }
-              }]
-            }
-          }, { type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'z' } }]
-        }
+                init: { type: 'LiteralNumericExpression', value: 3 },
+              }],
+            },
+          }, { type: 'ExpressionStatement', expression: { type: 'IdentifierExpression', name: 'z' } }],
+        },
       }
     );
 
@@ -173,9 +173,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{ type: 'ReturnStatement', expression: null }, {
             type: 'ExpressionStatement',
-            expression: { type: 'IdentifierExpression', name: 'x' }
-          }]
-        }
+            expression: { type: 'IdentifierExpression', name: 'x' },
+          }],
+        },
       }
     );
 
@@ -189,9 +189,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{ type: 'ReturnStatement', expression: null }, {
             type: 'ExpressionStatement',
-            expression: { type: 'IdentifierExpression', name: 'x' }
-          }]
-        }
+            expression: { type: 'IdentifierExpression', name: 'x' },
+          }],
+        },
       }
     );
     testParse('(function(){ return/* Multiline\nComment */x; })', expr,
@@ -204,9 +204,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{ type: 'ReturnStatement', expression: null }, {
             type: 'ExpressionStatement',
-            expression: { type: 'IdentifierExpression', name: 'x' }
-          }]
-        }
+            expression: { type: 'IdentifierExpression', name: 'x' },
+          }],
+        },
       }
     );
 
@@ -254,13 +254,13 @@ suite('Parser', function () {
 
   });
 
-  suite('whitespace characters', function () {
+  suite('whitespace characters', () => {
 
     testParse('new\u0020\u0009\u000B\u000C\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006' +
       '\u2007\u2008\u2009\u200A\u202F\u205F\u3000\uFEFFa', expr,
-      { type: 'NewExpression',
-        callee: { type: 'IdentifierExpression', name: 'a' },
-        arguments: [] }
+    { type: 'NewExpression',
+      callee: { type: 'IdentifierExpression', name: 'a' },
+      arguments: [] }
     );
 
     testParseFailure('new\u180Ea', 'Unexpected "\u180E"'); // Mongolian vowel separator
@@ -271,10 +271,10 @@ suite('Parser', function () {
         { type: 'Block',
           statements:
           [{ type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 1 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 2 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 3 } },
-                { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 4 } }] } }
+            { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 1 } },
+            { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 2 } },
+            { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 3 } },
+            { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 4 } }] } }
     );
 
   });

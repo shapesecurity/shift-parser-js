@@ -18,8 +18,8 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
 
-suite('Parser', function () {
-  suite('return statement', function () {
+suite('Parser', () => {
+  suite('return statement', () => {
     testParse('(function(){ return })', expr,
       { type: 'FunctionExpression',
         isGenerator: false,
@@ -27,7 +27,7 @@ suite('Parser', function () {
         params: { type: 'FormalParameters', items: [], rest: null },
         body: { type: 'FunctionBody', directives: [], statements: [
           { type: 'ReturnStatement', expression: null },
-        ] }
+        ] },
       }
     );
     testParse('(function(){ return; })', expr,
@@ -37,7 +37,7 @@ suite('Parser', function () {
         params: { type: 'FormalParameters', items: [], rest: null },
         body: { type: 'FunctionBody', directives: [], statements: [
           { type: 'ReturnStatement', expression: null },
-        ] }
+        ] },
       }
     );
     testParse('(function(){ return x; })', expr,
@@ -47,7 +47,7 @@ suite('Parser', function () {
         params: { type: 'FormalParameters', items: [], rest: null },
         body: { type: 'FunctionBody', directives: [], statements: [
           { type: 'ReturnStatement', expression: { type: 'IdentifierExpression', name: 'x' } },
-        ] }
+        ] },
       }
     );
     testParse('(function(){ return x * y })', expr,
@@ -61,10 +61,10 @@ suite('Parser', function () {
               type: 'BinaryExpression',
               operator: '*',
               left: { type: 'IdentifierExpression', name: 'x' },
-              right: { type: 'IdentifierExpression', name: 'y' }
-            }
+              right: { type: 'IdentifierExpression', name: 'y' },
+            },
           },
-        ] }
+        ] },
       }
     );
 
@@ -73,15 +73,15 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [{ type: 'BindingIdentifier', name: '_' }],
-          rest: null
+          rest: null,
         },
         body:
         { type: 'FunctionBody',
           directives: [],
           statements: [
-              { type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-          ]
-        }
+            { type: 'ReturnStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
+          ],
+        },
       }
     );
 

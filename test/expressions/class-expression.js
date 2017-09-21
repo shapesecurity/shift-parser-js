@@ -20,27 +20,27 @@ let testParseSuccess = require('../assertions').testParseSuccess;
 let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('class expression', function () {
+suite('Parser', () => {
+  suite('class expression', () => {
 
     testParse('(class {})', expr, { type: 'ClassExpression', name: null, super: null, elements: [] });
     testParse('(class A{})', expr, {
       type: 'ClassExpression',
       name: { type: 'BindingIdentifier', name: 'A' },
       super: null,
-      elements: []
+      elements: [],
     });
     testParse('(class extends A {})', expr, {
       type: 'ClassExpression',
       name: null,
       super: { type: 'IdentifierExpression', name: 'A' },
-      elements: []
+      elements: [],
     });
     testParse('(class A extends A {})', expr, {
       type: 'ClassExpression',
       name: { type: 'BindingIdentifier', name: 'A' },
       super: { type: 'IdentifierExpression', name: 'A' },
-      elements: []
+      elements: [],
     });
 
     testParse('(class {;;;\n;\n})', expr, { type: 'ClassExpression', name: null, super: null, elements: [] });
@@ -57,9 +57,9 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -76,8 +76,8 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
         }, {
           type: 'ClassElement',
           isStatic: false,
@@ -86,9 +86,9 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: 'b' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -104,9 +104,9 @@ suite('Parser', function () {
             type: 'Setter',
             name: { type: 'StaticPropertyName', value: 'a' },
             param: { type: 'BindingIdentifier', name: 'b' },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -121,9 +121,9 @@ suite('Parser', function () {
           method: {
             type: 'Getter',
             name: { type: 'StaticPropertyName', value: 'a' },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -139,9 +139,9 @@ suite('Parser', function () {
             type: 'Setter',
             name: { type: 'StaticPropertyName', value: 'a' },
             param: { type: 'BindingIdentifier', name: 'b' },
-            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] },
+          },
+        }],
       }
     );
 
@@ -158,9 +158,9 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: 'a' },
             params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: 'b' }], rest: null },
-            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] },
+          },
+        }],
       }
     );
 
@@ -177,9 +177,9 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: 'prototype' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -196,9 +196,9 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -215,9 +215,9 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: '3' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -238,13 +238,13 @@ suite('Parser', function () {
                 type: 'BinaryExpression',
                 operator: '+',
                 left: { type: 'LiteralNumericExpression', value: 3 },
-                right: { type: 'LiteralNumericExpression', value: 5 }
-              }
+                right: { type: 'LiteralNumericExpression', value: 5 },
+              },
             },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
-        }]
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
+        }],
       }
     );
 
@@ -256,26 +256,26 @@ suite('Parser', function () {
           type: 'BinaryExpression',
           operator: ',',
           left: { type: 'IdentifierExpression', name: 'a' },
-          right: { type: 'IdentifierExpression', name: 'b' }
+          right: { type: 'IdentifierExpression', name: 'b' },
         },
-        elements: []
+        elements: [],
       }
     );
 
-    testParse('var x = class extends (a,b) {};', function (program) {
+    testParse('var x = class extends (a,b) {};', program => {
       return stmt(program).declaration.declarators[0].init;
     },
-      {
-        type: 'ClassExpression',
-        name: null,
-        super: {
-          type: 'BinaryExpression',
-          operator: ',',
-          left: { type: 'IdentifierExpression', name: 'a' },
-          right: { type: 'IdentifierExpression', name: 'b' }
-        },
-        elements: []
-      }
+    {
+      type: 'ClassExpression',
+      name: null,
+      super: {
+        type: 'BinaryExpression',
+        operator: ',',
+        left: { type: 'IdentifierExpression', name: 'a' },
+        right: { type: 'IdentifierExpression', name: 'b' },
+      },
+      elements: [],
+    }
     );
 
     testParse('(class {static(){}})', expr, {
@@ -290,9 +290,9 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'StaticPropertyName', value: 'static' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }
-      }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        },
+      }],
     });
 
     testParse('(class {static constructor(){}})', expr, {
@@ -307,9 +307,9 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'StaticPropertyName', value: 'constructor' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }
-      }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        },
+      }],
     });
 
     testParseSuccess('({ a(){ (class {[super.a](){}}); } })');

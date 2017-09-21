@@ -28,7 +28,7 @@ function expr(program) {
 
 function schemaCheckUnion(node, spec) {
   if (spec.typeName === 'Union') {
-    return spec.arguments.some(function (argument) {
+    return spec.arguments.some(argument => {
       return schemaCheckUnion(node, argument);
     });
   } else if (spec.typeName === node.type) {
@@ -42,7 +42,7 @@ let fieldDatabase = Object.create(null);
 for (let type in SHIFT_SPEC) {
   if ({}.hasOwnProperty.call(SHIFT_SPEC, type)) {
     fieldDatabase[type] = {};
-    SHIFT_SPEC[type].fields.forEach(function (field) {
+    SHIFT_SPEC[type].fields.forEach(field => {
       fieldDatabase[type][field] = true;
     });
   }
@@ -54,7 +54,7 @@ function schemaCheck(node, spec) {
       if (!Array.isArray(node)) {
         expect().fail('node must be an array, but it is: ' + JSON.stringify(node, null, 2));
       }
-      node.forEach(function (n) {
+      node.forEach(n => {
         schemaCheck(n, spec.argument);
       });
       return;
@@ -93,7 +93,7 @@ function schemaCheck(node, spec) {
       return;
   }
 
-  spec.fields.forEach(function (field) {
+  spec.fields.forEach(field => {
     if (field.name === 'type') {
       if (node.type !== field.value) {
         expect(node.type).eql(field.value);
@@ -118,10 +118,11 @@ function checkSanity(range, child) {
   if (Array.isArray(child)) {
     let lower = range.min;
     for (let item of child) {
-      if (child.min < lower) {
+      if (item === null) continue;
+      if (item.min < lower) {
         throw new Error('list-lower out of order');
       }
-      lower = child.max;
+      lower = item.max;
     }
     if (lower > range.max) {
       throw new Error('list-upper out of order');
@@ -137,7 +138,7 @@ function locationSanityCheck(tree, locations) {
   let rangeChecker = {};
 
   for (let typeName of Object.keys(SHIFT_SPEC)) {
-    rangeChecker[`reduce${typeName}`] = function(node, children) {
+    rangeChecker[`reduce${typeName}`] = function (node, children) {
       if (!locations.has(node)) {
         if (node.type === 'BindingIdentifier' && node.name === '*default*') {
           // the artificial BindingIdentifier for export default unnamed function/class has no location information.
@@ -168,7 +169,7 @@ function locationSanityCheck(tree, locations) {
         }
       }
       return ret;
-    }
+    };
   }
 
   reduce(rangeChecker, tree);

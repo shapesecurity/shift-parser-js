@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 
-suite('Parser', function () {
-  suite('grouping', function () {
+suite('Parser', () => {
+  suite('grouping', () => {
 
     testParse('((((((((((((((((((((((((((((((((((((((((((((((((((0))))))))))))))))))))))))))))))))))))))))))))))))))',
       expr,
@@ -64,7 +64,7 @@ suite('Parser', function () {
         type: 'BinaryExpression',
         operator: '+',
         left: { type: 'IdentifierExpression', name: 'a' },
-        right: { type: 'IdentifierExpression', name: 'b' }
+        right: { type: 'IdentifierExpression', name: 'b' },
       }
     );
 
@@ -84,7 +84,7 @@ suite('Parser', function () {
       {
         type: 'CallExpression',
         callee: { type: 'IdentifierExpression', name: 'a' },
-        arguments: [{ type: 'IdentifierExpression', name: 'a' }]
+        arguments: [{ type: 'IdentifierExpression', name: 'a' }],
       }
     );
 
@@ -92,7 +92,7 @@ suite('Parser', function () {
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -100,7 +100,7 @@ suite('Parser', function () {
       {
         type: 'AssignmentExpression',
         binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        expression: { type: 'LiteralNumericExpression', value: 0 }
+        expression: { type: 'LiteralNumericExpression', value: 0 },
       }
     );
 
@@ -132,7 +132,7 @@ suite('Parser', function () {
         type: 'ConditionalExpression',
         test: { type: 'IdentifierExpression', name: 'a' },
         consequent: { type: 'IdentifierExpression', name: 'b' },
-        alternate: { type: 'IdentifierExpression', name: 'c' }
+        alternate: { type: 'IdentifierExpression', name: 'c' },
       }
     );
   });

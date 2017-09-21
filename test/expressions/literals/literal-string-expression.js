@@ -19,8 +19,8 @@ let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 let testParseModuleFailure = require('../../assertions').testParseModuleFailure;
 
-suite('Parser', function () {
-  suite('literal string expression', function () {
+suite('Parser', () => {
+  suite('literal string expression', () => {
     testParse('(\'x\')', expr, { type: 'LiteralStringExpression', value: 'x' });
     testParse('(\'\\\\\\\'\')', expr, { type: 'LiteralStringExpression', value: '\\\'' });
     testParse('("x")', expr, { type: 'LiteralStringExpression', value: 'x' });

@@ -22,8 +22,8 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('function declaration', function () {
+suite('Parser', () => {
+  suite('function declaration', () => {
     testParse('function hello() { z(); }', stmt,
       { type: 'FunctionDeclaration',
         isGenerator: false,
@@ -34,9 +34,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{
             type: 'ExpressionStatement',
-            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] }
-          }]
-        }
+            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] },
+          }],
+        },
       }
     );
 
@@ -45,7 +45,7 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'eval' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -54,7 +54,7 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'arguments' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -66,12 +66,12 @@ suite('Parser', function () {
         { type: 'FormalParameters',
           items:
           [
-                { type: 'BindingIdentifier', name: 't' },
-                { type: 'BindingIdentifier', name: 't' },
+            { type: 'BindingIdentifier', name: 't' },
+            { type: 'BindingIdentifier', name: 't' },
           ],
-          rest: null
+          rest: null,
         },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -88,9 +88,9 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'BindingIdentifier', name: 'inner' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] }
-          }]
-        }
+            body: { type: 'FunctionBody', directives: [{ type: 'Directive', rawValue: 'use strict' }], statements: [] },
+          }],
+        },
       }
     );
 
@@ -104,9 +104,9 @@ suite('Parser', function () {
           directives: [],
           statements: [{
             type: 'ExpressionStatement',
-            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] }
-          }]
-        }
+            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] },
+          }],
+        },
       }
     );
 
@@ -118,19 +118,19 @@ suite('Parser', function () {
         { type: 'FormalParameters',
           items:
           [
-                { type: 'BindingIdentifier', name: 'a' },
-                { type: 'BindingIdentifier', name: 'b' },
+            { type: 'BindingIdentifier', name: 'a' },
+            { type: 'BindingIdentifier', name: 'b' },
           ],
-          rest: null
+          rest: null,
         },
         body: {
           type: 'FunctionBody',
           directives: [],
           statements: [{
             type: 'ExpressionStatement',
-            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] }
-          }]
-        }
+            expression: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'z' }, arguments: [] },
+          }],
+        },
       }
     );
 
@@ -141,13 +141,13 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: { type: 'BindingIdentifier', name: 'b' }
+          rest: { type: 'BindingIdentifier', name: 'b' },
         },
         body: {
           type: 'FunctionBody',
           directives: [],
-          statements: []
-        }
+          statements: [],
+        },
       }
     );
 
@@ -158,13 +158,13 @@ suite('Parser', function () {
         params:
         { type: 'FormalParameters',
           items: [],
-          rest: { type: 'ArrayBinding', elements: [], rest: null }
+          rest: { type: 'ArrayBinding', elements: [], rest: null },
         },
         body: {
           type: 'FunctionBody',
           directives: [],
-          statements: []
-        }
+          statements: [],
+        },
       }
     );
 
@@ -173,7 +173,7 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'universe' },
         params: { type: 'FormalParameters', items: [{ type: 'BindingIdentifier', name: '__proto__' }], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
 
@@ -191,10 +191,10 @@ suite('Parser', function () {
               type: 'BinaryExpression',
               operator: '+',
               left: { type: 'LiteralStringExpression', value: 'use strict' },
-              right: { type: 'LiteralNumericExpression', value: 0 }
-            }
-          }]
-        }
+              right: { type: 'LiteralNumericExpression', value: 0 },
+            },
+          }],
+        },
       }
     );
 
@@ -207,14 +207,14 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: 'a' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
         }, {
           type: 'FunctionDeclaration',
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: 'a' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }]
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        }],
       }
     );
 
@@ -231,20 +231,20 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'BindingIdentifier', name: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
           }, {
             type: 'FunctionDeclaration',
             isGenerator: false,
             name: { type: 'BindingIdentifier', name: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }]
-        }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          }],
+        },
       }
     );
   });
 
-  suite('function declaration in labeled statement', function () {
+  suite('function declaration in labeled statement', () => {
     testParse('a: function a(){}', stmt,
       {
         type: 'LabeledStatement',
@@ -254,15 +254,15 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: 'a' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        },
       }
     );
 
     testParseFailure('a: function* a(){}', 'Unexpected token "*"');
   });
 
-  suite('Annex B 3.4: function declarations in if statements', function () {
+  suite('Annex B 3.4: function declarations in if statements', () => {
 
     testParse('if (0) function a(){}', stmt, {
       type: 'IfStatement',
@@ -272,9 +272,9 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       },
-      alternate: null
+      alternate: null,
     });
 
     testParse('if (0) function a(){} else;', stmt, {
@@ -285,9 +285,9 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       },
-      alternate: { type: 'EmptyStatement' }
+      alternate: { type: 'EmptyStatement' },
     });
 
     testParse('if (0); else function a(){}', stmt, {
@@ -299,8 +299,8 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      },
     });
 
     testParse('if (0) function a(){} else function b(){}', stmt, {
@@ -311,15 +311,15 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
       },
       alternate: {
         type: 'FunctionDeclaration',
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'b' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      },
     });
 
     testParse('try {} catch (e) { if(0) function e(){} }', stmt, {
@@ -339,13 +339,13 @@ suite('Parser', function () {
                 isGenerator: false,
                 name: { type: 'BindingIdentifier', name: 'e' },
                 body: { type: 'FunctionBody', directives: [], statements: [] },
-                params: { type: 'FormalParameters', items: [], rest: null }
+                params: { type: 'FormalParameters', items: [], rest: null },
               },
-              alternate: null
-            }
-          ]
-        }
-      }
+              alternate: null,
+            },
+          ],
+        },
+      },
     });
 
     testParseFailure('for(;;) function a(){}', 'Unexpected token "function"');

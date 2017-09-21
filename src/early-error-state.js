@@ -236,7 +236,7 @@ export class EarlyErrorState {
   }
 
   enforceDuplicateLexicallyDeclaredNames(createError) {
-    this.lexicallyDeclaredNames.forEachEntry((nodes/* , bindingName*/) => {
+    this.lexicallyDeclaredNames.forEachEntry(nodes => {
       if (nodes.length > 1) {
         nodes.slice(1).forEach(dupeNode => {
           this.addError(createError(dupeNode));
@@ -277,7 +277,7 @@ export class EarlyErrorState {
   }
 
   recordForOfVars() {
-    this.varDeclaredNames.forEach((bindingIdentifier) => {
+    this.varDeclaredNames.forEach(bindingIdentifier => {
       this.forOfVarDeclaredNames.push(bindingIdentifier);
     });
     return this;
@@ -379,7 +379,7 @@ identity = new EarlyErrorState;
 Object.getOwnPropertyNames(EarlyErrorState.prototype).forEach(methodName => {
   if (methodName === 'constructor') return;
   Object.defineProperty(identity, methodName, {
-    value: function () {
+    value() {
       return EarlyErrorState.prototype[methodName].apply(new EarlyErrorState, arguments);
     },
     enumerable: false,

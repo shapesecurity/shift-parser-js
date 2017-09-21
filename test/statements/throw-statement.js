@@ -17,8 +17,8 @@
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
 
-suite('Parser', function () {
-  suite('throw statement', function () {
+suite('Parser', () => {
+  suite('throw statement', () => {
 
     testParse('throw this', stmt, { type: 'ThrowStatement', expression: { type: 'ThisExpression' } });
 

@@ -28,8 +28,8 @@ function id(x) {
   return x;
 }
 
-suite('Parser', function () {
-  suite('export declaration', function () {
+suite('Parser', () => {
+  suite('export declaration', () => {
 
     testExportDecl('export * from "a"', { type: 'ExportAllFrom', moduleSpecifier: 'a' });
 
@@ -38,19 +38,19 @@ suite('Parser', function () {
     testExportDecl('export {a} from "a"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }],
-      moduleSpecifier: 'a'
+      moduleSpecifier: 'a',
     });
 
     testExportDecl('export {with} from "a"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'with', exportedName: null }],
-      moduleSpecifier: 'a'
+      moduleSpecifier: 'a',
     });
 
     testExportDecl('export {a,} from "a"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }],
-      moduleSpecifier: 'a'
+      moduleSpecifier: 'a',
     });
 
     testExportDecl('export {a,b} from "a"', {
@@ -58,45 +58,45 @@ suite('Parser', function () {
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }, {
         type: 'ExportFromSpecifier',
         name: 'b',
-        exportedName: null
+        exportedName: null,
       }],
-      moduleSpecifier: 'a'
+      moduleSpecifier: 'a',
     });
 
     testExportDecl('export {a as b} from "a"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: 'b' }],
-      moduleSpecifier: 'a'
+      moduleSpecifier: 'a',
     });
 
     testExportDecl('export {with as a} from "a"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'with', exportedName: 'a' }],
-      moduleSpecifier: 'a'
+      moduleSpecifier: 'a',
     });
 
     testExportDecl('export {as as as} from "as"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'as', exportedName: 'as' }],
-      moduleSpecifier: 'as'
+      moduleSpecifier: 'as',
     });
 
     testExportDecl('export {as as function} from "as"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'as', exportedName: 'function' }],
-      moduleSpecifier: 'as'
+      moduleSpecifier: 'as',
     });
 
     testExportDecl('export {a} from "m"', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }],
-      moduleSpecifier: 'm'
+      moduleSpecifier: 'm',
     });
 
     testExportDecl('export {if as var} from "a";', {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'if', exportedName: 'var' }],
-      moduleSpecifier: 'a'
+      moduleSpecifier: 'a',
     });
 
     testExportDecl('export {a}\n var a;', {
@@ -115,10 +115,10 @@ suite('Parser', function () {
       type: 'ExportLocals',
       namedExports: [{ type: 'ExportLocalSpecifier', name: { type: 'IdentifierExpression', name: 'a' },
         exportedName: null }, {
-          type: 'ExportLocalSpecifier',
-          name: { type: 'IdentifierExpression', name: 'b' },
-          exportedName: null
-        }]
+        type: 'ExportLocalSpecifier',
+        name: { type: 'IdentifierExpression', name: 'b' },
+        exportedName: null,
+      }],
     });
 
     testExportDecl(
@@ -131,9 +131,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'b' }, init: null }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }, { type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'b' }, init: null }],
+        },
       });
 
     testExportDecl(
@@ -146,13 +146,13 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
+            init: { type: 'LiteralNumericExpression', value: 0 },
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'b' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
+        },
       });
 
     testExportDecl(
@@ -165,13 +165,13 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'a' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
+            init: { type: 'LiteralNumericExpression', value: 0 },
           }, {
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'b' },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
+        },
       });
 
     testExportDecl(
@@ -184,9 +184,9 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'ArrayBinding', elements: [{ type: 'BindingIdentifier', name: 'a' }], rest: null },
-            init: { type: 'LiteralNumericExpression', value: 0 }
-          }]
-        }
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          }],
+        },
       });
 
     testExportDecl(
@@ -197,8 +197,8 @@ suite('Parser', function () {
           type: 'ClassDeclaration',
           name: { type: 'BindingIdentifier', name: 'A' },
           super: null,
-          elements: []
-        }
+          elements: [],
+        },
       });
 
     testExportDecl(
@@ -210,8 +210,8 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: 'A' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        },
       }
     );
 
@@ -224,8 +224,8 @@ suite('Parser', function () {
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: '*default*' },
           params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] }
-        }
+          body: { type: 'FunctionBody', directives: [], statements: [] },
+        },
       }
     );
 
@@ -237,8 +237,8 @@ suite('Parser', function () {
           type: 'ClassDeclaration',
           name: { type: 'BindingIdentifier', name: '*default*' },
           super: null,
-          elements: []
-        }
+          elements: [],
+        },
       });
 
     testExportDecl(
@@ -249,8 +249,8 @@ suite('Parser', function () {
           type: 'BinaryExpression',
           operator: '+',
           left: { type: 'LiteralNumericExpression', value: 3 },
-          right: { type: 'LiteralNumericExpression', value: 1 }
-        }
+          right: { type: 'LiteralNumericExpression', value: 1 },
+        },
       });
 
     testExportDecl(
@@ -264,13 +264,13 @@ suite('Parser', function () {
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      },
     });
 
     testExportDecl('export default class a{}', {
       type: 'ExportDefault',
-      body: { type: 'ClassDeclaration', name: { type: 'BindingIdentifier', name: 'a' }, super: null, elements: [] }
+      body: { type: 'ClassDeclaration', name: { type: 'BindingIdentifier', name: 'a' }, super: null, elements: [] },
     });
 
     testExportDecl('export default function* a(){}', {
@@ -280,8 +280,8 @@ suite('Parser', function () {
         isGenerator: true,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] }
-      }
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      },
     });
 
     testParseModule('export default 0;0', id,
@@ -329,8 +329,8 @@ suite('Parser', function () {
             isGenerator: false,
             name: { type: 'BindingIdentifier', name: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },
-            body: { type: 'FunctionBody', directives: [], statements: [] }
-          }
+            body: { type: 'FunctionBody', directives: [], statements: [] },
+          },
         },
         { type: 'VariableDeclarationStatement', declaration: { type: 'VariableDeclaration', kind: 'let', declarators:
           [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'b' }, init: null }] } },
@@ -340,11 +340,11 @@ suite('Parser', function () {
             type: 'ExportLocalSpecifier',
             name: {
               type: 'IdentifierExpression',
-              name: 'b'
+              name: 'b',
             },
-            exportedName: 'a'
-          }]
-        }
+            exportedName: 'a',
+          }],
+        },
       ] }
     );
 

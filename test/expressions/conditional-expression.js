@@ -17,8 +17,8 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 
-suite('Parser', function () {
-  suite('conditional expression', function () {
+suite('Parser', () => {
+  suite('conditional expression', () => {
 
     testParse('a?b:c', expr,
       { type: 'ConditionalExpression',
@@ -53,8 +53,8 @@ suite('Parser', function () {
           type: 'ConditionalExpression',
           test: { type: 'LiteralNumericExpression', value: 0 },
           consequent: { type: 'LiteralNumericExpression', value: 1 },
-          alternate: { type: 'LiteralNumericExpression', value: 2 }
-        }
+          alternate: { type: 'LiteralNumericExpression', value: 2 },
+        },
       }
     );
   });

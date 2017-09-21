@@ -23,9 +23,9 @@ function yd(p) {
   return stmt(p).body.statements[0].expression;
 }
 
-suite('Parser', function () {
+suite('Parser', () => {
 
-  suite('escapes in normal keywords', function () {
+  suite('escapes in normal keywords', () => {
     testParseFailure('i\\u0066 (0)', 'Unexpected escaped keyword');
     testParseFailure('var i\\u0066', 'Unexpected escaped keyword');
 
@@ -38,19 +38,19 @@ suite('Parser', function () {
             type: 'DataProperty',
             name: {
               type: 'StaticPropertyName',
-              value: 'if'
+              value: 'if',
             },
             expression: {
               type: 'LiteralNumericExpression',
-              value: 0
-            }
-          }]
-        }
+              value: 0,
+            },
+          }],
+        },
       }
     );
   });
 
-  suite('escapes in "let"', function () {
+  suite('escapes in "let"', () => {
     testParseFailure('le\\u0074 a', 'Unexpected identifier');
 
     testParse('var le\\u0074', stmt,
@@ -62,16 +62,16 @@ suite('Parser', function () {
           declarators: [{
             type: 'VariableDeclarator',
             binding: { type: 'BindingIdentifier', name: 'let' },
-            init: null
-          }]
-        }
+            init: null,
+          }],
+        },
       }
     );
 
     testEarlyError('"use strict"; var le\\u0074', 'The identifier "let" must not be in binding position in strict mode');
   });
 
-  suite('escapes in "yield"', function () {
+  suite('escapes in "yield"', () => {
     testParseFailure('function *a(){yi\\u0065ld 0}', '"yield" may not be used as an identifier in this context');
     testParseFailure('function *a(){var yi\\u0065ld}', '"yield" may not be used as an identifier in this context');
 
@@ -82,13 +82,13 @@ suite('Parser', function () {
           type: 'DataProperty',
           name: {
             type: 'StaticPropertyName',
-            value: 'yield'
+            value: 'yield',
           },
           expression: {
             type: 'LiteralNumericExpression',
-            value: 0
-          }
-        }]
+            value: 0,
+          },
+        }],
       }
     );
   });

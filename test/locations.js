@@ -207,4 +207,26 @@ suite('Locations', function () {
     const expr = statement.expression;
     helper.assertText(expr, '0, 1');
   });
+
+  test('spread', function () {
+    const helper = new LocationHelper('f( ...a );\n[ ...b ];');
+
+    let statement = helper.tree.statements[0];
+    helper.assertText(statement, 'f( ...a );');
+
+    let expr = statement.expression;
+    helper.assertText(expr, 'f( ...a )');
+
+    let spread = expr.arguments[0];
+    helper.assertText(spread, '...a');
+
+    statement = helper.tree.statements[1];
+    helper.assertText(statement, '[ ...b ];');
+
+    expr = statement.expression;
+    helper.assertText(expr, '[ ...b ]');
+
+    spread = expr.elements[0];
+    helper.assertText(spread, '...b');
+  });
 });

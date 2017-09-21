@@ -1753,8 +1753,8 @@ export class GenericParser extends Tokenizer {
         return result;
       }
       let arg;
+      let startState = this.startNode();
       if (this.eat(TokenType.ELLIPSIS)) {
-        let startState = this.startNode();
         arg = this.finishNode(new AST.SpreadElement({ expression: this.parseAssignmentExpression() }), startState);
       } else {
         arg = this.parseAssignmentExpression();

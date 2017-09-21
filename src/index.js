@@ -31,9 +31,16 @@ class ParserWithLocation extends GenericParser {
   }
 
   finishNode(node, start) {
+    if (node.type === 'Script' || node.type === 'Module') {
+      this.locations.set(node, {
+        start: { line: 0, column: 0, offset: 0 },
+        end: this.getLocation(),
+      });
+      return node;
+    }
     this.locations.set(node, {
       start,
-      end: this.getLocation()
+      end: this.getLastTokenEndLocation(),
     });
     return node;
   }

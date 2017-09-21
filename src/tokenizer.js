@@ -817,6 +817,14 @@ export default class Tokenizer {
     };
   }
 
+  getLastTokenEndLocation() {
+    return {
+      line: this.lastLine + 1,
+      column: this.lastIndex - this.lastLineStart,
+      offset: this.lastIndex,
+    };
+  }
+
   getSlice(start, startLocation) {
     return { text: this.source.slice(start, this.index), start, startLocation, end: this.index };
   }

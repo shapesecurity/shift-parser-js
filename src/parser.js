@@ -215,7 +215,6 @@ export class GenericParser extends Tokenizer {
   }
 
   parseFunctionBody() {
-    let startState = this.startNode();
 
     let oldInFunctionBody = this.inFunctionBody;
     let oldModule = this.module;
@@ -224,14 +223,15 @@ export class GenericParser extends Tokenizer {
     this.module = false;
 
     this.expect(TokenType.LBRACE);
-    let body = new AST.FunctionBody(this.parseBody());
+    let startState = this.startNode();
+    let body = this.finishNode(new AST.FunctionBody(this.parseBody()), startState);
     this.expect(TokenType.RBRACE);
 
     this.inFunctionBody = oldInFunctionBody;
     this.module = oldModule;
     this.strict = oldStrict;
 
-    return this.finishNode(body, startState);
+    return body;
   }
 
   parseBody() {

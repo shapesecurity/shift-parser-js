@@ -38,6 +38,18 @@ class ParserWithLocation extends GenericParser {
       });
       return node;
     }
+    if (node.type === 'FunctionBody' && node.directives.length === 0 && node.statements.length === 0) {
+      // Special case: a function body which contains no nodes spans no tokens, so the usual logic of "start of first contained token through end of last contained token" doesn't work. We choose to define it to start and end immediately after the opening brace.
+      const endLocation = this.getLastTokenEndLocation();
+      this.locations.set(node, { start: endLocation, end: endLocation });
+      return node;
+    }
+    if (node.type === 'FormalParameters' && node.items.length === 0 && node.rest === null) {
+      // Special case: formal parameters which contains no nodes span no tokens, so the usual logic of "start of first contained token through end of last contained token" doesn't work. We choose to define it to start and end immediately after the opening parenthesis.
+      const endLocation = this.getLastTokenEndLocation();
+      this.locations.set(node, { start: endLocation, end: endLocation });
+      return node;
+    }
     if (node.type === 'TemplateExpression') {
       // Adjust TemplateElements to not include surrounding backticks or braces
       for (let i = 0; i < node.elements.length; i += 2) {
@@ -49,11 +61,6 @@ class ParserWithLocation extends GenericParser {
           end: { line: location.end.line, column: location.end.column - endAdjustment, offset: location.end.offset - endAdjustment },
         });
       }
-    } else if (node.type === 'FormalParameters' && node.items.length === 0 && node.rest === null) {
-      // Special case: formal parameters which contains no nodes span no tokens, so the usual logic of "start of first contained token through end of last contained token" doesn't work. We choose to define it to start and end immediately after the opening parenthesis.
-      const endLocation = this.getLastTokenEndLocation();
-      this.locations.set(node, { start: endLocation, end: endLocation });
-      return node;
     }
     this.locations.set(node, {
       start,

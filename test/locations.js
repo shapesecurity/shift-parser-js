@@ -229,4 +229,17 @@ suite('Locations', function () {
     spread = expr.elements[0];
     helper.assertText(spread, '...b');
   });
+
+  test('function body', function () {
+    const helper = new LocationHelper('  function f(){ \n }  ');
+
+    const declaration = helper.tree.statements[0];
+    helper.assertText(declaration, 'function f(){ \n }');
+
+    const body = declaration.body;
+    helper.assertLocation(body, {
+      start: { line: 1, column: 15, offset: 15 },
+      end: { line: 1, column: 15, offset: 15 },
+    }); // i.e. right after the opening brace
+  });
 });

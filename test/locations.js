@@ -166,36 +166,36 @@ suite('Locations', () => {
     let helper = new LocationHelper('(a, b) => 0');
     let arrow = helper.tree.statements[0].expression;
     helper.assertText(arrow, '(a, b) => 0');
-    helper.assertText(arrow.params, 'a, b');
+    helper.assertText(arrow.params, '(a, b)');
 
     helper = new LocationHelper('(a, ...b) => 0');
-    helper.assertText(helper.tree.statements[0].expression.params, 'a, ...b');
+    helper.assertText(helper.tree.statements[0].expression.params, '(a, ...b)');
 
     helper = new LocationHelper('() => 0');
-    helper.assertText(helper.tree.statements[0].expression.params, '');
+    helper.assertText(helper.tree.statements[0].expression.params, '()');
+
+    helper = new LocationHelper('({a = 0}) => 0');
+    helper.assertText(helper.tree.statements[0].expression.params, '({a = 0})');
+
+    helper = new LocationHelper('({}) => 0');
+    helper.assertText(helper.tree.statements[0].expression.params, '({})');
 
     helper = new LocationHelper('a => 0');
     helper.assertText(helper.tree.statements[0].expression.params, 'a');
-
   });
 
   test('function params', () => {
     let helper = new LocationHelper('function f( ){}');
     let params = helper.tree.statements[0].params;
-    helper.assertText(params, '');
-
-    helper.assertLocation(params, {
-      start: { line: 1, column: 11, offset: 11 },
-      end: { line: 1, column: 11, offset: 11 },
-    });
+    helper.assertText(params, '( )');
 
     helper = new LocationHelper('function f( a ){}');
     params = helper.tree.statements[0].params;
-    helper.assertText(params, 'a');
+    helper.assertText(params, '( a )');
 
     helper = new LocationHelper('function f( a , ...b ){}');
     params = helper.tree.statements[0].params;
-    helper.assertText(params, 'a , ...b');
+    helper.assertText(params, '( a , ...b )');
   });
 
   test('group', () => {

@@ -222,10 +222,11 @@ export class GenericParser extends Tokenizer {
     this.inFunctionBody = true;
     this.module = false;
 
-    this.expect(TokenType.LBRACE);
     let startState = this.startNode();
-    let body = this.finishNode(new AST.FunctionBody(this.parseBody()), startState);
+    this.expect(TokenType.LBRACE);
+    let body = new AST.FunctionBody(this.parseBody());
     this.expect(TokenType.RBRACE);
+    body = this.finishNode(body, startState);
 
     this.inFunctionBody = oldInFunctionBody;
     this.module = oldModule;

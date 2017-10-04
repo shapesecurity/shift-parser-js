@@ -237,10 +237,11 @@ suite('Locations', () => {
     helper.assertText(declaration, 'function f(){ \n }');
 
     const body = declaration.body;
+    helper.assertText(body, '{ \n }');
     helper.assertLocation(body, {
-      start: { line: 1, column: 15, offset: 15 },
-      end: { line: 1, column: 15, offset: 15 },
-    }); // i.e. right after the opening brace
+      start: { line: 1, column: 14, offset: 14 },
+      end: { line: 2, column: 2, offset: 19 },
+    });
   });
 
   test('export default', () => {

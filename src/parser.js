@@ -1769,33 +1769,33 @@ export class GenericParser extends Tokenizer {
     //  2. Assignment target of assignment expression
     //  3. Parameter list of arrow function
     let rest = null;
+    let preParenStartState = this.startNode();
     let start = this.expect(TokenType.LPAREN);
     let postParenStartState = this.startNode();
     if (this.match(TokenType.RPAREN)) {
+      this.lex();
       let paramsNode = this.finishNode({
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
         rest: null,
-      }, postParenStartState);
-      this.lex();
+      }, preParenStartState);
       this.ensureArrow();
       this.isBindingElement = this.isAssignmentTarget = false;
       return paramsNode;
     } else if (this.eat(TokenType.ELLIPSIS)) {
       rest = this.parseBindingTarget();
+      this.expect(TokenType.RPAREN);
       let paramsNode = this.finishNode({
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
         rest,
-      }, postParenStartState);
-      this.expect(TokenType.RPAREN);
+      }, preParenStartState);
       this.ensureArrow();
       this.isBindingElement = this.isAssignmentTarget = false;
       return paramsNode;
     }
 
 
-    let startState = this.startNode();
     let group = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
 
     let params = this.isBindingElement ? [this.targetToBinding(this.transformDestructuringWithDefault(group))] : null;
@@ -1827,7 +1827,7 @@ export class GenericParser extends Tokenizer {
             left: group,
             operator: ',',
             right: expr,
-          }), startState);
+          }), postParenStartState);
         }
       } else {
         // Can be only binding elements.
@@ -1835,8 +1835,6 @@ export class GenericParser extends Tokenizer {
         params.push(binding);
       }
     }
-
-    const paramsNode = this.finishNode({ type: ARROW_EXPRESSION_PARAMS, params, rest }, postParenStartState);
 
     this.expect(TokenType.RPAREN);
 
@@ -1846,7 +1844,7 @@ export class GenericParser extends Tokenizer {
       }
 
       this.isBindingElement = false;
-      return paramsNode;
+      return this.finishNode({ type: ARROW_EXPRESSION_PARAMS, params, rest }, preParenStartState);
     }
     // Ensure assignment pattern:
     if (rest) {
@@ -2327,9 +2325,9 @@ export class GenericParser extends Tokenizer {
   }
 
   parseParams() {
-    this.expect(TokenType.LPAREN);
-
     let startState = this.startNode();
+
+    this.expect(TokenType.LPAREN);
 
     let items = [], rest = null;
     if (!this.match(TokenType.RPAREN)) {
@@ -2344,10 +2342,8 @@ export class GenericParser extends Tokenizer {
       }
     }
 
-    let params = this.finishNode(new AST.FormalParameters({ items, rest }), startState);
-
     this.expect(TokenType.RPAREN);
 
-    return params;
+    return this.finishNode(new AST.FormalParameters({ items, rest }), startState);
   }
 }

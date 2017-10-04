@@ -2,132 +2,123 @@ import fs from 'fs';
 import { parseScriptWithLocation, parseModuleWithLocation } from '../../';
 import { locationSanityCheck } from '../helpers';
 import expect from 'expect.js';
+import expectations from './expectations';
 
 let scriptDir = 'node_modules/test262-parser-tests';
 
-function parse(src, isModule, earlyErrors) {
-  return (isModule ? parseModuleWithLocation : parseScriptWithLocation)(src, { earlyErrors });
+function parse(src, asModule, earlyErrors) {
+  return (asModule ? parseModuleWithLocation : parseScriptWithLocation)(src, { earlyErrors });
+}
+
+function isModule(f) {
+  return /\.module\.js/.test(f);
 }
 
 suite('test262', () => {
   suite('pass and pass-explicit', () => {
-    let passExcludes = [
-      // https://github.com/shapesecurity/shift-parser-js/issues/311
-      '995.script.js',
+    for (let f of fs.readdirSync(`${scriptDir}/pass`)) {
+      if (expectations.xfail.pass.indexOf(f) !== -1) {
+        continue;
+      }
 
-      // This is an invalid test
-      '970.script.js',
+      let passTestFile = `${scriptDir}/pass/${f}`;
+      let passExplicitTestFile = `${scriptDir}/pass-explicit/${f}`;
+      test(`does not throw error and generates same tree[${f}]`, () => {
+        let passSrc = fs.readFileSync(passTestFile, 'utf8');
+        let passTree, passLocations;
+        expect(() => {
+          ({ tree: passTree, locations: passLocations } = parse(passSrc, isModule(f), true));
+        }).to.not.throwError();
+        locationSanityCheck(passTree, passLocations);
 
-      // https://github.com/shapesecurity/shift-parser-js/issues/311
-      '1012.script.js',
+        let passExplicitSrc = fs.readFileSync(passExplicitTestFile, 'utf8');
+        let passExplicitTree;
+        expect(() => {
+          passExplicitTree = parse(passExplicitSrc, isModule(f), true).tree;
+        }).to.not.throwError();
 
-      // https://github.com/tc39/test262-parser-tests/issues/12
-      '1252.script.js',
-    ];
-    fs.readdirSync(`${scriptDir}/pass`)
-      .filter(item => passExcludes.indexOf(item) === -1)
-      .forEach(f => {
-        let passTree, passLocations, passExplicitTree;
-        let passTestDir = `${scriptDir}/pass/${f}`;
-        let passExplicitTestDir = `${scriptDir}/pass-explicit/${f}`;
-        test(`does not throw error and generates same tree[${f}]`, () => {
-          let passSrc = fs.readFileSync(passTestDir, 'utf8');
-          expect(() => {
-            ({ tree: passTree, locations: passLocations } = parse(passSrc, f.match('.module.js'), true));
-          }).to.not.throwError();
-          locationSanityCheck(passTree, passLocations);
-
-          let passExplicitSrc = fs.readFileSync(passExplicitTestDir, 'utf8');
-          expect(() => {
-            passExplicitTree = parse(passExplicitSrc, f.match('.module.js'), true).tree;
-          }).to.not.throwError();
-
-          expect.eql(passTree, passExplicitTree);
-        });
+        expect.eql(passTree, passExplicitTree);
       });
+    }
+
+    for (let f of expectations.xfail.pass) {
+      let passTestFile = `${scriptDir}/pass/${f}`;
+      let passExplicitTestFile = `${scriptDir}/pass-explicit/${f}`;
+      test(`xfail: throws or fails to generate the same tree[${f}]`, () => {
+        let passSrc = fs.readFileSync(passTestFile, 'utf8'); // We are intentionally not catching errors here, so if the expectation becomes stale we'll get an error.
+        let passTree, passLocations;
+        let passExplicitSrc = fs.readFileSync(passExplicitTestFile, 'utf8');
+        let passExplicitTree;
+        try {
+          ({ tree: passTree, locations: passLocations } = parse(passSrc, isModule(f), true));
+          locationSanityCheck(passTree, passLocations);
+          passExplicitTree = parse(passExplicitSrc, isModule(f), true).tree;
+        } catch (e) {
+          return; // pass
+        }
+        expect.not.eql(passTree, passExplicitTree);
+      });
+    }
   });
 
   suite('fail', () => {
     let failTestDir = `${scriptDir}/fail`;
-    let failExcludes = [
-      // https://github.com/shapesecurity/shift-parser-js/issues/313
-      '69.script.js',
-      '70.script.js',
-      '71.script.js',
-      '75.script.js',
-      '76.script.js',
-      '77.script.js',
-      '149.script.js',
-      '151.script.js',
-      '248.script.js',
-      '519.script.js',
-    ];
-    fs.readdirSync(failTestDir)
-      .filter(item => failExcludes.indexOf(item) === -1)
-      .forEach(f => {
-        test(`throws error[${f}]`, () => {
-          let src = fs.readFileSync(`${failTestDir}/${f}`, 'utf8');
-          expect(() => {
-            parse(src, f.match('.module.js'), false);
-          }).to.throwError();
-        });
+    for (let f of fs.readdirSync(failTestDir)) {
+      if (expectations.xfail.fail.indexOf(f) !== -1) {
+        continue;
+      }
+
+      test(`throws error[${f}]`, () => {
+        let src = fs.readFileSync(`${failTestDir}/${f}`, 'utf8');
+        expect(() => {
+          parse(src, isModule(f), false);
+        }).to.throwError();
       });
+    }
+
+    for (let f of expectations.xfail.fail) {
+      test(`xfail: does not throw error[${f}]`, () => {
+        let src = fs.readFileSync(`${failTestDir}/${f}`, 'utf8');
+        expect(() => {
+          parse(src, isModule(f), false);
+        }).to.not.throwError();
+      });
+    }
   });
 
   suite('early', () => {
-    let earlyExcludes = [
-      // https://github.com/shapesecurity/shift-parser-js/issues/316
-      '56.script.js', '641.script.js', '642.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/317
-      '88.script.js', '90.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/318
-      '190.script.js', '205.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/319
-      '557.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/320
-      '558.script.js', '559.script.js', '560.script.js', '561.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/321
-      '563.script.js', '564.script.js', '565.script.js', '566.script.js',
-      '567.script.js', '568.script.js', '569.script.js', '570.script.js',
-      '571.script.js', '572.script.js', '574.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/322
-      '575.script.js', '576.script.js', '577.script.js', '578.script.js',
-      '579.script.js', '580.script.js', '581.script.js', '582.script.js',
-      '583.script.js', '585.script.js', '586.script.js', '587.script.js', '588.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/323
-      '589.script.js', '590.script.js', '591.script.js', '592.script.js', '593.script.js',
-
-      // https://github.com/tc39/test262-parser-tests/issues/7
-      '594.script.js', '596.script.js', '597.script.js', '598.script.js',
-
-      // https://github.com/tc39/test262-parser-tests/issues/6
-      '135.script.js',
-
-      // causes Syntax Errors in the test script
-      '599.script.js', '600.script.js', '601.script.js', '602.script.js',
-    ];
     let earlyErrorsTestDir = `${scriptDir}/early`;
-    fs.readdirSync(earlyErrorsTestDir)
-      .filter(item => earlyExcludes.indexOf(item) === -1)
-      .forEach(f => {
-        let src = fs.readFileSync(`${earlyErrorsTestDir}/${f}`, 'utf8');
-        test(`does not throw error with earlyErrors false[${f}]`, () => {
-          expect(() => {
-            parse(src, f.match('.module.js'), false);
-          }).to.not.throwError();
-        });
-        test(`throws error with earlyErrors true[${f}]`, () => {
-          expect(() => {
-            parse(src, f.match('.module.js'), true);
-          }).to.throwError();
-        });
+    for (let f of fs.readdirSync(earlyErrorsTestDir)) {
+      if (expectations.xfail.early.indexOf(f) !== -1) {
+        continue;
+      }
+
+      let src = fs.readFileSync(`${earlyErrorsTestDir}/${f}`, 'utf8');
+      test(`does not throw error with earlyErrors false[${f}]`, () => {
+        expect(() => {
+          parse(src, isModule(f), false);
+        }).to.not.throwError();
       });
+      test(`throws error with earlyErrors true[${f}]`, () => {
+        expect(() => {
+          parse(src, isModule(f), true);
+        }).to.throwError();
+      });
+    }
+
+    for (let f of expectations.xfail.early) {
+      let src = fs.readFileSync(`${earlyErrorsTestDir}/${f}`, 'utf8');
+
+      test(`xfail: throws with earlyErrors false or not with earlyErrors true[${f}]`, () => {
+        try {
+          parse(src, isModule(f), false);
+        } catch (e) {
+          return; // pass
+        }
+        expect(() => {
+          parse(src, isModule(f), true);
+        }).to.not.throwError();
+      });
+    }
   });
 });

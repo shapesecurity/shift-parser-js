@@ -38,9 +38,7 @@ class ParserWithLocation extends GenericParser {
       });
       return node;
     }
-    if (
-      node.type === 'FunctionBody' && node.directives.length === 0 && node.statements.length === 0
-      || node.type === 'FormalParameters' && node.items.length === 0 && node.rest === null) {
+    if (node.type === 'FormalParameters' && node.items.length === 0 && node.rest === null) {
       // Special case: formal parameters or function bodies which contain no nodes span no tokens, so the usual logic of "start of first contained token through end of last contained token" doesn't work. We choose to define it to start and end immediately after the opening parenthesis or brace.
       const endLocation = this.getLastTokenEndLocation();
       this.locations.set(node, { start: endLocation, end: endLocation });

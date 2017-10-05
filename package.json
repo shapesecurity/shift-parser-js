@@ -47,7 +47,7 @@
     "nyc": "10.1.2",
     "regenerate": "^1.3.2",
     "shift-spec": "^2016.0.0",
-    "test262-parser-tests": "0.0.1",
+    "test262-parser-tests": "0.0.2",
     "tick": "0.1.1",
     "traceur": "0.0.91",
     "uglifyjs": "2.4.10",

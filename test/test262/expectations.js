@@ -1,68 +1,63 @@
 export default {
   xfail: {
     pass: [
-      // https://github.com/shapesecurity/shift-parser-js/issues/311
-      '995.script.js',
-
-      // This is an invalid test
-      '970.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/311
-      '1012.script.js',
-
-      // https://github.com/tc39/test262-parser-tests/issues/12
-      '1252.script.js',
     ],
     early: [
-      // https://github.com/shapesecurity/shift-parser-js/issues/316
-      '56.script.js', '641.script.js', '642.script.js',
+      // Early Errors which our AST format can't represent
+      '024073814ce2cace.js',
+      '033064204b44b686.js',
+      '1c22bc1b20bdacf1.js',
+      '21f3dc70492447d0.js',
+      '0ed820b1748fb826.js',
+      '21f3dc70492447d0.js',
+      '24e27ce4ea8b1550.js',
+      '2b4520facdc72696.js',
+      '2c3cbce523ad436e.js',
+      '3121a50c07bfa0aa.js',
+      '3bc32f5a77e8468e.js',
+      '5995f93582b8bd22.js',
+      '59eb4e0a7c215b4c.js',
+      '5e4a34251d0fc48d.js',
+      '63452bbeb15314d6.js',
+      '670343391d88a743.js',
+      '78cb084c22573e4a.js',
+      '79592a4804326355.js',
+      '7a2bf91be132b22d.js',
+      '80c2d2d1d35c8dcc.js',
+      '869ac2b391a8c7cd.js',
+      '8b659d2805837e98.js',
+      '8c62442458de872f.js',
+      '90c089b382d8aaf9.js',
+      '9d030e1cf08f5d77.js',
+      'a633b3217b5b8026.js',
+      'b4cac065cfcbc658.js',
+      'b6a72a718cb7ca67.js',
+      'bd0a88a0f6b9250e.js',
+      'cdea3406c440ecf3.js',
+      'e9a40a98ec62f818.js',
+      'ea84c60f3b157d35.js',
+      'f0e47254d16fb114.js',
+      'f933ec047b8a7c3d.js',
+      'd52f769ab39372c7.js',
+      'c9566d6dccc93ae5.js',
+      'ef63ef2fa948d9b1.js',
+      '228aa4eba2418335.js',
+      '2e95646f9143563e.js',
+      '37cb3282e0c7d516.js',
+      'd008c8cd68d4446e.js',
 
-      // https://github.com/shapesecurity/shift-parser-js/issues/317
-      '88.script.js', '90.script.js',
+      // RegEx issues
+      // https://github.com/shapesecurity/shift-parser-js/issues/130
+      '0e631216f7271fce.js',
+      '1447683fba196181.js',
+      '4de83a7417cd30dd.js',
 
-      // https://github.com/shapesecurity/shift-parser-js/issues/318
-      '190.script.js', '205.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/319
-      '557.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/320
-      '558.script.js', '559.script.js', '560.script.js', '561.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/321
-      '563.script.js', '564.script.js', '565.script.js', '566.script.js',
-      '567.script.js', '568.script.js', '569.script.js', '570.script.js',
-      '571.script.js', '572.script.js', '574.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/322
-      '575.script.js', '576.script.js', '577.script.js', '578.script.js',
-      '579.script.js', '580.script.js', '581.script.js', '582.script.js',
-      '583.script.js', '585.script.js', '586.script.js', '587.script.js', '588.script.js',
-
-      // https://github.com/shapesecurity/shift-parser-js/issues/323
-      '589.script.js', '590.script.js', '591.script.js', '592.script.js', '593.script.js',
-
-      // https://github.com/tc39/test262-parser-tests/issues/7
-      '594.script.js', '596.script.js', '597.script.js', '598.script.js',
-
-      // https://github.com/tc39/test262-parser-tests/issues/6
-      '135.script.js',
-
-      // causes Syntax Errors in the test script
-      '599.script.js', '600.script.js', '601.script.js', '602.script.js',
+      // Invalid tests
+      // https://github.com/tc39/test262-parser-tests/issues/15
+      '14eaa7e71c682461.js',
+      'aca911e336954a5b.js',
     ],
     fail: [
-      // https://github.com/shapesecurity/shift-parser-js/issues/313
-      '69.script.js',
-      '70.script.js',
-      '71.script.js',
-      '75.script.js',
-      '76.script.js',
-      '77.script.js',
-      '149.script.js',
-      '151.script.js',
-      '248.script.js',
-      '519.script.js',
     ],
   },
 };

@@ -2,6 +2,7 @@ import fs from 'fs';
 import { parseScriptWithLocation, parseModuleWithLocation } from '../../';
 import { locationSanityCheck } from '../helpers';
 import expect from 'expect.js';
+import decorateWithLocations from 'shift-parser-tests/decorate-with-locations';
 import expectations from './expectations';
 
 let scriptDir = 'node_modules/test262-parser-tests';
@@ -38,6 +39,12 @@ suite('test262', () => {
         }).to.not.throwError();
 
         expect.eql(passTree, passExplicitTree);
+
+        let treeExpectation = JSON.parse(fs.readFileSync(expectationsDir + '/' + f + '-tree.json', 'utf8'));
+        expect(decorateWithLocations(passTree, passLocations)).to.eql(treeExpectation);
+
+        let commentExpectation = JSON.parse(fs.readFileSync(expectationsDir + '/' + f + '-comments.json', 'utf8'));
+        expect(passComments).to.eql(commentExpectation);
       });
     }
 

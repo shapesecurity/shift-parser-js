@@ -6,6 +6,7 @@ import decorateWithLocations from 'shift-parser-tests/decorate-with-locations';
 import expectations from './expectations';
 
 let scriptDir = 'node_modules/test262-parser-tests';
+let expectationsDir = 'node_modules/shift-parser-tests/expectations';
 
 function parse(src, asModule, earlyErrors) {
   return (asModule ? parseModuleWithLocation : parseScriptWithLocation)(src, { earlyErrors });
@@ -26,9 +27,9 @@ suite('test262', () => {
       let passExplicitTestFile = `${scriptDir}/pass-explicit/${f}`;
       test(`does not throw error and generates same tree[${f}]`, () => {
         let passSrc = fs.readFileSync(passTestFile, 'utf8');
-        let passTree, passLocations;
+        let passTree, passLocations, passComments;
         expect(() => {
-          ({ tree: passTree, locations: passLocations } = parse(passSrc, isModule(f), true));
+          ({ tree: passTree, locations: passLocations, comments: passComments } = parse(passSrc, isModule(f), true));
         }).to.not.throwError();
         locationSanityCheck(passTree, passLocations);
 

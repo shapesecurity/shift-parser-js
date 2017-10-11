@@ -1,4 +1,6 @@
 let expect = require('expect.js');
+let crypto = require('crypto');
+let normalize = require('normalize-parser-test').default;
 let parse = require('../').parseScriptWithLocation;
 let parseModule = require('../').parseModuleWithLocation;
 let locationSanityCheck = require('./helpers').locationSanityCheck;

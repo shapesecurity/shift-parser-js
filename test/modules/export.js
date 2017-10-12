@@ -20,10 +20,6 @@ let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 
 let moduleItem = require('../helpers').moduleItem;
 
-function testExportDecl(code, tree) {
-  testParseModule(code, moduleItem, tree);
-}
-
 function id(x) {
   return x;
 }

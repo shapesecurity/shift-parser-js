@@ -14,7 +14,7 @@ let expectationsDir = 'node_modules/shift-parser-tests/expectations';
 
 
 function checkPassNotExists(program, isModule) {
-  let digest = crypto.createHash('sha256').update(normalize(program)).digest('hex');
+  let digest = crypto.createHash('sha256').update(normalize(program, isModule)).digest('hex');
   let name = digest.substring(0, 16) + (isModule ? '.module' : '');
   if (fs.existsSync(expectationsDir + '/' + name + '.js-tree.json')) {
     throw new Error('Test already exists in shift-parser-tests as ' + name);

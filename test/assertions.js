@@ -42,6 +42,8 @@ exports.testParseModule = function testParseModule(program, accessor, expected) 
     schemaCheck(tree, SHIFT_SPEC.Module);
     locationSanityCheck(tree, locations);
     expect(accessor(parseModule(program, { earlyErrors: false }).tree)).to.eql(expected);
+
+    checkPassNotExists(program, true);
   });
 };
 

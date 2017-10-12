@@ -1,5 +1,6 @@
 let expect = require('expect.js');
 let crypto = require('crypto');
+let fs = require('fs');
 let normalize = require('normalize-parser-test').default;
 let parse = require('../').parseScriptWithLocation;
 let parseModule = require('../').parseModuleWithLocation;
@@ -9,6 +10,17 @@ let SHIFT_SPEC = require('shift-spec').default;
 let Parser = require('../dist/parser').GenericParser;
 let EarlyErrorChecker = require('../dist/early-errors').EarlyErrorChecker;
 
+let expectationsDir = 'node_modules/shift-parser-tests/expectations';
+
+
+function checkPassNotExists(program, isModule) {
+  let digest = crypto.createHash('sha256').update(normalize(program)).digest('hex');
+  let name = digest.substring(0, 16) + (isModule ? '.module' : '');
+  if (fs.existsSync(expectationsDir + '/' + name + '.js-tree.json')) {
+    throw new Error('Test already exists in shift-parser-tests as ' + name);
+  }
+}
+
 exports.testParse = function testParse(program, accessor, expected) {
   let args = arguments.length;
   test(program, () => {
@@ -17,6 +29,8 @@ exports.testParse = function testParse(program, accessor, expected) {
     schemaCheck(tree, SHIFT_SPEC.Script);
     locationSanityCheck(tree, locations);
     expect(accessor(parse(program, { earlyErrors: false }).tree)).to.eql(expected);
+
+    checkPassNotExists(program, false);
   });
 };
 

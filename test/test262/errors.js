@@ -2,7 +2,6 @@ import fs from 'fs';
 import { parseScriptWithLocation, parseModuleWithLocation } from '../../';
 import { locationSanityCheck } from '../helpers';
 import expect from 'expect.js';
-import decorateWithLocations from 'shift-parser-tests/decorate-with-locations';
 import expectations from './expectations';
 
 let scriptDir = 'node_modules/test262-parser-tests';
@@ -14,6 +13,23 @@ function parse(src, asModule, earlyErrors) {
 
 function isModule(f) {
   return /\.module\.js/.test(f);
+}
+
+function decorateWithLocations(tree, locations) {
+  if (typeof tree !== 'object' || tree === null) {
+    return tree;
+  }
+  if (Array.isArray(tree)) {
+    return tree.map(n => decorateWithLocations(n, locations));
+  }
+  const copy = {};
+  for (let [k, v] of Object.entries(tree)) {
+    copy[k] = decorateWithLocations(v, locations);
+  }
+  if (locations.has(tree)) {
+    copy.loc = locations.get(tree);
+  }
+  return copy;
 }
 
 suite('test262', () => {

@@ -23,8 +23,8 @@ function decorateWithLocations(tree, locations) {
     return tree.map(n => decorateWithLocations(n, locations));
   }
   const copy = {};
-  for (let [k, v] of Object.entries(tree)) {
-    copy[k] = decorateWithLocations(v, locations);
+  for (let k of Object.keys(tree)) {
+    copy[k] = decorateWithLocations(tree[k], locations);
   }
   if (locations.has(tree)) {
     copy.loc = locations.get(tree);

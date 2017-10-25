@@ -20,45 +20,6 @@ let expr = require('../helpers').expr;
 suite('Parser', () => {
   suite('array expression', () => {
 
-    testParse('[]', expr, { type: 'ArrayExpression', elements: [] });
-
-    testParse('[ ]', expr, { type: 'ArrayExpression', elements: [] });
-
-    testParse('[ 0 ]', expr, { type: 'ArrayExpression', elements: [{ type: 'LiteralNumericExpression', value: 0 }] });
-
-    testParse('[ 0, ]', expr, { type: 'ArrayExpression', elements: [{ type: 'LiteralNumericExpression', value: 0 }] });
-
-    testParse('[ ,, 0 ]', expr, {
-      type: 'ArrayExpression',
-      elements: [null, null, { type: 'LiteralNumericExpression', value: 0 }],
-    });
-
-    testParse('[ 1, 2, 3, ]', expr, {
-      type: 'ArrayExpression',
-      elements: [{ type: 'LiteralNumericExpression', value: 1 }, {
-        type: 'LiteralNumericExpression',
-        value: 2,
-      }, { type: 'LiteralNumericExpression', value: 3 }],
-    });
-
-    testParse('[ 1, 2,, 3, ]', expr, {
-      type: 'ArrayExpression',
-      elements: [{ type: 'LiteralNumericExpression', value: 1 }, {
-        type: 'LiteralNumericExpression',
-        value: 2,
-      }, null, { type: 'LiteralNumericExpression', value: 3 }],
-    });
-
-    testParse('[,,1,,,2,3,,]', expr, {
-      type: 'ArrayExpression',
-      elements: [null, null, {
-        type: 'LiteralNumericExpression',
-        value: 1,
-      }, null, null, { type: 'LiteralNumericExpression', value: 2 }, {
-        type: 'LiteralNumericExpression',
-        value: 3,
-      }, null],
-    });
 
   });
 

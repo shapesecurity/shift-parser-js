@@ -20,12 +20,7 @@ let stmt = require('../helpers').stmt;
 
 suite('Parser', () => {
   suite('class declaration', () => {
-    testParse('class A{}', stmt, {
-      type: 'ClassDeclaration',
-      name: { type: 'BindingIdentifier', name: 'A' },
-      super: null,
-      elements: [],
-    });
+
     testParseFailure('class {}', 'Unexpected token "{"');
     testParseFailure('class extends A{}', 'Unexpected token "extends"');
   });

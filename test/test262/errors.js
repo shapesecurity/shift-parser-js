@@ -5,7 +5,7 @@ import expect from 'expect.js';
 import expectations from './expectations';
 
 let scriptDir = 'node_modules/test262-parser-tests';
-let expectationsDir = 'node_modules/shift-parser-tests/expectations';
+let expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
 function parse(src, asModule, earlyErrors) {
   return (asModule ? parseModuleWithLocation : parseScriptWithLocation)(src, { earlyErrors });

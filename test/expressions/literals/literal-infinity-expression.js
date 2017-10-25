@@ -20,7 +20,6 @@ let testParse = require('../../assertions').testParse;
 suite('Parser', () => {
   suite('literal infinity expression', () => {
 
-    testParse('2e308', expr, { type: 'LiteralInfinityExpression' });
 
   });
 });

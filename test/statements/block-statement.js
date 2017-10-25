@@ -20,36 +20,6 @@ let stmt = require('../helpers').stmt;
 suite('Parser', () => {
   suite('block statement', () => {
 
-    testParse('{ foo }', stmt,
-      { type: 'BlockStatement',
-        block:
-        { type: 'Block',
-          statements:
-          [{ type: 'ExpressionStatement',
-            expression:
-                    { type: 'IdentifierExpression', name: 'foo' } }] } }
-    );
-
-    testParse('{ doThis(); doThat(); }', stmt,
-      { type: 'BlockStatement',
-        block:
-        { type: 'Block',
-          statements:
-          [{ type: 'ExpressionStatement',
-            expression:
-            { type: 'CallExpression',
-              callee: { type: 'IdentifierExpression', name: 'doThis' },
-              arguments: [] } },
-          { type: 'ExpressionStatement',
-            expression:
-            { type: 'CallExpression',
-              callee: { type: 'IdentifierExpression', name: 'doThat' },
-              arguments: [] } }] } }
-    );
-
-    testParse('{}', stmt,
-      { type: 'BlockStatement', block: { type: 'Block', statements: [] } }
-    );
 
   });
 });

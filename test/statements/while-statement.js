@@ -20,48 +20,6 @@ let testParse = require('../assertions').testParse;
 suite('Parser', () => {
   suite('while statement', () => {
 
-    testParse('while(1);', stmt,
-      { type: 'WhileStatement',
-        body: { type: 'EmptyStatement' },
-        test: { type: 'LiteralNumericExpression', value: 1 } }
-    );
-
-    testParse('while (true) doSomething()', stmt,
-      { type: 'WhileStatement',
-        body:
-        { type: 'ExpressionStatement',
-          expression:
-          { type: 'CallExpression',
-            callee: { type: 'IdentifierExpression', name: 'doSomething' },
-            arguments: [] } },
-        test: { type: 'LiteralBooleanExpression', value: true } }
-    );
-
-    testParse('while (x < 10) { x++; y--; }', stmt,
-      { type: 'WhileStatement',
-        body:
-        { type: 'BlockStatement',
-          block:
-          { type: 'Block',
-            statements:
-            [{ type: 'ExpressionStatement',
-              expression:
-              { type: 'UpdateExpression',
-                isPrefix: false,
-                operand: { type: 'AssignmentTargetIdentifier', name: 'x' },
-                operator: '++' } },
-            { type: 'ExpressionStatement',
-              expression:
-              { type: 'UpdateExpression',
-                isPrefix: false,
-                operand: { type: 'AssignmentTargetIdentifier', name: 'y' },
-                operator: '--' } }] } },
-        test:
-        { type: 'BinaryExpression',
-          operator: '<',
-          left: { type: 'IdentifierExpression', name: 'x' },
-          right: { type: 'LiteralNumericExpression', value: 10 } } }
-    );
 
   });
 });

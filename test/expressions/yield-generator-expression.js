@@ -27,16 +27,6 @@ suite('Parser', () => {
       });
     }
 
-    testParse('function*a(){yield*a}', yd, [{
-      type: 'YieldGeneratorExpression',
-      expression: { type: 'IdentifierExpression', name: 'a' },
-    }]);
-    testParse('function a(){yield*a}', yd, [{
-      type: 'BinaryExpression',
-      operator: '*',
-      left: { type: 'IdentifierExpression', name: 'yield' },
-      right: { type: 'IdentifierExpression', name: 'a' },
-    }]);
 
     testParseFailure('function *a(){yield\n*a}', 'Unexpected token "*"');
     testParseFailure('function *a(){yield*}', 'Unexpected token "}"');

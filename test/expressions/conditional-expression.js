@@ -20,42 +20,6 @@ let testParse = require('../assertions').testParse;
 suite('Parser', () => {
   suite('conditional expression', () => {
 
-    testParse('a?b:c', expr,
-      { type: 'ConditionalExpression',
-        test: { type: 'IdentifierExpression', name: 'a' },
-        consequent: { type: 'IdentifierExpression', name: 'b' },
-        alternate: { type: 'IdentifierExpression', name: 'c' } }
-    );
 
-    testParse('y ? 1 : 2', expr,
-      { type: 'ConditionalExpression',
-        test: { type: 'IdentifierExpression', name: 'y' },
-        consequent: { type: 'LiteralNumericExpression', value: 1 },
-        alternate: { type: 'LiteralNumericExpression', value: 2 } }
-    );
-
-    testParse('x && y ? 1 : 2', expr,
-      { type: 'ConditionalExpression',
-        test:
-        { type: 'BinaryExpression',
-          operator: '&&',
-          left: { type: 'IdentifierExpression', name: 'x' },
-          right: { type: 'IdentifierExpression', name: 'y' } },
-        consequent: { type: 'LiteralNumericExpression', value: 1 },
-        alternate: { type: 'LiteralNumericExpression', value: 2 } }
-    );
-
-    testParse('x = (0) ? 1 : 2', expr,
-      {
-        type: 'AssignmentExpression',
-        binding: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        expression: {
-          type: 'ConditionalExpression',
-          test: { type: 'LiteralNumericExpression', value: 0 },
-          consequent: { type: 'LiteralNumericExpression', value: 1 },
-          alternate: { type: 'LiteralNumericExpression', value: 2 },
-        },
-      }
-    );
   });
 });

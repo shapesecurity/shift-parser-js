@@ -20,56 +20,6 @@ let stmt = require('../helpers').stmt;
 suite('Parser', () => {
   suite('switch statement', () => {
 
-    testParse('switch (x) {}', stmt,
-      { type: 'SwitchStatement',
-        discriminant: { type: 'IdentifierExpression', name: 'x' },
-        cases: [] }
-    );
 
-    testParse('switch(a){case 1:}', stmt,
-      { type: 'SwitchStatement',
-        discriminant: { type: 'IdentifierExpression', name: 'a' },
-        cases:
-        [{ type: 'SwitchCase',
-          test: { type: 'LiteralNumericExpression', value: 1 },
-          consequent: [] }] }
-    );
-
-    testParse('switch (answer) { case 0: hi(); break; }', stmt,
-      { type: 'SwitchStatement',
-        discriminant: { type: 'IdentifierExpression', name: 'answer' },
-        cases:
-        [{ type: 'SwitchCase',
-          test: { type: 'LiteralNumericExpression', value: 0 },
-          consequent:
-          [{ type: 'ExpressionStatement',
-            expression:
-            { type: 'CallExpression',
-              callee: { type: 'IdentifierExpression', name: 'hi' },
-              arguments: [] } },
-          { type: 'BreakStatement', label: null }] }] }
-    );
-
-    testParse('switch (answer) { case 0: let a; }', stmt,
-      { type: 'SwitchStatement',
-        discriminant: { type: 'IdentifierExpression', name: 'answer' },
-        cases:
-        [{ type: 'SwitchCase',
-          test: { type: 'LiteralNumericExpression', value: 0 },
-          consequent:
-          [{ type: 'VariableDeclarationStatement',
-            declaration:
-            { type: 'VariableDeclaration',
-              kind: 'let',
-              declarators: [
-                { type: 'VariableDeclarator',
-                  binding:
-                          { type: 'BindingIdentifier', name: 'a' },
-                  init: null,
-                }],
-            },
-          }],
-        }],
-      });
   });
 });

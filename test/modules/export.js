@@ -27,7 +27,6 @@ function id(x) {
 suite('Parser', () => {
   suite('export declaration', () => {
 
-    testParseModule('export * from "a"', moduleItem, { type: 'ExportAllFrom', moduleSpecifier: 'a' });
 
     testParseModule('export {} from "a"', moduleItem, { type: 'ExportFrom', namedExports: [], moduleSpecifier: 'a' });
 
@@ -280,41 +279,6 @@ suite('Parser', () => {
       },
     });
 
-    testParseModule('export default 0;0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'ExportDefault', body: { type: 'LiteralNumericExpression', value: 0 } },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
-
-    testParseModule('export function f(){};0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'Export', declaration:
-        { type: 'FunctionDeclaration',
-          isGenerator: false,
-          name: { type: 'BindingIdentifier', name: 'f' },
-          params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] } } },
-        { type: 'EmptyStatement' },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
-
-    testParseModule('export class A{};0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'Export', declaration:
-          { type: 'ClassDeclaration', name: { type: 'BindingIdentifier', name: 'A' }, super: null, elements: [] } },
-        { type: 'EmptyStatement' },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
-
-    testParseModule('export {};0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'ExportLocals', namedExports: [] },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
 
     testParseModule('export default function a(){} let b; export {b as a};', id,
       { type: 'Module', directives: [], items: [

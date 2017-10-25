@@ -22,52 +22,13 @@ let testParseFailure = require('../assertions').testParseFailure;
 suite('Parser', () => {
   suite('grouped expressions', () => {
     // grouped expression that can be binding element and assignment target
-    testParse('(a)', expr, { type: 'IdentifierExpression', name: 'a' });
+
 
     // grouped expression than cannot be binding element or assignment target
-    testParse('(0)', expr, { type: 'LiteralNumericExpression', value: 0 });
+
 
     // mixture
-    testParse('(0, a)', expr, {
-      type: 'BinaryExpression',
-      left: { type: 'LiteralNumericExpression', value: 0 },
-      operator: ',',
-      right: { type: 'IdentifierExpression', name: 'a' },
-    });
 
-    testParse('(a, 0)', expr, {
-      type: 'BinaryExpression',
-      left: { type: 'IdentifierExpression', name: 'a' },
-      operator: ',',
-      right: { type: 'LiteralNumericExpression', value: 0 },
-    });
-
-    testParse('(a,a)', expr, {
-      type: 'BinaryExpression',
-      left: { type: 'IdentifierExpression', name: 'a' },
-      operator: ',',
-      right: { type: 'IdentifierExpression', name: 'a' },
-    });
-
-    testParse('((a,a),(a,a))', expr, {
-      type: 'BinaryExpression',
-      left: {
-        type: 'BinaryExpression',
-        left: { type: 'IdentifierExpression', name: 'a' },
-        operator: ',',
-        right: { type: 'IdentifierExpression', name: 'a' },
-      },
-      operator: ',',
-      right: {
-        type: 'BinaryExpression',
-        left: { type: 'IdentifierExpression', name: 'a' },
-        operator: ',',
-        right: { type: 'IdentifierExpression', name: 'a' },
-      },
-    });
-
-    testParse('((((((((((((((((((((((((((((((((((((((((a))))))))))))))))))))))))))))))))))))))))', expr,
-      { type: 'IdentifierExpression', name: 'a' });
 
     testParseFailure('(0, {a = 0}) = 0', 'Invalid left-hand side in assignment');
     testParseFailure('({a = 0})', 'Illegal property initializer');

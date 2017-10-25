@@ -20,59 +20,6 @@ let testParse = require('../assertions').testParse;
 suite('Parser', () => {
   suite('non-destructive unary expressions', () => {
 
-    testParse('!a', expr,
-      { type: 'UnaryExpression',
-        operand: { type: 'IdentifierExpression', name: 'a' },
-        operator: '!' }
-    );
-
-    testParse('!(a=b)', expr,
-      {
-        type: 'UnaryExpression',
-        operand: {
-          type: 'AssignmentExpression',
-          binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
-          expression: { type: 'IdentifierExpression', name: 'b' },
-        },
-        operator: '!',
-      }
-    );
-
-    testParse('typeof a', expr,
-      { type: 'UnaryExpression',
-        operand: { type: 'IdentifierExpression', name: 'a' },
-        operator: 'typeof' }
-    );
-
-    testParse('void a', expr,
-      { type: 'UnaryExpression',
-        operand: { type: 'IdentifierExpression', name: 'a' },
-        operator: 'void' }
-    );
-
-    testParse('delete a', expr,
-      { type: 'UnaryExpression',
-        operand: { type: 'IdentifierExpression', name: 'a' },
-        operator: 'delete' }
-    );
-
-    testParse('+a', expr,
-      { type: 'UnaryExpression',
-        operand: { type: 'IdentifierExpression', name: 'a' },
-        operator: '+' }
-    );
-
-    testParse('~a', expr,
-      { type: 'UnaryExpression',
-        operand: { type: 'IdentifierExpression', name: 'a' },
-        operator: '~' }
-    );
-
-    testParse('-a', expr,
-      { type: 'UnaryExpression',
-        operand: { type: 'IdentifierExpression', name: 'a' },
-        operator: '-' }
-    );
 
   });
 });

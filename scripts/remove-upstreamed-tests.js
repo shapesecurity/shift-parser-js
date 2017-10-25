@@ -6,7 +6,7 @@ const reducer = require('shift-reducer');
 const normalize = require('normalize-parser-test').default;
 const { parseScriptWithLocation, parseModuleWithLocation } = require('shift-parser');
 
-const expectationsDir = 'node_modules/shift-parser-tests/expectations';
+const expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
 function testExistsUpstream(src, isModule) {
   const digest = crypto

@@ -22,26 +22,7 @@ function id(x) {
 
 suite('Parser', () => {
   suite('Comments', () => {
-    testParse(' /**/', id, { type: 'Script', directives: [], statements: [] });
-    testParse(' /****/', id, { type: 'Script', directives: [], statements: [] });
-    testParse(' /**\n\r\r\n**/', id, {
-      type: 'Script', directives: [], statements: [] }
-    );
-    testParse(' //\n', id, { type: 'Script', directives: [], statements: [] });
-    testParse('<!-- foo', id, { type: 'Script', directives: [], statements: [] });
-    testParse('--> comment', id, { type: 'Script', directives: [], statements: [] });
-    testParse('<!-- comment', id, { type: 'Script', directives: [], statements: [] });
-    testParse(' \t --> comment', id, {
-      type: 'Script',
-      directives: [], statements: [] }
-    );
-    testParse(' \t /* block comment */  --> comment', id, {
-      type: 'Script',
-      directives: [], statements: [] }
-    );
-    testParse('/* block comment */--> comment', id, {
-      type: 'Script',
-      directives: [], statements: [] }
-    );
+
+
   });
 });

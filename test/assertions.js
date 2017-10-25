@@ -10,7 +10,7 @@ let SHIFT_SPEC = require('shift-spec').default;
 let Parser = require('../dist/parser').GenericParser;
 let EarlyErrorChecker = require('../dist/early-errors').EarlyErrorChecker;
 
-let expectationsDir = 'node_modules/shift-parser-tests/expectations';
+let expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
 
 function checkPassNotExists(program, isModule) {

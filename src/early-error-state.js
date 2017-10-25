@@ -17,14 +17,6 @@
 import {} from 'es6-map/implement';
 import MultiMap from 'multimap';
 
-// FIXME: remove this when collections/multi-map is working
-MultiMap.prototype.addEach = function (otherMap) {
-  otherMap.forEachEntry((v, k) => {
-    this.set.apply(this, [k].concat(v));
-  });
-  return this;
-};
-
 
 let identity; // initialised below EarlyErrorState
 

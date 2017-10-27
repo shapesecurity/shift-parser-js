@@ -32,10 +32,6 @@ suite('Parser', () => {
       return stmt(p).body.statements[0].expression.expression;
     }
 
-
-    // yield as an Identifier cannot show up in body of a generator or in strict mode.
-
-
     testParse('function *a(){yield delete 0}', yde, {
       type: 'UnaryExpression',
       operator: 'delete',

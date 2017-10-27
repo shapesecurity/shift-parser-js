@@ -20,15 +20,6 @@ let testParseFailure = require('../../assertions').testParseFailure;
 
 suite('Parser', () => {
   suite('literal regexp expression', () => {
-    // Regular Expression Literals
-
-
-    // valid only if Annex B.1.4 is implemented
-
-
-    // NOTE: The {0,} here is not a quantifier! It is just a regular atom.
-
-
     testParseFailure('/(?:)/gg', 'Duplicate regular expression flag \'g\'');
     testParseFailure('/(?:)/ii', 'Duplicate regular expression flag \'i\'');
     testParseFailure('/(?:)/mm', 'Duplicate regular expression flag \'m\'');

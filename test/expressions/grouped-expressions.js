@@ -21,15 +21,6 @@ let testParseFailure = require('../assertions').testParseFailure;
 
 suite('Parser', () => {
   suite('grouped expressions', () => {
-    // grouped expression that can be binding element and assignment target
-
-
-    // grouped expression than cannot be binding element or assignment target
-
-
-    // mixture
-
-
     testParseFailure('(0, {a = 0}) = 0', 'Invalid left-hand side in assignment');
     testParseFailure('({a = 0})', 'Illegal property initializer');
     testParseFailure('(0, {a = 0}) => 0', 'Illegal arrow function parameter list');

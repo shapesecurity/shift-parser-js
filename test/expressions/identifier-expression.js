@@ -22,26 +22,17 @@ let stmt = require('../helpers').stmt;
 
 suite('Parser', () => {
   suite('identifier expression', () => {
-
-
     testParseModuleFailure('await', 'Unexpected token "await"');
     testParseModuleFailure('function f() { var await }', 'Unexpected token "await"');
 
     suite('let used as identifier expression', () => {
-
-
       testParseFailure('for(let[a].b of 0);', 'Unexpected token "."');
       testParseFailure('for(let[a]().b of 0);', 'Unexpected token "("');
       testParseFailure('for(let.a of 0);', 'Invalid left-hand side in for-of');
     });
 
     suite('unicode identifier', () => {
-      // Unicode
-
-
       testParseFailure('\\uD800\\uDC00', 'Unexpected "\\\\"');
-
     });
-
   });
 });

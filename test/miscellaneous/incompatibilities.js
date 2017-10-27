@@ -39,38 +39,8 @@ suite('Parser', () => {
   });
 
 
-  // programs where we choose to diverge from the ES5 specification
-  suite('ES5 divergences', () => {
-    // ES5: assignment to computed member expression
-    // ES6: variable declaration statement
-
-
-    // ES5: invalid program
-    // ES6: function declaration within a block
-
-  });
-
-
   // programs that parse according to ES5 but either fail or parse differently according to ES6
   suite('ES6 backward incompatibilities', () => {
-    // ES5: in sloppy mode, future reserved words (including yield) are regular identifiers
-    // ES6: yield has been moved from the future reserved words list to the keywords list
-
-
-    // ES5: this declares a function-scoped variable while at the same time assigning to the block-scoped variable
-    // ES6: this particular construction is explicitly disallowed
-
-
-    // ES5: allows any LeftHandSideExpression on the left of an assignment
-    // ES6: allows only valid bindings on the left of an assignment
-    // NOTE: this is disabled due to separation of early errors in two-phase parsing
-    // testParseFailure("a+b=c", "Invalid left-hand side in assignment");
-    // testParseFailure("+i = 0", "Invalid left-hand side in assignment");
-    // testParseFailure("new a=b", "Invalid left-hand side in assignment");
-    // testParseFailure("(a+b)=c", "Invalid left-hand side in assignment");
-    // testParseFailure("f()++", "Invalid left-hand side in assignment");
-    // testParseFailure("--f()", "Invalid left-hand side in assignment");
-
     // ES5: allows initializers in for-in head
     // ES6: disallows initializers in for-in and for-of head
     testParseFailure('for(var x=1 in [1,2,3]) 0', 'Invalid variable declaration in for-in statement');
@@ -79,15 +49,8 @@ suite('Parser', () => {
     testParseFailure('for(let x=1 of [1,2,3]) 0', 'Invalid variable declaration in for-of statement');
 
 
-    // ES5: allows unicode escape sequences in regular expression flags
-    // ES6: disallowes unicode escape sequences in regular expression flags
-    // NOTE: this is disabled due to separation of early errors in two-phase parsing
-    // testParseFailure("/a/\\u0000", "Invalid regular expression");
-
     // ES5: disallow HTML-like comment
     // ES6: allowed in Script.
-
-
     testParseFailure('a -->', 'Unexpected end of input');
     testParseFailure(';/**/-->', 'Unexpected token ">"');
     testParse('\n  -->', stmt, void 0);
@@ -111,7 +74,5 @@ suite('Parser', () => {
         },
       }
     );
-
   });
-
 });

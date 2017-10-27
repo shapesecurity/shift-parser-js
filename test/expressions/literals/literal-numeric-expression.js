@@ -21,17 +21,9 @@ let testParseModuleFailure = require('../../assertions').testParseModuleFailure;
 
 suite('Parser', () => {
   suite('literal numeric expression', () => {
-
-
     testParse('\n    0\n\n', expr, { type: 'LiteralNumericExpression', value: 0 });
-
 
     // Legacy Octal Integer Literal
-
-
-    testParse('\n    0\n\n', expr, { type: 'LiteralNumericExpression', value: 0 });
-
-
     testParseFailure('\'use strict\'; 01', 'Unexpected legacy octal integer literal');
     testParseFailure('\'use strict\'; 0123', 'Unexpected legacy octal integer literal');
     testParseFailure('\'use strict\'; 00', 'Unexpected legacy octal integer literal');
@@ -41,8 +33,6 @@ suite('Parser', () => {
     testParseModuleFailure('01', 'Unexpected legacy octal integer literal');
 
     // Binary Integer Literal
-
-
     testParseFailure('0b', 'Unexpected end of input');
     testParseFailure('0b1a', 'Unexpected "a"');
     testParseFailure('0b9', 'Unexpected "9"');
@@ -55,8 +45,6 @@ suite('Parser', () => {
     testParseFailure('0B12', 'Unexpected "2"');
 
     // Octal Integer Literal
-
-
     testParseFailure('0o', 'Unexpected end of input');
     testParseFailure('0o1a', 'Unexpected "a"');
     testParseFailure('0o9', 'Unexpected "9"');
@@ -66,6 +54,5 @@ suite('Parser', () => {
     testParseFailure('0O9', 'Unexpected "9"');
     testParseFailure('09.x', 'Unexpected identifier');
     testParseFailure('0O18', 'Unexpected "8"');
-
   });
 });

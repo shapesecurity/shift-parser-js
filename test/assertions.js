@@ -12,10 +12,13 @@ let EarlyErrorChecker = require('../dist/early-errors').EarlyErrorChecker;
 
 let expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
+function getTest262Name(program, isModule) {
+  const digest = crypto.createHash('sha256').update(normalize(program, isModule)).digest('hex');
+  return digest.substring(0, 16) + (isModule ? '.module' : '');
+}
 
 function checkPassNotExists(program, isModule) {
-  let digest = crypto.createHash('sha256').update(normalize(program, isModule)).digest('hex');
-  let name = digest.substring(0, 16) + (isModule ? '.module' : '');
+  const name = getTest262Name(program, isModule);
   if (fs.existsSync(expectationsDir + '/' + name + '.js-tree.json')) {
     throw new Error('Test already exists in shift-parser-tests as ' + name);
   }

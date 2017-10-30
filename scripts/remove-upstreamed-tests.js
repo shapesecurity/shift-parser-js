@@ -8,12 +8,13 @@ const { parseScriptWithLocation, parseModuleWithLocation } = require('shift-pars
 
 const expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
+function getTest262Name(program, isModule) {
+  const digest = crypto.createHash('sha256').update(normalize(program, isModule)).digest('hex');
+  return digest.substring(0, 16) + (isModule ? '.module' : '');
+}
+
 function testExistsUpstream(src, isModule) {
-  const digest = crypto
-    .createHash('sha256')
-    .update(normalize(src, isModule))
-    .digest('hex');
-  const name = digest.substring(0, 16) + (isModule ? '.module' : '');
+  const name = getTest262Name(src, isModule);
   return fs.existsSync(expectationsDir + '/' + name + '.js-tree.json');
 }
 

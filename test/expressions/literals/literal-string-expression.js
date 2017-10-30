@@ -21,34 +21,7 @@ let testParseModuleFailure = require('../../assertions').testParseModuleFailure;
 
 suite('Parser', () => {
   suite('literal string expression', () => {
-    testParse('(\'x\')', expr, { type: 'LiteralStringExpression', value: 'x' });
-    testParse('(\'\\\\\\\'\')', expr, { type: 'LiteralStringExpression', value: '\\\'' });
-    testParse('("x")', expr, { type: 'LiteralStringExpression', value: 'x' });
-    testParse('("\\\\\\"")', expr, { type: 'LiteralStringExpression', value: '\\"' });
-    testParse('(\'\\\r\')', expr, { type: 'LiteralStringExpression', value: '' });
-    testParse('(\'\\\r\n\')', expr, { type: 'LiteralStringExpression', value: '' });
-    testParse('(\'\\\n\')', expr, { type: 'LiteralStringExpression', value: '' });
-    testParse('(\'\\\u2028\')', expr, { type: 'LiteralStringExpression', value: '' });
-    testParse('(\'\\\u2029\')', expr, { type: 'LiteralStringExpression', value: '' });
-    testParse('(\'\u202a\')', expr, { type: 'LiteralStringExpression', value: '\u202A' });
-    testParse('(\'\\0\')', expr, { type: 'LiteralStringExpression', value: '\0' });
-    testParse('\'use strict\'; (\'\\0\')', expr, { type: 'LiteralStringExpression', value: '\0' });
-    testParse('\'use strict\'; (\'\\0x\')', expr, { type: 'LiteralStringExpression', value: '\0' + 'x' });
-    testParse('(\'\\01\')', expr, { type: 'LiteralStringExpression', value: '\x01' });
-    testParse('(\'\\1\')', expr, { type: 'LiteralStringExpression', value: '\x01' });
-    testParse('(\'\\11\')', expr, { type: 'LiteralStringExpression', value: '\t' });
-    testParse('(\'\\111\')', expr, { type: 'LiteralStringExpression', value: 'I' });
-    testParse('(\'\\1111\')', expr, { type: 'LiteralStringExpression', value: 'I1' });
-    testParse('(\'\\2111\')', expr, { type: 'LiteralStringExpression', value: '\x891' });
-    testParse('(\'\\5111\')', expr, { type: 'LiteralStringExpression', value: ')11' });
-    testParse('(\'\\5a\')', expr, { type: 'LiteralStringExpression', value: '\x05a' });
-    testParse('(\'\\7a\')', expr, { type: 'LiteralStringExpression', value: '\x07a' });
-    testParse('(\'\\a\')', expr, { type: 'LiteralStringExpression', value: 'a' });
-    testParse('(\'\\`\')', expr, { type: 'LiteralStringExpression', value: '`' });
-    testParse('(\'\\u{00F8}\')', expr, { type: 'LiteralStringExpression', value: '\xF8' });
-    testParse('(\'\\u{0}\')', expr, { type: 'LiteralStringExpression', value: '\0' });
-    testParse('(\'\\u{10FFFF}\')', expr, { type: 'LiteralStringExpression', value: '\uDBFF\uDFFF' });
-    testParse('(\'\\u{0000000000F8}\')', expr, { type: 'LiteralStringExpression', value: '\xF8' });
+
 
     testParseFailure('\'', 'Unexpected end of input');
     testParseFailure('"', 'Unexpected end of input');

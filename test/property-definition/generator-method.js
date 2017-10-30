@@ -22,38 +22,6 @@ suite('Parser', () => {
 
   suite('generator method', () => {
 
-    testParse('({*a(){}})', expr, {
-      type: 'ObjectExpression',
-      properties: [{
-        type: 'Method',
-        isGenerator: true,
-        name: { type: 'StaticPropertyName', value: 'a' },
-        params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] },
-      }],
-    });
-
-    testParse('({*yield(){}})', expr, {
-      type: 'ObjectExpression',
-      properties: [{
-        type: 'Method',
-        isGenerator: true,
-        name: { type: 'StaticPropertyName', value: 'yield' },
-        params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] },
-      }],
-    });
-
-    testParse('({*[yield](){}})', expr, {
-      type: 'ObjectExpression',
-      properties: [{
-        type: 'Method',
-        isGenerator: true,
-        name: { type: 'ComputedPropertyName', expression: { type: 'IdentifierExpression', name: 'yield' } },
-        params: { type: 'FormalParameters', items: [], rest: null },
-        body: { type: 'FunctionBody', directives: [], statements: [] },
-      }],
-    });
 
   });
 

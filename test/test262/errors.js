@@ -5,6 +5,7 @@ import expect from 'expect.js';
 import expectations from './expectations';
 
 let scriptDir = 'node_modules/test262-parser-tests';
+let expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
 function parse(src, asModule, earlyErrors) {
   return (asModule ? parseModuleWithLocation : parseScriptWithLocation)(src, { earlyErrors });
@@ -12,6 +13,23 @@ function parse(src, asModule, earlyErrors) {
 
 function isModule(f) {
   return /\.module\.js/.test(f);
+}
+
+function decorateWithLocations(tree, locations) {
+  if (typeof tree !== 'object' || tree === null) {
+    return tree;
+  }
+  if (Array.isArray(tree)) {
+    return tree.map(n => decorateWithLocations(n, locations));
+  }
+  const copy = {};
+  for (let k of Object.keys(tree)) {
+    copy[k] = decorateWithLocations(tree[k], locations);
+  }
+  if (locations.has(tree)) {
+    copy.loc = locations.get(tree);
+  }
+  return copy;
 }
 
 suite('test262', () => {
@@ -25,9 +43,9 @@ suite('test262', () => {
       let passExplicitTestFile = `${scriptDir}/pass-explicit/${f}`;
       test(`does not throw error and generates same tree[${f}]`, () => {
         let passSrc = fs.readFileSync(passTestFile, 'utf8');
-        let passTree, passLocations;
+        let passTree, passLocations, passComments;
         expect(() => {
-          ({ tree: passTree, locations: passLocations } = parse(passSrc, isModule(f), true));
+          ({ tree: passTree, locations: passLocations, comments: passComments } = parse(passSrc, isModule(f), true));
         }).to.not.throwError();
         locationSanityCheck(passTree, passLocations);
 
@@ -38,6 +56,12 @@ suite('test262', () => {
         }).to.not.throwError();
 
         expect.eql(passTree, passExplicitTree);
+
+        let treeExpectation = JSON.parse(fs.readFileSync(expectationsDir + '/' + f + '-tree.json', 'utf8'));
+        expect(decorateWithLocations(passTree, passLocations)).to.eql(treeExpectation);
+
+        let commentExpectation = JSON.parse(fs.readFileSync(expectationsDir + '/' + f + '-comments.json', 'utf8'));
+        expect(passComments).to.eql(commentExpectation);
       });
     }
 

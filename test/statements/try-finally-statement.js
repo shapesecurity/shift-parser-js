@@ -19,77 +19,7 @@ let testParse = require('../assertions').testParse;
 
 suite('Parser', () => {
   suite('try-finally statement', () => {
-    testParse('try { } finally { cleanup(stuff) }', stmt,
-      {
-        type: 'TryFinallyStatement',
-        body: { type: 'Block', statements: [] },
-        catchClause: null,
-        finalizer: {
-          type: 'Block',
-          statements: [{
-            type: 'ExpressionStatement',
-            expression: {
-              type: 'CallExpression',
-              callee: { type: 'IdentifierExpression', name: 'cleanup' },
-              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }],
-            },
-          }],
-        },
-      }
-    );
-    testParse('try{}catch(a){}finally{}', stmt,
-      {
-        type: 'TryFinallyStatement',
-        body: { type: 'Block', statements: [] },
-        catchClause: {
-          type: 'CatchClause',
-          binding: { type: 'BindingIdentifier', name: 'a' },
-          body: { type: 'Block', statements: [] },
-        },
-        finalizer: { type: 'Block', statements: [] },
-      }
-    );
-    testParse('try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }', stmt,
-      {
-        type: 'TryFinallyStatement',
-        body: {
-          type: 'Block',
-          statements: [{
-            type: 'ExpressionStatement',
-            expression: {
-              type: 'CallExpression',
-              callee: { type: 'IdentifierExpression', name: 'doThat' },
-              arguments: [],
-            },
-          }],
-        },
-        catchClause: {
-          type: 'CatchClause',
-          binding: { type: 'BindingIdentifier', name: 'e' },
-          body: {
-            type: 'Block',
-            statements: [{
-              type: 'ExpressionStatement',
-              expression: {
-                type: 'CallExpression',
-                callee: { type: 'IdentifierExpression', name: 'say' },
-                arguments: [{ type: 'IdentifierExpression', name: 'e' }],
-              },
-            }],
-          },
-        },
-        finalizer: {
-          type: 'Block',
-          statements: [{
-            type: 'ExpressionStatement',
-            expression: {
-              type: 'CallExpression',
-              callee: { type: 'IdentifierExpression', name: 'cleanup' },
-              arguments: [{ type: 'IdentifierExpression', name: 'stuff' }],
-            },
-          }],
-        },
-      }
-    );
+
+
   });
 });

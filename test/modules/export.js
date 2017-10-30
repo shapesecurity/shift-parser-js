@@ -20,10 +20,6 @@ let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 
 let moduleItem = require('../helpers').moduleItem;
 
-function testExportDecl(code, tree) {
-  testParseModule(code, moduleItem, tree);
-}
-
 function id(x) {
   return x;
 }
@@ -31,29 +27,28 @@ function id(x) {
 suite('Parser', () => {
   suite('export declaration', () => {
 
-    testExportDecl('export * from "a"', { type: 'ExportAllFrom', moduleSpecifier: 'a' });
 
-    testExportDecl('export {} from "a"', { type: 'ExportFrom', namedExports: [], moduleSpecifier: 'a' });
+    testParseModule('export {} from "a"', moduleItem, { type: 'ExportFrom', namedExports: [], moduleSpecifier: 'a' });
 
-    testExportDecl('export {a} from "a"', {
+    testParseModule('export {a} from "a"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }],
       moduleSpecifier: 'a',
     });
 
-    testExportDecl('export {with} from "a"', {
+    testParseModule('export {with} from "a"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'with', exportedName: null }],
       moduleSpecifier: 'a',
     });
 
-    testExportDecl('export {a,} from "a"', {
+    testParseModule('export {a,} from "a"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }],
       moduleSpecifier: 'a',
     });
 
-    testExportDecl('export {a,b} from "a"', {
+    testParseModule('export {a,b} from "a"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }, {
         type: 'ExportFromSpecifier',
@@ -63,55 +58,55 @@ suite('Parser', () => {
       moduleSpecifier: 'a',
     });
 
-    testExportDecl('export {a as b} from "a"', {
+    testParseModule('export {a as b} from "a"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: 'b' }],
       moduleSpecifier: 'a',
     });
 
-    testExportDecl('export {with as a} from "a"', {
+    testParseModule('export {with as a} from "a"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'with', exportedName: 'a' }],
       moduleSpecifier: 'a',
     });
 
-    testExportDecl('export {as as as} from "as"', {
+    testParseModule('export {as as as} from "as"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'as', exportedName: 'as' }],
       moduleSpecifier: 'as',
     });
 
-    testExportDecl('export {as as function} from "as"', {
+    testParseModule('export {as as function} from "as"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'as', exportedName: 'function' }],
       moduleSpecifier: 'as',
     });
 
-    testExportDecl('export {a} from "m"', {
+    testParseModule('export {a} from "m"', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'a', exportedName: null }],
       moduleSpecifier: 'm',
     });
 
-    testExportDecl('export {if as var} from "a";', {
+    testParseModule('export {if as var} from "a";', moduleItem, {
       type: 'ExportFrom',
       namedExports: [{ type: 'ExportFromSpecifier', name: 'if', exportedName: 'var' }],
       moduleSpecifier: 'a',
     });
 
-    testExportDecl('export {a}\n var a;', {
+    testParseModule('export {a}\n var a;', moduleItem, {
       type: 'ExportLocals',
       namedExports: [{ type: 'ExportLocalSpecifier',
         name: { type: 'IdentifierExpression', name: 'a' }, exportedName: null }],
     });
 
-    testExportDecl('export {a,}\n var a;', {
+    testParseModule('export {a,}\n var a;', moduleItem, {
       type: 'ExportLocals',
       namedExports: [{ type: 'ExportLocalSpecifier',
         name: { type: 'IdentifierExpression', name: 'a' }, exportedName: null }],
     });
 
-    testExportDecl('export {a,b,}\n var a,b;', {
+    testParseModule('export {a,b,}\n var a,b;', moduleItem, {
       type: 'ExportLocals',
       namedExports: [{ type: 'ExportLocalSpecifier', name: { type: 'IdentifierExpression', name: 'a' },
         exportedName: null }, {
@@ -121,9 +116,9 @@ suite('Parser', () => {
       }],
     });
 
-    testExportDecl(
+    testParseModule(
       'export var a = 0, b;',
-      {
+      moduleItem, {
         type: 'Export',
         declaration: {
           type: 'VariableDeclaration',
@@ -136,9 +131,9 @@ suite('Parser', () => {
         },
       });
 
-    testExportDecl(
+    testParseModule(
       'export const a = 0, b = 0;',
-      {
+      moduleItem, {
         type: 'Export',
         declaration: {
           type: 'VariableDeclaration',
@@ -155,9 +150,9 @@ suite('Parser', () => {
         },
       });
 
-    testExportDecl(
+    testParseModule(
       'export let a = 0, b = 0;',
-      {
+      moduleItem, {
         type: 'Export',
         declaration: {
           type: 'VariableDeclaration',
@@ -174,9 +169,9 @@ suite('Parser', () => {
         },
       });
 
-    testExportDecl(
+    testParseModule(
       'export let[a] = 0;',
-      {
+      moduleItem, {
         type: 'Export',
         declaration: {
           type: 'VariableDeclaration',
@@ -189,9 +184,9 @@ suite('Parser', () => {
         },
       });
 
-    testExportDecl(
+    testParseModule(
       'export class A{} /* no semi */ false',
-      {
+      moduleItem, {
         type: 'Export',
         declaration: {
           type: 'ClassDeclaration',
@@ -201,9 +196,9 @@ suite('Parser', () => {
         },
       });
 
-    testExportDecl(
+    testParseModule(
       'export function A(){} /* no semi */ false',
-      {
+      moduleItem, {
         type: 'Export',
         declaration: {
           type: 'FunctionDeclaration',
@@ -215,9 +210,9 @@ suite('Parser', () => {
       }
     );
 
-    testExportDecl(
+    testParseModule(
       'export default function (){} /* no semi */ false',
-      {
+      moduleItem, {
         type: 'ExportDefault',
         body: {
           type: 'FunctionDeclaration',
@@ -229,9 +224,9 @@ suite('Parser', () => {
       }
     );
 
-    testExportDecl(
+    testParseModule(
       'export default class {} /* no semi */ false',
-      {
+      moduleItem, {
         type: 'ExportDefault',
         body: {
           type: 'ClassDeclaration',
@@ -241,9 +236,9 @@ suite('Parser', () => {
         },
       });
 
-    testExportDecl(
+    testParseModule(
       'export default 3 + 1',
-      {
+      moduleItem, {
         type: 'ExportDefault',
         body: {
           type: 'BinaryExpression',
@@ -253,11 +248,11 @@ suite('Parser', () => {
         },
       });
 
-    testExportDecl(
+    testParseModule(
       'export default a',
-      { type: 'ExportDefault', body: { type: 'IdentifierExpression', name: 'a' } });
+      moduleItem, { type: 'ExportDefault', body: { type: 'IdentifierExpression', name: 'a' } });
 
-    testExportDecl('export default function a(){}', {
+    testParseModule('export default function a(){}', moduleItem, {
       type: 'ExportDefault',
       body: {
         type: 'FunctionDeclaration',
@@ -268,12 +263,12 @@ suite('Parser', () => {
       },
     });
 
-    testExportDecl('export default class a{}', {
+    testParseModule('export default class a{}', moduleItem, {
       type: 'ExportDefault',
       body: { type: 'ClassDeclaration', name: { type: 'BindingIdentifier', name: 'a' }, super: null, elements: [] },
     });
 
-    testExportDecl('export default function* a(){}', {
+    testParseModule('export default function* a(){}', moduleItem, {
       type: 'ExportDefault',
       body: {
         type: 'FunctionDeclaration',
@@ -284,41 +279,6 @@ suite('Parser', () => {
       },
     });
 
-    testParseModule('export default 0;0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'ExportDefault', body: { type: 'LiteralNumericExpression', value: 0 } },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
-
-    testParseModule('export function f(){};0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'Export', declaration:
-        { type: 'FunctionDeclaration',
-          isGenerator: false,
-          name: { type: 'BindingIdentifier', name: 'f' },
-          params: { type: 'FormalParameters', items: [], rest: null },
-          body: { type: 'FunctionBody', directives: [], statements: [] } } },
-        { type: 'EmptyStatement' },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
-
-    testParseModule('export class A{};0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'Export', declaration:
-          { type: 'ClassDeclaration', name: { type: 'BindingIdentifier', name: 'A' }, super: null, elements: [] } },
-        { type: 'EmptyStatement' },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
-
-    testParseModule('export {};0', id,
-      { type: 'Module', directives: [], items: [
-        { type: 'ExportLocals', namedExports: [] },
-        { type: 'ExpressionStatement', expression: { type: 'LiteralNumericExpression', value: 0 } },
-      ] }
-    );
 
     testParseModule('export default function a(){} let b; export {b as a};', id,
       { type: 'Module', directives: [], items: [

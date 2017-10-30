@@ -20,7 +20,6 @@ let stmt = require('../helpers').stmt;
 suite('Parser', () => {
   suite('empty expression', () => {
 
-    testParse(';', stmt, { type: 'EmptyStatement' });
 
   });
 });

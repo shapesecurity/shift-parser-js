@@ -20,60 +20,6 @@ let testParse = require('../assertions').testParse;
 suite('Parser', () => {
   suite('destructive unary expressions', () => {
 
-    testParse('++a', expr,
-      { type: 'UpdateExpression',
-        isPrefix: true,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        operator: '++' }
-    );
 
-    testParse('--a', expr,
-      { type: 'UpdateExpression',
-        isPrefix: true,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'a' },
-        operator: '--' }
-    );
-
-    testParse('x++', expr,
-      { type: 'UpdateExpression',
-        isPrefix: false,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        operator: '++' }
-    );
-
-    testParse('x--', expr,
-      { type: 'UpdateExpression',
-        isPrefix: false,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'x' },
-        operator: '--' }
-    );
-
-    testParse('eval++', expr,
-      { type: 'UpdateExpression',
-        isPrefix: false,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'eval' },
-        operator: '++' }
-    );
-
-    testParse('eval--', expr,
-      { type: 'UpdateExpression',
-        isPrefix: false,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'eval' },
-        operator: '--' }
-    );
-
-    testParse('arguments++', expr,
-      { type: 'UpdateExpression',
-        isPrefix: false,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'arguments' },
-        operator: '++' }
-    );
-
-    testParse('arguments--', expr,
-      { type: 'UpdateExpression',
-        isPrefix: false,
-        operand: { type: 'AssignmentTargetIdentifier', name: 'arguments' },
-        operator: '--' }
-    );
   });
 });

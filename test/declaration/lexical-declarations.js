@@ -20,52 +20,9 @@ let stmt = require('../helpers').stmt;
 
 suite('Parser', () => {
   suite('declarations', () => {
-    testParse('let a', stmt,
-      {
-        type: 'VariableDeclarationStatement',
-        declaration: {
-          type: 'VariableDeclaration',
-          kind: 'let',
-          declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
-        },
-      }
-    );
 
-    testParse('{ let a; }', stmt,
-      {
-        type: 'BlockStatement',
-        block: {
-          type: 'Block',
-          statements: [{
-            type: 'VariableDeclarationStatement',
-            declaration: {
-              type: 'VariableDeclaration',
-              kind: 'let',
-              declarators: [{
-                type: 'VariableDeclarator',
-                binding: { type: 'BindingIdentifier', name: 'a' },
-                init: null,
-              }],
-            },
-          }],
-        },
-      });
 
-    // TODO: lookahead let [ : testParseFailure("while(true) let[a] = 0", "Unexpected token \"let\"");
-    testParse('while(true) var a', stmt,
-      {
-        type: 'WhileStatement',
-        test: { type: 'LiteralBooleanExpression', value: true },
-        body: {
-          type: 'VariableDeclarationStatement',
-          declaration: {
-            type: 'VariableDeclaration',
-            kind: 'var',
-            declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: null }],
-          },
-        },
-      });
-
+    testParseFailure('while(true) let[a] = 0', 'Unexpected token "let"');
     testParseFailure('while(true) let a', 'Unexpected token "let"');
     testParseFailure('while(true) const a', 'Unexpected token "const"');
     testParseFailure('with(true) let a', 'Unexpected token "let"');

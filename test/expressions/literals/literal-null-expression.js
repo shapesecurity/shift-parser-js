@@ -20,9 +20,6 @@ let testParse = require('../../assertions').testParse;
 suite('Parser', () => {
   suite('literal null expression', () => {
 
-    testParse('null', expr, { type: 'LiteralNullExpression' });
-    testParse('null;', expr, { type: 'LiteralNullExpression' });
-    testParse('null\n', expr, { type: 'LiteralNullExpression' });
 
   });
 });

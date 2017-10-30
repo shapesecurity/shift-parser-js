@@ -20,13 +20,7 @@ let testParse = require('../../assertions').testParse;
 suite('Parser', () => {
   suite('binding identifier', () => {
     suite('let as binding identifier', () => {
-      testParse('for(let in 0);', stmt,
-        { type: 'ForInStatement',
-          left: { type: 'AssignmentTargetIdentifier', name: 'let' },
-          right: { type: 'LiteralNumericExpression', value: 0 },
-          body: { type: 'EmptyStatement' },
-        }
-      );
+
     });
   });
 });

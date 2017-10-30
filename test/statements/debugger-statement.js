@@ -20,8 +20,6 @@ let testParse = require('../assertions').testParse;
 suite('Parser', () => {
   suite('debugger statement', () => {
 
-    testParse('debugger', stmt, { type: 'DebuggerStatement' });
-    testParse('debugger;', stmt, { type: 'DebuggerStatement' });
 
   });
 });

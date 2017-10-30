@@ -3,5 +3,8 @@ module.exports = {
     env: {
         mocha: true,
         node: true
+    },
+    rules: {
+      'no-unused-vars': 'off'
     }
 }

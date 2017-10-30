@@ -20,7 +20,6 @@ let testParse = require('../assertions').testParse;
 suite('Parser', () => {
   suite('this expression', () => {
 
-    testParse('this\n', expr, { type: 'ThisExpression' });
 
   });
 });

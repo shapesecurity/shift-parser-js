@@ -20,39 +20,6 @@ let stmt = require('../helpers').stmt;
 suite('Parser', () => {
   suite('expression statement', () => {
 
-    testParse('x', stmt,
-      { type: 'ExpressionStatement',
-        expression: { type: 'IdentifierExpression', name: 'x' } }
-    );
-
-    testParse('x, y', stmt,
-      { type: 'ExpressionStatement',
-        expression:
-        { type: 'BinaryExpression',
-          operator: ',',
-          left: { type: 'IdentifierExpression', name: 'x' },
-          right: { type: 'IdentifierExpression', name: 'y' } } }
-    );
-
-    testParse('\\u0061', stmt,
-      { type: 'ExpressionStatement',
-        expression: { type: 'IdentifierExpression', name: 'a' } }
-    );
-
-    testParse('a\\u0061', stmt,
-      { type: 'ExpressionStatement',
-        expression: { type: 'IdentifierExpression', name: 'aa' } }
-    );
-
-    testParse('\\u0061a', stmt,
-      { type: 'ExpressionStatement',
-        expression: { type: 'IdentifierExpression', name: 'aa' } }
-    );
-
-    testParse('\\u0061a ', stmt,
-      { type: 'ExpressionStatement',
-        expression: { type: 'IdentifierExpression', name: 'aa' } }
-    );
 
   });
 });

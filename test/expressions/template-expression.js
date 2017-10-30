@@ -21,85 +21,7 @@ let expr = require('../helpers').expr;
 
 suite('Parser', () => {
   suite('untagged template expressions', () => {
-    testParse('``', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '' }],
-    });
-    testParse('`abc`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: 'abc' }],
-    });
-    testParse('`\n`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '\n' }],
-    });
-    testParse('`\r\n\t\n`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '\r\n\t\n' }],
-    });
-    testParse('`\\``', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '\\`' }],
-    });
-    testParse('`$$$`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '$$$' }],
-    });
-    testParse('`$$$${a}`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '$$$' }, {
-        type: 'IdentifierExpression',
-        name: 'a',
-      }, { type: 'TemplateElement', rawValue: '' }],
-    });
-    testParse('`${a}`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '' }, {
-        type: 'IdentifierExpression',
-        name: 'a',
-      }, { type: 'TemplateElement', rawValue: '' }],
-    });
-    testParse('`${a}$`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '' }, {
-        type: 'IdentifierExpression',
-        name: 'a',
-      }, { type: 'TemplateElement', rawValue: '$' }],
-    });
-    testParse('`${a}${b}`', expr, {
-      type: 'TemplateExpression',
-      tag: null,
-      elements: [{ type: 'TemplateElement', rawValue: '' }, {
-        type: 'IdentifierExpression',
-        name: 'a',
-      }, { type: 'TemplateElement', rawValue: '' }, {
-        type: 'IdentifierExpression',
-        name: 'b',
-      }, { type: 'TemplateElement', rawValue: '' }],
-    });
-    testParse('````', expr, {
-      type: 'TemplateExpression',
-      tag: { type: 'TemplateExpression', tag: null, elements: [{ type: 'TemplateElement', rawValue: '' }] },
-      elements: [{ type: 'TemplateElement', rawValue: '' }],
-    });
-    testParse('``````', expr, {
-      type: 'TemplateExpression',
-      tag: {
-        type: 'TemplateExpression',
-        tag: { type: 'TemplateExpression', tag: null, elements: [{ type: 'TemplateElement', rawValue: '' }] },
-        elements: [{ type: 'TemplateElement', rawValue: '' }],
-      },
-      elements: [{ type: 'TemplateElement', rawValue: '' }],
-    });
+
 
     testParseFailure('`', 'Unexpected end of input');
     testParseFailure('a++``', 'Unexpected template');
@@ -109,29 +31,7 @@ suite('Parser', () => {
   });
 
   suite('tagged template expressions', () => {
-    testParse('a``', expr, {
-      type: 'TemplateExpression',
-      tag: { type: 'IdentifierExpression', name: 'a' },
-      elements: [{ type: 'TemplateElement', rawValue: '' }],
-    });
-    testParse('a()``', expr, {
-      type: 'TemplateExpression',
-      tag: { type: 'CallExpression', callee: { type: 'IdentifierExpression', name: 'a' }, arguments: [] },
-      elements: [{ type: 'TemplateElement', rawValue: '' }],
-    });
-    testParse('new a``', expr, {
-      type: 'NewExpression',
-      callee: {
-        type: 'TemplateExpression',
-        tag: { type: 'IdentifierExpression', name: 'a' },
-        elements: [{ type: 'TemplateElement', rawValue: '' }],
-      },
-      arguments: [],
-    });
-    testParse('new a()``', expr, {
-      type: 'TemplateExpression',
-      tag: { type: 'NewExpression', callee: { type: 'IdentifierExpression', name: 'a' }, arguments: [] },
-      elements: [{ type: 'TemplateElement', rawValue: '' }],
-    });
+
+
   });
 });

@@ -20,23 +20,6 @@ let stmt = require('../helpers').stmt;
 suite('Parser', () => {
   suite('throw statement', () => {
 
-    testParse('throw this', stmt, { type: 'ThrowStatement', expression: { type: 'ThisExpression' } });
-
-    testParse('throw x;', stmt,
-      { type: 'ThrowStatement',
-        expression: { type: 'IdentifierExpression', name: 'x' } }
-    );
-
-    testParse('throw x * y', stmt,
-      { type: 'ThrowStatement',
-        expression:
-        { type: 'BinaryExpression',
-          operator: '*',
-          left: { type: 'IdentifierExpression', name: 'x' },
-          right: { type: 'IdentifierExpression', name: 'y' } } }
-    );
-
-    testParse('throw {}', stmt, { type: 'ThrowStatement', expression: { type: 'ObjectExpression', properties: [] } });
 
   });
 });

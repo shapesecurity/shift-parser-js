@@ -17,6 +17,14 @@
 import {} from 'es6-map/implement';
 import MultiMap from 'multimap';
 
+function addEach(thisMap, ...otherMaps) {
+  otherMaps.forEach(otherMap => {
+    otherMap.forEachEntry((v, k) => {
+      thisMap.set.apply(thisMap, [k].concat(v));
+    });
+  });
+  return thisMap;
+}
 
 let identity; // initialised below EarlyErrorState
 
@@ -215,7 +223,7 @@ export class EarlyErrorState {
   }
 
   observeLexicalDeclaration() {
-    this.lexicallyDeclaredNames.addEach(this.boundNames);
+    addEach(this.lexicallyDeclaredNames, this.boundNames);
     this.boundNames = new MultiMap;
     return this;
   }
@@ -251,19 +259,19 @@ export class EarlyErrorState {
 
   observeFunctionDeclaration() {
     this.observeVarBoundary();
-    this.functionDeclarationNames.addEach(this.boundNames);
+    addEach(this.functionDeclarationNames, this.boundNames);
     this.boundNames = new MultiMap;
     return this;
   }
 
   functionDeclarationNamesAreLexical() {
-    this.lexicallyDeclaredNames.addEach(this.functionDeclarationNames);
+    addEach(this.lexicallyDeclaredNames, this.functionDeclarationNames);
     this.functionDeclarationNames = new MultiMap;
     return this;
   }
 
   observeVarDeclaration() {
-    this.varDeclaredNames.addEach(this.boundNames);
+    addEach(this.varDeclaredNames, this.boundNames);
     this.boundNames = new MultiMap;
     return this;
   }
@@ -290,8 +298,8 @@ export class EarlyErrorState {
   }
 
   exportDeclaredNames() {
-    this.exportedNames.addEach(this.lexicallyDeclaredNames).addEach(this.varDeclaredNames);
-    this.exportedBindings.addEach(this.lexicallyDeclaredNames).addEach(this.varDeclaredNames);
+    addEach(this.exportedNames, this.lexicallyDeclaredNames, this.varDeclaredNames);
+    addEach(this.exportedBindings, this.lexicallyDeclaredNames, this.varDeclaredNames);
     return this;
   }
 
@@ -351,13 +359,13 @@ export class EarlyErrorState {
     [].push.apply(this.freeLabeledBreakStatements, s.freeLabeledBreakStatements);
     [].push.apply(this.freeLabeledContinueStatements, s.freeLabeledContinueStatements);
     [].push.apply(this.newTargetExpressions, s.newTargetExpressions);
-    this.boundNames.addEach(s.boundNames);
-    this.lexicallyDeclaredNames.addEach(s.lexicallyDeclaredNames);
-    this.functionDeclarationNames.addEach(s.functionDeclarationNames);
-    this.varDeclaredNames.addEach(s.varDeclaredNames);
+    addEach(this.boundNames, s.boundNames);
+    addEach(this.lexicallyDeclaredNames, s.lexicallyDeclaredNames);
+    addEach(this.functionDeclarationNames, s.functionDeclarationNames);
+    addEach(this.varDeclaredNames, s.varDeclaredNames);
     [].push.apply(this.forOfVarDeclaredNames, s.forOfVarDeclaredNames);
-    this.exportedNames.addEach(s.exportedNames);
-    this.exportedBindings.addEach(s.exportedBindings);
+    addEach(this.exportedNames, s.exportedNames);
+    addEach(this.exportedBindings, s.exportedBindings);
     [].push.apply(this.superCallExpressions, s.superCallExpressions);
     [].push.apply(this.superCallExpressionsInConstructorMethod, s.superCallExpressionsInConstructorMethod);
     [].push.apply(this.superPropertyExpressions, s.superPropertyExpressions);

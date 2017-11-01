@@ -1268,6 +1268,9 @@ export default class Tokenizer {
               }
               ch = this.source.charAt(this.index);
             }
+            if (code === 0 && octLen === 1 && (ch === '8' || ch === '9')) {
+              octal = this.source.slice(octalStart, this.index + 1);
+            }
             str += String.fromCharCode(code);
           } else if (ch === '8' || ch === '9') {
             throw this.createILLEGAL();
@@ -1331,7 +1334,7 @@ export default class Tokenizer {
         case 0x5C: { // \\
           let octal = this.scanStringEscape('', null)[1];
           if (octal != null) {
-            throw this.createILLEGAL();
+            throw this.createError(ErrorMessages.NO_OCTALS_IN_TEMPLATES);
           }
           break;
         }

@@ -44,6 +44,8 @@ suite('Parser', () => {
     testParseFailure('\'use strict\'; (\'\\001\')', 'Unexpected legacy octal escape sequence: \\001');
     testParseFailure('\'use strict\'; (\'\\000\')', 'Unexpected legacy octal escape sequence: \\000');
     testParseFailure('\'use strict\'; (\'\\123\')', 'Unexpected legacy octal escape sequence: \\123');
+    testParseFailure('\'use strict\'; (\'\\08\')', 'Unexpected legacy octal escape sequence: \\08');
+    testParseFailure('\'use strict\'; (\'\\09\')', 'Unexpected legacy octal escape sequence: \\09');
     testParseModuleFailure('(\'\\1\')', 'Unexpected legacy octal escape sequence: \\1');
 
     // early grammar error: 11.8.4.1

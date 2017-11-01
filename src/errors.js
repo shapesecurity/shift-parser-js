@@ -105,4 +105,5 @@ export const ErrorMessages = {
   ILLEGAL_FUNC_DECL_IF: 'FunctionDeclarations in IfStatements are disallowed in strict mode',
   ILLEGAL_USE_STRICT: 'Functions with non-simple parameter lists may not contain a "use strict" directive',
   ILLEGAL_EXPORTED_NAME: 'Names of variables used in an export specifier from the current module must be identifiers',
+  NO_OCTALS_IN_TEMPLATES: 'Template literals may not contain octal escape sequences',
 };

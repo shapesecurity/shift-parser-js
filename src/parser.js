@@ -2163,13 +2163,14 @@ export class GenericParser extends Tokenizer {
         continue;
       }
       let isStatic = false;
+      let classElementStart = this.startNode();
       let { methodOrKey, kind } = this.parseMethodDefinition();
       if (kind === 'identifier' && methodOrKey.value === 'static') {
         isStatic = true;
         ({ methodOrKey, kind } = this.parseMethodDefinition());
       }
       if (kind === 'method') {
-        elements.push(this.copyNode(methodOrKey, new AST.ClassElement({ isStatic, method: methodOrKey })));
+        elements.push(this.finishNode(new AST.ClassElement({ isStatic, method: methodOrKey }), classElementStart));
       } else {
         throw this.createError('Only methods are allowed in classes');
       }

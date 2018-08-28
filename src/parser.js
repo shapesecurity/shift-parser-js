@@ -154,18 +154,18 @@ export class GenericParser extends Tokenizer {
   }
 
   matchContextualKeyword(keyword) {
-    return this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword;
+    return this.lookahead.type === TokenType.IDENTIFIER && !this.lookahead.escaped && this.lookahead.value === keyword;
   }
 
   expectContextualKeyword(keyword) {
-    if (this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword) {
+    if (this.lookahead.type === TokenType.IDENTIFIER && !this.lookahead.escaped && this.lookahead.value === keyword) {
       return this.lex();
     }
     throw this.createUnexpected(this.lookahead);
   }
 
   eatContextualKeyword(keyword) {
-    if (this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword) {
+    if (this.lookahead.type === TokenType.IDENTIFIER && !this.lookahead.escaped && this.lookahead.value === keyword) {
       return this.lex();
     }
     return null;

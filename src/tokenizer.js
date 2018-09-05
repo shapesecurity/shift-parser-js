@@ -806,13 +806,12 @@ export default class Tokenizer {
     let type = this.getKeyword(id);
     let escaped = false;
     if (hasEscape) {
-      if (type === TokenType.IDENTIFIER) {
-        escaped = true;
-      } else {
+      escaped = true;
+      if (type !== TokenType.IDENTIFIER) {
         type = TokenType.ESCAPED_KEYWORD;
       }
     }
-    return { type, value: id, slice, escaped};
+    return { type, value: id, slice, escaped };
   }
 
   getLocation() {

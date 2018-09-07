@@ -18,6 +18,7 @@ let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testEarlyError = require('../assertions').testEarlyError;
 let testParseFailure = require('../assertions').testParseFailure;
+let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 
 function yd(p) {
   return stmt(p).body.statements[0].expression;
@@ -91,5 +92,13 @@ suite('Parser', () => {
         }],
       }
     );
+  });
+
+  suite('no escapes in contextual keywords', () => {
+    testParseFailure('({ g\\u0065t x(){} });', 'Unexpected identifier');
+    testParseModuleFailure('export {a \\u0061s b} from "";', 'Unexpected identifier');
+    testParseModuleFailure('export {} fr\\u006fm "";', 'Unexpected identifier');
+    testParseFailure('for (a o\\u0066 b);', 'Unexpected identifier');
+    testParseFailure('class a { st\\u0061tic m(){} }', 'Only methods are allowed in classes');
   });
 });

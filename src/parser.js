@@ -2081,7 +2081,7 @@ export class GenericParser extends Tokenizer {
     if (!isGenerator && token.type === TokenType.IDENTIFIER) {
       if (token.value.length === 3) {
         // Property Assignment: Getter and Setter.
-        if (!token.escaped && token.value === 'get' && this.lookaheadPropertyName()) {
+        if (token.value === 'get' && this.lookaheadPropertyName() && !token.escaped) {
           ({ name } = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
@@ -2093,7 +2093,7 @@ export class GenericParser extends Tokenizer {
             methodOrKey: this.finishNode(new AST.Getter({ name, body }), startState),
             kind: 'method',
           };
-        } else if (!token.escaped && token.value === 'set' && this.lookaheadPropertyName()) {
+        } else if (token.value === 'set' && this.lookaheadPropertyName() && !token.escaped) {
           ({ name } = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           let previousYield = this.allowYieldExpression;

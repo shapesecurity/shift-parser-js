@@ -804,7 +804,7 @@ export default class Tokenizer {
     let hasEscape = this.index - start !== id.length;
 
     let type = this.getKeyword(id);
-    if (type !== TokenType.IDENTIFIER && hasEscape) {
+    if (hasEscape && type !== TokenType.IDENTIFIER) {
       type = TokenType.ESCAPED_KEYWORD;
     }
     return { type, value: id, slice, escaped: hasEscape };

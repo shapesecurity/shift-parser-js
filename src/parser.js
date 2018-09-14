@@ -154,18 +154,18 @@ export class GenericParser extends Tokenizer {
   }
 
   matchContextualKeyword(keyword) {
-    return this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword;
+    return this.lookahead.type === TokenType.IDENTIFIER && !this.lookahead.escaped && this.lookahead.value === keyword;
   }
 
   expectContextualKeyword(keyword) {
-    if (this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword) {
+    if (this.lookahead.type === TokenType.IDENTIFIER && !this.lookahead.escaped && this.lookahead.value === keyword) {
       return this.lex();
     }
     throw this.createUnexpected(this.lookahead);
   }
 
   eatContextualKeyword(keyword) {
-    if (this.lookahead.type === TokenType.IDENTIFIER && this.lookahead.value === keyword) {
+    if (this.lookahead.type === TokenType.IDENTIFIER && !this.lookahead.escaped && this.lookahead.value === keyword) {
       return this.lex();
     }
     return null;
@@ -2081,7 +2081,7 @@ export class GenericParser extends Tokenizer {
     if (!isGenerator && token.type === TokenType.IDENTIFIER) {
       if (token.value.length === 3) {
         // Property Assignment: Getter and Setter.
-        if (token.value === 'get' && this.lookaheadPropertyName()) {
+        if (token.value === 'get' && this.lookaheadPropertyName() && !token.escaped) {
           ({ name } = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
@@ -2093,7 +2093,7 @@ export class GenericParser extends Tokenizer {
             methodOrKey: this.finishNode(new AST.Getter({ name, body }), startState),
             kind: 'method',
           };
-        } else if (token.value === 'set' && this.lookaheadPropertyName()) {
+        } else if (token.value === 'set' && this.lookaheadPropertyName() && !token.escaped) {
           ({ name } = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           let previousYield = this.allowYieldExpression;
@@ -2132,6 +2132,7 @@ export class GenericParser extends Tokenizer {
       methodOrKey: name,
       kind: token.type.klass.isIdentifierName ? 'identifier' : 'property',
       binding,
+      escaped: token.escaped,
     };
   }
 
@@ -2164,8 +2165,8 @@ export class GenericParser extends Tokenizer {
       }
       let isStatic = false;
       let classElementStart = this.startNode();
-      let { methodOrKey, kind } = this.parseMethodDefinition();
-      if (kind === 'identifier' && methodOrKey.value === 'static') {
+      let { methodOrKey, kind, escaped } = this.parseMethodDefinition();
+      if (kind === 'identifier' && methodOrKey.value === 'static' && !escaped) {
         isStatic = true;
         ({ methodOrKey, kind } = this.parseMethodDefinition());
       }

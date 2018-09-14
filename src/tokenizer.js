@@ -807,7 +807,7 @@ export default class Tokenizer {
     if (hasEscape && type !== TokenType.IDENTIFIER) {
       type = TokenType.ESCAPED_KEYWORD;
     }
-    return { type, value: id, slice };
+    return { type, value: id, slice, escaped: hasEscape };
   }
 
   getLocation() {

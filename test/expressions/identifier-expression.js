@@ -22,6 +22,7 @@ let stmt = require('../helpers').stmt;
 
 suite('Parser', () => {
   suite('identifier expression', () => {
+    testParse('await', expr, { type: 'IdentifierExpression', name: 'await' });
     testParseModuleFailure('await', 'Unexpected token "await"');
     testParseModuleFailure('function f() { var await }', 'Unexpected token "await"');
 

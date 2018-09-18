@@ -23,7 +23,7 @@ global.esprima = require("esprima");
 global.acorn = require("acorn");
 global.babel = require("babel-core");
 global.traceur = require("traceur");
-global.uglifyjs = require("uglifyjs");
+global.uglifyjs = require("uglify-js");
 
 // Poor man's error reporter for Traceur.
 console.reportError = console.error;
@@ -63,5 +63,5 @@ function benchmarkParsing(fileName) {
 }
 
 benchmarkParsing("angular/angular");
-benchmarkParsing("esprima/esprima");
+benchmarkParsing("esprima/dist/esprima");
 benchmarkParsing("./dist/parser");

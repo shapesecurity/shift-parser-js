@@ -27,7 +27,7 @@
     "es6-map": "^0.1.1",
     "multimap": "^0.1.1",
     "shift-ast": "^4.0.0",
-    "shift-reducer": "^4.0.0"
+    "shift-reducer": "^4.4.0"
   },
   "devDependencies": {
     "acorn": "2.1.0",
@@ -42,18 +42,18 @@
     "esprima": "2.5.0",
     "everything.js": "1.0.3",
     "expect.js": "0.3.1",
-    "microtime": "^2.0.0",
+    "microtime": "^2.1.8",
     "mocha": "2.3.4",
     "normalize-parser-test": "1.0.3",
     "nyc": "10.1.2",
-    "regenerate": "^1.3.2",
+    "regenerate": "^1.4.0",
     "shift-parser-expectations": "2016.0.1",
     "shift-spec": "^2016.0.0",
     "test262-parser-tests": "0.0.3",
     "tick": "0.1.1",
     "traceur": "0.0.91",
     "uglifyjs": "2.4.10",
-    "unicode-8.0.0": "^0.7.0"
+    "unicode-8.0.0": "^0.7.5"
   },
   "keywords": [
     "Shift",

@@ -18,10 +18,29 @@ let stmt = require('../helpers').stmt;
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 
 suite('Parser', () => {
   suite('variable declaration statement', () => {
     // Variable Statement
+
+    testParse('var await;', stmt,
+      {
+        type: 'VariableDeclarationStatement',
+        declaration: {
+          type: 'VariableDeclaration',
+          kind: 'var',
+          declarators: [{
+            type: 'VariableDeclarator',
+            binding: {
+              type: 'BindingIdentifier',
+              name: 'await',
+            },
+            init: null,
+          }],
+        },
+      }
+    );
 
 
     // Let Statement
@@ -33,6 +52,7 @@ suite('Parser', () => {
     // Const Statement
 
 
+    testParseModuleFailure('var await', 'Unexpected token "await"');
     testParseFailure('var const', 'Unexpected token "const"');
     testParseFailure('var a[0]=0;', 'Unexpected token "["');
     testParseFailure('var (a)=0;', 'Unexpected token "("');

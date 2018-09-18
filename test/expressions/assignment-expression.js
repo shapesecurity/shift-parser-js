@@ -16,11 +16,25 @@
 
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 let expr = require('../helpers').expr;
 
 suite('Parser', () => {
   suite('assignment expression', () => {
 
+    testParse('await = 0', expr,
+      {
+        type: 'AssignmentExpression',
+        binding: {
+          type: 'AssignmentTargetIdentifier',
+          name: 'await',
+        },
+        expression: {
+          type: 'LiteralNumericExpression',
+          value: 0,
+        },
+      }
+    );
 
     testParse('x **= 0', expr,
       {
@@ -47,6 +61,8 @@ suite('Parser', () => {
         },
         expression: { type: 'LiteralNumericExpression', value: 0 },
       });
+
+    testParseModuleFailure('await = 0', 'Unexpected token "await"');
 
     testParseFailure('(({a})=0);', 'Invalid left-hand side in assignment');
     testParseFailure('(([a])=0);', 'Invalid left-hand side in assignment');

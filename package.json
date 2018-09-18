@@ -24,7 +24,6 @@
     "regenerate-unicode": "node scripts/generate-unicode-data.js > src/unicode.js"
   },
   "dependencies": {
-    "es6-map": "^0.1.1",
     "multimap": "^1.0.2",
     "shift-ast": "^4.0.0",
     "shift-reducer": "^4.4.0"

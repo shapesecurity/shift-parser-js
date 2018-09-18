@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {} from 'es6-map/implement';
 import MultiMap from 'multimap';
 
 function addEach(thisMap, ...otherMaps) {

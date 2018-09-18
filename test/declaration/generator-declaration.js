@@ -61,7 +61,10 @@ suite('Parser', () => {
     testParseFailure('function*g() { ({yield} = 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { var {yield} = 0; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { for ({yield} in 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { for ({yield} in [{}]); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { for ({yield} of [{}]); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { ({yield = 0}); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function*g() { 0, {yield} = {}; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { ({yield = 0} = 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { var {yield = 0} = 0; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g() { for ({yield = 0} in 0); }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);

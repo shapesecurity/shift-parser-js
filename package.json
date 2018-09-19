@@ -43,7 +43,7 @@
     "expect.js": "0.3.1",
     "microtime": "^2.1.8",
     "mocha": "5.2.0",
-    "normalize-parser-test": "1.0.4",
+    "normalize-parser-test": "2.0.0",
     "nyc": "13.0.1",
     "regenerate": "^1.4.0",
     "shift-parser-expectations": "2016.0.1",

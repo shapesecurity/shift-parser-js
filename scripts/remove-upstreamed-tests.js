@@ -8,8 +8,10 @@ const { parseScriptWithLocation, parseModuleWithLocation } = require('shift-pars
 
 const expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
+let normalizeParseScript = src => parseScriptWithLocation(src, { earlyErrors: false });
+let normalizeParseModule = src => parseModuleWithLocation(src, { earlyErrors: false });
 function getTest262Name(program, isModule) {
-  const digest = crypto.createHash('sha256').update(normalize(program, isModule)).digest('hex');
+  const digest = crypto.createHash('sha256').update(normalize(program, { parseFn: isModule ? normalizeParseModule : normalizeParseScript })).digest('hex');
   return digest.substring(0, 16) + (isModule ? '.module' : '');
 }
 

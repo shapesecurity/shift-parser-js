@@ -70,17 +70,11 @@ module.exports = {
       ...numsepXpass,
     ],
     files: [
-      // multi-line html comments: https://github.com/shapesecurity/shift-parser-js/issues/391
-      'annexB/language/comments/multi-line-html-close.js',
-
       // functions with reserved names whose bodies are strict: https://github.com/tc39/ecma262/pull/1158
       'language/expressions/function/name-arguments-strict-body.js',
       'language/expressions/function/name-eval-strict-body.js',
       'language/statements/function/name-arguments-strict-body.js',
       'language/statements/function/name-eval-strict-body.js',
-
-      // new.target unicode escapes bug: https://github.com/shapesecurity/shift-parser-js/issues/388
-      'language/expressions/new.target/escaped-target.js',
 
       // `for (;;) let \n {` bug: https://github.com/shapesecurity/shift-parser-js/issues/389
       'language/statements/for/let-block-with-newline.js',

@@ -29,10 +29,10 @@ suite('Parser', () => {
         {
           type: 'ExpressionStatement',
           expression: {
-            type: 'IdentifierExpression', name: 'a'
+            type: 'IdentifierExpression', name: 'a',
           },
         },
-      ]
+      ],
     });
 
     testParse('a/*\n*/-->b', x => x, {
@@ -42,10 +42,10 @@ suite('Parser', () => {
         {
           type: 'ExpressionStatement',
           expression: {
-            type: 'IdentifierExpression', name: 'a'
+            type: 'IdentifierExpression', name: 'a',
           },
         },
-      ]
+      ],
     });
 
     testParse('a<!--\n-->', x => x, {
@@ -55,10 +55,10 @@ suite('Parser', () => {
         {
           type: 'ExpressionStatement',
           expression: {
-            type: 'IdentifierExpression', name: 'a'
+            type: 'IdentifierExpression', name: 'a',
           },
         },
-      ]
+      ],
     });
 
     testParse('a<!--\n-->b', x => x, {
@@ -68,10 +68,10 @@ suite('Parser', () => {
         {
           type: 'ExpressionStatement',
           expression: {
-            type: 'IdentifierExpression', name: 'a'
+            type: 'IdentifierExpression', name: 'a',
           },
         },
-      ]
+      ],
     });
 
     testParse('a<!--\n\n-->', x => x, {
@@ -81,10 +81,10 @@ suite('Parser', () => {
         {
           type: 'ExpressionStatement',
           expression: {
-            type: 'IdentifierExpression', name: 'a'
+            type: 'IdentifierExpression', name: 'a',
           },
         },
-      ]
+      ],
     });
 
     testParse('a<!--\n\n-->b', x => x, {
@@ -94,10 +94,10 @@ suite('Parser', () => {
         {
           type: 'ExpressionStatement',
           expression: {
-            type: 'IdentifierExpression', name: 'a'
+            type: 'IdentifierExpression', name: 'a',
           },
         },
-      ]
+      ],
     });
   });
 });

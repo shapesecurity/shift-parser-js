@@ -48,6 +48,8 @@
     "regenerate": "^1.4.0",
     "shift-parser-expectations": "2016.0.1",
     "shift-spec": "^2016.0.0",
+    "test262": "git+https://github.com/tc39/test262.git#94cb047ab826e86564e4ff39ec1908c78fa46416",
+    "test262-parser": "^2.0.7",
     "test262-parser-tests": "0.0.3",
     "tick": "0.1.1",
     "traceur": "0.0.111",

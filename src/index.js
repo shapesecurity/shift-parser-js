@@ -93,7 +93,7 @@ class ParserWithLocation extends GenericParser {
     };
     const type = 'MultiLine';
 
-    super.skipMultiLineComment();
+    const retval = super.skipMultiLineComment();
 
     const end = {
       line: this.line + 1,
@@ -103,6 +103,8 @@ class ParserWithLocation extends GenericParser {
     const text = this.source.substring(start.offset + 2, end.offset - 2);
 
     this.comments.push({ text, type, start, end });
+
+    return retval;
   }
 }
 

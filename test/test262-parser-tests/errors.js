@@ -32,7 +32,7 @@ function decorateWithLocations(tree, locations) {
   return copy;
 }
 
-suite('test262', () => {
+suite('test262-parser-tests', () => {
   suite('pass and pass-explicit', () => {
     for (let f of fs.readdirSync(`${scriptDir}/pass`)) {
       if (expectations.xfail.pass.indexOf(f) !== -1) {

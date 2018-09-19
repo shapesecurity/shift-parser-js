@@ -32,24 +32,24 @@ module.exports = {
       // arguable feature misclassification https://github.com/tc39/test262/blob/master/test/language/expressions/async-arrow-function/escaped-async-line-terminator.js
       'language/expressions/async-arrow-function/escaped-async-line-terminator.js',
 
-      // json-superset
+      // json-superset: tests using eval
       'language/literals/string/line-separator-eval.js',
       'language/literals/string/paragraph-separator-eval.js',
 
-      // export-star-as-namespace-from-module
+      // export-star-as-namespace-from-module: feature used in an import, not the main test
       'language/module-code/instn-star-as-props-dflt-skip.js',
       'language/module-code/instn-star-props-nrml.js',
       'language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js',
       'language/module-code/namespace/internals/get-nested-namespace-props-nrml.js',
 
-      // class-fields-private
+      // class-fields-private: tests using eval
       'language/statements/class/privatename-not-valid-eval-earlyerr-1.js',
       'language/statements/class/privatename-not-valid-eval-earlyerr-2.js',
       'language/statements/class/privatename-not-valid-eval-earlyerr-6.js',
       'language/statements/class/privatename-not-valid-eval-earlyerr-7.js',
       'language/statements/class/privatename-not-valid-eval-earlyerr-8.js',
 
-      // regexp-dotall
+      // regexp-dotall: tests using constructor, or checking properties of functions
       'annexB/built-ins/RegExp/prototype/flags/order-after-compile.js',
       'built-ins/RegExp/duplicate-flags.js',
       'built-ins/RegExp/prototype/dotAll/length.js',
@@ -68,13 +68,9 @@ module.exports = {
       ...regexpXpass,
 
       ...numsepXpass,
-
-      // TODO test bug: https://github.com/tc39/test262/pull/1777
-      'built-ins/TypedArrayConstructors/Float32Array/length.js',
-      'built-ins/Atomics/wait/was-woken-before-timeout.js',
     ],
     files: [
-      // multi-line html comments, still
+      // multi-line html comments: https://github.com/shapesecurity/shift-parser-js/issues/391
       'annexB/language/comments/multi-line-html-close.js',
 
       // functions with reserved names whose bodies are strict: https://github.com/tc39/ecma262/pull/1158

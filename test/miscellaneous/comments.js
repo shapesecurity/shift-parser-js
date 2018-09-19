@@ -35,6 +35,19 @@ suite('Parser', () => {
       ]
     });
 
+    testParse('a/*\n*/-->b', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a'
+          },
+        },
+      ]
+    });
+
     testParse('a<!--\n-->', x => x, {
       type: 'Script',
       directives: [],
@@ -48,7 +61,33 @@ suite('Parser', () => {
       ]
     });
 
+    testParse('a<!--\n-->b', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a'
+          },
+        },
+      ]
+    });
+
     testParse('a<!--\n\n-->', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a'
+          },
+        },
+      ]
+    });
+
+    testParse('a<!--\n\n-->b', x => x, {
       type: 'Script',
       directives: [],
       statements: [

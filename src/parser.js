@@ -1555,10 +1555,7 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
     this.lex();
     if (this.eat(TokenType.PERIOD)) {
-      let ident = this.expect(TokenType.IDENTIFIER);
-      if (ident.value !== 'target') {
-        throw this.createUnexpected(ident);
-      }
+      this.expectContextualKeyword('target');
       return this.finishNode(new AST.NewTargetExpression, startState);
     }
     let callee = this.isolateCoverGrammar(() => this.parseLeftHandSideExpression({ allowCall: false }));

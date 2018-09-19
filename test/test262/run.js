@@ -41,7 +41,7 @@ suite('test262 tests', () => {
       const isModule = data.attrs.flags.module;
       const shouldFail = data.attrs.negative != null && (data.attrs.negative.phase === 'parse' || data.attrs.negative.phase === 'early');
 
-      const xfailed = xfail.has(shortName) || !shouldFail && data.attrs.features != null && data.attrs.features.some(f => xfailFeatures.has(f)) && !xpassDespiteFeatures.has(shortName);
+      const xfailed = xfail.has(shortName) || !shouldFail && data.attrs.features != null && data.attrs.features.some(feat => xfailFeatures.has(feat)) && !xpassDespiteFeatures.has(shortName);
 
       let failed;
       try {

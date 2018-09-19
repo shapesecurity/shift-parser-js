@@ -645,6 +645,7 @@ export default class Tokenizer {
       } else if (!this.moduleIsTheGoalSymbol && chCode === 60 /* "<" */) {
         if (this.source.slice(this.index + 1, this.index + 4) === '!--') {
           this.skipSingleLineComment(4);
+          isLineStart = true;
         } else {
           break;
         }

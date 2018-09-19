@@ -22,7 +22,82 @@ function id(x) {
 
 suite('Parser', () => {
   suite('Comments', () => {
+    testParse('a/*\n*/-->', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a',
+          },
+        },
+      ],
+    });
 
+    testParse('a/*\n*/-->b', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a',
+          },
+        },
+      ],
+    });
 
+    testParse('a<!--\n-->', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a',
+          },
+        },
+      ],
+    });
+
+    testParse('a<!--\n-->b', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a',
+          },
+        },
+      ],
+    });
+
+    testParse('a<!--\n\n-->', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a',
+          },
+        },
+      ],
+    });
+
+    testParse('a<!--\n\n-->b', x => x, {
+      type: 'Script',
+      directives: [],
+      statements: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'IdentifierExpression', name: 'a',
+          },
+        },
+      ],
+    });
   });
 });

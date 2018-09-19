@@ -42,6 +42,7 @@ suite('Parser', () => {
 
     testParseFailure('function f() { new.anythingElse; }', 'Unexpected identifier');
     testParseFailure('function f() { new..target; }', 'Unexpected token "."');
+    testParseFailure('function f() { new.t\\u0061rget; }', 'Unexpected identifier');
 
   });
 });

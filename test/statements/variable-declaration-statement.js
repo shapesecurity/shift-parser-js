@@ -19,6 +19,7 @@ let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('variable declaration statement', () => {
@@ -52,16 +53,16 @@ suite('Parser', () => {
     // Const Statement
 
 
-    testParseModuleFailure('var await', 'Unexpected token "await"');
-    testParseFailure('var const', 'Unexpected token "const"');
-    testParseFailure('var a[0]=0;', 'Unexpected token "["');
-    testParseFailure('var (a)=0;', 'Unexpected token "("');
-    testParseFailure('var new A = 0;', 'Unexpected token "new"');
-    testParseFailure('var (x)', 'Unexpected token "("');
-    testParseFailure('var this', 'Unexpected token "this"');
-    testParseFailure('var a.b;', 'Unexpected token "."');
-    testParseFailure('var [a];', 'Unexpected token ";"');
-    testParseFailure('var {a};', 'Unexpected token ";"');
-    testParseFailure('var {a:a};', 'Unexpected token ";"');
+    testParseModuleFailure('var await', ErrorMessages.UNEXPECTED_TOKEN, 'await');
+    testParseFailure('var const', ErrorMessages.UNEXPECTED_TOKEN, 'const');
+    testParseFailure('var a[0]=0;', ErrorMessages.UNEXPECTED_TOKEN, '[');
+    testParseFailure('var (a)=0;', ErrorMessages.UNEXPECTED_TOKEN, '(');
+    testParseFailure('var new A = 0;', ErrorMessages.UNEXPECTED_TOKEN, 'new');
+    testParseFailure('var (x)', ErrorMessages.UNEXPECTED_TOKEN, '(');
+    testParseFailure('var this', ErrorMessages.UNEXPECTED_TOKEN, 'this');
+    testParseFailure('var a.b;', ErrorMessages.UNEXPECTED_TOKEN, '.');
+    testParseFailure('var [a];', ErrorMessages.UNEXPECTED_TOKEN, ';');
+    testParseFailure('var {a};', ErrorMessages.UNEXPECTED_TOKEN, ';');
+    testParseFailure('var {a:a};', ErrorMessages.UNEXPECTED_TOKEN, ';');
   });
 });

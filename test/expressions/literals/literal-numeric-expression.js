@@ -18,41 +18,42 @@ let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 let testParseModuleFailure = require('../../assertions').testParseModuleFailure;
+let ErrorMessages = require('../../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('literal numeric expression', () => {
     testParse('\n    0\n\n', expr, { type: 'LiteralNumericExpression', value: 0 });
 
     // Legacy Octal Integer Literal
-    testParseFailure('\'use strict\'; 01', 'Unexpected legacy octal integer literal');
-    testParseFailure('\'use strict\'; 0123', 'Unexpected legacy octal integer literal');
-    testParseFailure('\'use strict\'; 00', 'Unexpected legacy octal integer literal');
-    testParseFailure('\'use strict\'; 07', 'Unexpected legacy octal integer literal');
-    testParseFailure('\'use strict\'; 08', 'Unexpected noctal integer literal');
-    testParseFailure('\'use strict\'; 019', 'Unexpected noctal integer literal');
-    testParseModuleFailure('01', 'Unexpected legacy octal integer literal');
+    testParseFailure('\'use strict\'; 01', ErrorMessages.UNEXPECTED_OCTAL);
+    testParseFailure('\'use strict\'; 0123', ErrorMessages.UNEXPECTED_OCTAL);
+    testParseFailure('\'use strict\'; 00', ErrorMessages.UNEXPECTED_OCTAL);
+    testParseFailure('\'use strict\'; 07', ErrorMessages.UNEXPECTED_OCTAL);
+    testParseFailure('\'use strict\'; 08', ErrorMessages.UNEXPECTED_NOCTAL);
+    testParseFailure('\'use strict\'; 019', ErrorMessages.UNEXPECTED_NOCTAL);
+    testParseModuleFailure('01', ErrorMessages.UNEXPECTED_OCTAL);
 
     // Binary Integer Literal
-    testParseFailure('0b', 'Unexpected end of input');
-    testParseFailure('0b1a', 'Unexpected "a"');
-    testParseFailure('0b9', 'Unexpected "9"');
-    testParseFailure('0b18', 'Unexpected "8"');
-    testParseFailure('0b12', 'Unexpected "2"');
-    testParseFailure('0B', 'Unexpected end of input');
-    testParseFailure('0B1a', 'Unexpected "a"');
-    testParseFailure('0B9', 'Unexpected "9"');
-    testParseFailure('0B18', 'Unexpected "8"');
-    testParseFailure('0B12', 'Unexpected "2"');
+    testParseFailure('0b', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('0b1a', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, 'a');
+    testParseFailure('0b9', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '9');
+    testParseFailure('0b18', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '8');
+    testParseFailure('0b12', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '2');
+    testParseFailure('0B', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('0B1a', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, 'a');
+    testParseFailure('0B9', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '9');
+    testParseFailure('0B18', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '8');
+    testParseFailure('0B12', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '2');
 
     // Octal Integer Literal
-    testParseFailure('0o', 'Unexpected end of input');
-    testParseFailure('0o1a', 'Unexpected "a"');
-    testParseFailure('0o9', 'Unexpected "9"');
-    testParseFailure('0o18', 'Unexpected "8"');
-    testParseFailure('0O', 'Unexpected end of input');
-    testParseFailure('0O1a', 'Unexpected "a"');
-    testParseFailure('0O9', 'Unexpected "9"');
-    testParseFailure('09.x', 'Unexpected identifier');
-    testParseFailure('0O18', 'Unexpected "8"');
+    testParseFailure('0o', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('0o1a', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, 'a');
+    testParseFailure('0o9', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '9');
+    testParseFailure('0o18', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '8');
+    testParseFailure('0O', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('0O1a', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, 'a');
+    testParseFailure('0O9', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '9');
+    testParseFailure('09.x', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('0O18', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '8');
   });
 });

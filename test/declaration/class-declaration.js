@@ -17,6 +17,8 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
+let parseScript = require('../../').parseScriptWithLocation;
 
 suite('Parser', () => {
   suite('class declaration', () => {
@@ -49,7 +51,7 @@ suite('Parser', () => {
       elements: [],
     });
 
-    testParseFailure('class {}', 'Unexpected token "{"');
-    testParseFailure('class extends A{}', 'Unexpected token "extends"');
+    testParseFailure('class {}', ErrorMessages.UNEXPECTED_TOKEN, '{');
+    testParseFailure('class extends A{}', ErrorMessages.UNEXPECTED_TOKEN, 'extends');
   });
 });

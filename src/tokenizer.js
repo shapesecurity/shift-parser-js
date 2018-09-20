@@ -266,18 +266,17 @@ export default class Tokenizer {
   }
 
   createError(message, ...params) {
+    return this.createErrorWithLocation({ offset: this.startIndex, line: this.startLine + 1, column: this.startIndex - this.startLineStart }, message, ...params);
+  }
+
+  createErrorWithLocation(location, message, ...params) {
+    /* istanbul ignore next */
     let msg;
     if (typeof message === 'function') {
       msg = message(...params);
     } else {
       msg = message;
     }
-    return new JsError(this.startIndex, this.startLine + 1, this.startIndex - this.startLineStart + 1, msg);
-  }
-
-  createErrorWithLocation(location, message) {
-    /* istanbul ignore next */
-    let msg = message.replace(/\{(\d+)\}/g, (_, n) => JSON.stringify(arguments[+n + 2]));
     if (location.slice && location.slice.startLocation) {
       location = location.slice.startLocation;
     }

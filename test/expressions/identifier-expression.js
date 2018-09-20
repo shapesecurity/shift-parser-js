@@ -18,22 +18,22 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 let expr = require('../helpers').expr;
-let stmt = require('../helpers').stmt;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('identifier expression', () => {
     testParse('await', expr, { type: 'IdentifierExpression', name: 'await' });
-    testParseModuleFailure('await', 'Unexpected token "await"');
-    testParseModuleFailure('function f() { var await }', 'Unexpected token "await"');
+    testParseModuleFailure('await', ErrorMessages.UNEXPECTED_TOKEN, 'await');
+    testParseModuleFailure('function f() { var await }', ErrorMessages.UNEXPECTED_TOKEN, 'await');
 
     suite('let used as identifier expression', () => {
-      testParseFailure('for(let[a].b of 0);', 'Unexpected token "."');
-      testParseFailure('for(let[a]().b of 0);', 'Unexpected token "("');
-      testParseFailure('for(let.a of 0);', 'Invalid left-hand side in for-of');
+      testParseFailure('for(let[a].b of 0);', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('for(let[a]().b of 0);', ErrorMessages.UNEXPECTED_TOKEN, '(');
+      testParseFailure('for(let.a of 0);', ErrorMessages.INVALID_LHS_IN_FOR_OF);
     });
 
     suite('unicode identifier', () => {
-      testParseFailure('\\uD800\\uDC00', 'Unexpected "\\\\"');
+      testParseFailure('\\uD800\\uDC00', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '\\');
     });
   });
 });

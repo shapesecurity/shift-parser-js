@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('arrow expression', () => {
@@ -47,26 +48,26 @@ suite('Parser', () => {
     );
 
 
-    testParseFailure('[]=>0', 'Unexpected token "=>"');
-    testParseFailure('() + 1', 'Unexpected token "+"');
-    testParseFailure('1 + ()', 'Unexpected end of input');
-    testParseFailure('1 + ()', 'Unexpected end of input');
-    testParseFailure('(a)\n=> 0', 'Unexpected token "=>"');
-    testParseFailure('a\n=> 0', 'Unexpected token "=>"');
-    testParseFailure('((a)) => 1', 'Illegal arrow function parameter list');
-    testParseFailure('((a),...a) => 1', 'Unexpected token "..."');
-    testParseFailure('(a,...a)', 'Unexpected end of input');
-    testParseFailure('(a,...a)\n', 'Unexpected line terminator');
-    testParseFailure('(a,...a)/*\r\n*/ => 0', 'Unexpected line terminator');
-    testParseFailure('(a,...a)/*\u2028*/ => 0', 'Unexpected line terminator');
-    testParseFailure('(a,...a)/*\u2029*/ => 0', 'Unexpected line terminator');
-    testParseFailure('(a,...a)/*\n*/ => 0', 'Unexpected line terminator');
-    testParseFailure('(a,...a)/*\r*/ => 0', 'Unexpected line terminator');
-    testParseFailure('(a,...a)/*\u202a*/', 'Unexpected end of input');
-    testParseFailure('() <= 0', 'Unexpected token "<="');
-    testParseFailure('() ? 0', 'Unexpected token "?"');
-    testParseFailure('() + 0', 'Unexpected token "+"');
-    testParseFailure('(10) => 0', 'Illegal arrow function parameter list');
-    testParseFailure('(10, 20) => 0', 'Illegal arrow function parameter list');
+    testParseFailure('[]=>0', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('() + 1', ErrorMessages.UNEXPECTED_TOKEN, '+');
+    testParseFailure('1 + ()', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('1 + ()', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('(a)\n=> 0', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('a\n=> 0', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('((a)) => 1', ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
+    testParseFailure('((a),...a) => 1', ErrorMessages.UNEXPECTED_TOKEN, '...');
+    testParseFailure('(a,...a)', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('(a,...a)\n', ErrorMessages.UNEXPECTED_LINE_TERMINATOR);
+    testParseFailure('(a,...a)/*\r\n*/ => 0', ErrorMessages.UNEXPECTED_LINE_TERMINATOR);
+    testParseFailure('(a,...a)/*\u2028*/ => 0', ErrorMessages.UNEXPECTED_LINE_TERMINATOR);
+    testParseFailure('(a,...a)/*\u2029*/ => 0', ErrorMessages.UNEXPECTED_LINE_TERMINATOR);
+    testParseFailure('(a,...a)/*\n*/ => 0', ErrorMessages.UNEXPECTED_LINE_TERMINATOR);
+    testParseFailure('(a,...a)/*\r*/ => 0', ErrorMessages.UNEXPECTED_LINE_TERMINATOR);
+    testParseFailure('(a,...a)/*\u202a*/', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('() <= 0', ErrorMessages.UNEXPECTED_TOKEN, '<=');
+    testParseFailure('() ? 0', ErrorMessages.UNEXPECTED_TOKEN, '?');
+    testParseFailure('() + 0', ErrorMessages.UNEXPECTED_TOKEN, '+');
+    testParseFailure('(10) => 0', ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
+    testParseFailure('(10, 20) => 0', ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
   });
 });

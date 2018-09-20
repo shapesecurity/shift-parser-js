@@ -17,14 +17,15 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('return statement', () => {
 
 
-    testParseFailure('return;', 'Illegal return statement');
-    testParseFailure('{ return; }', 'Illegal return statement');
-    testParseFailure('if (false) { return; }', 'Illegal return statement');
+    testParseFailure('return;', ErrorMessages.ILLEGAL_RETURN);
+    testParseFailure('{ return; }', ErrorMessages.ILLEGAL_RETURN);
+    testParseFailure('if (false) { return; }', ErrorMessages.ILLEGAL_RETURN);
 
   });
 });

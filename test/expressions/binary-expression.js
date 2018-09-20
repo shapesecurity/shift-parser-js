@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('binary expression', () => {
@@ -87,8 +88,7 @@ suite('Parser', () => {
           right: { type: 'IdentifierExpression', name: 'y' } } }
     );
 
-    testParseFailure('-x ** y', 'Unary expressions as the left operand of an exponentation expression must be ' +
-      'disambiguated with parentheses');
+    testParseFailure('-x ** y', ErrorMessages.INVALID_EXPONENTIATION_LHS);
 
     // Bitwise Shift Operator
 

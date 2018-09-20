@@ -17,11 +17,12 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('try-catch statement', () => {
 
 
-    testParseFailure('try {} catch ((e)) {}', 'Unexpected token "("');
+    testParseFailure('try {} catch ((e)) {}', ErrorMessages.UNEXPECTED_TOKEN, '(');
   });
 });

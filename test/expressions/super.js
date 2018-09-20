@@ -19,6 +19,7 @@ let stmt = require('../helpers').stmt;
 
 let testParseFailure = require('../assertions').testParseFailure;
 let testParse = require('../assertions').testParse;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('super call', () => {
@@ -57,18 +58,18 @@ suite('Parser', () => {
     );
 
 
-    testParseFailure('function f() { (super)() }', 'Unexpected token "super"');
-    testParseFailure('class A extends B { constructor() { super; } }', 'Unexpected token "super"');
-    testParseFailure('class A extends B { constructor() { (super)(); } }', 'Unexpected token "super"');
-    testParseFailure('class A extends B { constructor() { new super(); } }', 'Unexpected token "super"');
+    testParseFailure('function f() { (super)() }', ErrorMessages.UNEXPECTED_TOKEN, 'super');
+    testParseFailure('class A extends B { constructor() { super; } }', ErrorMessages.UNEXPECTED_TOKEN, 'super');
+    testParseFailure('class A extends B { constructor() { (super)(); } }', ErrorMessages.UNEXPECTED_TOKEN, 'super');
+    testParseFailure('class A extends B { constructor() { new super(); } }', ErrorMessages.UNEXPECTED_TOKEN, 'super');
 
   });
 
   suite('super member access', () => {
 
 
-    testParseFailure('({ a() { (super).b(); } });', 'Unexpected token "super"');
-    testParseFailure('class A extends B { constructor() { (super).a(); } }', 'Unexpected token "super"');
+    testParseFailure('({ a() { (super).b(); } });', ErrorMessages.UNEXPECTED_TOKEN, 'super');
+    testParseFailure('class A extends B { constructor() { (super).a(); } }', ErrorMessages.UNEXPECTED_TOKEN, 'super');
 
   });
 });

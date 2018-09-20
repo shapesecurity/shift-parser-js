@@ -18,6 +18,7 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
 let expr = require('../helpers').expr;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('assignment expression', () => {
@@ -62,12 +63,12 @@ suite('Parser', () => {
         expression: { type: 'LiteralNumericExpression', value: 0 },
       });
 
-    testParseModuleFailure('await = 0', 'Unexpected token "await"');
+    testParseModuleFailure('await = 0', ErrorMessages.UNEXPECTED_TOKEN, 'await');
 
-    testParseFailure('(({a})=0);', 'Invalid left-hand side in assignment');
-    testParseFailure('(([a])=0);', 'Invalid left-hand side in assignment');
+    testParseFailure('(({a})=0);', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+    testParseFailure('(([a])=0);', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 
-    testParseFailure('({a: (b = 0)} = {})', 'Invalid left-hand side in assignment');
-    testParseFailure('([(a = b)] = []', 'Invalid left-hand side in assignment');
+    testParseFailure('({a: (b = 0)} = {})', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+    testParseFailure('([(a = b)] = []', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
   });
 });

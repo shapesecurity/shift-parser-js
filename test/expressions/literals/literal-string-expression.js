@@ -18,39 +18,40 @@ let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
 let testParseModuleFailure = require('../../assertions').testParseModuleFailure;
+let ErrorMessages = require('../../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('literal string expression', () => {
 
 
-    testParseFailure('\'', 'Unexpected end of input');
-    testParseFailure('"', 'Unexpected end of input');
-    testParseFailure('(\')', 'Unexpected end of input');
-    testParseFailure('(\'\n\')', 'Unexpected "\\n"');
-    testParseFailure('(\'\\x\')', 'Unexpected "\'"');
-    testParseFailure('(\'\\u\')', 'Unexpected "\'"');
-    testParseFailure('(\'\\8\')', 'Unexpected "8"');
-    testParseFailure('(\'\\9\')', 'Unexpected "9"');
-    testParseFailure('(\'\\x0\')', 'Unexpected "0"');
-    testParseFailure('(\'\u2028\')', 'Unexpected "\u2028"');
-    testParseFailure('(\'\u2029\')', 'Unexpected "\u2029"');
-    testParseFailure('(\'\\u{2028\')', 'Unexpected "{"');
-    testParseFailure('\'use strict\'; (\'\\1\')', 'Unexpected legacy octal escape sequence: \\1');
-    testParseFailure('\'use strict\'; (\'\\4\')', 'Unexpected legacy octal escape sequence: \\4');
-    testParseFailure('\'use strict\'; (\'\\11\')', 'Unexpected legacy octal escape sequence: \\11');
-    testParseFailure('\'use strict\'; (\'\\41\')', 'Unexpected legacy octal escape sequence: \\41');
-    testParseFailure('\'use strict\'; (\'\\01\')', 'Unexpected legacy octal escape sequence: \\01');
-    testParseFailure('\'use strict\'; (\'\\00\')', 'Unexpected legacy octal escape sequence: \\00');
-    testParseFailure('\'use strict\'; (\'\\001\')', 'Unexpected legacy octal escape sequence: \\001');
-    testParseFailure('\'use strict\'; (\'\\000\')', 'Unexpected legacy octal escape sequence: \\000');
-    testParseFailure('\'use strict\'; (\'\\123\')', 'Unexpected legacy octal escape sequence: \\123');
-    testParseFailure('\'use strict\'; (\'\\08\')', 'Unexpected legacy octal escape sequence: \\08');
-    testParseFailure('\'use strict\'; (\'\\09\')', 'Unexpected legacy octal escape sequence: \\09');
-    testParseModuleFailure('(\'\\1\')', 'Unexpected legacy octal escape sequence: \\1');
+    testParseFailure('\'', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('"', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('(\')', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('(\'\n\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '\n');
+    testParseFailure('(\'\\x\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '\'');
+    testParseFailure('(\'\\u\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '\'');
+    testParseFailure('(\'\\8\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '8');
+    testParseFailure('(\'\\9\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '9');
+    testParseFailure('(\'\\x0\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '0');
+    testParseFailure('(\'\u2028\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '\u2028');
+    testParseFailure('(\'\u2029\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '\u2029');
+    testParseFailure('(\'\\u{2028\')', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '{');
+    testParseFailure('\'use strict\'; (\'\\1\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '1');
+    testParseFailure('\'use strict\'; (\'\\4\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '4');
+    testParseFailure('\'use strict\'; (\'\\11\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '11');
+    testParseFailure('\'use strict\'; (\'\\41\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '41');
+    testParseFailure('\'use strict\'; (\'\\01\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '01');
+    testParseFailure('\'use strict\'; (\'\\00\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '00');
+    testParseFailure('\'use strict\'; (\'\\001\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '001');
+    testParseFailure('\'use strict\'; (\'\\000\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '000');
+    testParseFailure('\'use strict\'; (\'\\123\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '123');
+    testParseFailure('\'use strict\'; (\'\\08\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '08');
+    testParseFailure('\'use strict\'; (\'\\09\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '09');
+    testParseModuleFailure('(\'\\1\')', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '1');
 
     // early grammar error: 11.8.4.1
     // It is a Syntax Error if the MV of HexDigits > 1114111.
-    testParseFailure('("\\u{110000}")', 'Unexpected "{"');
-    testParseFailure('("\\u{FFFFFFF}")', 'Unexpected "{"');
+    testParseFailure('("\\u{110000}")', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '{');
+    testParseFailure('("\\u{FFFFFFF}")', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '{');
   });
 });

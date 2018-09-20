@@ -18,12 +18,13 @@
 let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('grouped expressions', () => {
-    testParseFailure('(0, {a = 0}) = 0', 'Invalid left-hand side in assignment');
-    testParseFailure('({a = 0})', 'Illegal property initializer');
-    testParseFailure('(0, {a = 0}) => 0', 'Illegal arrow function parameter list');
-    testParseFailure('({a = 0}, {a = 0}, 0) => 0', 'Unexpected number');
+    testParseFailure('(0, {a = 0}) = 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+    testParseFailure('({a = 0})', ErrorMessages.ILLEGAL_PROPERTY);
+    testParseFailure('(0, {a = 0}) => 0', ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
+    testParseFailure('({a = 0}, {a = 0}, 0) => 0', ErrorMessages.UNEXPECTED_NUMBER);
   });
 });

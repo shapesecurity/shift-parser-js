@@ -18,34 +18,35 @@ let stmt = require('../../helpers').stmt;
 let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
+let ErrorMessages = require('../../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('object binding', () => {
     suite('variable declarator', () => {
 
 
-      testParseFailure('var {a: b.c} = 0;', 'Unexpected token "."');
+      testParseFailure('var {a: b.c} = 0;', ErrorMessages.UNEXPECTED_TOKEN, '.');
     });
 
     suite('formal parameter', () => {
 
 
       // other passing cases are tested in other function test cases.
-      testParseFailure('({e: a.b}) => 0', 'Illegal arrow function parameter list');
-      testParseFailure('function a({e: a.b}) {}', 'Unexpected token "."');
-      testParseFailure('function* a({e: a.b}) {}', 'Unexpected token "."');
-      testParseFailure('(function ({e: a.b}) {})', 'Unexpected token "."');
-      testParseFailure('(function* ({e: a.b}) {})', 'Unexpected token "."');
-      testParseFailure('({a({e: a.b}){}})', 'Unexpected token "."');
-      testParseFailure('({*a({e: a.b}){}})', 'Unexpected token "."');
-      testParseFailure('({set a({e: a.b}){}})', 'Unexpected token "."');
+      testParseFailure('({e: a.b}) => 0', ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
+      testParseFailure('function a({e: a.b}) {}', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('function* a({e: a.b}) {}', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('(function ({e: a.b}) {})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('(function* ({e: a.b}) {})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('({a({e: a.b}){}})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('({*a({e: a.b}){}})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('({set a({e: a.b}){}})', ErrorMessages.UNEXPECTED_TOKEN, '.');
 
     });
 
     suite('catch clause', () => {
 
 
-      testParseFailure('try {} catch ({e: x.a}) {}', 'Unexpected token "."');
+      testParseFailure('try {} catch ({e: x.a}) {}', ErrorMessages.UNEXPECTED_TOKEN, '.');
     });
 
   });

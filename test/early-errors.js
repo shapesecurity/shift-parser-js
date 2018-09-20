@@ -38,8 +38,8 @@ suite('Parser', () => {
     testParseFailure('(a, ...b)', ErrorMessages.UNEXPECTED_EOS);
     // All Early Errors rules for ParenthesizedExpression and its derived productions also apply to
     // CoveredParenthesizedExpression of CoverParenthesizedExpressionAndArrowParameterList.
-    testParseFailure('(((...a)))', 'Unexpected token ")"');
-    testParseFailure('(((a, ...b)))', 'Unexpected token ")"');
+    testParseFailure('(((...a)))', ErrorMessages.UNEXPECTED_TOKEN, ')');
+    testParseFailure('(((a, ...b)))', ErrorMessages.UNEXPECTED_TOKEN, ')');
 
     // 12.4.1
     // It is an early Reference Error if IsValidSimpleAssignmentTarget of LeftHandSideExpression is false.
@@ -118,25 +118,25 @@ suite('Parser', () => {
 
     // 11.8.4.1
     // It is a Syntax Error if the MV of HexDigits > 1114111.
-    testParseFailure('("\\u{110000}")', 'Unexpected "{"');
-    testParseFailure('("\\u{FFFFFFF}")', 'Unexpected "{"');
+    testParseFailure('("\\u{110000}")', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '{');
+    testParseFailure('("\\u{FFFFFFF}")', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '{');
 
     // 11.8.5.1
     // It is a Syntax Error if IdentifierPart contains a Unicode escape sequence.
-    testParseFailure('/./\\u0069', 'Invalid regular expression flags');
-    testParseFailure('/./\\u{69}', 'Invalid regular expression flags');
+    testParseFailure('/./\\u0069', ErrorMessages.INVALID_REGEXP_FLAGS);
+    testParseFailure('/./\\u{69}', ErrorMessages.INVALID_REGEXP_FLAGS);
 
   });
 
   suite('early errors', () => {
     // #sec-arrow-function-definitions-static-semantics-early-errors
-    testEarlyError('async function a(){ (a = await (0)) => {}; }', 'Arrow parameters must not contain await expressions');
+    testEarlyError('async function a(){ (a = await (0)) => {}; }', ErrorMessages.ILLEGAL_AWAIT_EXPRESSIONS, 'Arrow');
 
     // #sec-async-function-definitions-static-semantics-early-errors
     // It is a Syntax Error if UniqueFormalParameters Contains AwaitExpression is true
-    testEarlyError('async function a(b = await (0)) {}', 'Async function parameters must not contain await expressions');
-    testEarlyError('(async function(b = await (0)) {})', 'Async function parameters must not contain await expressions');
-    testEarlyError('({ async a(b = await (0)) {} })', 'Async function parameters must not contain await expressions');
+    testEarlyError('async function a(b = await (0)) {}', ErrorMessages.ILLEGAL_AWAIT_EXPRESSIONS, 'Async function');
+    testEarlyError('(async function(b = await (0)) {})', ErrorMessages.ILLEGAL_AWAIT_EXPRESSIONS, 'Async function');
+    testEarlyError('({ async a(b = await (0)) {} })', ErrorMessages.ILLEGAL_AWAIT_EXPRESSIONS, 'Async function');
 
     // #sec-class-definitions-static-semantics-early-errors
     // It is a Syntax Error if PropName of MethodDefinition is "constructor" and SpecialMethod of MethodDefinition is true.
@@ -145,76 +145,75 @@ suite('Parser', () => {
     // 12.1.1
     // It is a Syntax Error if the code matched by this production is contained in strict code and the StringValue of
     // Identifier is "arguments" or "eval".
-    testEarlyError('\'use strict\'; arguments = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; arguments *= 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
+    testEarlyError('\'use strict\'; arguments = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; arguments *= 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
 
-    testEarlyError('\'use strict\'; [eval] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; [,,,eval,] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; ({a: eval} = 0)', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; ({a: eval = 0} = 0)', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
+    testEarlyError('\'use strict\'; [eval] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; [,,,eval,] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; ({a: eval} = 0)', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; ({a: eval = 0} = 0)', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
 
-    testEarlyError('\'use strict\'; [arguments] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; [,,,arguments,] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; ({a: arguments} = 0)', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; ({a: arguments = 0} = 0)',
-      ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
+    testEarlyError('\'use strict\'; [arguments] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; [,,,arguments,] = 0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; ({a: arguments} = 0)', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; ({a: arguments = 0} = 0)', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
 
-    testEarlyError('\'use strict\'; var eval;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; var arguments;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; let [eval] = 0;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; const {a: eval} = 0;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testModuleEarlyError('var eval;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
+    testEarlyError('\'use strict\'; var eval;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; var arguments;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; let [eval] = 0;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; const {a: eval} = 0;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testModuleEarlyError('var eval;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
 
-    testModuleEarlyError('eval=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; eval=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; arguments=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; (eval)=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; (arguments)=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
+    testModuleEarlyError('eval=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; eval=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; arguments=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; (eval)=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; (arguments)=>0', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
 
-    testEarlyError('\'use strict\'; function f(eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('function f(eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; !function (eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('!function (eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; function* f(eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('function* f(eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; !function* (eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('!function* (eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('!{ f(eval){ \'use strict\'; } };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('!{ *f(eval){ \'use strict\'; } };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; !{ set f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('!{ set f(eval){ \'use strict\'; } };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('class A { f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('class A { *f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('class A { set f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('class A extends (eval = null) { };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('!class extends (eval = null) { };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
+    testEarlyError('\'use strict\'; function f(eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('function f(eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; !function (eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('!function (eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; function* f(eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('function* f(eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; !function* (eval){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('!function* (eval){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('!{ f(eval){ \'use strict\'; } };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('!{ *f(eval){ \'use strict\'; } };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; !{ set f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('!{ set f(eval){ \'use strict\'; } };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('class A { f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('class A { *f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('class A { set f(eval){} };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('class A extends (eval = null) { };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('!class extends (eval = null) { };', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
     // It is a Syntax Error if the code matched by this production is contained in strict code.
-    testEarlyError('\'use strict\'; +yield;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('yield'));
-    testEarlyError('\'use strict\'; yield:;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('yield'));
-    testEarlyError('\'use strict\'; var [yield] = 0;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
+    testEarlyError('\'use strict\'; +yield;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'yield');
+    testEarlyError('\'use strict\'; yield:;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'yield');
+    testEarlyError('\'use strict\'; var [yield] = 0;', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'yield');
     // It is a Syntax Error if this phrase is contained in strict code and the StringValue of IdentifierName is:
     // "implements", "interface", "let", "package", "private", "protected", "public", "static", or "yield".
-    testEarlyError('\'use strict\'; +implements;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('implements'));
-    testEarlyError('\'use strict\'; +interface;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('interface'));
-    testEarlyError('\'use strict\'; +let;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('let'));
-    testEarlyError('\'use strict\'; +package;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('package'));
-    testEarlyError('\'use strict\'; +private;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('private'));
-    testEarlyError('\'use strict\'; +protected;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('protected'));
-    testEarlyError('\'use strict\'; +public;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('public'));
-    testEarlyError('\'use strict\'; +static;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('static'));
-    testEarlyError('\'use strict\'; +yield;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('yield'));
-    testEarlyError('\'use strict\'; implements:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('implements'));
-    testEarlyError('\'use strict\'; interface:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('interface'));
-    testEarlyError('\'use strict\'; let:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('let'));
-    testEarlyError('\'use strict\'; package:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('package'));
-    testEarlyError('\'use strict\'; private:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('private'));
-    testEarlyError('\'use strict\'; protected:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('protected'));
-    testEarlyError('\'use strict\'; public:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('public'));
-    testEarlyError('\'use strict\'; static:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('static'));
-    testEarlyError('\'use strict\'; yield:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE('yield'));
-    testEarlyError('function a(yield){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
+    testEarlyError('\'use strict\'; +implements;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'implements');
+    testEarlyError('\'use strict\'; +interface;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'interface');
+    testEarlyError('\'use strict\'; +let;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'let');
+    testEarlyError('\'use strict\'; +package;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'package');
+    testEarlyError('\'use strict\'; +private;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'private');
+    testEarlyError('\'use strict\'; +protected;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'protected');
+    testEarlyError('\'use strict\'; +public;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'public');
+    testEarlyError('\'use strict\'; +static;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'static');
+    testEarlyError('\'use strict\'; +yield;', ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'yield');
+    testEarlyError('\'use strict\'; implements:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'implements');
+    testEarlyError('\'use strict\'; interface:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'interface');
+    testEarlyError('\'use strict\'; let:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'let');
+    testEarlyError('\'use strict\'; package:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'package');
+    testEarlyError('\'use strict\'; private:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'private');
+    testEarlyError('\'use strict\'; protected:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'protected');
+    testEarlyError('\'use strict\'; public:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'public');
+    testEarlyError('\'use strict\'; static:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'static');
+    testEarlyError('\'use strict\'; yield:0;', ErrorMessages.INVALID_ID_IN_LABEL_STRICT_MODE, 'yield');
+    testEarlyError('function a(yield){ \'use strict\'; }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'yield');
     testEarlyError('function a(){ \'use strict\'; function a(a=yield){}}',
-      ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE('yield'));
+      ErrorMessages.INVALID_ID_IN_EXPRESSION_STRICT_MODE, 'yield');
     testEarlyError('function a(){ \'use strict\'; function a(yield){}}',
       ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
     testEarlyError('\'use strict\'; function a([yield]){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
@@ -243,9 +242,9 @@ suite('Parser', () => {
     // It is a Syntax Error if StringValue of IdentifierName is the same string value as the StringValue of any
     // ReservedWord except for yield.
     // TODO: these should fail but will not
-    // testEarlyError("(i\\u006E)", "Unexpected token \"in\"");
-    // testEarlyError("var i\\u006E;", "Unexpected token \"in\"");
-    // testModuleEarlyError("import {a as i\\u006E} from \"module\";", "Unexpected token \"in\"");
+    // testEarlyError("(i\\u006E)", ErrorMessages.UNEXPECTED_TOKEN, 'in');
+    // testEarlyError("var i\\u006E;", ErrorMessages.UNEXPECTED_TOKEN, 'in');
+    // testModuleEarlyError("import {a as i\\u006E} from \"module\";", ErrorMessages.UNEXPECTED_TOKEN, 'in');
 
     // 12.2.5.1
     // It is a Syntax Error if HasDirectSuper of MethodDefinition is true.
@@ -288,116 +287,116 @@ suite('Parser', () => {
 
     // 12.14.5.1
     // It is a Syntax Error if IsValidSimpleAssignmentTarget of IdentifierReference is false.
-    testEarlyError('\'use strict\'; ({eval} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; ({eval = 0} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; ({arguments} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; ({arguments = 0} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
+    testEarlyError('\'use strict\'; ({eval} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; ({eval = 0} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; ({arguments} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; ({arguments = 0} = 0);', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
 
     // 13.2.1
     // It is a Syntax Error if the LexicallyDeclaredNames of StatementList contains any duplicate entries.
-    testEarlyError('{ let a; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ let a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ const a = 0; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ const a = 0; const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ function a(){} function a(){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ function a(){} function* a(){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ let a; function a(){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ const a = 0; function a(){} }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('{ let a; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ let a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ const a = 0; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ const a = 0; const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ function a(){} function a(){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ function a(){} function* a(){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ let a; function a(){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ const a = 0; function a(){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of StatementList also
     // occurs in the VarDeclaredNames of StatementList.
-    testEarlyError('{ let a; var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ let a; { var a; } }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ var a; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ const a = 0; var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('{ var a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('{ let a; var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ let a; { var a; } }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ var a; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ const a = 0; var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('{ var a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
 
     // 13.3.1.1
     // It is a Syntax Error if the BoundNames of BindingList contains "let".
-    testEarlyError('let let;', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('let a, let;', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('let a, let = 0;', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(let let;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(let a, let;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(const let = 0;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(const a = 0, let = 1;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(let [let] = 0;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
+    testEarlyError('let let;', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('let a, let;', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('let a, let = 0;', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(let let;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(let a, let;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(const let = 0;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(const a = 0, let = 1;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(let [let] = 0;;);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
     // It is a Syntax Error if the BoundNames of BindingList contains any duplicate entries.
-    testEarlyError('let a, a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let a, b, a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let a = 0, a = 1;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('const a = 0, a = 1;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('const a = 0, b = 1, a = 2;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let a, [a] = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let [a, a] = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let {a: b, c: b} = 0;', 'Duplicate binding "b"');
-    testEarlyError('let [a, ...a] = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let \\u{61}, \\u{0061};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let \\u0061, \\u{0061};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let x\\u{61}, x\\u{0061};', 'Duplicate binding "xa"');
-    testEarlyError('let x\\u{E01D5}, x\uDB40\uDDD5;', 'Duplicate binding "x\uDB40\uDDD5"');
-    testEarlyError('for(let a, a;;);', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(let [a, a] = 0;;);', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(const a = 0, a = 1;;);', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(const [a, a] = 0;;);', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('let a, a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let a, b, a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let a = 0, a = 1;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('const a = 0, a = 1;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('const a = 0, b = 1, a = 2;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let a, [a] = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let [a, a] = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let {a: b, c: b} = 0;', ErrorMessages.DUPLICATE_BINDING, 'b');
+    testEarlyError('let [a, ...a] = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let \\u{61}, \\u{0061};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let \\u0061, \\u{0061};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let x\\u{61}, x\\u{0061};', ErrorMessages.DUPLICATE_BINDING, 'xa');
+    testEarlyError('let x\\u{E01D5}, x\uDB40\uDDD5;', ErrorMessages.DUPLICATE_BINDING, 'x\uDB40\uDDD5');
+    testEarlyError('for(let a, a;;);', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(let [a, a] = 0;;);', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(const a = 0, a = 1;;);', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(const [a, a] = 0;;);', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if Initializer is not present and IsConstantDeclaration of the LexicalDeclaration
     // containing this production is true.
-    testEarlyError('const a;', ErrorMessages.UNITIALIZED_CONST);
-    testEarlyError('const a, b = 0;', ErrorMessages.UNITIALIZED_CONST);
-    testEarlyError('const a = 0, b;', ErrorMessages.UNITIALIZED_CONST);
-    testEarlyError('{ const a; }', ErrorMessages.UNITIALIZED_CONST);
-    testEarlyError('function f(){ const a; }', ErrorMessages.UNITIALIZED_CONST);
-    testEarlyError('for(const a;;);', ErrorMessages.UNITIALIZED_CONST);
-    testEarlyError('for(const a = 0, b;;);', ErrorMessages.UNITIALIZED_CONST);
+    testEarlyError('const a;', ErrorMessages.UNINITIALIZED_CONST);
+    testEarlyError('const a, b = 0;', ErrorMessages.UNINITIALIZED_CONST);
+    testEarlyError('const a = 0, b;', ErrorMessages.UNINITIALIZED_CONST);
+    testEarlyError('{ const a; }', ErrorMessages.UNINITIALIZED_CONST);
+    testEarlyError('function f(){ const a; }', ErrorMessages.UNINITIALIZED_CONST);
+    testEarlyError('for(const a;;);', ErrorMessages.UNINITIALIZED_CONST);
+    testEarlyError('for(const a = 0, b;;);', ErrorMessages.UNINITIALIZED_CONST);
 
     // 13.6.1
     // It is a Syntax Error if IsLabelledFunction(Statement) is true for any occurrence of Statement in these rules.
-    testEarlyError('if(0) label: function f(){}', ErrorMessages.ILLEGEAL_LABEL_IN_IF);
-    testEarlyError('if(0) labelA: labelB: function f(){}', ErrorMessages.ILLEGEAL_LABEL_IN_IF);
-    testEarlyError('if(0) label: function f(){} else ;', ErrorMessages.ILLEGEAL_LABEL_IN_IF);
+    testEarlyError('if(0) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_IF);
+    testEarlyError('if(0) labelA: labelB: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_IF);
+    testEarlyError('if(0) label: function f(){} else ;', ErrorMessages.ILLEGAL_LABEL_IN_IF);
     testEarlyError('if(0) ; else label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_ELSE);
 
     // 13.7.1.1
     // It is a Syntax Error if IsLabelledFunction(Statement) is true for any occurrence of Statement in these rules.
-    testEarlyError('do label: function f(){} while (0)', ErrorMessages.ILLEGAL_LABEL_IN_BODY('do-while'));
-    testEarlyError('do label: function f(){} while (0);', ErrorMessages.ILLEGAL_LABEL_IN_BODY('do-while'));
-    testEarlyError('while(0) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('while'));
-    testEarlyError('for(;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for'));
-    testEarlyError('for(var a;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for'));
-    testEarlyError('for(const a = 0;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for'));
-    testEarlyError('for(let a;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for'));
-    testEarlyError('for(a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-in'));
-    testEarlyError('for(var a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-in'));
-    testEarlyError('for(let a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-in'));
-    testEarlyError('for(const a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-in'));
-    testEarlyError('for(a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-of'));
-    testEarlyError('for(var a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-of'));
-    testEarlyError('for(let a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-of'));
-    testEarlyError('for(const a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-of'));
-    testEarlyError('for(;;) labelA: labelB: labelC: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for'));
+    testEarlyError('do label: function f(){} while (0)', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'do-while');
+    testEarlyError('do label: function f(){} while (0);', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'do-while');
+    testEarlyError('while(0) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'while');
+    testEarlyError('for(;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for');
+    testEarlyError('for(var a;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for');
+    testEarlyError('for(const a = 0;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for');
+    testEarlyError('for(let a;;) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for');
+    testEarlyError('for(a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-in');
+    testEarlyError('for(var a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-in');
+    testEarlyError('for(let a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-in');
+    testEarlyError('for(const a in b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-in');
+    testEarlyError('for(a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-of');
+    testEarlyError('for(var a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-of');
+    testEarlyError('for(let a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-of');
+    testEarlyError('for(const a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for-of');
+    testEarlyError('for(;;) labelA: labelB: labelC: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'for');
 
     // 13.7.4.1
     // It is a Syntax Error if any element of the BoundNames of LexicalDeclaration
     // also occurs in the VarDeclaredNames of Statement.
-    testEarlyError('for(let a;;) { var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(const a = 0;;) { var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('for(let a;;) { var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(const a = 0;;) { var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
 
     // 13.7.5.1
     // It is a Syntax Error if the BoundNames of ForDeclaration contains "let".
-    testEarlyError('for(let let in 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(const let in 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(let let of 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
-    testEarlyError('for(const let of 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION('let'));
+    testEarlyError('for(let let in 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(const let in 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(let let of 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
+    testEarlyError('for(const let of 0);', ErrorMessages.ILLEGAL_ID_IN_LEXICAL_DECLARATION, 'let');
     // It is a Syntax Error if any element of the BoundNames of ForDeclaration also occurs in
     // the VarDeclaredNames of Statement.
-    testEarlyError('for(let a in 0) { var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(const a in 0) { var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(let a of 0) { var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(const a of 0) { var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('for(let a in 0) { var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(const a in 0) { var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(let a of 0) { var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(const a of 0) { var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if the BoundNames of ForDeclaration contains any duplicate entries.
-    testEarlyError('for(let {a, a} in 0);', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(const {a, a} in 0);', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(let {a, a} of 0);', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('for(const {a, a} of 0);', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('for(let {a, a} in 0);', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(const {a, a} in 0);', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(let {a, a} of 0);', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('for(const {a, a} of 0);', ErrorMessages.DUPLICATE_BINDING, 'a');
 
     // 13.8.1
     // It is a Syntax Error if this production is not nested, directly or indirectly
@@ -408,13 +407,13 @@ suite('Parser', () => {
     testEarlyError('if(0) continue;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION);
     testEarlyError('while(0) !function(){ continue; };', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION);
     testEarlyError('while(0) { function f(){ continue; } }', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION);
-    testEarlyError('label: continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
-    testEarlyError('label: { continue label; }', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
-    testEarlyError('label: if(0) continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
+    testEarlyError('label: continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
+    testEarlyError('label: { continue label; }', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
+    testEarlyError('label: if(0) continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
     testEarlyError('label: while(0) !function(){ continue label; };',
-      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
+      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
     testEarlyError('label: while(0) { function f(){ continue label; } }',
-      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
+      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
 
     // 13.9.1
     // It is a Syntax Error if this production is not nested, directly or indirectly
@@ -440,31 +439,31 @@ suite('Parser', () => {
     // It is a Syntax Error if the code that matches this production is contained in strict code.
     testEarlyError('\'use strict\'; with(0);', ErrorMessages.ILLEGAL_WITH_STRICT_MODE);
     // It is a Syntax Error if IsLabelledFunction(Statement) is true.
-    testEarlyError('with(0) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('with'));
+    testEarlyError('with(0) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY, 'with');
 
     // 13.12.1
     // It is a Syntax Error if the LexicallyDeclaredNames of CaseClauses contains any duplicate entries.
-    testEarlyError('switch(0) { case 0: let a; case 1: let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: let a; case 1: function a(){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: let a; default: let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: let a; case 0: let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: let a; case 0: function a(){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: function a(){} case 0: let a  }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: function a(){} case 0: let a  }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('switch(0) { case 0: let a; case 1: let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: let a; case 1: function a(){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: let a; default: let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: let a; case 0: let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: let a; case 0: function a(){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: function a(){} case 0: let a  }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: function a(){} case 0: let a  }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of CaseClauses also occurs in the
     // VarDeclaredNames of CaseClauses.
-    testEarlyError('switch(0) { case 0: let a; case 1: var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: var a; case 1: let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: let a; default: var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: var a; default: let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: let a; case 0: var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: var a; case 0: let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: const a = 0; case 1: var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: var a; case 1: const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: const a = 0; default: var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { case 0: var a; default: const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: const a = 0; case 0: var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('switch(0) { default: var a; case 0: const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('switch(0) { case 0: let a; case 1: var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: var a; case 1: let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: let a; default: var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: var a; default: let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: let a; case 0: var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: var a; case 0: let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: const a = 0; case 1: var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: var a; case 1: const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: const a = 0; default: var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { case 0: var a; default: const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: const a = 0; case 0: var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('switch(0) { default: var a; case 0: const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
 
     // 13.13.1
     // It is a Syntax Error if any source text matches this rule.
@@ -472,10 +471,10 @@ suite('Parser', () => {
 
     // 13.15.1
     // It is a Syntax Error if BoundNames of CatchParameter contains any duplicate elements.
-    testEarlyError('try {} catch ([e, e]) {}', ErrorMessages.DUPLICATE_BINDING('e'));
-    testEarlyError('try {} catch ({e, e}) {}', ErrorMessages.DUPLICATE_BINDING('e'));
-    testEarlyError('try {} catch ({a: e, b: e}) {}', ErrorMessages.DUPLICATE_BINDING('e'));
-    testEarlyError('try {} catch ({e = 0, a: e}) {}', ErrorMessages.DUPLICATE_BINDING('e'));
+    testEarlyError('try {} catch ([e, e]) {}', ErrorMessages.DUPLICATE_BINDING, 'e');
+    testEarlyError('try {} catch ({e, e}) {}', ErrorMessages.DUPLICATE_BINDING, 'e');
+    testEarlyError('try {} catch ({a: e, b: e}) {}', ErrorMessages.DUPLICATE_BINDING, 'e');
+    testEarlyError('try {} catch ({e = 0, a: e}) {}', ErrorMessages.DUPLICATE_BINDING, 'e');
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs in the
     // LexicallyDeclaredNames of Block.
     //  (see Annex B 3.5)
@@ -486,27 +485,27 @@ suite('Parser', () => {
     // 14.1.2
     // If the source code matching this production is strict code, the Early Error rules for
     //  StrictFormalParameters : FormalParameters are applied.
-    testEarlyError('\'use strict\'; function f(a, a){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('\'use strict\'; function f([a, a]){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('export default function(a, a){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('export default function([a, a]){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('\'use strict\'; !function(a, a){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('\'use strict\'; !function([a, a]){}', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('\'use strict\'; function f(a, a){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('\'use strict\'; function f([a, a]){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('export default function(a, a){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('export default function([a, a]){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('\'use strict\'; !function(a, a){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('\'use strict\'; !function([a, a]){}', ErrorMessages.DUPLICATE_BINDING, 'a');
     // If the source code matching this production is strict code, it is a Syntax Error if
     // BindingIdentifier is the IdentifierName eval or the IdentifierName arguments.
-    testEarlyError('\'use strict\'; function eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
-    testEarlyError('\'use strict\'; function arguments(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; !function eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
+    testEarlyError('\'use strict\'; function eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
+    testEarlyError('\'use strict\'; function arguments(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; !function eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
     testEarlyError('\'use strict\'; !function arguments(){}',
-      ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
+      ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
     // It is a Syntax Error if any element of the BoundNames of FormalParameters also occurs
     // in the LexicallyDeclaredNames of FunctionBody.
-    testEarlyError('function f(a){ let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function f(a){ const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('export default function(a){ let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('export default function(a){ const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!function(a){ let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!function(a){ const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('function f(a){ let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function f(a){ const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('export default function(a){ let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('export default function(a){ const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!function(a){ let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!function(a){ const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if FormalParameters Contains SuperProperty is true.
     testEarlyError('function f(a = super.b){}', ErrorMessages.ILLEGAL_ACCESS_SUPER_MEMBER);
     testEarlyError('!function f(a = super[0]){}', ErrorMessages.ILLEGAL_ACCESS_SUPER_MEMBER);
@@ -546,85 +545,85 @@ suite('Parser', () => {
     testEarlyError('class A extends B { constructor() { !function(){ super(); } } }',
       ErrorMessages.INVALID_CALL_TO_SUPER);
     // It is a Syntax Error if BoundNames of FormalParameters contains any duplicate elements.
-    testEarlyError('!{ f(a, a){} };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ f([a, a]){} };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ f({a, a}){} };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ *g(a, a){} };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ *g([a, a]){} };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ *g({a, a}){} };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('class A { static f(a, a){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('class A { static f([a, a]){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('class A { static f({a, a}){} }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('(a, a) => 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('([a, a]) => 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('({a, a}) => 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('(a,...a)=>0', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('([a],...a)=>0', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('!{ f(a, a){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ f([a, a]){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ f({a, a}){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ *g(a, a){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ *g([a, a]){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ *g({a, a}){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('class A { static f(a, a){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('class A { static f([a, a]){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('class A { static f({a, a}){} }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('(a, a) => 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('([a, a]) => 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('({a, a}) => 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('(a,...a)=>0', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('([a],...a)=>0', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if IsSimpleParameterList of FormalParameterList is false and
     // BoundNames of FormalParameterList contains any duplicate elements.
-    testEarlyError('function f(a, [a]){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('(function([a, a]){})', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('(function({a: x, b: x}){})', 'Duplicate binding "x"');
-    testEarlyError('(function({a: x}, {b: x}){})', 'Duplicate binding "x"');
+    testEarlyError('function f(a, [a]){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('(function([a, a]){})', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('(function({a: x, b: x}){})', ErrorMessages.DUPLICATE_BINDING, 'x');
+    testEarlyError('(function({a: x}, {b: x}){})', ErrorMessages.DUPLICATE_BINDING, 'x');
     // It is a Syntax Error if the LexicallyDeclaredNames of FunctionStatementList contains any duplicate entries.
-    testEarlyError('function f(){ let a; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function f(){ let a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function f(){ const a = 0; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function f(){ const a = 0; const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!function f(){ let a; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ f(){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ *g(){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ get f(){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ set f(b){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('class A { static f(){ let a; let a; } }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('() => { let a; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('function f(){ let a; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function f(){ let a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function f(){ const a = 0; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function f(){ const a = 0; const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!function f(){ let a; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ f(){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ *g(){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ get f(){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ set f(b){ let a; let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('class A { static f(){ let a; let a; } }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('() => { let a; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of FunctionStatementList
     // also occurs in the VarDeclaredNames of FunctionStatementList.
-    testEarlyError('function f(){ let a; var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function f(){ var a; let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function f(){ const a = 0; var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function f(){ var a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!function f(){ let a; var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ f(){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ *g(){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ get f(){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ set f(b){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('class A { static f(){ let a; var a; } }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('() => { let a; var a; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('function f(){ let a; var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function f(){ var a; let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function f(){ const a = 0; var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function f(){ var a; const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!function f(){ let a; var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ f(){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ *g(){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ get f(){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ set f(b){ let a; var a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('class A { static f(){ let a; var a; } }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('() => { let a; var a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if ContainsDuplicateLabels of FunctionStatementList with argument « » is true.
-    testEarlyError('function f(){ label: label: ; }', ErrorMessages.DUPLICATE_LABEL_DECLARATION('label'));
-    testEarlyError('function f(){ label: { label: ; } }', ErrorMessages.DUPLICATE_LABEL_DECLARATION('label'));
-    testEarlyError('function f(){ label: if(0) label: ; }', ErrorMessages.DUPLICATE_LABEL_DECLARATION('label'));
+    testEarlyError('function f(){ label: label: ; }', ErrorMessages.DUPLICATE_LABEL_DECLARATION, 'label');
+    testEarlyError('function f(){ label: { label: ; } }', ErrorMessages.DUPLICATE_LABEL_DECLARATION, 'label');
+    testEarlyError('function f(){ label: if(0) label: ; }', ErrorMessages.DUPLICATE_LABEL_DECLARATION, 'label');
     // It is a Syntax Error if ContainsUndefinedBreakTarget of FunctionStatementList with argument « » is true.
-    testEarlyError('function f(){ break label; }', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL('label'));
+    testEarlyError('function f(){ break label; }', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL, 'label');
     testEarlyError('function f(){ labelA: break labelB; }',
-      ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL('labelB'));
+      ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL, 'labelB');
     // It is a Syntax Error if ContainsUndefinedContinueTarget of FunctionStatementList
     // with arguments « » and « » is true.
     testEarlyError('function f(){ while(0) continue label; }',
-      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
+      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
     testEarlyError('function f(){ labelA: while(0) continue labelB; }',
-      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('labelB'));
+      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'labelB');
 
     // 14.2.1
     // It is a Syntax Error if ArrowParameters Contains YieldExpression is true.
-    testEarlyError('function* g(){ (a = yield) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Arrow'));
-    testEarlyError('function* g(){ (a = yield b) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Arrow'));
-    testEarlyError('function* g(){ (a = yield* b) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Arrow'));
-    testEarlyError('function* g(){ (a = x + f(yield)) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Arrow'));
-    testEarlyError('function* g(){ ({[yield]: a}) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Arrow'));
-    testEarlyError('function* g(){ ({a = yield}) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Arrow'));
-    testEarlyError('function* g(){ ([a = yield]) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Arrow'));
+    testEarlyError('function* g(){ (a = yield) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Arrow');
+    testEarlyError('function* g(){ (a = yield b) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Arrow');
+    testEarlyError('function* g(){ (a = yield* b) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Arrow');
+    testEarlyError('function* g(){ (a = x + f(yield)) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Arrow');
+    testEarlyError('function* g(){ ({[yield]: a}) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Arrow');
+    testEarlyError('function* g(){ ({a = yield}) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Arrow');
+    testEarlyError('function* g(){ ([a = yield]) => 0; }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Arrow');
     // TODO: testEarlyError("function* g(){ (...{a = yield}) => 0; }",
     // "Arrow parameters must not contain yield expressions");
     // It is a Syntax Error if any element of the BoundNames of ArrowParameters
     // also occurs in the LexicallyDeclaredNames of ConciseBody.
-    testEarlyError('(a) => { let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('([a]) => { let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('({a}) => { let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('(a) => { const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('([a]) => { const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('({a}) => { const a = 0; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('(a) => { let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('([a]) => { let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('({a}) => { let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('(a) => { const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('([a]) => { const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('({a}) => { const a = 0; }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // If the [Yield] grammar parameter is present on ArrowParameters, it is a Syntax Error if the lexical
     // token sequence matched by CoverParenthesizedExpressionAndArrowParameterList[?Yield] cannot be parsed
     // with no tokens left over using ArrowFormalParameters[Yield, GeneratorParameter] as the goal symbol.
@@ -640,38 +639,38 @@ suite('Parser', () => {
     // 14.3.1
     // It is a Syntax Error if any element of the BoundNames of StrictFormalParameters also occurs in the
     // LexicallyDeclaredNames of FunctionBody.
-    testEarlyError('!{ f(a) { let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ f([a]){ let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ f({a}){ let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('!{ f(a) { let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ f([a]){ let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ f({a}){ let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if BoundNames of PropertySetParameterList contains any duplicate elements.
-    testEarlyError('!{ set f({a, a}){} };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ set f([a, a]){} };', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('!{ set f({a, a}){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ set f([a, a]){} };', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if any element of the BoundNames of PropertySetParameterList also occurs in
     // the LexicallyDeclaredNames of FunctionBody.
-    testEarlyError('!{ set f(a) { let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ set f([a]){ let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ set f({a}){ let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('!{ set f(a) { let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ set f([a]){ let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ set f({a}){ let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
 
     // 14.4.1
     // It is a Syntax Error if HasDirectSuper of GeneratorMethod is true .
     testEarlyError('!{ *f(a = super()){} };', ErrorMessages.INVALID_CALL_TO_SUPER);
     testEarlyError('!{ *f(a) { super() } };', ErrorMessages.INVALID_CALL_TO_SUPER);
     // It is a Syntax Error if StrictFormalParameters Contains YieldExpression is true.
-    testEarlyError('function* g(){ ({ *m(a = yield){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ ({ *m(a = yield b){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ ({ *m(a = yield* b){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+    testEarlyError('function* g(){ ({ *m(a = yield){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ ({ *m(a = yield b){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ ({ *m(a = yield* b){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     testEarlyError('function* g(){ ({ *m(a = x + f(yield)){} }); }',
-      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ ({ *m({[yield]: a}){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ ({ *m({a = yield}){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ ({ *m([a = yield]){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ ({ *m({[yield]: a}){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ ({ *m({a = yield}){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ ({ *m([a = yield]){} }); }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     // TODO: testEarlyError("function* g(){ ({ *m(...{a = yield}){} }); }",
     // "Generator parameters must not contain yield expressions");
     // It is a Syntax Error if any element of the BoundNames of StrictFormalParameters also occurs
     // in the LexicallyDeclaredNames of GeneratorBody.
-    testEarlyError('!{ *f(a) { let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ *f([a]){ let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('!{ *f({a}){ let a; } };', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('!{ *f(a) { let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ *f([a]){ let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('!{ *f({a}){ let a; } };', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if HasDirectSuper of GeneratorDeclaration is true .
     testEarlyError('function* f(a = super()){}', ErrorMessages.INVALID_CALL_TO_SUPER);
     testEarlyError('function* f(a){ super() }', ErrorMessages.INVALID_CALL_TO_SUPER);
@@ -682,42 +681,42 @@ suite('Parser', () => {
     testEarlyError('!function* f(a) { super() }', ErrorMessages.INVALID_CALL_TO_SUPER);
     // If the source code matching this production is strict code, the Early Error rules for
     // StrictFormalParameters : FormalParameters are applied.
-    testEarlyError('\'use strict\'; function* f(a, a){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('\'use strict\'; !function*(a, a){}', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('\'use strict\'; function* f(a, a){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('\'use strict\'; !function*(a, a){}', ErrorMessages.DUPLICATE_BINDING, 'a');
     // If the source code matching this production is strict code, it is a Syntax Error if BindingIdentifier
     // is the IdentifierName eval or the IdentifierName arguments.
-    testEarlyError('\'use strict\'; function* eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
+    testEarlyError('\'use strict\'; function* eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
     testEarlyError('\'use strict\'; function* arguments(){}',
-      ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
-    testEarlyError('\'use strict\'; !function* eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('eval'));
+      ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
+    testEarlyError('\'use strict\'; !function* eval(){}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'eval');
     testEarlyError('\'use strict\'; !function* arguments(){}',
-      ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('arguments'));
+      ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'arguments');
     // It is a Syntax Error if any element of the BoundNames of FormalParameters also occurs in the
     // LexicallyDeclaredNames of GeneratorBody.
-    testEarlyError('function* f(a) { let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function* f([a]){ let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('function* f({a}){ let a; }', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('function* f(a) { let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function* f([a]){ let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('function* f({a}){ let a; }', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if FormalParameters Contains YieldExpression is true.
-    testEarlyError('function* g(){ function* f(a = yield){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ function* f(a = yield b){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+    testEarlyError('function* g(){ function* f(a = yield){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ function* f(a = yield b){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     testEarlyError('function* g(){ function* f(a = yield* b){} }',
-      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     testEarlyError('function* g(){ function* f(a = x + f(yield)){} }',
-      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     testEarlyError('function* g(){ function* f({[yield]: a}){} }',
-      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ function* f({a = yield}){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ function* f([a = yield]){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ function* f({a = yield}){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ function* f([a = yield]){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     // TODO: testEarlyError("function* g(){ function* f(...{a = yield}){} }",
     // "Generator parameters must not contain yield expressions");
-    testEarlyError('function* g(){ !function*(a = yield){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ !function*(a = yield b){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ !function*(a = yield* b){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+    testEarlyError('function* g(){ !function*(a = yield){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ !function*(a = yield b){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ !function*(a = yield* b){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     testEarlyError('function* g(){ !function*(a = x + f(yield)){} }',
-      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ !function*({[yield]: a}){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ !function*({a = yield}){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
-    testEarlyError('function* g(){ !function*([a = yield]){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS('Generator'));
+      ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ !function*({[yield]: a}){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ !function*({a = yield}){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
+    testEarlyError('function* g(){ !function*([a = yield]){} }', ErrorMessages.ILLEGAL_YIELD_EXPRESSIONS, 'Generator');
     // TODO: testEarlyError("function* g(){ !function*(...{a = yield}){} }",
     // "Generator parameters must not contain yield expressions");
     // It is a Syntax Error if FormalParameters Contains SuperProperty is true.
@@ -771,16 +770,16 @@ suite('Parser', () => {
 
     // 15.1.1
     // It is a Syntax Error if the LexicallyDeclaredNames of StatementList contains any duplicate entries.
-    testEarlyError('let a; let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('let a; const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('const a = 0; let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('const a = 0; const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('let a; let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('let a; const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('const a = 0; let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('const a = 0; const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of StatementList
     // also occurs in the VarDeclaredNames of StatementList.
-    testEarlyError('let a; var a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('var a; let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('const a = 0; var a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testEarlyError('var a; const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
+    testEarlyError('let a; var a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('var a; let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('const a = 0; var a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testEarlyError('var a; const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if StatementList Contains super unless the source code containing super
     // is eval code that is being processed by a direct eval that is contained in function code.
     // However, such function code does not include ArrowFunction function code.
@@ -794,95 +793,93 @@ suite('Parser', () => {
     // However, such function code does not include ArrowFunction function code.
     testEarlyError('new.target', ErrorMessages.NEW_TARGET_ERROR);
     // It is a Syntax Error if ContainsDuplicateLabels of StatementList with argument « » is true.
-    testEarlyError('label: label: ;', ErrorMessages.DUPLICATE_LABEL_DECLARATION('label'));
+    testEarlyError('label: label: ;', ErrorMessages.DUPLICATE_LABEL_DECLARATION, 'label');
     // It is a Syntax Error if ContainsUndefinedBreakTarget of StatementList with argument « » is true.
-    testEarlyError('break label;', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL('label'));
-    testEarlyError('labelA: break labelB;', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL('labelB'));
+    testEarlyError('break label;', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL, 'label');
+    testEarlyError('labelA: break labelB;', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL, 'labelB');
     // It is a Syntax Error if ContainsUndefinedContinueTarget of StatementList with arguments « » and « » is true.
-    testEarlyError('while(0) continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
+    testEarlyError('while(0) continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
     testEarlyError('labelA: while(0) continue labelB;',
-      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('labelB'));
+      ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'labelB');
 
     // 15.2.1.1
     // It is a Syntax Error if the LexicallyDeclaredNames of ModuleItemList contains any duplicate entries.
-    testModuleEarlyError('let a; let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; function a(){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('const a = 0; let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('const a = 0; const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; export class a {};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; export function a(){};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; export let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; export const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('const a = 0; export class a {};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('const a = 0; export function a(){};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('const a = 0; export let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('const a = 0; export const a = 1;', ErrorMessages.DUPLICATE_BINDING('a'));
+    testModuleEarlyError('let a; let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; function a(){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('const a = 0; let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('const a = 0; const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; export class a {};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; export function a(){};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; export let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; export const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('const a = 0; export class a {};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('const a = 0; export function a(){};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('const a = 0; export let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('const a = 0; export const a = 1;', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if any element of the LexicallyDeclaredNames of ModuleItemList also occurs in
     // the VarDeclaredNames of ModuleItemList.
-    testModuleEarlyError('let a; var a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('var a; function a(){}', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('var a; let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('const a = 0; var a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('var a; const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('var a; export class a {};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('var a; export function a(){};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('var a; export let a;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('var a; export const a = 0;', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; export default function a(){};', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('let a; export default class a {};', ErrorMessages.DUPLICATE_BINDING('a'));
+    testModuleEarlyError('let a; var a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('var a; function a(){}', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('var a; let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('const a = 0; var a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('var a; const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('var a; export class a {};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('var a; export function a(){};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('var a; export let a;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('var a; export const a = 0;', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; export default function a(){};', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('let a; export default class a {};', ErrorMessages.DUPLICATE_BINDING, 'a');
     // It is a Syntax Error if the ExportedNames of ModuleItemList contains any duplicate entries.
-    testModuleEarlyError('export var a; export var a;', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('let a; export {a, a};', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('let a, b; export {a, b as a};', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('let a; export {a, a as a};', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('export {a}; export class a{};', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('export {a}; export function a(){};', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('export let a; export {a};', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('export {a}; export const a = 0;', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('export let a; let b; export {b as a};', ErrorMessages.DUPLICATE_EXPORT('a'));
-    testModuleEarlyError('export default 0; export default 0;', ErrorMessages.DUPLICATE_EXPORT('default'));
-    testModuleEarlyError('export default 0; export default function f(){};', ErrorMessages.DUPLICATE_EXPORT('default'));
-    testModuleEarlyError('export default 0; export default class a {};', ErrorMessages.DUPLICATE_EXPORT('default'));
+    testModuleEarlyError('export var a; export var a;', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('let a; export {a, a};', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('let a, b; export {a, b as a};', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('let a; export {a, a as a};', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('export {a}; export class a{};', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('export {a}; export function a(){};', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('export let a; export {a};', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('export {a}; export const a = 0;', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('export let a; let b; export {b as a};', ErrorMessages.DUPLICATE_EXPORT, 'a');
+    testModuleEarlyError('export default 0; export default 0;', ErrorMessages.DUPLICATE_EXPORT, 'default');
+    testModuleEarlyError('export default 0; export default function f(){};', ErrorMessages.DUPLICATE_EXPORT, 'default');
+    testModuleEarlyError('export default 0; export default class a {};', ErrorMessages.DUPLICATE_EXPORT, 'default');
     testModuleEarlyError('var a; export default function() {} export { a as default };',
-      ErrorMessages.DUPLICATE_EXPORT('default'));
+      ErrorMessages.DUPLICATE_EXPORT, 'default');
     testModuleEarlyError('var a; export default class {} export { a as default };',
-      ErrorMessages.DUPLICATE_EXPORT('default'));
+      ErrorMessages.DUPLICATE_EXPORT, 'default');
     testModuleEarlyError('var a, b; export default a; export { b as default };',
-      ErrorMessages.DUPLICATE_EXPORT('default'));
+      ErrorMessages.DUPLICATE_EXPORT, 'default');
     // It is a Syntax Error if any element of the ExportedBindings of ModuleItemList does not also occur
     // in either the VarDeclaredNames of ModuleItemList, or the LexicallyDeclaredNames of ModuleItemList.
-    testModuleEarlyError('export {a};', ErrorMessages.UNDECLARED_BINDING('a'));
-    testModuleEarlyError('export {b as a};', ErrorMessages.UNDECLARED_BINDING('b'));
-    testModuleEarlyError('var a; export {b as a};', ErrorMessages.UNDECLARED_BINDING('b'));
-    testModuleEarlyError('export {a as b}; var b;', ErrorMessages.UNDECLARED_BINDING('a'));
-    testModuleEarlyError('export {b as a};', ErrorMessages.UNDECLARED_BINDING('b'));
-    testModuleEarlyError('let a; export {b as a};', ErrorMessages.UNDECLARED_BINDING('b'));
-    testModuleEarlyError('export {a as b}; let b;', ErrorMessages.UNDECLARED_BINDING('a'));
+    testModuleEarlyError('export {a};', ErrorMessages.UNDECLARED_BINDING, 'a');
+    testModuleEarlyError('export {b as a};', ErrorMessages.UNDECLARED_BINDING, 'b');
+    testModuleEarlyError('var a; export {b as a};', ErrorMessages.UNDECLARED_BINDING, 'b');
+    testModuleEarlyError('export {a as b}; var b;', ErrorMessages.UNDECLARED_BINDING, 'a');
+    testModuleEarlyError('export {b as a};', ErrorMessages.UNDECLARED_BINDING, 'b');
+    testModuleEarlyError('let a; export {b as a};', ErrorMessages.UNDECLARED_BINDING, 'b');
+    testModuleEarlyError('export {a as b}; let b;', ErrorMessages.UNDECLARED_BINDING, 'a');
     // It is a Syntax Error if ModuleItemList Contains super.
     testModuleEarlyError('super()', ErrorMessages.INVALID_CALL_TO_SUPER);
     testModuleEarlyError('super.a', ErrorMessages.ILLEGAL_ACCESS_SUPER_MEMBER);
     // It is a Syntax Error if ModuleItemList Contains NewTarget
     testModuleEarlyError('new.target', ErrorMessages.NEW_TARGET_ERROR);
     // It is a Syntax Error if ContainsDuplicateLabels of ModuleItemList with argument « » is true.
-    testModuleEarlyError('label: label: ;', ErrorMessages.DUPLICATE_LABEL_DECLARATION('label'));
+    testModuleEarlyError('label: label: ;', ErrorMessages.DUPLICATE_LABEL_DECLARATION, 'label');
     // It is a Syntax Error if ContainsUndefinedBreakTarget of ModuleItemList with argument « » is true.
-    testModuleEarlyError('break label;', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL('label'));
-    testModuleEarlyError('labelA: break labelB;',
-      'Break statement must be nested within a statement with label "labelB"');
+    testModuleEarlyError('break label;', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL, 'label');
+    testModuleEarlyError('labelA: break labelB;', ErrorMessages.ILLEGAL_BREAK_WITHIN_LABEL, 'labelB');
     // It is a Syntax Error if ContainsUndefinedContinueTarget of ModuleItemList with arguments « » and « » is true.
-    testModuleEarlyError('while(0) continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID('label'));
-    testModuleEarlyError('labelA: while(0) continue labelB;',
-      'Continue statement must be nested within an iteration statement with label "labelB"');
+    testModuleEarlyError('while(0) continue label;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'label');
+    testModuleEarlyError('labelA: while(0) continue labelB;', ErrorMessages.ILLEGAL_CONTINUE_WITHOUT_ITERATION_WITH_ID, 'labelB');
 
     // 15.2.2.1
     // It is a Syntax Error if the BoundNames of ImportDeclaration contains any duplicate entries.
-    testModuleEarlyError('import a, * as a from "module";', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('import a, {a} from "module";', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('import a, {b as a} from "module";', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('import {a, b as a} from "module";', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('import {a, a} from "module";', ErrorMessages.DUPLICATE_BINDING('a'));
-    testModuleEarlyError('import {b as a, c as a} from "module";', ErrorMessages.DUPLICATE_BINDING('a'));
+    testModuleEarlyError('import a, * as a from "module";', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('import a, {a} from "module";', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('import a, {b as a} from "module";', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('import {a, b as a} from "module";', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('import {a, a} from "module";', ErrorMessages.DUPLICATE_BINDING, 'a');
+    testModuleEarlyError('import {b as a, c as a} from "module";', ErrorMessages.DUPLICATE_BINDING, 'a');
 
     // 15.2.3.1
     // For each IdentifierName n in ReferencedBindings of ExportClause :
@@ -911,13 +908,13 @@ suite('Parser', () => {
     // Annex B 3.5 (13.14.1)
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs
     // in the LexicallyDeclaredNames of Block.
-    testEarlyError('try {} catch(e) { let e; }', ErrorMessages.DUPLICATE_BINDING('e'));
-    testEarlyError('try {} catch(e) { function e(){} }', ErrorMessages.DUPLICATE_BINDING('e'));
+    testEarlyError('try {} catch(e) { let e; }', ErrorMessages.DUPLICATE_BINDING, 'e');
+    testEarlyError('try {} catch(e) { function e(){} }', ErrorMessages.DUPLICATE_BINDING, 'e');
     // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs
     // in the VarDeclaredNames of Block,
     // unless that element is only bound by a VariableStatement or the VariableDeclarationList of a for statement,
     // or the ForBinding of a for-in statement.
-    testEarlyError('try {} catch(e) { for(var e of 0); }', ErrorMessages.DUPLICATE_BINDING('e'));
+    testEarlyError('try {} catch(e) { for(var e of 0); }', ErrorMessages.DUPLICATE_BINDING, 'e');
 
     // 14.1.2, 14.2.1, 14.3.1, 14.4.1
     // It is a Syntax Error if ContainsUseStrict of FunctionBody is true and IsSimpleParameterList

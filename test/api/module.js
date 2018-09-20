@@ -16,6 +16,7 @@
 
 let testParseModule = require('../assertions').testParseModule;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -25,6 +26,6 @@ suite('Parser', () => {
   suite('module', () => {
     testParseModule('', id, { type: 'Module', directives: [], items: [] });
 
-    testParseModuleFailure('/*', 'Unexpected end of input');
+    testParseModuleFailure('/*', ErrorMessages.UNEXPECTED_EOS);
   });
 });

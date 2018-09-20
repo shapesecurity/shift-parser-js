@@ -20,6 +20,7 @@ let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParseModule = require('../assertions').testParseModule;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function moduleExpr(m) {
   return m.items[0].expression;
@@ -31,11 +32,11 @@ suite('Parser', () => {
   suite('ES5 backward incompatibilities', () => {
     // ES3: zero-width non-breaking space is allowed in an identifier
     // ES5: zero-width non-breaking space is a whitespace character
-    testParseFailure('_\uFEFF_', 'Unexpected identifier');
+    testParseFailure('_\uFEFF_', ErrorMessages.UNEXPECTED_IDENTIFIER);
 
     // ES3: a slash in a regexp character class will terminate the regexp
     // ES5: a slash is allowed within a regexp character class
-    testParseFailure('[/[/]', 'Invalid regular expression: missing /');
+    testParseFailure('[/[/]', ErrorMessages.UNTERMINATED_REGEXP);
   });
 
 
@@ -44,22 +45,22 @@ suite('Parser', () => {
     // ES5: allows initializers in for-in head
     // ES6: disallows initializers in for-in and for-of head
     // ES2017: allows initializers only in for-in heads in sloppy mode, and only for var declarations with no destructuring
-    testParseFailure('for(let x=1 in [1,2,3]) 0', 'Invalid variable declaration in for-in statement');
-    testParseFailure('for(var x=1 of [1,2,3]) 0', 'Invalid variable declaration in for-of statement');
-    testParseFailure('for(let x=1 of [1,2,3]) 0', 'Invalid variable declaration in for-of statement');
+    testParseFailure('for(let x=1 in [1,2,3]) 0', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
+    testParseFailure('for(var x=1 of [1,2,3]) 0', ErrorMessages.INVALID_VAR_INIT_FOR_OF);
+    testParseFailure('for(let x=1 of [1,2,3]) 0', ErrorMessages.INVALID_VAR_INIT_FOR_OF);
 
 
     // ES5: disallow HTML-like comment
     // ES6: allowed in Script.
-    testParseFailure('a -->', 'Unexpected end of input');
-    testParseFailure(';/**/-->', 'Unexpected token ">"');
+    testParseFailure('a -->', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure(';/**/-->', ErrorMessages.UNEXPECTED_TOKEN, '>');
     testParse('\n  -->', stmt, void 0);
 
 
-    testParseModuleFailure('<!--', 'Unexpected token "<"');
-    testParseModuleFailure('function a(){\n<!--\n}', 'Unexpected token "<"');
-    testParseModuleFailure('-->', 'Unexpected token ">"');
-    testParseModuleFailure('function a(){\n-->\n}', 'Unexpected token ">"');
+    testParseModuleFailure('<!--', ErrorMessages.UNEXPECTED_TOKEN, '<');
+    testParseModuleFailure('function a(){\n<!--\n}', ErrorMessages.UNEXPECTED_TOKEN, '<');
+    testParseModuleFailure('-->', ErrorMessages.UNEXPECTED_TOKEN, '>');
+    testParseModuleFailure('function a(){\n-->\n}', ErrorMessages.UNEXPECTED_TOKEN, '>');
 
     testParseModule('a<!--b', moduleExpr,
       {

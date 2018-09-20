@@ -1,6 +1,7 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('parenthesized assignment', () => {
@@ -63,8 +64,8 @@ suite('Parser', () => {
         ],
       });
 
-      testParseFailure('var [(a)] = 0', 'Unexpected token "("');
-      testParseFailure('[(a = 0)] = 1', 'Invalid left-hand side in assignment');
+      testParseFailure('var [(a)] = 0', ErrorMessages.UNEXPECTED_TOKEN, '(');
+      testParseFailure('[(a = 0)] = 1', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
     });
 
     suite('object', () => {
@@ -121,10 +122,10 @@ suite('Parser', () => {
         ],
       });
 
-      testParseFailure('var {(a)} = 0', 'Unexpected token "("');
-      testParseFailure('var {a:(b)} = 0', 'Unexpected token "("');
-      testParseFailure('({(a)} = 0)', 'Unexpected token "("');
-      testParseFailure('({a:(b = 0)} = 1)', 'Invalid left-hand side in assignment');
+      testParseFailure('var {(a)} = 0', ErrorMessages.UNEXPECTED_TOKEN, '(');
+      testParseFailure('var {a:(b)} = 0', ErrorMessages.UNEXPECTED_TOKEN, '(');
+      testParseFailure('({(a)} = 0)', ErrorMessages.UNEXPECTED_TOKEN, '(');
+      testParseFailure('({a:(b = 0)} = 1)', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
     });
   });
 });

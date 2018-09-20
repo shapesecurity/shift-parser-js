@@ -16,6 +16,7 @@
 
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -25,6 +26,6 @@ suite('Parser', () => {
   suite('script', () => {
 
 
-    testParseFailure('/*', 'Unexpected end of input');
+    testParseFailure('/*', ErrorMessages.UNEXPECTED_EOS);
   });
 });

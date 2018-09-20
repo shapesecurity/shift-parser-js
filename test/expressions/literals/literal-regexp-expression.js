@@ -17,13 +17,14 @@
 let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
+let ErrorMessages = require('../../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('literal regexp expression', () => {
-    testParseFailure('/(?:)/gg', 'Duplicate regular expression flag \'g\'');
-    testParseFailure('/(?:)/ii', 'Duplicate regular expression flag \'i\'');
-    testParseFailure('/(?:)/mm', 'Duplicate regular expression flag \'m\'');
-    testParseFailure('/(?:)/yy', 'Duplicate regular expression flag \'y\'');
-    testParseFailure('/(?:)/uu', 'Duplicate regular expression flag \'u\'');
+    testParseFailure('/(?:)/gg', ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'g');
+    testParseFailure('/(?:)/ii', ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'i');
+    testParseFailure('/(?:)/mm', ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'm');
+    testParseFailure('/(?:)/yy', ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'y');
+    testParseFailure('/(?:)/uu', ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'u');
   });
 });

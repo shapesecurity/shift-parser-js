@@ -18,6 +18,7 @@ let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParse = require('../assertions').testParse;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -28,7 +29,7 @@ suite('Parser', () => {
     // LiteralNumericExpression and StaticMemberExpression
 
 
-    testParseFailure('0.toString', 'Unexpected "t"');
+    testParseFailure('0.toString', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, 't');
 
     // LeftHandSideExpressions
 
@@ -124,7 +125,7 @@ suite('Parser', () => {
       }
     );
 
-    testParseFailure('({a: b += 0} = {})', 'Invalid left-hand side in assignment');
-    testParseFailure('[a += b] = []', 'Invalid left-hand side in assignment');
+    testParseFailure('({a: b += 0} = {})', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+    testParseFailure('[a += b] = []', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
   });
 });

@@ -17,6 +17,7 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('property name', () => {
@@ -34,9 +35,9 @@ suite('Parser', () => {
     );
 
 
-    testParseFailure('({[1,2]:3})', 'Unexpected token ","');
-    testParseFailure('({ *a })', 'Unexpected token "}"');
-    testParseFailure('({ *a: 0 })', 'Unexpected token ":"');
-    testParseFailure('({ *[0]: 0 })', 'Unexpected token ":"');
+    testParseFailure('({[1,2]:3})', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('({ *a })', ErrorMessages.UNEXPECTED_TOKEN, '}');
+    testParseFailure('({ *a: 0 })', ErrorMessages.UNEXPECTED_TOKEN, ':');
+    testParseFailure('({ *[0]: 0 })', ErrorMessages.UNEXPECTED_TOKEN, ':');
   });
 });

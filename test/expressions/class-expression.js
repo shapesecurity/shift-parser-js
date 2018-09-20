@@ -19,6 +19,7 @@ let testParseFailure = require('../assertions').testParseFailure;
 let testParseSuccess = require('../assertions').testParseSuccess;
 let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('class expression', () => {
@@ -29,15 +30,15 @@ suite('Parser', () => {
     testParseSuccess('class A extends Object { constructor(a = super()){} }');
     testParseSuccess('class A { b(c = super.d){} }');
 
-    testParseFailure('(class {a:0})', 'Only methods are allowed in classes');
-    testParseFailure('(class {a=0})', 'Only methods are allowed in classes');
-    testParseFailure('(class {a})', 'Only methods are allowed in classes');
-    testParseFailure('(class {3:0})', 'Only methods are allowed in classes');
-    testParseFailure('(class {[3]:0})', 'Only methods are allowed in classes');
-    testParseFailure('(class {)', 'Unexpected token ")"');
-    testParseFailure('(class extends a,b {})', 'Unexpected token ","');
-    testParseFailure('(class extends !a {})', 'Unexpected token "!"');
-    testParseFailure('(class [a] {})', 'Unexpected token "["');
-    testParseFailure('(class {[a,b](){}})', 'Unexpected token ","');
+    testParseFailure('(class {a:0})', ErrorMessages.ONLY_METHODS_IN_CLASSES);
+    testParseFailure('(class {a=0})', ErrorMessages.ONLY_METHODS_IN_CLASSES);
+    testParseFailure('(class {a})', ErrorMessages.ONLY_METHODS_IN_CLASSES);
+    testParseFailure('(class {3:0})', ErrorMessages.ONLY_METHODS_IN_CLASSES);
+    testParseFailure('(class {[3]:0})', ErrorMessages.ONLY_METHODS_IN_CLASSES);
+    testParseFailure('(class {)', ErrorMessages.UNEXPECTED_TOKEN, ')');
+    testParseFailure('(class extends a,b {})', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('(class extends !a {})', ErrorMessages.UNEXPECTED_TOKEN, '!');
+    testParseFailure('(class [a] {})', ErrorMessages.UNEXPECTED_TOKEN, '[');
+    testParseFailure('(class {[a,b](){}})', ErrorMessages.UNEXPECTED_TOKEN, ',');
   });
 });

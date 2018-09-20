@@ -271,7 +271,7 @@ export class GenericParser extends Tokenizer {
       if (parsingDirectives) {
         if (isStringLiteral && stmt.type === 'ExpressionStatement' && stmt.expression.type === 'LiteralStringExpression') {
           if (!directiveOctal && token.octal) {
-            directiveOctal = this.createErrorWithLocation(directiveLocation, 'Unexpected legacy octal escape sequence: \\' + token.octal);
+            directiveOctal = this.createErrorWithLocation(directiveLocation, ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, token.octal);
           }
           let rawValue = text.slice(1, -1);
           if (rawValue === 'use strict') {
@@ -1704,36 +1704,36 @@ export class GenericParser extends Tokenizer {
       switch (f) {
         case 'g':
           if (global) {
-            throw this.createError('Duplicate regular expression flag \'g\'');
+            throw this.createError(ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'g');
           }
           global = true;
           break;
         case 'i':
           if (ignoreCase) {
-            throw this.createError('Duplicate regular expression flag \'i\'');
+            throw this.createError(ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'i');
           }
           ignoreCase = true;
           break;
         case 'm':
           if (multiLine) {
-            throw this.createError('Duplicate regular expression flag \'m\'');
+            throw this.createError(ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'm');
           }
           multiLine = true;
           break;
         case 'u':
           if (unicode) {
-            throw this.createError('Duplicate regular expression flag \'u\'');
+            throw this.createError(ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'u');
           }
           unicode = true;
           break;
         case 'y':
           if (sticky) {
-            throw this.createError('Duplicate regular expression flag \'y\'');
+            throw this.createError(ErrorMessages.DUPLICATE_REGEXP_FLAGS, 'y');
           }
           sticky = true;
           break;
         default:
-          throw this.createError(`Invalid regular expression flag '${f}'`);
+          throw this.createError(ErrorMessages.INVALID_REGEXP_FLAG, f);
       }
     }
     return { global, ignoreCase, multiLine, unicode, sticky };
@@ -1819,9 +1819,9 @@ export class GenericParser extends Tokenizer {
     let token = this.lex();
     if (token.octal && this.strict) {
       if (token.noctal) {
-        throw this.createErrorWithLocation(startLocation, 'Unexpected noctal integer literal');
+        throw this.createErrorWithLocation(startLocation, ErrorMessages.UNEXPECTED_NOCTAL);
       } else {
-        throw this.createErrorWithLocation(startLocation, 'Unexpected legacy octal integer literal');
+        throw this.createErrorWithLocation(startLocation, ErrorMessages.UNEXPECTED_OCTAL);
       }
     }
     let node = token.value === 1 / 0
@@ -1835,7 +1835,7 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
     let token = this.lex();
     if (token.octal != null && this.strict) {
-      throw this.createErrorWithLocation(startLocation, 'Unexpected legacy octal escape sequence: \\' + token.octal);
+      throw this.createErrorWithLocation(startLocation, ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, token.octal);
     }
     return this.finishNode(new AST.LiteralStringExpression({ value: token.str }), startState);
   }
@@ -2368,7 +2368,7 @@ export class GenericParser extends Tokenizer {
       if (kind === 'method') {
         elements.push(this.finishNode(new AST.ClassElement({ isStatic, method: methodOrKey }), classElementStart));
       } else {
-        throw this.createError('Only methods are allowed in classes');
+        throw this.createError(ErrorMessages.ONLY_METHODS_IN_CLASSES);
       }
     }
     return this.finishNode(new (isExpr ? AST.ClassExpression : AST.ClassDeclaration)({ name, super: heritage, elements }), startState);

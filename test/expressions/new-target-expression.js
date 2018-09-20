@@ -18,6 +18,7 @@ let stmt = require('../helpers').stmt;
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('new.target expression', () => {
@@ -41,9 +42,9 @@ suite('Parser', () => {
     );
 
 
-    testParseFailure('function f() { new.anythingElse; }', 'Unexpected identifier');
-    testParseFailure('function f() { new..target; }', 'Unexpected token "."');
-    testParseFailure('function f() { new.t\\u0061rget; }', 'Unexpected identifier');
+    testParseFailure('function f() { new.anythingElse; }', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('function f() { new..target; }', ErrorMessages.UNEXPECTED_TOKEN, '.');
+    testParseFailure('function f() { new.t\\u0061rget; }', ErrorMessages.UNEXPECTED_IDENTIFIER);
 
   });
 });

@@ -17,7 +17,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
-let ErrorMessages = require('../../dist/errors.js').ErrorMessages;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -44,7 +44,7 @@ suite('Parser', () => {
     });
 
 
-    testParseFailure('label: function* a(){}', 'Unexpected token "*"');
+    testParseFailure('label: function* a(){}', ErrorMessages.UNEXPECTED_TOKEN, '*');
     testParseFailure('function*g(yield){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g({yield}){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     testParseFailure('function*g([yield]){}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);

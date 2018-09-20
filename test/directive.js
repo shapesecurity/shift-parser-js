@@ -20,6 +20,7 @@ let stmt = require('./helpers').stmt;
 let testParse = require('./assertions').testParse;
 let testParseFailure = require('./assertions').testParseFailure;
 let testParseModule = require('./assertions').testParseModule;
+let ErrorMessages = require('../dist/errors.js').ErrorMessages;
 
 function directives(program) {
   return program.directives;
@@ -33,11 +34,11 @@ suite('Parser', () => {
   suite('directives', () => {
 
 
-    testParseFailure('"\\1"; "use strict";', 'Unexpected legacy octal escape sequence: \\1');
-    testParseFailure('"\\1"; "use strict"; null;', 'Unexpected legacy octal escape sequence: \\1');
-    testParseFailure('"use strict"; "\\1";', 'Unexpected legacy octal escape sequence: \\1');
-    testParseFailure('"use strict"; "\\1"; null;', 'Unexpected legacy octal escape sequence: \\1');
-    testParseFailure('"use strict"; function f(){"\\1";}', 'Unexpected legacy octal escape sequence: \\1');
+    testParseFailure('"\\1"; "use strict";', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '1');
+    testParseFailure('"\\1"; "use strict"; null;', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '1');
+    testParseFailure('"use strict"; "\\1";', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '1');
+    testParseFailure('"use strict"; "\\1"; null;', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '1');
+    testParseFailure('"use strict"; function f(){"\\1";}', ErrorMessages.UNEXPECTED_OCTAL_ESCAPE, '1');
 
   });
 });

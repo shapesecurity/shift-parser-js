@@ -17,6 +17,7 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('for of statement', () => {
@@ -38,17 +39,17 @@ suite('Parser', () => {
       body: { type: 'EmptyStatement' },
     });
 
-    testParseFailure('for(let of 0);', 'Unexpected number');
-    testParseFailure('for(this of 0);', 'Invalid left-hand side in for-of');
+    testParseFailure('for(let of 0);', ErrorMessages.UNEXPECTED_NUMBER);
+    testParseFailure('for(this of 0);', ErrorMessages.INVALID_LHS_IN_FOR_OF);
 
-    testParseFailure('for(var a = 0 of b);', 'Invalid variable declaration in for-of statement');
-    testParseFailure('for(let a = 0 of b);', 'Invalid variable declaration in for-of statement');
-    testParseFailure('for(const a = 0 of b);', 'Invalid variable declaration in for-of statement');
+    testParseFailure('for(var a = 0 of b);', ErrorMessages.INVALID_VAR_INIT_FOR_OF);
+    testParseFailure('for(let a = 0 of b);', ErrorMessages.INVALID_VAR_INIT_FOR_OF);
+    testParseFailure('for(const a = 0 of b);', ErrorMessages.INVALID_VAR_INIT_FOR_OF);
 
-    testParseFailure('for(({a}) of 0);', 'Invalid left-hand side in for-of');
-    testParseFailure('for(([a]) of 0);', 'Invalid left-hand side in for-of');
+    testParseFailure('for(({a}) of 0);', ErrorMessages.INVALID_LHS_IN_FOR_OF);
+    testParseFailure('for(([a]) of 0);', ErrorMessages.INVALID_LHS_IN_FOR_OF);
 
-    testParseFailure('for(var a of b, c);', 'Unexpected token ","');
-    testParseFailure('for(a of b, c);', 'Unexpected token ","');
+    testParseFailure('for(var a of b, c);', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('for(a of b, c);', ErrorMessages.UNEXPECTED_TOKEN, ',');
   });
 });

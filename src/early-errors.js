@@ -174,7 +174,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceClassDeclaration(node, { name, super: _super, elements }) {
-    let s = name;
+    let s = name.enforceStrictErrors();
     let sElements = this.fold(elements);
     sElements = sElements.enforceStrictErrors();
     if (node.super != null) {
@@ -200,7 +200,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceClassExpression(node, { name, super: _super, elements }) {
-    let s = node.name == null ? this.identity : name;
+    let s = node.name == null ? this.identity : name.enforceStrictErrors();
     let sElements = this.fold(elements);
     sElements = sElements.enforceStrictErrors();
     if (node.super != null) {

@@ -32,6 +32,46 @@ suite('Parser', () => {
       }
     );
 
+    testParse('({ let })', expr,
+      {
+        type: 'ObjectExpression',
+        properties: [{
+          type: 'ShorthandProperty',
+          name: { type: 'IdentifierExpression', name: 'let' },
+        }],
+      }
+    );
+
+    testParse('({ yield })', expr,
+      {
+        type: 'ObjectExpression',
+        properties: [{
+          type: 'ShorthandProperty',
+          name: { type: 'IdentifierExpression', name: 'yield' },
+        }],
+      }
+    );
+
+    testParse('({ async })', expr,
+      {
+        type: 'ObjectExpression',
+        properties: [{
+          type: 'ShorthandProperty',
+          name: { type: 'IdentifierExpression', name: 'async' },
+        }],
+      }
+    );
+
+    testParse('({ await })', expr,
+      {
+        type: 'ObjectExpression',
+        properties: [{
+          type: 'ShorthandProperty',
+          name: { type: 'IdentifierExpression', name: 'await' },
+        }],
+      }
+    );
+
 
     testParse('({a, b: 0, c})', expr,
       {

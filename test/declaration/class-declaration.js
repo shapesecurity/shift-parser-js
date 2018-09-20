@@ -21,6 +21,34 @@ let stmt = require('../helpers').stmt;
 suite('Parser', () => {
   suite('class declaration', () => {
 
+    testParse('class await {}', stmt, {
+      type: 'ClassDeclaration',
+      name: { type: 'BindingIdentifier', name: 'await' },
+      super: null,
+      elements: [],
+    });
+
+    testParse('class a\\u{77}ait {}', stmt, {
+      type: 'ClassDeclaration',
+      name: { type: 'BindingIdentifier', name: 'await' },
+      super: null,
+      elements: [],
+    });
+
+    testParse('class async {}', stmt, {
+      type: 'ClassDeclaration',
+      name: { type: 'BindingIdentifier', name: 'async' },
+      super: null,
+      elements: [],
+    });
+
+    testParse('class a\\u{73}ync {}', stmt, {
+      type: 'ClassDeclaration',
+      name: { type: 'BindingIdentifier', name: 'async' },
+      super: null,
+      elements: [],
+    });
+
     testParseFailure('class {}', 'Unexpected token "{"');
     testParseFailure('class extends A{}', 'Unexpected token "extends"');
   });

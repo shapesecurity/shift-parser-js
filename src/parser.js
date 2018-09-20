@@ -132,9 +132,15 @@ export class GenericParser extends Tokenizer {
       case TokenType.IDENTIFIER:
       case TokenType.LET:
       case TokenType.YIELD:
+      case TokenType.ASYNC:
         return true;
+      case TokenType.AWAIT:
+        return !this.moduleIsTheGoalSymbol;
       case TokenType.ESCAPED_KEYWORD:
-        return this.lookahead.value === 'let' || this.lookahead.value === 'yield';
+        return this.lookahead.value === 'let'
+          || this.lookahead.value === 'yield'
+          || this.lookahead.value === 'async'
+          || this.lookahead.value === 'await' && !this.moduleIsTheGoalSymbol;
     }
     return false;
   }
@@ -1739,9 +1745,9 @@ export class GenericParser extends Tokenizer {
       let arg;
       let startState = this.startNode();
       if (this.eat(TokenType.ELLIPSIS)) {
-        arg = this.finishNode(new AST.SpreadElement({ expression: this.parseAssignmentExpression() }), startState);
+        arg = this.finishNode(new AST.SpreadElement({ expression: this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget) }), startState);
       } else {
-        arg = this.parseAssignmentExpression();
+        arg = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
       }
       result.push(arg);
       if (!this.eat(TokenType.COMMA)) break;
@@ -1981,7 +1987,7 @@ export class GenericParser extends Tokenizer {
           if (this.allowYieldExpression && token.value === 'yield') {
             throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
           }
-          if (token.type === TokenType.IDENTIFIER || token.value === 'let' || token.value === 'yield') {
+          if (token.type === TokenType.IDENTIFIER || token.value === 'let' || token.value === 'yield' || token.value === 'async' || token.value === 'await') {
             return this.finishNode(new AST.ShorthandProperty({ name: this.finishNode(new AST.IdentifierExpression({ name: methodOrKey.value }), startState) }), startState);
           }
           throw this.createUnexpected(token);
@@ -2140,7 +2146,7 @@ export class GenericParser extends Tokenizer {
     let name = null;
     let heritage = null;
 
-    if (this.match(TokenType.IDENTIFIER)) {
+    if (this.matchIdentifier()) {
       name = this.parseBindingIdentifier();
     } else if (!isExpr) {
       if (inDefault) {

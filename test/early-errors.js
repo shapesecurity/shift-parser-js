@@ -219,6 +219,15 @@ suite('Parser', () => {
     testEarlyError('!{ set a(let) { \'use strict\'; } }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('let'));
     testEarlyError('!{ a(let) { \'use strict\'; } }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('let'));
     testEarlyError('!{ a(let) { \'use strict\'; } }', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('let'));
+
+    testEarlyError('class let {}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('let'));
+    testEarlyError('class l\\u{65}t {}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('let'));
+    testEarlyError('class yield {}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
+    testEarlyError('class yi\\u{65}ld {}', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
+    testEarlyError('(class let {})', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('let'));
+    testEarlyError('(class l\\u{65}t {})', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('let'));
+    testEarlyError('(class yield {})', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
+    testEarlyError('(class yi\\u{65}ld {})', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE('yield'));
     // It is a Syntax Error if StringValue of IdentifierName is the same string value as the StringValue of any
     // ReservedWord except for yield.
     // TODO: these should fail but will not

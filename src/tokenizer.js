@@ -86,6 +86,7 @@ export const TokenType = {
   IN: { klass: TokenClass.Keyword, name: 'in' },
   NOT: { klass: TokenClass.Punctuator, name: '!' },
   BIT_NOT: { klass: TokenClass.Punctuator, name: '~' },
+  ASYNC: { klass: TokenClass.Keyword, name: 'async' },
   AWAIT: { klass: TokenClass.Keyword, name: 'await' },
   ENUM: { klass: TokenClass.Keyword, name: 'enum' },
   DELETE: { klass: TokenClass.Keyword, name: 'delete' },
@@ -403,7 +404,10 @@ export default class Tokenizer {
       case 5:
         switch (id.charAt(0)) {
           case 'a':
-            if (this.moduleIsTheGoalSymbol && Tokenizer.cse4(id, 'w', 'a', 'i', 't')) {
+            if (Tokenizer.cse4(id, 's', 'y', 'n', 'c')) {
+              return TokenType.ASYNC;
+            }
+            if (Tokenizer.cse4(id, 'w', 'a', 'i', 't')) {
               return TokenType.AWAIT;
             }
             break;

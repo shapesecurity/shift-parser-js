@@ -98,6 +98,24 @@ module.exports = {
       // ES2017 for-var-in: https://github.com/tc39/ecma262/pull/614
       'annexB/language/statements/for-in/nonstrict-initializer.js',
 
+      // Test bug, sorta: trailing commas in tests which aren't testing them: https://github.com/tc39/test262/pull/1783
+      'built-ins/Atomics/notify/undefined-index-defaults-to-zero.js',
+      'built-ins/String/prototype/trimEnd/this-value-line-terminator.js',
+      'built-ins/String/prototype/trimEnd/this-value-object-cannot-convert-to-primitive-err.js',
+      'built-ins/String/prototype/trimEnd/this-value-object-toprimitive-meth-priority.js',
+      'built-ins/String/prototype/trimEnd/this-value-object-tostring-meth-priority.js',
+      'built-ins/String/prototype/trimEnd/this-value-object-valueof-meth-priority.js',
+      'built-ins/String/prototype/trimEnd/this-value-whitespace.js',
+      'built-ins/String/prototype/trimStart/this-value-line-terminator.js',
+      'built-ins/String/prototype/trimStart/this-value-object-cannot-convert-to-primitive-err.js',
+      'built-ins/String/prototype/trimStart/this-value-object-toprimitive-meth-priority.js',
+      'built-ins/String/prototype/trimStart/this-value-object-tostring-meth-priority.js',
+      'built-ins/String/prototype/trimStart/this-value-object-valueof-meth-priority.js',
+      'built-ins/String/prototype/trimStart/this-value-whitespace.js',
+      'intl402/Locale/constructor-options-casefirst-valid.js',
+      'intl402/Locale/constructor-options-numeric-valid.js',
+
+
       ...trailingCommaXfail,
 
       ...asyncXfail,

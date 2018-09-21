@@ -21,7 +21,8 @@ let testParseFailure = require('../assertions').testParseFailure;
 suite('Parser', () => {
   suite('call expression', () => {
 
-
+    testParseFailure('f(a,)', 'Unexpected token ")"');
+    testParseFailure('f(...a,)', 'Unexpected token ")"');
     testParseFailure('f(..a)', 'Unexpected token "."');
     testParseFailure('f(....a)', 'Unexpected token "."');
     testParseFailure('f(... ... a)', 'Unexpected token "..."');

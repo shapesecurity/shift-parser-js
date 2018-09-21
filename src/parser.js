@@ -548,8 +548,6 @@ export class GenericParser extends Tokenizer {
             throw this.createUnexpected(this.lookahead);
           }
           this.restoreLexerState(lexerState);
-        } else if (this.lookaheadLexicalDeclaration()) {
-          throw this.createUnexpected(this.lookahead);
         }
         let expr = this.parseExpression();
         // 12.12 Labelled Statements;

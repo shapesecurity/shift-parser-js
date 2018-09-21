@@ -20,8 +20,26 @@ let stmt = require('../helpers').stmt;
 
 suite('Parser', () => {
   suite('declarations', () => {
+    testParse('for (; false; ) let\n{}', program => program.statements,
+      [
+        {
+          type: 'ForStatement',
+          init: null,
+          test: { type: 'LiteralBooleanExpression', value: false },
+          update: null,
+          body: {
+            type: 'ExpressionStatement',
+            expression: { type: 'IdentifierExpression', name: 'let' },
+          },
+        },
+        {
+          type: 'BlockStatement',
+          block: { type: 'Block', statements: [] },
+        },
+      ]
+    );
 
-
+    testParseFailure('for(; false;) let {}', 'Unexpected token "let"');
     testParseFailure('while(true) let[a] = 0', 'Unexpected token "let"');
     testParseFailure('while(true) let a', 'Unexpected token "let"');
     testParseFailure('while(true) const a', 'Unexpected token "const"');

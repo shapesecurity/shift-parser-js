@@ -462,6 +462,11 @@ export class GenericParser extends Tokenizer {
     if (this.match(TokenType.LET) || this.match(TokenType.CONST)) {
       let lexerState = this.saveLexerState();
       this.lex();
+      if (this.hasLineTerminatorBeforeNext) {
+        let isArrayBinding = this.match(TokenType.LBRACK);
+        this.restoreLexerState(lexerState);
+        return isArrayBinding;
+      }
       if (
         this.matchIdentifier() ||
         this.match(TokenType.LBRACE) ||

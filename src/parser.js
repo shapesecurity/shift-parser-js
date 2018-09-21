@@ -1738,10 +1738,10 @@ export class GenericParser extends Tokenizer {
 
   parseArguments() {
     let result = [];
+    if (this.match(TokenType.RPAREN)) {
+      return result;
+    }
     while (true) {
-      if (this.match(TokenType.RPAREN) || this.eof()) {
-        return result;
-      }
       let arg;
       let startState = this.startNode();
       if (this.eat(TokenType.ELLIPSIS)) {
@@ -1750,9 +1750,11 @@ export class GenericParser extends Tokenizer {
         arg = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
       }
       result.push(arg);
-      if (!this.eat(TokenType.COMMA)) break;
+      if (this.match(TokenType.RPAREN)) {
+        return result;
+      }
+      this.expect(TokenType.COMMA);
     }
-    return result;
   }
 
   // 11.2 Left-Hand-Side Expressions;

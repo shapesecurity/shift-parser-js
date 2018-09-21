@@ -489,6 +489,15 @@ export class GenericParser extends Tokenizer {
         return this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true });
       case TokenType.CLASS:
         return this.parseClass({ isExpr: false, inDefault: false });
+      case TokenType.ASYNC: {
+        let lexerState = this.saveLexerState();
+        this.lex();
+        if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
+          return this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false });
+        }
+        this.restoreLexerState(lexerState);
+        return this.parseStatement();
+      }
       default:
         if (this.lookaheadLexicalDeclaration()) {
           let startState = this.startNode();
@@ -1475,8 +1484,13 @@ export class GenericParser extends Tokenizer {
       this.isBindingElement = this.isAssignmentTarget = false;
       expr = this.parseNewExpression();
     } else if (this.match(TokenType.ASYNC)) {
-      expr = this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);
-      if (allowCall && !this.hasLineTerminatorBeforeNext && this.match(TokenType.LPAREN)) {
+      expr = this.parsePrimaryExpression();
+      if (this.firstExprError) {
+        return expr;
+      }
+
+      // expr = this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);
+      if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext && this.match(TokenType.LPAREN)) {
         // the maximally obnoxious case: `async (`
         console.log('a', this.isBindingElement);
         let args = this.parseArgumentList();
@@ -1665,6 +1679,15 @@ export class GenericParser extends Tokenizer {
     }
 
     let startState = this.startNode();
+
+    if (this.eat(TokenType.ASYNC)) {
+      console.log('eaten');
+      if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
+        this.isBindingElement = this.isAssignmentTarget = false;
+        return this.finishNode(this.parseFunction({ isExpr: true, inDefault: false, allowGenerator: false }), startState);
+      }
+      return this.finishNode(new AST.IdentifierExpression({ name: 'async' }), startState);
+    }
 
     if (this.matchIdentifier()) {
       return this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);

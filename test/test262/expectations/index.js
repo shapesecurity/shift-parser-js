@@ -76,22 +76,6 @@ module.exports = {
       'language/statements/function/name-arguments-strict-body.js',
       'language/statements/function/name-eval-strict-body.js',
 
-      // `for (;;) let \n {` bug: https://github.com/shapesecurity/shift-parser-js/issues/389
-      'language/statements/for/let-block-with-newline.js',
-      'language/statements/for/let-identifier-with-newline.js',
-      'language/statements/for-in/let-block-with-newline.js',
-      'language/statements/for-in/let-identifier-with-newline.js',
-      'language/statements/for-of/let-block-with-newline.js',
-      'language/statements/for-of/let-identifier-with-newline.js',
-      'language/statements/if/let-block-with-newline.js',
-      'language/statements/if/let-identifier-with-newline.js',
-      'language/statements/labeled/let-block-with-newline.js',
-      'language/statements/labeled/let-identifier-with-newline.js',
-      'language/statements/while/let-block-with-newline.js',
-      'language/statements/while/let-identifier-with-newline.js',
-      'language/statements/with/let-block-with-newline.js',
-      'language/statements/with/let-identifier-with-newline.js',
-
       // ES2018 invalid escapes in template literals: https://github.com/tc39/ecma262/pull/773
       'language/expressions/tagged-template/invalid-escape-sequences.js',
 

@@ -547,8 +547,13 @@ export class GenericParser extends Tokenizer {
         throw this.createUnexpected(this.lookahead);
 
       default: {
-        if (this.lookaheadLexicalDeclaration()) {
-          throw this.createUnexpected(this.lookahead);
+        let lexerState = this.saveLexerState();
+        if (this.eat(TokenType.LET)) {
+          if (this.match(TokenType.LBRACK)) {
+            this.restoreLexerState(lexerState);
+            throw this.createUnexpected(this.lookahead);
+          }
+          this.restoreLexerState(lexerState);
         }
         let expr = this.parseExpression();
         // 12.12 Labelled Statements;

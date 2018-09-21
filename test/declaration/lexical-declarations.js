@@ -20,15 +20,57 @@ let stmt = require('../helpers').stmt;
 
 suite('Parser', () => {
   suite('declarations', () => {
+    testParse('for (; false; ) let\n{}', program => program.statements,
+      [
+        {
+          type: 'ForStatement',
+          init: null,
+          test: { type: 'LiteralBooleanExpression', value: false },
+          update: null,
+          body: {
+            type: 'ExpressionStatement',
+            expression: { type: 'IdentifierExpression', name: 'let' },
+          },
+        },
+        {
+          type: 'BlockStatement',
+          block: { type: 'Block', statements: [] },
+        },
+      ]
+    );
 
+    testParse('for(let\n{} = {};;);', program => program.statements,
+      [
+        {
+          type: 'ForStatement',
+          init: {
+            type: 'VariableDeclaration',
+            kind: 'let',
+            declarators: [
+              {
+                binding: { properties: [], type: 'ObjectBinding' },
+                init: { properties: [], type: 'ObjectExpression' },
+                type: 'VariableDeclarator',
+              },
+            ],
+          },
+          test: null,
+          update: null,
+          body: {
+            type: 'EmptyStatement',
+          },
+        },
+      ]
+    );
 
+    testParseFailure('for(; false;) let {}', 'Unexpected token "{"');
     testParseFailure('while(true) let[a] = 0', 'Unexpected token "let"');
-    testParseFailure('while(true) let a', 'Unexpected token "let"');
+    testParseFailure('while(true) let a', 'Unexpected identifier');
     testParseFailure('while(true) const a', 'Unexpected token "const"');
-    testParseFailure('with(true) let a', 'Unexpected token "let"');
+    testParseFailure('with(true) let a', 'Unexpected identifier');
     testParseFailure('with(true) class a {}', 'Unexpected token "class"');
 
-    testParseFailure('a: let a', 'Unexpected token "let"');
+    testParseFailure('a: let a', 'Unexpected identifier');
 
   });
 });

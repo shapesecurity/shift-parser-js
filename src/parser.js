@@ -1492,16 +1492,17 @@ export class GenericParser extends Tokenizer {
       // expr = this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);
       if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext && this.match(TokenType.LPAREN)) {
         // the maximally obnoxious case: `async (`
-        console.log('a', this.isBindingElement);
+        // console.log('a', this.isBindingElement);
         let args = this.parseArgumentList();
-        console.log('b', this.isBindingElement);
+        // console.log('b', this.isBindingElement);
         if (this.isBindingElement && !this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
           // an async arrow! convert args to params and return up the chain
           let params = [];
           let rest = null;
           for (let arg of args) {
             if (rest !== null) {
-              throw new Error('arrow params may not have more than one rest element'); // TODO workshop
+              // TODO have parseArgumentList return location of first thing following first SpreadElement
+              throw new Error('arrow params may not have anything following a rest element'); // TODO workshop, location, etc
             }
             if (arg.type === 'SpreadElement') {
               rest = this.targetToBinding(this.transformDestructuringWithDefault(arg.expression));
@@ -1681,7 +1682,7 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
 
     if (this.eat(TokenType.ASYNC)) {
-      console.log('eaten');
+      // console.log('eaten');
       if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.finishNode(this.parseFunction({ isExpr: true, inDefault: false, allowGenerator: false }), startState);
@@ -2144,10 +2145,10 @@ export class GenericParser extends Tokenizer {
 
     let isGenerator = !!this.eat(TokenType.MUL);
 
-    let { name, binding } = this.parsePropertyName();
+    let { name } = this.parsePropertyName();
 
-    if (!isGenerator && token.type === TokenType.IDENTIFIER) {
-      if (token.value.length === 3) {
+    if (!isGenerator) {
+      if (token.type === TokenType.IDENTIFIER && token.value.length === 3) {
         // Property Assignment: Getter and Setter.
         if (token.value === 'get' && this.lookaheadPropertyName() && !token.escaped) {
           ({ name } = this.parsePropertyName());
@@ -2175,6 +2176,19 @@ export class GenericParser extends Tokenizer {
             kind: 'method',
           };
         }
+      } else if (token.type === TokenType.ASYNC && !this.hasLineTerminatorBeforeNext && this.lookaheadPropertyName()) {
+        ({ name } = this.parsePropertyName());
+        let previousYield = this.allowYieldExpression;
+        this.allowYieldExpression = false;
+        let params = this.parseParams();
+        this.allowYieldExpression = false;
+        let body = this.parseFunctionBody();
+        this.allowYieldExpression = previousYield;
+
+        return {
+          methodOrKey: this.finishNode(new AST.Method({ isGenerator, name, params, body }), startState),
+          kind: 'method',
+        };
       }
     }
 
@@ -2198,7 +2212,6 @@ export class GenericParser extends Tokenizer {
     return {
       methodOrKey: name,
       kind: token.type.klass.isIdentifierName ? 'identifier' : 'property',
-      binding,
       escaped: token.escaped,
     };
   }

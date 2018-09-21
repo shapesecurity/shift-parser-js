@@ -541,19 +541,15 @@ export class GenericParser extends Tokenizer {
         throw this.createUnexpected(this.lookahead);
 
       default: {
-        if (this.lookaheadLexicalDeclaration()) {
-          let lexerState = this.saveLexerState()
-          this.eat(TokenType.LET) || this.eat(TokenType.CONST);
-          if (this.hasLineTerminatorBeforeNext) {
-            let isArrayBinding = this.match(TokenType.LBRACK);
-            this.restoreLexerState(lexerState);
-            if (isArrayBinding) {
-              throw this.createUnexpected(this.lookahead);
-            }
-          } else {
+        let lexerState = this.saveLexerState();
+        if (this.eat(TokenType.LET)) {
+          if (this.match(TokenType.LBRACK)) {
             this.restoreLexerState(lexerState);
             throw this.createUnexpected(this.lookahead);
           }
+          this.restoreLexerState(lexerState);
+        } else if (this.lookaheadLexicalDeclaration()) {
+          throw this.createUnexpected(this.lookahead);
         }
         let expr = this.parseExpression();
         // 12.12 Labelled Statements;

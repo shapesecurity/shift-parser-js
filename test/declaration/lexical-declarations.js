@@ -63,14 +63,14 @@ suite('Parser', () => {
       ]
     );
 
-    testParseFailure('for(; false;) let {}', 'Unexpected token "let"');
+    testParseFailure('for(; false;) let {}', 'Unexpected token "{"');
     testParseFailure('while(true) let[a] = 0', 'Unexpected token "let"');
-    testParseFailure('while(true) let a', 'Unexpected token "let"');
+    testParseFailure('while(true) let a', 'Unexpected identifier');
     testParseFailure('while(true) const a', 'Unexpected token "const"');
-    testParseFailure('with(true) let a', 'Unexpected token "let"');
+    testParseFailure('with(true) let a', 'Unexpected identifier');
     testParseFailure('with(true) class a {}', 'Unexpected token "class"');
 
-    testParseFailure('a: let a', 'Unexpected token "let"');
+    testParseFailure('a: let a', 'Unexpected identifier');
 
   });
 });

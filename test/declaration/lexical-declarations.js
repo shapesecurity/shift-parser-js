@@ -39,6 +39,30 @@ suite('Parser', () => {
       ]
     );
 
+    testParse('for(let\n{} = {};;);', program => program.statements,
+      [
+        {
+          type: 'ForStatement',
+          init: {
+            type: 'VariableDeclaration',
+            kind: 'let',
+            declarators: [
+              {
+                binding: { properties: [], type: 'ObjectBinding' },
+                init: { properties: [], type: 'ObjectExpression' },
+                type: 'VariableDeclarator',
+              },
+            ],
+          },
+          test: null,
+          update: null,
+          body: {
+            type: 'EmptyStatement',
+          },
+        },
+      ]
+    );
+
     testParseFailure('for(; false;) let {}', 'Unexpected token "let"');
     testParseFailure('while(true) let[a] = 0', 'Unexpected token "let"');
     testParseFailure('while(true) let a', 'Unexpected token "let"');

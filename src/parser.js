@@ -1460,7 +1460,7 @@ export class GenericParser extends Tokenizer {
         if (allowCall) {
           expr = this.finishNode(new AST.CallExpression({
             callee: expr,
-            arguments: this.parseArgumentList(),
+            arguments: this.parseArgumentList().args,
           }), startState);
         } else {
           throw this.createUnexpected(token);
@@ -1489,38 +1489,28 @@ export class GenericParser extends Tokenizer {
         return expr;
       }
 
-      // expr = this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);
       if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext && this.match(TokenType.LPAREN)) {
         // the maximally obnoxious case: `async (`
-        // console.log('a', this.isBindingElement);
-        let args = this.parseArgumentList();
-        // console.log('b', this.isBindingElement);
+        let { args, locationFollowingFirstSpread } = this.parseArgumentList();
         if (this.isBindingElement && !this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
-          // an async arrow! convert args to params and return up the chain
-          let params = [];
-          let rest = null;
-          for (let arg of args) {
-            if (rest !== null) {
-              // TODO have parseArgumentList return location of first thing following first SpreadElement
-              throw new Error('arrow params may not have anything following a rest element'); // TODO workshop, location, etc
-            }
-            if (arg.type === 'SpreadElement') {
-              rest = this.targetToBinding(this.transformDestructuringWithDefault(arg.expression));
-            } else {
-              params.push(this.targetToBinding(this.transformDestructuringWithDefault(arg)));
-            }
+          if (locationFollowingFirstSpread !== null) {
+            throw this.createErrorWithLocation(locationFollowingFirstSpread, 'arrow params may not have anything following a rest element'); // TODO workshop message, split it into constant
           }
-          // console.log(params);
-          // console.log(rest);
-          // console.log('true');
+          let rest = null;
+          if (args.length > 0 && args[args.length - 1].type === 'SpreadElement') {
+            rest = this.targetToBinding(this.transformDestructuringWithDefault(args[args.length - 1].expression));
+            args = args.slice(0, -1);
+          }
+          let params = args.map(arg => this.targetToBinding(this.transformDestructuringWithDefault(arg)));
           return this.finishNode({
             type: ARROW_EXPRESSION_PARAMS,
             params,
             rest,
+            isAsync: true,
           }, startState);
         }
-        this.isBindingElement = this.isAssignmentTarget = false;
         // otherwise we've just taken the first iteration of the loop below
+        this.isBindingElement = this.isAssignmentTarget = false;
         expr = this.finishNode(new AST.CallExpression({
           callee: expr,
           arguments: args,
@@ -1538,7 +1528,7 @@ export class GenericParser extends Tokenizer {
         this.isBindingElement = this.isAssignmentTarget = false;
         expr = this.finishNode(new AST.CallExpression({
           callee: expr,
-          arguments: this.parseArgumentList(),
+          arguments: this.parseArgumentList().args,
         }), startState);
       } else if (this.match(TokenType.LBRACK)) {
         this.isBindingElement = false;
@@ -1624,7 +1614,7 @@ export class GenericParser extends Tokenizer {
     let callee = this.isolateCoverGrammar(() => this.parseLeftHandSideExpression({ allowCall: false }));
     return this.finishNode(new AST.NewExpression({
       callee,
-      arguments: this.match(TokenType.LPAREN) ? this.parseArgumentList() : [],
+      arguments: this.match(TokenType.LPAREN) ? this.parseArgumentList().args : [],
     }), startState);
   }
 
@@ -1803,21 +1793,31 @@ export class GenericParser extends Tokenizer {
   }
 
   parseArguments() {
-    let result = [];
+    let args = [];
+    let locationFollowingFirstSpread = null;
     if (this.match(TokenType.RPAREN)) {
-      return result;
+      return { args, locationFollowingFirstSpread };
     }
     while (true) {
       let arg;
       let startState = this.startNode();
       if (this.eat(TokenType.ELLIPSIS)) {
         arg = this.finishNode(new AST.SpreadElement({ expression: this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget) }), startState);
+        if (locationFollowingFirstSpread === null) {
+          args.push(arg);
+          if (this.match(TokenType.RPAREN)) {
+            return { args, locationFollowingFirstSpread };
+          }
+          locationFollowingFirstSpread = this.getLocation();
+          this.expect(TokenType.COMMA);
+          continue;
+        }
       } else {
         arg = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
       }
-      result.push(arg);
+      args.push(arg);
       if (this.match(TokenType.RPAREN)) {
-        return result;
+        return { args, locationFollowingFirstSpread };
       }
       this.expect(TokenType.COMMA);
     }
@@ -1849,6 +1849,7 @@ export class GenericParser extends Tokenizer {
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
         rest: null,
+        isAsync: false,
       }, preParenStartState);
       this.ensureArrow();
       this.isBindingElement = this.isAssignmentTarget = false;
@@ -1860,6 +1861,7 @@ export class GenericParser extends Tokenizer {
         type: ARROW_EXPRESSION_PARAMS,
         params: [],
         rest,
+        isAsync: false,
       }, preParenStartState);
       this.ensureArrow();
       this.isBindingElement = this.isAssignmentTarget = false;
@@ -1915,7 +1917,12 @@ export class GenericParser extends Tokenizer {
       }
 
       this.isBindingElement = false;
-      return this.finishNode({ type: ARROW_EXPRESSION_PARAMS, params, rest }, preParenStartState);
+      return this.finishNode({
+        type: ARROW_EXPRESSION_PARAMS,
+        params,
+        rest,
+        isAsync: false,
+      }, preParenStartState);
     }
     // Ensure assignment pattern:
     if (rest) {

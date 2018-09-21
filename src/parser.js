@@ -1474,6 +1474,43 @@ export class GenericParser extends Tokenizer {
     } else if (this.match(TokenType.NEW)) {
       this.isBindingElement = this.isAssignmentTarget = false;
       expr = this.parseNewExpression();
+    } else if (this.match(TokenType.ASYNC)) {
+      expr = this.finishNode(new AST.IdentifierExpression({ name: this.parseIdentifier() }), startState);
+      if (allowCall && !this.hasLineTerminatorBeforeNext && this.match(TokenType.LPAREN)) {
+        // the maximally obnoxious case: `async (`
+        console.log('a', this.isBindingElement);
+        let args = this.parseArgumentList();
+        console.log('b', this.isBindingElement);
+        if (this.isBindingElement && !this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
+          // an async arrow! convert args to params and return up the chain
+          let params = [];
+          let rest = null;
+          for (let arg of args) {
+            if (rest !== null) {
+              throw new Error('arrow params may not have more than one rest element'); // TODO workshop
+            }
+            if (arg.type === 'SpreadElement') {
+              rest = this.targetToBinding(this.transformDestructuringWithDefault(arg.expression));
+            } else {
+              params.push(this.targetToBinding(this.transformDestructuringWithDefault(arg)));
+            }
+          }
+          // console.log(params);
+          // console.log(rest);
+          // console.log('true');
+          return this.finishNode({
+            type: ARROW_EXPRESSION_PARAMS,
+            params,
+            rest,
+          }, startState);
+        }
+        this.isBindingElement = this.isAssignmentTarget = false;
+        // otherwise we've just taken the first iteration of the loop below
+        expr = this.finishNode(new AST.CallExpression({
+          callee: expr,
+          arguments: args,
+        }), startState);
+      }
     } else {
       expr = this.parsePrimaryExpression();
       if (this.firstExprError) {

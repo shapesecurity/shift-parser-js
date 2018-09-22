@@ -2038,11 +2038,9 @@ export class GenericParser extends Tokenizer {
         };
       }
       case TokenType.LBRACK: {
-        let previousYield = this.allowYieldExpression;
         this.lex();
         let expr = this.parseAssignmentExpression();
         this.expect(TokenType.RBRACK);
-        this.allowYieldExpression = previousYield;
         return { name: this.finishNode(new AST.ComputedPropertyName({ expression: expr }), startState), binding: null };
       }
     }
@@ -2268,10 +2266,7 @@ export class GenericParser extends Tokenizer {
         }
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {
-          let previousAllowYieldExpression = this.allowYieldExpression;
-          let expr = this.parseAssignmentExpression();
-          defaultValue = expr;
-          this.allowYieldExpression = previousAllowYieldExpression;
+          defaultValue = this.parseAssignmentExpression();
         }
         return this.finishNode(new AST.BindingPropertyIdentifier({
           binding,
@@ -2320,10 +2315,8 @@ export class GenericParser extends Tokenizer {
     let binding = this.parseBindingTarget();
 
     if (this.eat(TokenType.ASSIGN)) {
-      let previousYieldExpression = this.allowYieldExpression;
       let init = this.parseAssignmentExpression();
       binding = this.finishNode(new AST.BindingWithDefault({ binding, init }), startState);
-      this.allowYieldExpression = previousYieldExpression;
     }
     return binding;
   }

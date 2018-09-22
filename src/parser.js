@@ -1050,7 +1050,6 @@ export class GenericParser extends Tokenizer {
   }
 
   parseArrowExpressionTail(params, startState) {
-    // Convert param list.
     this.expect(TokenType.ARROW);
 
     let previousYield = this.allowYieldExpression;
@@ -1672,7 +1671,6 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
 
     if (this.eat(TokenType.ASYNC)) {
-      // console.log('eaten');
       if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
         this.isBindingElement = this.isAssignmentTarget = false;
         return this.finishNode(this.parseFunction({ isExpr: true, inDefault: false, allowGenerator: false }), startState);

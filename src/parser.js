@@ -2122,7 +2122,6 @@ export class GenericParser extends Tokenizer {
       let previousYield = this.allowYieldExpression;
       this.allowYieldExpression = isGenerator;
       let params = this.parseParams();
-      this.allowYieldExpression = isGenerator;
       let body = this.parseFunctionBody();
       this.allowYieldExpression = previousYield;
 
@@ -2213,7 +2212,6 @@ export class GenericParser extends Tokenizer {
 
     this.allowYieldExpression = isGenerator;
     let params = this.parseParams();
-    this.allowYieldExpression = isGenerator;
     let body = this.parseFunctionBody();
     this.allowYieldExpression = previousYield;
 

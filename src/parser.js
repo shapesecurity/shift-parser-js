@@ -565,6 +565,11 @@ export class GenericParser extends Tokenizer {
             throw this.createUnexpected(this.lookahead);
           }
           this.restoreLexerState(lexerState);
+        } else if (this.eat(TokenType.ASYNC)) {
+          if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
+            throw this.createUnexpected(this.lookahead);
+          }
+          this.restoreLexerState(lexerState);
         }
         let expr = this.parseExpression();
         // 12.12 Labelled Statements;
@@ -1058,7 +1063,6 @@ export class GenericParser extends Tokenizer {
     let previousAwait = this.allowAwaitExpression;
     this.allowYieldExpression = false;
     this.allowAwaitExpression = isAsync;
-    console.log(isAsync);
 
     let body;
     if (this.match(TokenType.LBRACE)) {
@@ -1407,7 +1411,7 @@ export class GenericParser extends Tokenizer {
       return this.parseUpdateExpression();
     }
     if (this.allowAwaitExpression && this.eat(TokenType.AWAIT)) {
-      console.log('await');
+      // console.log('await');
       let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
       return this.finishNode(new AST.UnaryExpression({ operator: 'await', operand })); // TODO AwaitExpression
     }
@@ -1501,32 +1505,45 @@ export class GenericParser extends Tokenizer {
         return expr;
       }
 
-      if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext && this.match(TokenType.LPAREN)) {
-        // the maximally obnoxious case: `async (`
-        let { args, locationFollowingFirstSpread } = this.parseArgumentList();
-        if (this.isBindingElement && !this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
-          if (locationFollowingFirstSpread !== null) {
-            throw this.createErrorWithLocation(locationFollowingFirstSpread, 'arrow params may not have anything following a rest element'); // TODO workshop message, split it into constant
-          }
-          let rest = null;
-          if (args.length > 0 && args[args.length - 1].type === 'SpreadElement') {
-            rest = this.targetToBinding(this.transformDestructuringWithDefault(args[args.length - 1].expression));
-            args = args.slice(0, -1);
-          }
-          let params = args.map(arg => this.targetToBinding(this.transformDestructuringWithDefault(arg)));
+      if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext) {
+        if (this.matchIdentifier) {
+          // `async [no lineterminator here] identifier` must be an async arrow
+          let param = this.parseBindingIdentifier();
+          this.ensureArrow();
           return this.finishNode({
             type: ARROW_EXPRESSION_PARAMS,
-            params,
-            rest,
+            params: [param],
+            rest: null,
             isAsync: true,
           }, startState);
         }
-        // otherwise we've just taken the first iteration of the loop below
-        this.isBindingElement = this.isAssignmentTarget = false;
-        expr = this.finishNode(new AST.CallExpression({
-          callee: expr,
-          arguments: args,
-        }), startState);
+        if (this.match(TokenType.LPAREN)) {
+          // the maximally obnoxious case: `async (`
+          let { args, locationFollowingFirstSpread } = this.parseArgumentList();
+          if (this.isBindingElement && !this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
+            if (locationFollowingFirstSpread !== null) {
+              throw this.createErrorWithLocation(locationFollowingFirstSpread, 'arrow params may not have anything following a rest element'); // TODO workshop message, split it into constant
+            }
+            let rest = null;
+            if (args.length > 0 && args[args.length - 1].type === 'SpreadElement') {
+              rest = this.targetToBinding(this.transformDestructuringWithDefault(args[args.length - 1].expression));
+              args = args.slice(0, -1);
+            }
+            let params = args.map(arg => this.targetToBinding(this.transformDestructuringWithDefault(arg)));
+            return this.finishNode({
+              type: ARROW_EXPRESSION_PARAMS,
+              params,
+              rest,
+              isAsync: true,
+            }, startState);
+          }
+          // otherwise we've just taken the first iteration of the loop below
+          this.isBindingElement = this.isAssignmentTarget = false;
+          expr = this.finishNode(new AST.CallExpression({
+            callee: expr,
+            arguments: args,
+          }), startState);
+        }
       }
     } else {
       expr = this.parsePrimaryExpression();

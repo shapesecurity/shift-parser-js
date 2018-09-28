@@ -51,7 +51,7 @@ function isSpecialMethod(methodDefinition) {
     case 'Setter':
       return true;
     case 'Method':
-      return methodDefinition.isGenerator;
+      return methodDefinition.isGenerator || methodDefinition.isAsync;
   }
   /* istanbul ignore next */
   throw new Error('not reached');
@@ -112,11 +112,15 @@ export class EarlyErrorChecker extends MonoidalReducer {
     params.yieldExpressions.forEach(n => {
       params = params.addError(new EarlyError(n, 'Arrow parameters must not contain yield expressions'));
     });
+    params.awaitExpressions.forEach(n => {
+      params = params.addError(new EarlyError(n, 'Arrow parameters must not contain await expressions'));
+    });
     let s = super.reduceArrowExpression(node, { params, body });
     if (!isSimpleParameterList && node.body.type === 'FunctionBody' && isStrictFunctionBody(node.body)) {
       s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -343,6 +347,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     s = s.enforceFreeLabeledBreakStatementErrors(UNBOUND_BREAK);
     s = s.clearUsedLabelNames();
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     if (isStrictFunctionBody(node)) {
       s = s.enforceStrictErrors();
     }
@@ -369,6 +374,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
         params = params.addError(new EarlyError(n, 'Generator parameters must not contain yield expressions'));
       });
     }
+    if (node.isAsync) {
+      params.awaitExpressions.forEach(n => {
+        params = params.addError(new EarlyError(n, 'Async function parameters must not contain await expressions'));
+      });
+    }
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
@@ -380,6 +390,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeFunctionDeclaration();
     return s;
   }
@@ -404,6 +415,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
         params = params.addError(new EarlyError(n, 'Generator parameters must not contain yield expressions'));
       });
     }
+    if (node.isAsync) {
+      params.awaitExpressions.forEach(n => {
+        params = params.addError(new EarlyError(n, 'Async function parameters must not contain await expressions'));
+      });
+    }
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
@@ -416,6 +432,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     }
     s = s.clearBoundNames();
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -512,6 +529,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
         params = params.addError(new EarlyError(n, 'Generator parameters must not contain yield expressions'));
       });
     }
+    if (node.isAsync) {
+      params.awaitExpressions.forEach(n => {
+        params = params.addError(new EarlyError(n, 'Async function parameters must not contain await expressions'));
+      });
+    }
     body = body.clearSuperPropertyExpressions();
     params = params.clearSuperPropertyExpressions();
     params = params.clearNewTargetExpressions();
@@ -525,6 +547,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -585,6 +608,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
     let s = super.reduceUnaryExpression(...arguments);
     if (node.operator === 'delete' && node.operand.type === 'IdentifierExpression') {
       s = s.addStrictError(new EarlyError(node, 'Identifier expressions must not be deleted in strict mode'));
+    }
+    if (node.operator === 'await') { // TODO reduceAwaitExpression
+      s = s.observeAwaitExpression(node);
     }
     return s;
   }

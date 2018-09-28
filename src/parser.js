@@ -428,7 +428,10 @@ export class GenericParser extends Tokenizer {
         // export HoistableDeclaration
         decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true, isAsync: false }) });
         break;
-      // TODO export async function, default async function
+      case TokenType.ASYNC:
+        this.lex();
+        decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false, isAsync: true }) });
+        break;
       case TokenType.DEFAULT:
         this.lex();
         switch (this.lookahead.type) {
@@ -442,8 +445,19 @@ export class GenericParser extends Tokenizer {
             // export default ClassDeclaration[Default]
             decl = new AST.ExportDefault({ body: this.parseClass({ isExpr: false, inDefault: true }) });
             break;
+          case TokenType.ASYNC: {
+            let lexerState = this.saveLexerState();
+            this.lex();
+            if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
+              decl = new AST.ExportDefault({
+                body: this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: false, isAsync: true }),
+              });
+              break;
+            }
+            this.restoreLexerState(lexerState);
+          }
           default:
-            // export default [lookahead ∉ {function, class}] AssignmentExpression[In] ;
+            // export default [lookahead ∉ {function, async [no LineTerminatorHere] function, class}] AssignmentExpression[In] ;
             decl = new AST.ExportDefault({ body: this.parseAssignmentExpression() });
             this.consumeSemicolon();
             break;
@@ -1421,7 +1435,6 @@ export class GenericParser extends Tokenizer {
       return this.parseUpdateExpression();
     }
     if (this.allowAwaitExpression && this.eat(TokenType.AWAIT)) {
-      // console.log('await');
       let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
       return this.finishNode(new AST.UnaryExpression({ operator: 'await', operand })); // TODO AwaitExpression
     }
@@ -1518,9 +1531,11 @@ export class GenericParser extends Tokenizer {
       if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext) {
         if (this.matchIdentifier()) {
           // `async [no lineterminator here] identifier` must be an async arrow
+          let previousAwait = this.allowAwaitExpression;
+          this.allowAwaitExpression = true;
           let param = this.parseBindingIdentifier();
+          this.allowAwaitExpression = previousAwait;
           this.ensureArrow();
-          // TODO error for async await => 0
           return this.finishNode({
             type: ARROW_EXPRESSION_PARAMS,
             params: [param],

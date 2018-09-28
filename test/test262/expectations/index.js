@@ -3,14 +3,12 @@
 const bigintXpass = require('./bigint-tests-without-literals.js');
 const numsepXpass = require('./numeric-seperator-tests-without-literals.js');
 const { xpass: regexpXpass, xfail: regexpXfail } = require('./regexp.js');
-const asyncXfail = require('./async.js');
 const trailingCommaXfail = require('./trailing-function-commas.js');
 
 module.exports = {
   xfail: {
     // Tests with any of these feature flags are expected not to parse, unless they are whitelisted in xpassDespiteFeatures
     features: [
-      'async-functions',
       'async-iteration',
       'BigInt',
       'regexp-dotall',
@@ -29,9 +27,6 @@ module.exports = {
       'optional-catch-binding',
     ],
     xpassDespiteFeatures: [
-      // arguable feature misclassification https://github.com/tc39/test262/blob/master/test/language/expressions/async-arrow-function/escaped-async-line-terminator.js
-      'language/expressions/async-arrow-function/escaped-async-line-terminator.js',
-
       // json-superset: tests using eval
       'language/literals/string/line-separator-eval.js',
       'language/literals/string/paragraph-separator-eval.js',
@@ -70,6 +65,10 @@ module.exports = {
       ...numsepXpass,
     ],
     files: [
+      // feature misclassification (missing async iteration flag): TODO report
+      'built-ins/Function/prototype/toString/proxy-async-generator-function.js',
+      'built-ins/Function/prototype/toString/proxy-async-generator-method-definition.js',
+
       // functions with reserved names whose bodies are strict: https://github.com/tc39/ecma262/pull/1158
       'language/expressions/function/name-arguments-strict-body.js',
       'language/expressions/function/name-eval-strict-body.js',
@@ -101,8 +100,6 @@ module.exports = {
 
 
       ...trailingCommaXfail,
-
-      ...asyncXfail,
 
       ...regexpXfail,
     ],

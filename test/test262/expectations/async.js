@@ -3,7 +3,7 @@
 // Tests which have neither the `async-functions` nor the `async-iteration` feature flags, but which use at least one of those features.
 // This is arguably a bug in test262, and these should be reported.
 // These are split out so the main expectations file is easier to read.
-module.exports = [
+module.exports = []; [
   'built-ins/AsyncFunction/AsyncFunction-construct.js',
   'built-ins/AsyncFunction/AsyncFunction-is-extensible.js',
   'built-ins/AsyncFunction/AsyncFunction-is-subclass.js',

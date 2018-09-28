@@ -1506,7 +1506,7 @@ export class GenericParser extends Tokenizer {
       }
 
       if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext) {
-        if (this.matchIdentifier) {
+        if (this.matchIdentifier()) {
           // `async [no lineterminator here] identifier` must be an async arrow
           let param = this.parseBindingIdentifier();
           this.ensureArrow();
@@ -1526,7 +1526,7 @@ export class GenericParser extends Tokenizer {
             }
             let rest = null;
             if (args.length > 0 && args[args.length - 1].type === 'SpreadElement') {
-              rest = this.targetToBinding(this.transformDestructuringWithDefault(args[args.length - 1].expression));
+              rest = this.targetToBinding(this.transformDestructuring(args[args.length - 1].expression));
               args = args.slice(0, -1);
             }
             let params = args.map(arg => this.targetToBinding(this.transformDestructuringWithDefault(arg)));
@@ -1806,6 +1806,9 @@ export class GenericParser extends Tokenizer {
   parseIdentifier() {
     if (this.lookahead.value === 'yield' && this.allowYieldExpression) {
       throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    }
+    if (this.lookahead.value === 'await' && this.allowAwaitExpression) {
+      throw this.createError('NO AWAIT IDENTIFIERS'); // TODO this
     }
     if (this.matchIdentifier()) {
       return this.lex().value;

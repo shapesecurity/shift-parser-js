@@ -372,6 +372,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
+      name = name.enforceStrictErrors();
       params = params.enforceStrictErrors();
       body = body.enforceStrictErrors();
     }
@@ -407,6 +408,9 @@ export class EarlyErrorChecker extends MonoidalReducer {
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
+      if (name) {
+        name = name.enforceStrictErrors();
+      }
       params = params.enforceStrictErrors();
       body = body.enforceStrictErrors();
     }

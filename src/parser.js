@@ -1100,7 +1100,7 @@ export class GenericParser extends Tokenizer {
     this.allowYieldExpression = previousYield;
     this.allowAwaitExpression = previousAwait;
     this.firstAwaitLocation = previousAwaitLocation;
-    return this.finishNode(new AST.ArrowExpression({ params, body }), startState);
+    return this.finishNode(new AST.ArrowExpression({ isAsync, params, body }), startState);
   }
 
   parseAssignmentExpression() {
@@ -1435,8 +1435,8 @@ export class GenericParser extends Tokenizer {
       return this.parseUpdateExpression();
     }
     if (this.allowAwaitExpression && this.eat(TokenType.AWAIT)) {
-      let operand = this.isolateCoverGrammar(this.parseUnaryExpression);
-      return this.finishNode(new AST.UnaryExpression({ operator: 'await', operand })); // TODO AwaitExpression
+      let expression = this.isolateCoverGrammar(this.parseUnaryExpression);
+      return this.finishNode(new AST.AwaitExpression({ expression }));
     }
 
     let operator = this.lookahead;
@@ -2272,7 +2272,7 @@ export class GenericParser extends Tokenizer {
         this.allowAwaitExpression = previousAwait;
 
         return {
-          methodOrKey: this.finishNode(new AST.Method({ isGenerator, name, params, body }), startState),
+          methodOrKey: this.finishNode(new AST.Method({ isAsync: true, isGenerator, name, params, body }), startState),
           kind: 'method',
         };
       }
@@ -2292,7 +2292,7 @@ export class GenericParser extends Tokenizer {
       this.previousAwaitLocation = previousAwaitLocation;
 
       return {
-        methodOrKey: this.finishNode(new AST.Method({ isGenerator, name, params, body }), startState),
+        methodOrKey: this.finishNode(new AST.Method({ isAsync: false, isGenerator, name, params, body }), startState),
         kind: 'method',
       };
     }
@@ -2387,7 +2387,7 @@ export class GenericParser extends Tokenizer {
     this.allowAwaitExpression = previousAwait;
     this.firstAwaitLocation = previousAwaitLocation;
 
-    return this.finishNode(new (isExpr ? AST.FunctionExpression : AST.FunctionDeclaration)({ isGenerator, name, params, body }), startState);
+    return this.finishNode(new (isExpr ? AST.FunctionExpression : AST.FunctionDeclaration)({ isAsync, isGenerator, name, params, body }), startState);
   }
 
   parseArrayBinding() {

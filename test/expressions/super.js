@@ -34,6 +34,7 @@ suite('Parser', () => {
           isStatic: false,
           method: {
             type: 'Method',
+            isAsync: false,
             isGenerator: false,
             name: { type: 'StaticPropertyName', value: 'constructor' },
             params: { type: 'FormalParameters', items: [], rest: null },
@@ -44,6 +45,7 @@ suite('Parser', () => {
                 type: 'ExpressionStatement',
                 expression: {
                   type: 'ArrowExpression',
+                  isAsync: false,
                   params: { type: 'FormalParameters', items: [], rest: null },
                   body: { type: 'CallExpression', callee: { type: 'Super' }, arguments: [] },
                 },

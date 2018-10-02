@@ -26,6 +26,7 @@ suite('Parser', () => {
       { type: 'ForStatement',
         init: {
           type: 'ArrowExpression',
+          isAsync: false,
           params: { type: 'FormalParameters', items: [], rest: null },
           body: { type: 'FunctionBody', directives: [], statements: [
             { type: 'ExpressionStatement',

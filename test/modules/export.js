@@ -202,6 +202,7 @@ suite('Parser', () => {
         type: 'Export',
         declaration: {
           type: 'FunctionDeclaration',
+          isAsync: false,
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: 'A' },
           params: { type: 'FormalParameters', items: [], rest: null },
@@ -216,6 +217,7 @@ suite('Parser', () => {
         type: 'ExportDefault',
         body: {
           type: 'FunctionDeclaration',
+          isAsync: false,
           isGenerator: false,
           name: { type: 'BindingIdentifier', name: '*default*' },
           params: { type: 'FormalParameters', items: [], rest: null },
@@ -256,6 +258,7 @@ suite('Parser', () => {
       type: 'ExportDefault',
       body: {
         type: 'FunctionDeclaration',
+        isAsync: false,
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
@@ -272,6 +275,7 @@ suite('Parser', () => {
       type: 'ExportDefault',
       body: {
         type: 'FunctionDeclaration',
+        isAsync: false,
         isGenerator: true,
         name: { type: 'BindingIdentifier', name: 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
@@ -286,6 +290,7 @@ suite('Parser', () => {
           type: 'ExportDefault',
           body: {
             type: 'FunctionDeclaration',
+            isAsync: false,
             isGenerator: false,
             name: { type: 'BindingIdentifier', name: 'a' },
             params: { type: 'FormalParameters', items: [], rest: null },

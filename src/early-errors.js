@@ -125,6 +125,10 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
+  reduceAwaitExpression(node, { expression }) {
+    return expression.observeAwaitExpression(node);
+  }
+
   reduceBindingIdentifier(node) {
     let s = this.identity;
     if (node.name === 'eval' || node.name === 'arguments' || isStrictModeReservedWord(node.name)) {
@@ -608,9 +612,6 @@ export class EarlyErrorChecker extends MonoidalReducer {
     let s = super.reduceUnaryExpression(...arguments);
     if (node.operator === 'delete' && node.operand.type === 'IdentifierExpression') {
       s = s.addStrictError(new EarlyError(node, 'Identifier expressions must not be deleted in strict mode'));
-    }
-    if (node.operator === 'await') { // TODO reduceAwaitExpression
-      s = s.observeAwaitExpression(node);
     }
     return s;
   }

@@ -25,6 +25,7 @@ suite('Parser', () => {
 
     testParse('function f() { new.target(); }', stmt,
       { type: 'FunctionDeclaration',
+        isAsync: false,
         isGenerator: false,
         name: { type: 'BindingIdentifier', name: 'f' },
         params: { type: 'FormalParameters', items: [], rest: null },

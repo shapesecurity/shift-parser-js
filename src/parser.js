@@ -1439,9 +1439,11 @@ export class GenericParser extends Tokenizer {
     if (this.lookahead.type.klass !== TokenClass.Punctuator && this.lookahead.type.klass !== TokenClass.Keyword) {
       return this.parseUpdateExpression();
     }
+
+    let startState = this.startNode();
     if (this.allowAwaitExpression && this.eat(TokenType.AWAIT)) {
       let expression = this.isolateCoverGrammar(this.parseUnaryExpression);
-      return this.finishNode(new AST.AwaitExpression({ expression }));
+      return this.finishNode(new AST.AwaitExpression({ expression }), startState);
     }
 
     let operator = this.lookahead;
@@ -1449,7 +1451,6 @@ export class GenericParser extends Tokenizer {
       return this.parseUpdateExpression();
     }
 
-    let startState = this.startNode();
     this.lex();
     this.isBindingElement = this.isAssignmentTarget = false;
 

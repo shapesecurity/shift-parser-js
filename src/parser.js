@@ -461,6 +461,7 @@ export class GenericParser extends Tokenizer {
             }
             this.restoreLexerState(lexerState);
           }
+          // else fall through
           default:
             // export default [lookahead ∉ {function, async [no LineTerminatorHere] function, class}] AssignmentExpression[In] ;
             decl = new AST.ExportDefault({ body: this.parseAssignmentExpression() });

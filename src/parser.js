@@ -1530,9 +1530,7 @@ export class GenericParser extends Tokenizer {
       expr = this.parseNewExpression();
     } else if (this.match(TokenType.ASYNC)) {
       expr = this.parsePrimaryExpression();
-      if (this.firstExprError) {
-        return expr;
-      }
+      // there's only three things this could be: an identifier, an async arrow, or an async function expression.
 
       if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext) {
         if (this.matchIdentifier()) {
@@ -1556,10 +1554,10 @@ export class GenericParser extends Tokenizer {
           let { args, locationFollowingFirstSpread } = this.parseArgumentList();
           if (this.isBindingElement && !this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
             if (locationFollowingFirstSpread !== null) {
-              throw this.createErrorWithLocation(locationFollowingFirstSpread, 'arrow params may not have anything following a rest element'); // TODO workshop message, split it into constant
+              throw this.createErrorWithLocation(locationFollowingFirstSpread, ErrorMessages.UNEXPECTED_TOKEN(','));
             }
             if (this.firstAwaitLocation !== null) {
-              throw this.createErrorWithLocation(this.firstAwaitLocation, 'async arrow params may not contain "await"'); // TODO workshop message, split it into constant
+              throw this.createErrorWithLocation(this.firstAwaitLocation, ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
             }
             let rest = null;
             if (args.length > 0 && args[args.length - 1].type === 'SpreadElement') {
@@ -1846,7 +1844,7 @@ export class GenericParser extends Tokenizer {
       throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     }
     if (this.lookahead.value === 'await' && this.allowAwaitExpression) {
-      throw this.createError('NO AWAIT IDENTIFIERS'); // TODO this
+      throw this.createError(ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
     }
     if (this.matchIdentifier()) {
       return this.lex().value;
@@ -2230,7 +2228,7 @@ export class GenericParser extends Tokenizer {
           ({ name } = this.parsePropertyName());
           this.expect(TokenType.LPAREN);
           this.expect(TokenType.RPAREN);
-          let previousYield = this.allowYieldExpression; // TODO contemplate having some sort of "enter function" encapsulating this stuff
+          let previousYield = this.allowYieldExpression;
           let previousAwait = this.allowAwaitExpression;
           let previousAwaitLocation = this.firstAwaitLocation;
           this.allowYieldExpression = false;

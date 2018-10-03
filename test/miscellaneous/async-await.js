@@ -671,7 +671,7 @@ suite('async', () => {
   });
 
   suite('failures', () => {
-    testParseFailure('async (a, ...b, ...c) => {}', 'arrow params may not have anything following a rest element');
+    testParseFailure('async (a, ...b, ...c) => {}', 'Unexpected token ","');
     testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');
     testParseFailure('new async() => {}', 'Unexpected token "=>"');
     testParseFailure('({ async\nf(){} })', 'Unexpected identifier');
@@ -686,14 +686,14 @@ suite('async', () => {
     testParseFailure('async function* a(){}', 'Unexpected token "*"');
     testParseFailure('(async function* (){})', 'Unexpected token "*"');
     testParseFailure('({ async *a(){} })', 'Unexpected token "*"');
-    testParseFailure('async await => 0', 'NO AWAIT IDENTIFIERS'); // TODO fix message
-    testParseFailure('async (await) => 0', 'async arrow params may not contain "await"');
+    testParseFailure('async await => 0', '"await" may not be used as an identifier in this context');
+    testParseFailure('async (await) => 0', 'Async arrow parameters may not contain "await"');
     testParseFailure('(class { async })', 'Only methods are allowed in classes');
     testParseFailure('(class { async\na(){} })', 'Only methods are allowed in classes');
     testParseFailure('(class { async get a(){} })', 'Unexpected identifier');
-    testParseFailure('async (a = await => {}) => {}', 'async arrow params may not contain "await"');
-    testParseFailure('async (a = (await) => {}) => {}', 'async arrow params may not contain "await"');
-    testParseFailure('async (a = aw\\u{61}it => {}) => {}', 'async arrow params may not contain "await"');
-    testParseFailure('async (a = (b = await (0)) => {}) => {}', 'async arrow params may not contain "await"');
+    testParseFailure('async (a = await => {}) => {}', 'Async arrow parameters may not contain "await"');
+    testParseFailure('async (a = (await) => {}) => {}', 'Async arrow parameters may not contain "await"');
+    testParseFailure('async (a = aw\\u{61}it => {}) => {}', 'Async arrow parameters may not contain "await"');
+    testParseFailure('async (a = (b = await (0)) => {}) => {}', 'Async arrow parameters may not contain "await"');
   });
 });

@@ -16,6 +16,7 @@
 
 import reduce, { MonoidalReducer } from 'shift-reducer';
 import { isStrictModeReservedWord } from './utils';
+import { ErrorMessages } from './errors';
 
 import { EarlyErrorState, EarlyError } from './early-error-state';
 
@@ -199,7 +200,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceClassElement(node) {
     let s = super.reduceClassElement(...arguments);
     if (!node.isStatic && isSpecialMethod(node.method)) {
-      s = s.addError(new EarlyError(node, 'Constructors cannot be generators, getters or setters'));
+      s = s.addError(new EarlyError(node, ErrorMessages.ILLEGAL_CONSTRUCTORS));
     }
     if (node.isStatic && node.method.name.type === 'StaticPropertyName' && node.method.name.value === 'prototype') {
       s = s.addError(new EarlyError(node, 'Static class methods cannot be named "prototype"'));

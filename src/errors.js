@@ -90,8 +90,9 @@ export const ErrorMessages = {
     return `${paramType} parameters must not contain yield expressions`;
   },
   ILLEGAL_YIELD_IDENTIFIER: '"yield" may not be used as an identifier in this context',
+  ILLEGAL_AWAIT_IDENTIFIER: '"await" may not be used as an identifier in this context',
   DUPLICATE_CONSTRUCTOR: 'Duplicate constructor method in class',
-  ILLEGAL_CONSTRUCTORS: 'Constructors cannot be generators, getters or setters',
+  ILLEGAL_CONSTRUCTORS: 'Constructors cannot be async, generators, getters or setters',
   ILLEGAL_STATIC_CLASS_NAME: 'Static class methods cannot be named "prototype"',
   NEW_TARGET_ERROR: 'new.target must be within function (but not arrow expression) code',
   DUPLICATE_EXPORT(id) {
@@ -106,4 +107,5 @@ export const ErrorMessages = {
   ILLEGAL_USE_STRICT: 'Functions with non-simple parameter lists may not contain a "use strict" directive',
   ILLEGAL_EXPORTED_NAME: 'Names of variables used in an export specifier from the current module must be identifiers',
   NO_OCTALS_IN_TEMPLATES: 'Template literals may not contain octal escape sequences',
+  NO_AWAIT_IN_ASYNC_PARAMS: 'Async arrow parameters may not contain "await"',
 };

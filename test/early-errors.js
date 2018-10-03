@@ -140,7 +140,7 @@ suite('Parser', () => {
 
     // #sec-class-definitions-static-semantics-early-errors
     // It is a Syntax Error if PropName of MethodDefinition is "constructor" and SpecialMethod of MethodDefinition is true.
-    testEarlyError('(class { async constructor(){} })', 'Constructors cannot be generators, getters or setters'); // TODO fix message
+    testEarlyError('(class { async constructor(){} })', ErrorMessages.ILLEGAL_CONSTRUCTORS);
 
     // 12.1.1
     // It is a Syntax Error if the code matched by this production is contained in strict code and the StringValue of

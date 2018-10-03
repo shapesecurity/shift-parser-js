@@ -256,4 +256,60 @@ suite('Locations', () => {
     const binding = declaration.name;
     expect(helper.locations.has(binding)).to.be.false;
   });
+
+  test('static', () => {
+    const helper = new LocationHelper('  class A {  static  method  ()   {} }  ');
+
+    const element = helper.tree.statements[0].elements[0];
+    helper.assertText(element, 'static  method  ()   {}');
+
+    const method = element.method;
+    helper.assertText(method, 'method  ()   {}');
+  });
+
+  test('async', () => {
+    let helper = new LocationHelper(' async a => 0 ');
+    let arrow = helper.tree.statements[0].expression;
+    let params = arrow.params;
+    helper.assertText(arrow, 'async a => 0');
+    helper.assertText(params, 'a');
+
+    helper = new LocationHelper(' async (a) => 0 ');
+    arrow = helper.tree.statements[0].expression;
+    params = arrow.params;
+    helper.assertText(arrow, 'async (a) => 0');
+    helper.assertText(params, '(a)');
+
+    helper = new LocationHelper(' async function f() {} ; ');
+    let fn = helper.tree.statements[0];
+    helper.assertText(fn, 'async function f() {}');
+
+    helper = new LocationHelper(' (async function f() {}) ; ');
+    fn = helper.tree.statements[0].expression;
+    helper.assertText(fn, 'async function f() {}');
+
+    helper = new LocationHelper(' export async function f() {} ; ', { isModule: true });
+    fn = helper.tree.items[0].declaration;
+    helper.assertText(fn, 'async function f() {}');
+
+    helper = new LocationHelper(' export default async function f() {} ; ', { isModule: true });
+    fn = helper.tree.items[0].body;
+    helper.assertText(fn, 'async function f() {}');
+
+    helper = new LocationHelper(' class A { async m () {} } ');
+    let element = helper.tree.statements[0].elements[0];
+    let method = element.method;
+    helper.assertText(element, 'async m () {}');
+    helper.assertText(method, 'async m () {}');
+
+    helper = new LocationHelper(' class A { static async m () {} } ');
+    element = helper.tree.statements[0].elements[0];
+    method = element.method;
+    helper.assertText(element, 'static async m () {}');
+    helper.assertText(method, 'async m () {}');
+
+    helper = new LocationHelper(' ({ async m () {} }) ');
+    method = helper.tree.statements[0].expression.properties[0];
+    helper.assertText(method, 'async m () {}');
+  });
 });

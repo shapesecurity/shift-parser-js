@@ -433,10 +433,12 @@ export class GenericParser extends Tokenizer {
         // export HoistableDeclaration
         decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true, isAsync: false }) });
         break;
-      case TokenType.ASYNC:
+      case TokenType.ASYNC: {
+        let preAsyncStartState = this.startNode();
         this.lex();
-        decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false, isAsync: true }) });
+        decl = new AST.Export({ declaration: this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false, isAsync: true, startState: preAsyncStartState }) });
         break;
+      }
       case TokenType.DEFAULT:
         this.lex();
         switch (this.lookahead.type) {
@@ -451,11 +453,12 @@ export class GenericParser extends Tokenizer {
             decl = new AST.ExportDefault({ body: this.parseClass({ isExpr: false, inDefault: true }) });
             break;
           case TokenType.ASYNC: {
+            let preAsyncStartState = this.startNode();
             let lexerState = this.saveLexerState();
             this.lex();
             if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
               decl = new AST.ExportDefault({
-                body: this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: false, isAsync: true }),
+                body: this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: false, isAsync: true, startState: preAsyncStartState }),
               });
               break;
             }
@@ -519,10 +522,11 @@ export class GenericParser extends Tokenizer {
       case TokenType.CLASS:
         return this.parseClass({ isExpr: false, inDefault: false });
       case TokenType.ASYNC: {
+        let preAsyncStartState = this.getLocation();
         let lexerState = this.saveLexerState();
         this.lex();
         if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
-          return this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false, isAsync: true });
+          return this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: false, isAsync: true, startState: preAsyncStartState });
         }
         this.restoreLexerState(lexerState);
         return this.parseStatement();
@@ -1536,6 +1540,7 @@ export class GenericParser extends Tokenizer {
       if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext) {
         if (this.matchIdentifier()) {
           // `async [no lineterminator here] identifier` must be an async arrow
+          let afterAsyncStartState = this.startNode();
           let previousAwait = this.allowAwaitExpression;
           this.allowAwaitExpression = true;
           let param = this.parseBindingIdentifier();
@@ -1546,10 +1551,11 @@ export class GenericParser extends Tokenizer {
             params: [param],
             rest: null,
             isAsync: true,
-          }, startState);
+          }, afterAsyncStartState);
         }
         if (this.match(TokenType.LPAREN)) {
           // the maximally obnoxious case: `async (`
+          let afterAsyncStartState = this.startNode();
           let previousAwaitLocation = this.firstAwaitLocation;
           this.firstAwaitLocation = null;
           let { args, locationFollowingFirstSpread } = this.parseArgumentList();
@@ -1571,7 +1577,7 @@ export class GenericParser extends Tokenizer {
               params,
               rest,
               isAsync: true,
-            }, startState);
+            }, afterAsyncStartState);
           }
           this.firstAwaitLocation = previousAwaitLocation || this.firstAwaitLocation;
           // otherwise we've just taken the first iteration of the loop below
@@ -2356,9 +2362,7 @@ export class GenericParser extends Tokenizer {
     return this.finishNode(new (isExpr ? AST.ClassExpression : AST.ClassDeclaration)({ name, super: heritage, elements }), startState);
   }
 
-  parseFunction({ isExpr, inDefault, allowGenerator, isAsync }) {
-    let startState = this.startNode();
-
+  parseFunction({ isExpr, inDefault, allowGenerator, isAsync, startState = this.startNode() }) {
     this.lex();
 
     let name = null;

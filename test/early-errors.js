@@ -129,6 +129,18 @@ suite('Parser', () => {
   });
 
   suite('early errors', () => {
+    // #sec-arrow-function-definitions-static-semantics-early-errors
+    testEarlyError('async function a(){ (a = await (0)) => {}; }', 'Arrow parameters must not contain await expressions');
+
+    // #sec-async-function-definitions-static-semantics-early-errors
+    // It is a Syntax Error if UniqueFormalParameters Contains AwaitExpression is true
+    testEarlyError('async function a(b = await (0)) {}', 'Async function parameters must not contain await expressions');
+    testEarlyError('(async function(b = await (0)) {})', 'Async function parameters must not contain await expressions');
+    testEarlyError('({ async a(b = await (0)) {} })', 'Async function parameters must not contain await expressions');
+
+    // #sec-class-definitions-static-semantics-early-errors
+    // It is a Syntax Error if PropName of MethodDefinition is "constructor" and SpecialMethod of MethodDefinition is true.
+    testEarlyError('(class { async constructor(){} })', 'Constructors cannot be generators, getters or setters'); // TODO fix message
 
     // 12.1.1
     // It is a Syntax Error if the code matched by this production is contained in strict code and the StringValue of

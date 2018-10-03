@@ -145,10 +145,15 @@ export class GenericParser extends Tokenizer {
         }
         return false;
       case TokenType.ESCAPED_KEYWORD:
+        if (this.lookahead.value === 'await' && !this.moduleIsTheGoalSymbol) {
+          if (this.firstAwaitLocation === null) {
+            this.firstAwaitLocation = this.getLocation();
+          }
+          return true;
+        }
         return this.lookahead.value === 'let'
           || this.lookahead.value === 'yield'
-          || this.lookahead.value === 'async'
-          || this.lookahead.value === 'await' && !this.moduleIsTheGoalSymbol;
+          || this.lookahead.value === 'async';
     }
     return false;
   }

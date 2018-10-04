@@ -101,7 +101,7 @@ class PatternAcceptorState {
 	}
 
 	eatIdentifierPart() {
-		if (this.index > this.pattern.length) {
+		if (this.index >= this.pattern.length) {
 			return false;
 		}
 		let characterValue;
@@ -129,23 +129,6 @@ class PatternAcceptorState {
 			}
 		}
 		return false;
-	}
-
-	eatMany(str, limit = 0) {
-		let i = 0;
-		for (i = 0; limit == 0 || i < limit; i++) {
-			if (!this.eat(str)) {
-				return i;
-			}
-		}
-		return i;
-	}
-
-	eatRegExp(regex) {
-		let match = this.pattern.slice(this.index).match(regex);
-		if (!match || !match[0]) return false;
-		this.index += match[0].length;
-		return match[0];
 	}
 
 	expect(str) {
@@ -240,15 +223,12 @@ const acceptDisjunction = (state, terminator) => {
 }
 
 const acceptAlternative = (state, terminator) => {
-	let returnValue = true;
-	while (returnValue && !state.match('|') && !state.empty() && (terminator === void 0 || !state.match(terminator))) {
-		let si = state.index;
-		returnValue = acceptTerm(state);
-		if (!returnValue) {
-			console.log('failure: ', si);
+	while (!state.match('|') && !state.empty() && (terminator === void 0 || !state.match(terminator))) {
+		if (!acceptTerm(state)) {
+			return false;
 		}
 	}
-	return returnValue;
+	return true;
 }
 
 const acceptTerm = state => {
@@ -290,22 +270,18 @@ const acceptQuantified = acceptor => backtrackOnFailure(state => {
 		return false;
 	}
 	if (state.match('{')) {
-		let value = backtrackOnFailure(state => {
+		return backtrackOnFailure(state => {
 			state.expect('{');
 			if (!acceptDecimal(state)) {
 				return false;
 			}
-			if (state.eat(',') && state.matchAny(...decimalDigits)) {
-				if (!acceptDecimal(state)) {
-					return false;
-				}
+			if (state.eat(',') && state.matchAny(...decimalDigits) && !acceptDecimal(state)) {
+				return false;
 			}
 			state.expect('}');
 			state.eat('?');
 			return true;
-		})(state);
-		return value || (!state.flags.unicode);
-		//hangs here for some reason
+		})(state) || !state.flags.unicode;
 	} else if (!!state.eatAny('*', '+', '?')) {
 		state.eat('?');
 	}
@@ -326,7 +302,7 @@ const acceptPatternCharacter = acceptCharacterExcept(syntaxCharacters);
 const acceptExtendedPatternCharacter = acceptCharacterExcept(extendedSyntaxCharacters);
 
 const acceptInvalidBracedQuantifier = state => {
-	let value = backtrackOnFailure(state => {
+	return backtrackOnFailure(state => {
 		state.expect('{');
 		if (!acceptDecimal(state)) {
 			return false;
@@ -337,7 +313,6 @@ const acceptInvalidBracedQuantifier = state => {
 		state.expect('}');
 		return true;
 	})(state);
-	return value;
 };
 
 const acceptAtom = state => {
@@ -393,9 +368,8 @@ const acceptDecimalEscape = backtrackOnFailure(state => {
 	let firstDecimal = state.eatAny(...decimalDigits.slice(1));
 	if (firstDecimal === false) {
 		return false;
-	} else {
-		decimals.push(firstDecimal);
 	}
+	decimals.push(firstDecimal);
 	let digit;
 	while (digit = state.eatAny(...decimalDigits) !== false) {
 		decimals.push(digit);
@@ -518,17 +492,15 @@ const acceptCharacterEscape = nonZeroLogicalOr(
 		if (octal1Value < 4) {
 			if (octalDigits.indexOf(state.nextCodePoint()) === -1) {
 				return octal1Value << 3 | octal2Value;
-			} else {
-				let octal3 = state.eatAny(...octalDigits);
-				if (!octal3) {
-					return false;
-				}
-				let octal3Value = parseInt(octal3, 8);
-				return octal1Value << 6 | octal2Value << 3 | octal3Value;
 			}
-		} else {
-			return octal1Value << 3 | octal2Value;
+			let octal3 = state.eatAny(...octalDigits);
+			if (!octal3) {
+				return false;
+			}
+			let octal3Value = parseInt(octal3, 8);
+			return octal1Value << 6 | octal2Value << 3 | octal3Value;
 		}
+		return octal1Value << 3 | octal2Value;
 	}),
 	backtrackOnFailure(state => {
 		if (!state.flags.unicode) {
@@ -584,7 +556,7 @@ const acceptCharacterClass = backtrackOnFailure(state => {
 	state.expect('[');
 	state.eat('^');
 	const acceptClassEscape = nonZeroLogicalOr(
-		state => state.eat('b') && 0x0008,
+		state => state.eat('b') && 0x0008, // backspace
 		state => state.flags.unicode && state.eat('-') && '-'.charCodeAt(0),
 		backtrackOnFailure(state => !state.flags.unicode && state.eat('c') && state.eatAny(...decimalDigits, '_')),
 		acceptCharacterClassEscape,
@@ -639,22 +611,18 @@ const acceptCharacterClass = backtrackOnFailure(state => {
 		return isTrueOrZero(atom) && finishClassRange(state, atom);
 	};
 	const acceptNonEmptyClassRangesNoDash = state => {
-		if (state.match('-')) {
-			state.eat('-');
-			if (!state.match(']')) {
-				throw new Error('illegal dash');
-			}
+		if (state.eat('-') && !state.match(']')) {
+			throw new Error('illegal dash');
 		}
 		let atom = acceptClassAtomNoDash(state);
 		return isTrueOrZero(atom) && finishClassRange(state, atom);
 	};
 	if (state.eat(']')) {
 		return true;
-	} else {
-		let value = acceptNonEmptyClassRanges(state);
-		if (value) {
-			state.expect(']');
-		}
-		return value;
 	}
+	let value = acceptNonEmptyClassRanges(state);
+	if (value) {
+		state.expect(']');
+	}
+	return value;
 });

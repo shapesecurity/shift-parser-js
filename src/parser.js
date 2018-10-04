@@ -17,6 +17,7 @@
 import { ErrorMessages } from './errors';
 
 import Tokenizer, { TokenClass, TokenType } from './tokenizer';
+import { acceptRegex } from './pattern-acceptor';
 
 import * as AST from 'shift-ast';
 
@@ -1663,6 +1664,9 @@ export class GenericParser extends Tokenizer {
         let pattern = token.value.slice(1, lastSlash);
         let flags = token.value.slice(lastSlash + 1);
         let ctorArgs = this.parseRegexFlags(flags);
+        if (!acceptRegex(pattern, ctorArgs)) {
+          throw this.createError(ErrorMessages.INVALID_REGEX);
+        }
         ctorArgs.pattern = pattern;
         return this.finishNode(new AST.LiteralRegExpExpression(ctorArgs), startState);
       }

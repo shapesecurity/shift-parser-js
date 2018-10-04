@@ -33,7 +33,9 @@ suite('test262 tests', () => {
       return;
     }
     const shortName = path.relative(testDir, f);
-
+    if (!shortName.startsWith('built-ins/RegExp')) {
+      return;
+    }
     test(shortName, () => {
       const contents = fs.readFileSync(f, 'utf8');
       const data = test262Parser.parseFile({ file: shortName, contents });

@@ -2,7 +2,6 @@
 
 const bigintXpass = require('./bigint-tests-without-literals.js');
 const numsepXpass = require('./numeric-seperator-tests-without-literals.js');
-const { xpass: regexpXpass, xfail: regexpXfail } = require('./regexp.js');
 const asyncXfail = require('./async.js');
 const trailingCommaXfail = require('./trailing-function-commas.js');
 
@@ -14,7 +13,6 @@ module.exports = {
       'async-iteration',
       'BigInt',
       'regexp-dotall',
-      'regexp-unicode-property-escapes',
       'class-fields-public',
       'class-fields-private',
       'class-static-fields-public',
@@ -65,8 +63,6 @@ module.exports = {
 
       ...bigintXpass,
 
-      ...regexpXpass,
-
       ...numsepXpass,
     ],
     files: [
@@ -102,7 +98,6 @@ module.exports = {
 
       ...asyncXfail,
 
-      ...regexpXfail,
     ],
   },
 };

@@ -75,7 +75,7 @@ suite('Parser', () => {
     testParseFailure('/(?<t>)(?<t>)/', 'Invalid regular expression');
 
 
-    testParse('/t|v/u', expr, {type: 'LiteralRegExpExpression', pattern: 't|v', global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: true});
-    testParse('/\\p{ASCII}\\u{4819F}/u', expr, {type: 'LiteralRegExpExpression', pattern: '\\p{ASCII}\\u{4819F}', global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: true});
+    testParse('/t|v/u', expr, { type: 'LiteralRegExpExpression', pattern: 't|v', global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: true });
+    testParse('/\\p{ASCII}\\u{4819F}/u', expr, { type: 'LiteralRegExpExpression', pattern: '\\p{ASCII}\\u{4819F}', global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: true });
   });
 });

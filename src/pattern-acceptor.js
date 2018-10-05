@@ -66,9 +66,6 @@ class PatternAcceptorState {
 		for (let i = 0; i < n && this.index < this.pattern.length; i++) {
 			this.index += this.nextCodePoint().length;
 		}
-		if (this.index > this.pattern.length) {
-			this.index = this.pattern.length;
-		}
 	}
 
 	eat(str) {
@@ -80,9 +77,6 @@ class PatternAcceptorState {
 	}
 
 	eatIdentifierStart() {
-		if (this.index > this.pattern.length) {
-			return false;
-		}
 		let characterValue;
 		let originalIndex = this.index;
 		if (this.match('\\u')) {
@@ -101,9 +95,6 @@ class PatternAcceptorState {
 	}
 
 	eatIdentifierPart() {
-		if (this.index >= this.pattern.length) {
-			return false;
-		}
 		let characterValue;
 		let originalIndex = this.index;
 		if (this.match('\\u')) {
@@ -149,19 +140,26 @@ class PatternAcceptorState {
 		}
 		return false;
 	}
-}
 
-const exceptionIsFalse = func => (...args) => {
-	try {
-		return func(...args);
-	} catch (e) {
-		return false;
+	collect(...strs) {
+		let characters = [];
+		masterLoop:
+		while (true) {
+			for (let str of strs) {
+				if (this.eat(str)) {
+					characters.push(str);
+					continue masterLoop;
+				}
+			}
+			break;
+		}
+		return characters.join('');
 	}
 }
 
 export const acceptRegex = (pattern, flags) => {
 	let state = new PatternAcceptorState(pattern, flags);
-	let accepted = exceptionIsFalse(acceptDisjunction)(state);
+	let accepted = acceptDisjunction(state);
 	if (accepted) {
 		if (state.flags.unicode) {
 			for (let backreference of state.backreferences) {
@@ -256,14 +254,7 @@ const acceptAssertion = state => !!state.eatAny('^', '$', '\\b', '\\B') ||
 
 const acceptQuantifiableAssertion = acceptLabeledGroup(state => !!state.eatAny('?=', '?!'));
 
-const acceptDecimal = state => {
-	do {
-		if (!state.eatAny(...decimalDigits)) {
-			return false;
-		}
-	} while (state.matchAny(...decimalDigits));
-	return true;
-}
+const acceptDecimal = state => state.collect(...decimalDigits).length > 0;
 
 const acceptQuantified = acceptor => backtrackOnFailure(state => {
 	if (!acceptor(state)) {
@@ -272,11 +263,15 @@ const acceptQuantified = acceptor => backtrackOnFailure(state => {
 	if (state.match('{')) {
 		return backtrackOnFailure(state => {
 			state.expect('{');
-			if (!acceptDecimal(state)) {
+			let num1 = state.collect(...decimalDigits);
+			if (num1.length == 0) {
 				return false;
 			}
-			if (state.eat(',') && state.matchAny(...decimalDigits) && !acceptDecimal(state)) {
-				return false;
+			if (state.eat(',') && state.matchAny(...decimalDigits)) {
+				let num2 = state.collect(...decimalDigits);
+				if (num2.length == 0 || parseInt(num1) > parseInt(num2)) {
+					return false;
+				}
 			}
 			state.expect('}');
 			state.eat('?');
@@ -374,6 +369,8 @@ const acceptDecimalEscape = backtrackOnFailure(state => {
 	while (digit = state.eatAny(...decimalDigits) !== false) {
 		decimals.push(digit);
 	}
+	// we also accept octal escapes here, but it is impossible to tell if it is a octal escape until all parsing is complete.
+	// octal escapes are handled in acceptCharacterEscape for classes
 	state.backreferences.push(parseInt(decimals.join('')));
 	return true;
 });
@@ -434,13 +431,13 @@ const acceptUnicodeEscape = backtrackOnFailure(state => {
 		return value > 0x10FFFF ? false : value;
 	}
 	let digits = [0, 0, 0, 0].map(() => state.eatAny(...hexDigits));
-	if (digits.find(value => value === false)) {
+	if (digits.find(value => value === false) === false) {
 		return false;
 	}
 	let value = parseInt(digits.join(''), 16);
 	if (value >= 0xD800 && value <= 0xDBFF && state.eat('\\u')) {
 		let digits2 = [0, 0, 0, 0].map(() => state.eatAny(...hexDigits));
-		if (digits2.find(value => value === false)) {
+		if (digits2.find(value => value === false) === false) {
 			return false;
 		}
 		let value2 = parseInt(digits2.join(''), 16);
@@ -466,7 +463,7 @@ const acceptCharacterEscape = nonZeroLogicalOr(
 	backtrackOnFailure(state => {
 		state.expect('x');
 		let digits = [0, 0].map(() => state.eatAny(...hexDigits));
-		if (digits.find(value => value === false)) {
+		if (digits.find(value => value === false) === false) {
 			return false;
 		}
 		return parseInt(digits.join(''), 16);
@@ -485,18 +482,12 @@ const acceptCharacterEscape = nonZeroLogicalOr(
 			return octal1Value;
 		}
 		let octal2 = state.eatAny(...octalDigits);
-		if (!octal2) {
-			return false;
-		}
 		let octal2Value = parseInt(octal2, 8);
 		if (octal1Value < 4) {
 			if (octalDigits.indexOf(state.nextCodePoint()) === -1) {
 				return octal1Value << 3 | octal2Value;
 			}
 			let octal3 = state.eatAny(...octalDigits);
-			if (!octal3) {
-				return false;
-			}
 			let octal3Value = parseInt(octal3, 8);
 			return octal1Value << 6 | octal2Value << 3 | octal3Value;
 		}
@@ -518,7 +509,7 @@ const acceptCharacterEscape = nonZeroLogicalOr(
 			return false;
 		}
 		let next = state.nextCodePoint();
-		if (next !== 'c' && next !== 'k') {
+		if (next !== false && next !== 'c' && next !== 'k') {
 			state.skip(1);
 			return next.codePointAt(0);
 		}
@@ -576,7 +567,7 @@ const acceptCharacterClass = backtrackOnFailure(state => {
 			)(state);
 		}
 		let nextCodePoint = state.nextCodePoint();
-		if (nextCodePoint === ']' || nextCodePoint === '-') {
+		if (nextCodePoint === false) {
 			return false;
 		}
 		state.skip(nextCodePoint.length);
@@ -611,9 +602,6 @@ const acceptCharacterClass = backtrackOnFailure(state => {
 		return isTrueOrZero(atom) && finishClassRange(state, atom);
 	};
 	const acceptNonEmptyClassRangesNoDash = state => {
-		if (state.eat('-') && !state.match(']')) {
-			throw new Error('illegal dash');
-		}
 		let atom = acceptClassAtomNoDash(state);
 		return isTrueOrZero(atom) && finishClassRange(state, atom);
 	};

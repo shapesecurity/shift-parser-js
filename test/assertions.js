@@ -9,6 +9,7 @@ let schemaCheck = require('./helpers').schemaCheck;
 let SHIFT_SPEC = require('shift-spec').default;
 let Parser = require('../dist/parser').GenericParser;
 let EarlyErrorChecker = require('../dist/early-errors').EarlyErrorChecker;
+let acceptRegex = require('../dist/pattern-acceptor').acceptRegex;
 
 let expectationsDir = 'node_modules/shift-parser-expectations/expectations';
 
@@ -62,6 +63,20 @@ exports.testParseSuccess = function testParseSuccess(program) {
     locationSanityCheck(tree, locations);
   });
 };
+
+// below two added to escape tokenizer preventing some tests
+
+exports.testRegexAcceptSuccess = function testRegexAcceptSuccess(regexp, flags = {unicode: false}) {
+  test(regexp, () => {
+    expect(acceptRegex(regexp, flags)).to.be(true);
+  });
+}
+
+exports.testRegexAcceptFailure = function testRegexAcceptFailure(regexp, flags = {unicode: false}) {
+  test(regexp, () => {
+    expect(acceptRegex(regexp, flags)).to.be(false);
+  });
+}
 
 exports.testParseFailure = function testParseFailure(source, message) {
   let args = arguments.length;

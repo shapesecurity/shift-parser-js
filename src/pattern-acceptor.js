@@ -62,43 +62,6 @@ class PatternAcceptorState {
     return true;
   }
 
-  eatIdentifierStart() {
-    let characterValue;
-    let originalIndex = this.index;
-    if (this.match('\\u')) {
-      this.skip(1);
-      characterValue = acceptUnicodeEscape(this);
-    } else {
-      characterValue = this.pattern.codePointAt(this.index);
-      this.index += String.fromCodePoint(characterValue).length;
-    }
-    let character = String.fromCodePoint(characterValue);
-    if (character === '_' || character === '$' || isIdentifierStart(characterValue)) {
-      return character;
-    }
-    this.index = originalIndex;
-    return false;
-  }
-
-  eatIdentifierPart() {
-    let characterValue;
-    let originalIndex = this.index;
-    if (this.match('\\u')) {
-      this.skip(1);
-      characterValue = acceptUnicodeEscape(this);
-    } else {
-      characterValue = this.pattern.codePointAt(this.index);
-      this.index += String.fromCodePoint(characterValue).length;
-    }
-    let character = String.fromCodePoint(characterValue);
-    // ZWNJ / ZWJ
-    if (character === '\u200C' || character === '\u200D' || character === '$' || isIdentifierPart(characterValue)) {
-      return character;
-    }
-    this.index = originalIndex;
-    return false;
-  }
-
   eatAny(...strs) {
     for (let str of strs) {
       if (this.eat(str)) {
@@ -204,16 +167,22 @@ const acceptUnicodeEscape = backtrackOnFailure(state => {
     return false;
   }
   let value = parseInt(digits.join(''), 16);
-  if (value >= 0xD800 && value <= 0xDBFF && state.eat('\\u')) {
-    let digits2 = [0, 0, 0, 0].map(() => state.eatAny(...hexDigits));
-    if (digits2.find(digit => digit === false) === false) {
-      return false;
+  if (state.flags.unicode && value >= 0xD800 && value <= 0xDBFF) {
+    let surrogatePairValue = backtrackOnFailure(subState => {
+      subState.expect('\\u');
+      let digits2 = [0, 0, 0, 0].map(() => subState.eatAny(...hexDigits));
+      if (digits2.find(digit => digit === false) === false) {
+        return false;
+      }
+      let value2 = parseInt(digits2.join(''), 16);
+      if (value2 < 0xDC00 || value2 >= 0xE000) {
+        return false;
+      }
+      return 0x10000 + ((value & 0x03FF) << 10) + (value2 & 0x03FF);
+    })(state);
+    if (surrogatePairValue !== false) {
+      return surrogatePairValue;
     }
-    let value2 = parseInt(digits2.join(''), 16);
-    if (value2 < 0xDC00 || value2 >= 0xE000) {
-      return false;
-    }
-    return 0x10000 + ((value & 0x03FF) << 10) + (value2 & 0x03FF);
   }
   return value;
 });

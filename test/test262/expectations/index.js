@@ -27,7 +27,7 @@ module.exports = {
       'optional-catch-binding',
       'regexp-unicode-property-escapes',
       'regexp-named-groups',
-      'regexp-lookbehind'
+      'regexp-lookbehind',
     ],
     xpassDespiteFeatures: [
       // arguable feature misclassification https://github.com/tc39/test262/blob/master/test/language/expressions/async-arrow-function/escaped-async-line-terminator.js

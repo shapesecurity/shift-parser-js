@@ -25,6 +25,9 @@ module.exports = {
       'json-superset',
       'export-star-as-namespace-from-module',
       'optional-catch-binding',
+      'regexp-unicode-property-escapes',
+      'regexp-named-groups',
+      'regexp-lookbehind'
     ],
     xpassDespiteFeatures: [
       // arguable feature misclassification https://github.com/tc39/test262/blob/master/test/language/expressions/async-arrow-function/escaped-async-line-terminator.js
@@ -60,6 +63,21 @@ module.exports = {
       'built-ins/RegExp/prototype/flags/get-order.js',
       'built-ins/RegExp/prototype/flags/rethrow.js',
       'built-ins/RegExp/prototype/flags/return-order.js',
+
+      // regexp named backreference is valid in es2016, with different semantics (as long as no unicode flag)
+      'built-ins/RegExp/named-groups/unicode-malformed.js',
+      'built-ins/RegExp/named-groups/string-replace-undefined.js',
+      'built-ins/RegExp/named-groups/string-replace-unclosed.js',
+      'built-ins/RegExp/named-groups/string-replace-numbered.js',
+      'built-ins/RegExp/named-groups/string-replace-nocaptures.js',
+      'built-ins/RegExp/named-groups/string-replace-missing.js',
+      'built-ins/RegExp/named-groups/string-replace-get.js',
+      'built-ins/RegExp/named-groups/string-replace-escaped.js',
+      'built-ins/RegExp/named-groups/groups-object-undefined.js',
+      'built-ins/RegExp/named-groups/groups-object-subclass.js',
+      'built-ins/RegExp/named-groups/groups-object-subclass-sans.js',
+      'built-ins/RegExp/named-groups/functional-replace-non-global.js',
+      'built-ins/RegExp/named-groups/functional-replace-global.js',
 
       ...bigintXpass,
 

@@ -28,21 +28,7 @@ const controlCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const hexDigits = '0123456789abcdefABCDEF'.split('');
 const decimalDigits = '0123456789'.split('');
 const octalDigits = '01234567'.split('');
-const utf16GeneralCategoryValues = ['Cased_Letter', 'LC', 'Close_Punctuation', 'Pe', 'Connector_Punctuation', 'Pc', 'Control', 'Cc', 'cntrl', 'Currency_Symbol', 'Sc', 'Dash_Punctuation', 'Pd', 'Decimal_Number', 'Nd', 'digit', 'Enclosing_Mark', 'Me', 'Final_Punctuation', 'Pf', 'Format', 'Cf', 'Initial_Punctuation', 'Pi', 'Letter', 'L', 'Letter_Number', 'Nl', 'Line_Separator', 'Zl', 'Lowercase_Letter', 'Ll', 'Mark', 'M', 'Combining_Mark', 'Math_Symbol', 'Sm', 'Modifier_Letter', 'Lm', 'Modifier_Symbol', 'Sk', 'Nonspacing_Mark', 'Mn', 'Number', 'N', 'Open_Punctuation', 'Ps', 'Other', 'C', 'Other_Letter', 'Lo', 'Other_Number', 'No', 'Other_Punctuation', 'Po', 'Other_Symbol', 'So', 'Paragraph_Separator', 'Zp', 'Private_Use', 'Co', 'Punctuation', 'P', 'punct', 'Separator', 'Z', 'Space_Separator', 'Zs', 'Spacing_Mark', 'Mc', 'Surrogate', 'Cs', 'Symbol', 'S', 'Titlecase_Letter', 'Lt', 'Unassigned', 'Cn', 'Uppercase_Letter', 'Lu'];
 
-const utf16ScriptCategoryValues = ['Adlam', 'Adlm', 'Ahom', 'Anatolian_Hieroglyphs', 'Hluw', 'Arabic', 'Arab', 'Armenian', 'Armn', 'Avestan', 'Avst', 'Balinese', 'Bali', 'Bamum', 'Bamu', 'Bassa_Vah', 'Bass', 'Batak', 'Batk', 'Bengali', 'Beng', 'Bhaiksuki', 'Bhks', 'Bopomofo', 'Bopo', 'Brahmi', 'Brah', 'Braille', 'Brai', 'Buginese', 'Bugi', 'Buhid', 'Buhd', 'Canadian_Aboriginal', 'Cans', 'Carian', 'Cari', 'Caucasian_Albanian', 'Aghb', 'Chakma', 'Cakm', 'Cham', 'Cherokee', 'Cher', 'Common', 'Zyyy', 'Coptic', 'Copt', 'Qaac', 'Cuneiform', 'Xsux', 'Cypriot', 'Cprt', 'Cyrillic', 'Cyrl', 'Deseret', 'Dsrt', 'Devanagari', 'Deva', 'Dogra', 'Dogr', 'Duployan', 'Dupl', 'Egyptian_Hieroglyphs', 'Egyp', 'Elbasan', 'Elba', 'Ethiopic', 'Ethi', 'Georgian', 'Geor', 'Glagolitic', 'Glag', 'Gothic', 'Goth', 'Grantha', 'Gran', 'Greek', 'Grek', 'Gujarati', 'Gujr', 'Gunjala_Gondi', 'Gong', 'Gurmukhi', 'Guru', 'Han', 'Hani', 'Hangul', 'Hang', 'Hanifi_Rohingya', 'Rohg', 'Hanunoo', 'Hano', 'Hatran', 'Hatr', 'Hebrew', 'Hebr', 'Hiragana', 'Hira', 'Imperial_Aramaic', 'Armi', 'Inherited', 'Zinh', 'Qaai', 'Inscriptional_Pahlavi', 'Phli', 'Inscriptional_Parthian', 'Prti', 'Javanese', 'Java', 'Kaithi', 'Kthi', 'Kannada', 'Knda', 'Katakana', 'Kana', 'Kayah_Li', 'Kali', 'Kharoshthi', 'Khar', 'Khmer', 'Khmr', 'Khojki', 'Khoj', 'Khudawadi', 'Sind', 'Lao', 'Laoo', 'Latin', 'Latn', 'Lepcha', 'Lepc', 'Limbu', 'Limb', 'Linear_A', 'Lina', 'Linear_B', 'Linb', 'Lisu', 'Lycian', 'Lyci', 'Lydian', 'Lydi', 'Mahajani', 'Mahj', 'Makasar', 'Maka', 'Malayalam', 'Mlym', 'Mandaic', 'Mand', 'Manichaean', 'Mani', 'Marchen', 'Marc', 'Medefaidrin', 'Medf', 'Masaram_Gondi', 'Gonm', 'Meetei_Mayek', 'Mtei', 'Mende_Kikakui', 'Mend', 'Meroitic_Cursive', 'Merc', 'Meroitic_Hieroglyphs', 'Mero', 'Miao', 'Plrd', 'Modi', 'Mongolian', 'Mong', 'Mro', 'Mroo', 'Multani', 'Mult', 'Myanmar', 'Mymr', 'Nabataean', 'Nbat', 'New_Tai_Lue', 'Talu', 'Newa', 'Nko', 'Nkoo', 'Nushu', 'Nshu', 'Ogham', 'Ogam', 'Ol_Chiki', 'Olck', 'Old_Hungarian', 'Hung', 'Old_Italic', 'Ital', 'Old_North_Arabian', 'Narb', 'Old_Permic', 'Perm', 'Old_Persian', 'Xpeo', 'Old_Sogdian', 'Sogo', 'Old_South_Arabian', 'Sarb', 'Old_Turkic', 'Orkh', 'Oriya', 'Orya', 'Osage', 'Osge', 'Osmanya', 'Osma', 'Pahawh_Hmong', 'Hmng', 'Palmyrene', 'Palm', 'Pau_Cin_Hau', 'Pauc', 'Phags_Pa', 'Phag', 'Phoenician', 'Phnx', 'Psalter_Pahlavi', 'Phlp', 'Rejang', 'Rjng', 'Runic', 'Runr', 'Samaritan', 'Samr', 'Saurashtra', 'Saur', 'Sharada', 'Shrd', 'Shavian', 'Shaw', 'Siddham', 'Sidd', 'SignWriting', 'Sgnw', 'Sinhala', 'Sinh', 'Sogdian', 'Sogd', 'Sora_Sompeng', 'Sora', 'Soyombo', 'Soyo', 'Sundanese', 'Sund', 'Syloti_Nagri', 'Sylo', 'Syriac', 'Syrc', 'Tagalog', 'Tglg', 'Tagbanwa', 'Tagb', 'Tai_Le', 'Tale', 'Tai_Tham', 'Lana', 'Tai_Viet', 'Tavt', 'Takri', 'Takr', 'Tamil', 'Taml', 'Tangut', 'Tang', 'Telugu', 'Telu', 'Thaana', 'Thaa', 'Thai', 'Tibetan', 'Tibt', 'Tifinagh', 'Tfng', 'Tirhuta', 'Tirh', 'Ugaritic', 'Ugar', 'Vai', 'Vaii', 'Warang_Citi', 'Wara', 'Yi', 'Yiii', 'Zanabazar_Square', 'Zanb'];
-
-const utf16LonePropertyValues = ['ASCII', 'ASCII_Hex_Digit', 'AHex', 'Alphabetic', 'Alpha', 'Any', 'Assigned', 'Bidi_Control', 'Bidi_C', 'Bidi_Mirrored', 'Bidi_M', 'Case_Ignorable', 'CI', 'Cased', 'Changes_When_Casefolded', 'CWCF', 'Changes_When_Casemapped', 'CWCM', 'Changes_When_Lowercased', 'CWL', 'Changes_When_NFKC_Casefolded', 'CWKCF', 'Changes_When_Titlecased', 'CWT', 'Changes_When_Uppercased', 'CWU', 'Dash', 'Default_Ignorable_Code_Point', 'DI', 'Deprecated', 'Dep', 'Diacritic', 'Dia', 'Emoji', 'Emoji_Component', 'Emoji_Modifier', 'Emoji_Modifier_Base', 'Emoji_Presentation', 'Extended_Pictographic', 'Extender', 'Ext', 'Grapheme_Base', 'Gr_Base', 'Grapheme_Extend', 'Gr_Ext', 'Hex_Digit', 'Hex', 'IDS_Binary_Operator', 'IDSB', 'IDS_Trinary_Operator', 'IDST', 'ID_Continue', 'IDC', 'ID_Start', 'IDS', 'Ideographic', 'Ideo', 'Join_Control', 'Join_C', 'Logical_Order_Exception', 'LOE', 'Lowercase', 'Lower', 'Math', 'Noncharacter_Code_Point', 'NChar', 'Pattern_Syntax', 'Pat_Syn', 'Pattern_White_Space', 'Pat_WS', 'Quotation_Mark', 'QMark', 'Radical', 'Regional_Indicator', 'RI', 'Sentence_Terminal', 'STerm', 'Soft_Dotted', 'SD', 'Terminal_Punctuation', 'Term', 'Unified_Ideograph', 'UIdeo', 'Uppercase', 'Upper', 'Variation_Selector', 'VS', 'White_Space', 'space', 'XID_Continue', 'XIDC', 'XID_Start', 'XIDS']
-  .concat(utf16GeneralCategoryValues);
-
-const utf16NonBinaryPropertyNames = {
-  'General_Category': utf16GeneralCategoryValues,
-  'gc': utf16GeneralCategoryValues,
-  'Script': utf16ScriptCategoryValues,
-  'sc': utf16ScriptCategoryValues,
-  'Script_Extensions': utf16ScriptCategoryValues,
-  'scx': utf16ScriptCategoryValues,
-};
 
 class PatternAcceptorState {
   constructor(pattern, flags) {
@@ -50,8 +36,6 @@ class PatternAcceptorState {
     this.flags = flags;
     this.index = 0;
     this.backreferences = [];
-    this.backreferenceNames = [];
-    this.groupingNames = [];
     this.nParenthesis = 0;
   }
 
@@ -170,11 +154,6 @@ export const acceptRegex = (pattern, flags) => {
         }
       }
     }
-    for (let backreferenceName of state.backreferenceNames) {
-      if (state.groupingNames.indexOf(backreferenceName) === -1) {
-        return false;
-      }
-    }
   }
   return accepted;
 };
@@ -285,10 +264,10 @@ const acceptLabeledGroup = predicate => backtrackOnFailure(state => {
   return false;
 });
 
-const acceptAssertion = state => !!state.eatAny('^', '$', '\\b', '\\B') ||
-  acceptLabeledGroup(subState => subState.flags.unicode ? !!subState.eatAny('?=', '?!', '?<=', '?<!') : !!subState.eatAny('?<=', '?<!'))(state);
-
 const acceptQuantifiableAssertion = acceptLabeledGroup(state => !!state.eatAny('?=', '?!'));
+
+const acceptAssertion = state => !!state.eatAny('^', '$', '\\b', '\\B') ||
+  acceptQuantifiableAssertion(state);
 
 const acceptDecimal = state => state.collect(...decimalDigits).length > 0;
 
@@ -357,7 +336,6 @@ const acceptAtom = state => {
   }
   let matched = state.eat('.') ||
     backtrackOnFailure(subState => subState.eat('\\') && !falsyNotZero(acceptAtomEscape(subState)))(state) ||
-    backtrackOnFailure(subState => subState.eat('\\') && subState.match('c'))(state) ||
     acceptCharacterClass(state) ||
     acceptLabeledGroup(subState => subState.eat('?:'))(state) ||
     acceptGrouping(state);
@@ -370,18 +348,8 @@ const acceptAtom = state => {
 
 const acceptGrouping = backtrackOnFailure(state => {
   state.expect('(');
-  let groupName = backtrackOnFailure(subState => {
-    subState.expect('?');
-    return acceptGroupName(subState);
-  })(state);
   if (!acceptDisjunction(state, ')')) {
     return false;
-  }
-  if (groupName) {
-    if (state.groupingNames.indexOf(groupName) !== -1) {
-      return false;
-    }
-    state.groupingNames.push(groupName);
   }
   state.nParenthesis++;
   return true;
@@ -390,8 +358,7 @@ const acceptGrouping = backtrackOnFailure(state => {
 const acceptAtomEscape = nonZeroLogicalOr(
   state => acceptDecimalEscape(state),
   state => acceptCharacterClassEscape(state),
-  state => acceptCharacterEscape(state),
-  state => acceptGroupNameBackreference(state)
+  state => acceptCharacterEscape(state)
 );
 
 const acceptDecimalEscape = backtrackOnFailure(state => {
@@ -411,46 +378,7 @@ const acceptDecimalEscape = backtrackOnFailure(state => {
   return true;
 });
 
-const acceptCharacterClassEscape = state => !!state.eatAny('d', 'D', 's', 'S', 'w', 'W') ||
-  state.flags.unicode && backtrackOnFailure(subState => (subState.eat('p{') || subState.eat('P{')) && acceptUnicodePropertyValueExpression(subState) && subState.eat('}'))(state);
-
-const acceptUnicodePropertyName = state => {
-  let characters = [];
-  let character;
-  while (character = state.eatAny(...controlCharacters, '_')) { // eslint-disable-line no-cond-assign
-    characters.push(character);
-  }
-  return characters.length === 0 ? false : characters.join('');
-};
-
-const acceptUnicodePropertyValue = state => {
-  let characters = [];
-  let character;
-  while (character = state.eatAny(...controlCharacters, ...decimalDigits, '_')) { // eslint-disable-line no-cond-assign
-    characters.push(character);
-  }
-  return characters.length === 0 ? false : characters.join('');
-};
-
-const acceptLoneUnicodePropertyNameOrValue = state => {
-  let loneValue = acceptUnicodePropertyValue(state);
-  return loneValue && utf16LonePropertyValues.indexOf(loneValue) >= 0;
-};
-
-const acceptUnicodePropertyValueExpression = state =>
-  backtrackOnFailure(subState => {
-    let name = acceptUnicodePropertyName(subState);
-    if (name === false) {
-      return false;
-    }
-    subState.expect('=');
-    let value = acceptUnicodePropertyValue(subState);
-    if (value === false) {
-      return false;
-    }
-    return name in utf16NonBinaryPropertyNames && utf16NonBinaryPropertyNames[name].indexOf(value) >= 0;
-  })(state) ||
-  backtrackOnFailure(acceptLoneUnicodePropertyNameOrValue)(state);
+const acceptCharacterClassEscape = state => !!state.eatAny('d', 'D', 's', 'S', 'w', 'W');
 
 const acceptCharacterEscape = nonZeroLogicalOr(
   state => controlEscapeCharacterValues[state.eatAny(...controlEscapeCharacters)],
@@ -519,32 +447,6 @@ const acceptCharacterEscape = nonZeroLogicalOr(
     return false;
   })
 );
-
-const acceptGroupNameBackreference = backtrackOnFailure(state => {
-  state.expect('k');
-  let name = acceptGroupName(state);
-  if (!name) {
-    return false;
-  }
-  state.backreferenceNames.push(name);
-  return true;
-});
-
-const acceptGroupName = backtrackOnFailure(state => {
-  state.expect('<');
-  let characters = [];
-  let start = state.eatIdentifierStart();
-  if (!start) {
-    return false;
-  }
-  characters.push(start);
-  let part;
-  while (part = state.eatIdentifierPart()) { // eslint-disable-line no-cond-assign
-    characters.push(part);
-  }
-  state.expect('>');
-  return characters.join('');
-});
 
 const acceptCharacterClass = backtrackOnFailure(state => {
   state.expect('[');

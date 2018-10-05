@@ -162,6 +162,7 @@ suite('Parser', () => {
       '/[\\9]/',
       '/[\\-]/u',
       '/[\\-]/',
+      '/(?<test>)\\k<test>/',
     ];
     const regexToFail = [
       '/(?=t|v|X|.|$||)*/u',
@@ -175,8 +176,6 @@ suite('Parser', () => {
       '/\\123/u',
       '/\\1/u',
       '/\\2/u',
-      '/\\p{ASCII}/u',
-      '/\\P{ASCII}/u',
       '/\\u{110FFFF}/u',
       '/\\L/u',
       '/[b-a]/',
@@ -195,56 +194,12 @@ suite('Parser', () => {
       '/[\\1]/u',
       '/[\\9]/u',
       '/\\c/u',
+      '/(?<">)/',
+      '/\\k<">/',
+      '/\\xZZ/',
+      '/\\k<f>/',
     ];
     regexToPass.forEach(source => testRegexSuccess(source));
     regexToFail.forEach(source => testRegexFailure(source));
-    testParseFailure('/(?<">)/', 'Invalid regular expression');
-    testParseFailure('/\\k<">/', 'Invalid regular expression');
-    testParseSuccess('/[\\c]/');
-    testParseSuccess('/[\\c]/u');
-    testParseSuccess('/\\0/');
-    testParseSuccess('/\\0/u');
-    testParseSuccess('/\\1/');
-    testParseSuccess('/\\7/');
-    testParseSuccess('/\\15/');
-    testParseSuccess('/\\153/');
-    testParseSuccess('/\\72/');
-    testParseSuccess('/[\\1]/');
-    testParseSuccess('/[\\7]/');
-    testParseSuccess('/[\\15]/');
-    testParseSuccess('/[\\153]/');
-    testParseSuccess('/[\\72]/');
-    testParseSuccess('/[\\s-5]/');
-    testParseFailure('/[\\s-5]/u', 'Invalid regular expression');
-    testParseSuccess('/[4-5]/');
-    testParseFailure('/[6-5]/u', 'Invalid regular expression');
-    testParseSuccess('/[6-]/');
-    testParseSuccess('/\\xAF/');
-    testParseFailure('/\\xZZ/u', 'Invalid regular expression');
-    testParseFailure('/\\ud800\\u1000/u', 'Invalid regular expression');
-    testParseFailure('/\\ud800\\uZZ/u', 'Invalid regular expression');
-    testParseFailure('/\\uZZ/u', 'Invalid regular expression');
-    testParseSuccess('/\\u{10}/u');
-    testParseFailure('/\\u{ZZ}/u', 'Invalid regular expression');
-    testParseFailure('/{5}/', 'Invalid regular expression');
-    testParseFailure('/{5,}/', 'Invalid regular expression');
-    testParseFailure('/{5,10}/', 'Invalid regular expression');
-    testParseSuccess('/{5,G}/');
-    testParseSuccess('/{5,1G}/');
-    testParseSuccess('/{G}/');
-    testParseSuccess('/X{5}/u');
-    testParseSuccess('/X{5,}/u');
-    testParseSuccess('/X{5,10}/u');
-    testParseFailure('/X{5,G}/u', 'Invalid regular expression');
-    testParseFailure('/X{5,1G}/u', 'Invalid regular expression');
-    testParseFailure('/X{G}/u', 'Invalid regular expression');
-    testParseSuccess('/(?<test>)\\k<test>/');
-    testParseFailure('/\\k<f>/', 'Invalid regular expression');
-    testParseFailure('/5{5,1G}/u', 'Invalid regular expression');
-    testParseFailure('/(?<t>)(?<t>)/', 'Invalid regular expression');
-
-
-    testParse('/t|v/u', expr, { type: 'LiteralRegExpExpression', pattern: 't|v', global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: true });
-    testParse('/\\p{ASCII}\\u{4819F}/u', expr, { type: 'LiteralRegExpExpression', pattern: '\\p{ASCII}\\u{4819F}', global: false, ignoreCase: false, multiLine: false, sticky: false, unicode: true });
-  });
+    });
 });

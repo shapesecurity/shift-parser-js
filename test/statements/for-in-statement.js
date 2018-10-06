@@ -89,11 +89,33 @@ suite('Parser', () => {
       body: { type: 'EmptyStatement' },
     });
 
+    testParse('for(var a = 0 in b, c);', stmt, {
+      type: 'ForInStatement',
+      left: {
+        type: 'VariableDeclaration',
+        kind: 'var',
+        declarators: [{ type: 'VariableDeclarator', binding: { type: 'BindingIdentifier', name: 'a' }, init: { type: 'LiteralNumericExpression', value: 0 } }],
+      },
+      right: {
+        type: 'BinaryExpression',
+        operator: ',',
+        left: { type: 'IdentifierExpression', name: 'b' },
+        right: { type: 'IdentifierExpression', name: 'c' },
+      },
+      body: { type: 'EmptyStatement' },
+    });
+
     testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('for(let ? b : c in 0);', 'Invalid left-hand side in for-in');
 
     testParseFailure('for(({a}) in 0);', 'Invalid left-hand side in for-in');
     testParseFailure('for(([a]) in 0);', 'Invalid left-hand side in for-in');
+    testParseFailure('for(var [] = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('for(var {} = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('"use strict"; for(var a = 0 in b);', 'Invalid variable declaration in for-in statement');
+
   });
 });

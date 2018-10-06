@@ -711,16 +711,17 @@ export class GenericParser extends Tokenizer {
 
       if (init.declarators.length === 1 && (this.match(TokenType.IN) || this.matchContextualKeyword('of'))) {
         let ctor;
+        let decl = init.declarators[0];
 
         if (this.match(TokenType.IN)) {
-          if (init.declarators[0].init != null) {
+          if (decl.init !== null && (this.strict || init.kind !== 'var' || decl.binding.type !== 'BindingIdentifier')) {
             throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN);
           }
           ctor = AST.ForInStatement;
           this.lex();
           right = this.parseExpression();
         } else {
-          if (init.declarators[0].init != null) {
+          if (decl.init !== null) {
             throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_OF);
           }
           ctor = AST.ForOfStatement;

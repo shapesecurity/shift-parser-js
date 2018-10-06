@@ -78,9 +78,6 @@ module.exports = {
       // ES2018 invalid escapes in template literals: https://github.com/tc39/ecma262/pull/773
       'language/expressions/tagged-template/invalid-escape-sequences.js',
 
-      // ES2017 for-var-in: https://github.com/tc39/ecma262/pull/614
-      'annexB/language/statements/for-in/nonstrict-initializer.js',
-
       // Test bug, sorta: trailing commas in tests which aren't testing them: https://github.com/tc39/test262/pull/1783
       'built-ins/Atomics/notify/undefined-index-defaults-to-zero.js',
       'built-ins/String/prototype/trimEnd/this-value-line-terminator.js',

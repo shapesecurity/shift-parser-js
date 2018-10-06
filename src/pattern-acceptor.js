@@ -16,8 +16,6 @@
 
 /* eslint-disable no-use-before-define */
 
-import { isIdentifierStart, isIdentifierPart } from './utils';
-
 const syntaxCharacters = '^$\\.*+?()[]{}|'.split('');
 const extendedSyntaxCharacters = '^$\\.*+?()[|'.split('');
 

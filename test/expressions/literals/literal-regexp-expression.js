@@ -214,5 +214,5 @@ suite('Parser', () => {
     ];
     regexToPass.forEach(source => testRegexSuccess(source));
     regexToFail.forEach(source => testRegexFailure(source));
-    });
+  });
 });

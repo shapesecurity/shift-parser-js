@@ -1870,10 +1870,7 @@ export class GenericParser extends Tokenizer {
   parseArguments() {
     let args = [];
     let locationFollowingFirstSpread = null;
-    if (this.match(TokenType.RPAREN)) {
-      return { args, locationFollowingFirstSpread };
-    }
-    while (true) {
+    while (!this.match(TokenType.RPAREN)) {
       let arg;
       let startState = this.startNode();
       if (this.eat(TokenType.ELLIPSIS)) {
@@ -1881,7 +1878,7 @@ export class GenericParser extends Tokenizer {
         if (locationFollowingFirstSpread === null) {
           args.push(arg);
           if (this.match(TokenType.RPAREN)) {
-            return { args, locationFollowingFirstSpread };
+            break;
           }
           locationFollowingFirstSpread = this.getLocation();
           this.expect(TokenType.COMMA);
@@ -1892,10 +1889,11 @@ export class GenericParser extends Tokenizer {
       }
       args.push(arg);
       if (this.match(TokenType.RPAREN)) {
-        return { args, locationFollowingFirstSpread };
+        break;
       }
       this.expect(TokenType.COMMA);
     }
+    return { args, locationFollowingFirstSpread };
   }
 
   // 11.2 Left-Hand-Side Expressions;
@@ -1949,6 +1947,14 @@ export class GenericParser extends Tokenizer {
     let params = this.isBindingElement ? [this.targetToBinding(this.transformDestructuringWithDefault(group))] : null;
 
     while (this.eat(TokenType.COMMA)) {
+      if (this.match(TokenType.RPAREN)) {
+        if (!this.isBindingElement) {
+          throw this.createUnexpected(this.lookahead);
+        }
+        this.firstExprError = this.firstExprError || this.createUnexpected(this.lookahead);
+        group = null;
+        break;
+      }
       this.isAssignmentTarget = false;
       if (this.match(TokenType.ELLIPSIS)) {
         if (!this.isBindingElement) {
@@ -2515,16 +2521,14 @@ export class GenericParser extends Tokenizer {
     this.expect(TokenType.LPAREN);
 
     let items = [], rest = null;
-    if (!this.match(TokenType.RPAREN)) {
-      while (!this.eof()) {
-        if (this.eat(TokenType.ELLIPSIS)) {
-          rest = this.parseBindingTarget();
-          break;
-        }
-        items.push(this.parseParam());
-        if (this.match(TokenType.RPAREN)) break;
-        this.expect(TokenType.COMMA);
+    while (!this.match(TokenType.RPAREN)) {
+      if (this.eat(TokenType.ELLIPSIS)) {
+        rest = this.parseBindingTarget();
+        break;
       }
+      items.push(this.parseParam());
+      if (this.match(TokenType.RPAREN)) break;
+      this.expect(TokenType.COMMA);
     }
 
     this.expect(TokenType.RPAREN);

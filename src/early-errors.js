@@ -184,7 +184,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceClassDeclaration(node, { name, super: _super, elements }) {
     let s = name.enforceStrictErrors();
-    let sElements = this.fold(elements);
+    let sElements = this.append(...elements);
     sElements = sElements.enforceStrictErrors();
     if (node.super != null) {
       _super = _super.enforceStrictErrors();
@@ -210,7 +210,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceClassExpression(node, { name, super: _super, elements }) {
     let s = node.name == null ? this.identity : name.enforceStrictErrors();
-    let sElements = this.fold(elements);
+    let sElements = this.append(...elements);
     sElements = sElements.enforceStrictErrors();
     if (node.super != null) {
       _super = _super.enforceStrictErrors();
@@ -668,7 +668,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceSwitchStatement(node, { discriminant, cases }) {
-    let sCases = this.fold(cases);
+    let sCases = this.append(...cases);
     sCases = sCases.functionDeclarationNamesAreLexical();
     sCases = sCases.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     sCases = sCases.enforceConflictingLexicallyDeclaredNames(sCases.varDeclaredNames, DUPLICATE_BINDING);
@@ -679,7 +679,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceSwitchStatementWithDefault(node, { discriminant, preDefaultCases, defaultCase, postDefaultCases }) {
-    let sCases = this.append(defaultCase, this.append(this.fold(preDefaultCases), this.fold(postDefaultCases)));
+    let sCases = this.append(defaultCase, ...preDefaultCases, ...postDefaultCases);
     sCases = sCases.functionDeclarationNamesAreLexical();
     sCases = sCases.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     sCases = sCases.enforceConflictingLexicallyDeclaredNames(sCases.varDeclaredNames, DUPLICATE_BINDING);

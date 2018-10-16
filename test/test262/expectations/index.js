@@ -3,7 +3,6 @@
 const bigintXpass = require('./bigint-tests-without-literals.js');
 const numsepXpass = require('./numeric-seperator-tests-without-literals.js');
 const { xpass: regexpXpass, xfail: regexpXfail } = require('./regexp.js');
-const trailingCommaXfail = require('./trailing-function-commas.js');
 
 module.exports = {
   xfail: {
@@ -77,26 +76,6 @@ module.exports = {
 
       // ES2018 invalid escapes in template literals: https://github.com/tc39/ecma262/pull/773
       'language/expressions/tagged-template/invalid-escape-sequences.js',
-
-      // Test bug, sorta: trailing commas in tests which aren't testing them: https://github.com/tc39/test262/pull/1783
-      'built-ins/Atomics/notify/undefined-index-defaults-to-zero.js',
-      'built-ins/String/prototype/trimEnd/this-value-line-terminator.js',
-      'built-ins/String/prototype/trimEnd/this-value-object-cannot-convert-to-primitive-err.js',
-      'built-ins/String/prototype/trimEnd/this-value-object-toprimitive-meth-priority.js',
-      'built-ins/String/prototype/trimEnd/this-value-object-tostring-meth-priority.js',
-      'built-ins/String/prototype/trimEnd/this-value-object-valueof-meth-priority.js',
-      'built-ins/String/prototype/trimEnd/this-value-whitespace.js',
-      'built-ins/String/prototype/trimStart/this-value-line-terminator.js',
-      'built-ins/String/prototype/trimStart/this-value-object-cannot-convert-to-primitive-err.js',
-      'built-ins/String/prototype/trimStart/this-value-object-toprimitive-meth-priority.js',
-      'built-ins/String/prototype/trimStart/this-value-object-tostring-meth-priority.js',
-      'built-ins/String/prototype/trimStart/this-value-object-valueof-meth-priority.js',
-      'built-ins/String/prototype/trimStart/this-value-whitespace.js',
-      'intl402/Locale/constructor-options-casefirst-valid.js',
-      'intl402/Locale/constructor-options-numeric-valid.js',
-
-
-      ...trailingCommaXfail,
 
       ...regexpXfail,
     ],

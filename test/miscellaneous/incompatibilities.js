@@ -43,7 +43,7 @@ suite('Parser', () => {
   suite('ES6 backward incompatibilities', () => {
     // ES5: allows initializers in for-in head
     // ES6: disallows initializers in for-in and for-of head
-    testParseFailure('for(var x=1 in [1,2,3]) 0', 'Invalid variable declaration in for-in statement');
+    // ES2017: allows initializers only in for-in heads in sloppy mode, and only for var declarations with no destructuring
     testParseFailure('for(let x=1 in [1,2,3]) 0', 'Invalid variable declaration in for-in statement');
     testParseFailure('for(var x=1 of [1,2,3]) 0', 'Invalid variable declaration in for-of statement');
     testParseFailure('for(let x=1 of [1,2,3]) 0', 'Invalid variable declaration in for-of statement');

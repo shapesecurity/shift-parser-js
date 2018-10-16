@@ -61,6 +61,9 @@ export default {
       'aca911e336954a5b.js',
     ],
     fail: [
+      // Invalid test
+      // https://github.com/tc39/test262-parser-tests/issues/21
+      'e3fbcf63d7e43ead.js',
     ],
   },
 };

@@ -60,6 +60,7 @@ suite('Parser', () => {
     // YieldExpression is legal in class expression heritage
     testParse('function* a(){(class extends (yield) {});}', stmt,
       { type: 'FunctionDeclaration',
+        isAsync: false,
         isGenerator: true,
         name: { 'type': 'BindingIdentifier', 'name': 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
@@ -85,6 +86,7 @@ suite('Parser', () => {
     // YieldExpression is legal in class expression body
     testParse('function* a(){(class {[yield](){}})};', stmt,
       { type: 'FunctionDeclaration',
+        isAsync: false,
         isGenerator: true,
         name: { 'type': 'BindingIdentifier', 'name': 'a' },
         params: { type: 'FormalParameters', items: [], rest: null },
@@ -102,6 +104,7 @@ suite('Parser', () => {
                 isStatic: false,
                 method: {
                   type: 'Method',
+                  isAsync: false,
                   isGenerator: false,
                   name: {
                     type: 'ComputedPropertyName',

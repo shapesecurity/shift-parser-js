@@ -24,6 +24,7 @@ suite('Parser', () => {
 
     testParse('(...[]) => 0', expr,
       { type: 'ArrowExpression',
+        isAsync: false,
         params:
         { type: 'FormalParameters',
           items: [],
@@ -35,6 +36,7 @@ suite('Parser', () => {
 
     testParse('(a, ...[]) => 0', expr,
       { type: 'ArrowExpression',
+        isAsync: false,
         params:
         { type: 'FormalParameters',
           items: [{ type: 'BindingIdentifier', name: 'a' }],

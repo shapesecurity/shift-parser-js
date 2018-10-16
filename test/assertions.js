@@ -21,7 +21,13 @@ function getTest262Name(program, isModule) {
 }
 
 function checkPassNotExists(program, isModule) {
-  const name = getTest262Name(program, isModule);
+  let name;
+  try {
+    // TODO: this is guarded until normalize-parser-tests can get updated to 2017
+    name = getTest262Name(program, isModule);
+  } catch (e) {
+    return;
+  }
   if (fs.existsSync(expectationsDir + '/' + name + '.js-tree.json')) {
     throw new Error('Test already exists in shift-parser-tests as ' + name);
   }

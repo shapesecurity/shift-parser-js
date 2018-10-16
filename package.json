@@ -18,15 +18,15 @@
     "coverage": "npm run build -- --plugins=istanbul && nyc --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 npm test",
     "lint": "eslint src test",
     "build": "babel --out-dir dist src",
-    "prepare": "rm -rf dist/* && npm update && npm run build",
+    "prepare": "rm -rf dist/* && npm run build",
     "benchmark": "node benchmark",
     "profile": "node --prof profile.js && node-tick-processor",
     "regenerate-unicode": "node scripts/generate-unicode-data.js > src/unicode.js"
   },
   "dependencies": {
     "multimap": "^1.0.2",
-    "shift-ast": "^4.0.0",
-    "shift-reducer": "^4.4.0"
+    "shift-ast": "^5.0.0",
+    "shift-reducer": "^5.0.0"
   },
   "devDependencies": {
     "acorn": "6.0.1",
@@ -46,8 +46,8 @@
     "normalize-parser-test": "2.0.0",
     "nyc": "13.0.1",
     "regenerate": "^1.4.0",
-    "shift-parser-expectations": "2016.0.1",
-    "shift-spec": "^2016.0.0",
+    "shift-parser-expectations": "^2017.0.0",
+    "shift-spec": "^2017.0.0",
     "test262": "git+https://github.com/tc39/test262.git#a6412918d211bd47157d2815e297d52ff2d21ab2",
     "test262-parser": "^2.0.7",
     "test262-parser-tests": "0.0.3",

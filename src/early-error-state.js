@@ -75,6 +75,8 @@ export class EarlyErrorState {
 
     // YieldExpression and YieldGeneratorExpression nodes; cleared at function boundaries
     this.yieldExpressions = [];
+    // AwaitExpression nodes; cleared at function boundaries
+    this.awaitExpressions = [];
   }
 
 
@@ -323,6 +325,16 @@ export class EarlyErrorState {
     return this;
   }
 
+  observeAwaitExpression(node) {
+    this.awaitExpressions.push(node);
+    return this;
+  }
+
+  clearAwaitExpressions() {
+    this.awaitExpressions = [];
+    return this;
+  }
+
 
   addError(e) {
     this.errors.push(e);
@@ -369,6 +381,7 @@ export class EarlyErrorState {
     [].push.apply(this.superCallExpressionsInConstructorMethod, s.superCallExpressionsInConstructorMethod);
     [].push.apply(this.superPropertyExpressions, s.superPropertyExpressions);
     [].push.apply(this.yieldExpressions, s.yieldExpressions);
+    [].push.apply(this.awaitExpressions, s.awaitExpressions);
     return this;
   }
 

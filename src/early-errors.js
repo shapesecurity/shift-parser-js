@@ -16,6 +16,7 @@
 
 import reduce, { MonoidalReducer } from 'shift-reducer';
 import { isStrictModeReservedWord } from './utils';
+import { ErrorMessages } from './errors';
 
 import { EarlyErrorState, EarlyError } from './early-error-state';
 
@@ -51,7 +52,7 @@ function isSpecialMethod(methodDefinition) {
     case 'Setter':
       return true;
     case 'Method':
-      return methodDefinition.isGenerator;
+      return methodDefinition.isGenerator || methodDefinition.isAsync;
   }
   /* istanbul ignore next */
   throw new Error('not reached');
@@ -112,13 +113,21 @@ export class EarlyErrorChecker extends MonoidalReducer {
     params.yieldExpressions.forEach(n => {
       params = params.addError(new EarlyError(n, 'Arrow parameters must not contain yield expressions'));
     });
+    params.awaitExpressions.forEach(n => {
+      params = params.addError(new EarlyError(n, 'Arrow parameters must not contain await expressions'));
+    });
     let s = super.reduceArrowExpression(node, { params, body });
     if (!isSimpleParameterList && node.body.type === 'FunctionBody' && isStrictFunctionBody(node.body)) {
       s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeVarBoundary();
     return s;
+  }
+
+  reduceAwaitExpression(node, { expression }) {
+    return expression.observeAwaitExpression(node);
   }
 
   reduceBindingIdentifier(node) {
@@ -175,7 +184,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceClassDeclaration(node, { name, super: _super, elements }) {
     let s = name.enforceStrictErrors();
-    let sElements = this.fold(elements);
+    let sElements = this.append(...elements);
     sElements = sElements.enforceStrictErrors();
     if (node.super != null) {
       _super = _super.enforceStrictErrors();
@@ -191,7 +200,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   reduceClassElement(node) {
     let s = super.reduceClassElement(...arguments);
     if (!node.isStatic && isSpecialMethod(node.method)) {
-      s = s.addError(new EarlyError(node, 'Constructors cannot be generators, getters or setters'));
+      s = s.addError(new EarlyError(node, ErrorMessages.ILLEGAL_CONSTRUCTORS));
     }
     if (node.isStatic && node.method.name.type === 'StaticPropertyName' && node.method.name.value === 'prototype') {
       s = s.addError(new EarlyError(node, 'Static class methods cannot be named "prototype"'));
@@ -201,7 +210,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
 
   reduceClassExpression(node, { name, super: _super, elements }) {
     let s = node.name == null ? this.identity : name.enforceStrictErrors();
-    let sElements = this.fold(elements);
+    let sElements = this.append(...elements);
     sElements = sElements.enforceStrictErrors();
     if (node.super != null) {
       _super = _super.enforceStrictErrors();
@@ -343,6 +352,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     s = s.enforceFreeLabeledBreakStatementErrors(UNBOUND_BREAK);
     s = s.clearUsedLabelNames();
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     if (isStrictFunctionBody(node)) {
       s = s.enforceStrictErrors();
     }
@@ -369,6 +379,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
         params = params.addError(new EarlyError(n, 'Generator parameters must not contain yield expressions'));
       });
     }
+    if (node.isAsync) {
+      params.awaitExpressions.forEach(n => {
+        params = params.addError(new EarlyError(n, 'Async function parameters must not contain await expressions'));
+      });
+    }
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
@@ -380,6 +395,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeFunctionDeclaration();
     return s;
   }
@@ -404,6 +420,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
         params = params.addError(new EarlyError(n, 'Generator parameters must not contain yield expressions'));
       });
     }
+    if (node.isAsync) {
+      params.awaitExpressions.forEach(n => {
+        params = params.addError(new EarlyError(n, 'Async function parameters must not contain await expressions'));
+      });
+    }
     params = params.clearNewTargetExpressions();
     body = body.clearNewTargetExpressions();
     if (isStrictFunctionBody(node.body)) {
@@ -416,6 +437,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
     }
     s = s.clearBoundNames();
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -512,6 +534,11 @@ export class EarlyErrorChecker extends MonoidalReducer {
         params = params.addError(new EarlyError(n, 'Generator parameters must not contain yield expressions'));
       });
     }
+    if (node.isAsync) {
+      params.awaitExpressions.forEach(n => {
+        params = params.addError(new EarlyError(n, 'Async function parameters must not contain await expressions'));
+      });
+    }
     body = body.clearSuperPropertyExpressions();
     params = params.clearSuperPropertyExpressions();
     params = params.clearNewTargetExpressions();
@@ -525,6 +552,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
       s = s.addError(new EarlyError(node, 'Functions with non-simple parameter lists may not contain a "use strict" directive'));
     }
     s = s.clearYieldExpressions();
+    s = s.clearAwaitExpressions();
     s = s.observeVarBoundary();
     return s;
   }
@@ -640,7 +668,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceSwitchStatement(node, { discriminant, cases }) {
-    let sCases = this.fold(cases);
+    let sCases = this.append(...cases);
     sCases = sCases.functionDeclarationNamesAreLexical();
     sCases = sCases.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     sCases = sCases.enforceConflictingLexicallyDeclaredNames(sCases.varDeclaredNames, DUPLICATE_BINDING);
@@ -651,7 +679,7 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceSwitchStatementWithDefault(node, { discriminant, preDefaultCases, defaultCase, postDefaultCases }) {
-    let sCases = this.append(defaultCase, this.append(this.fold(preDefaultCases), this.fold(postDefaultCases)));
+    let sCases = this.append(defaultCase, ...preDefaultCases, ...postDefaultCases);
     sCases = sCases.functionDeclarationNamesAreLexical();
     sCases = sCases.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
     sCases = sCases.enforceConflictingLexicallyDeclaredNames(sCases.varDeclaredNames, DUPLICATE_BINDING);

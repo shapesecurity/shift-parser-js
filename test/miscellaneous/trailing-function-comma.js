@@ -163,5 +163,6 @@ suite('trailing function comma', () => {
 
     testParseFailure('({ set a (b,) {} })', 'Unexpected token ","');
     testParseFailure('(a,)', 'Unexpected token ")"');
+    testParseFailure('({a:1},)', 'Unexpected token ")"');
   });
 });

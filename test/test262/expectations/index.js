@@ -64,7 +64,7 @@ module.exports = {
       'built-ins/RegExp/prototype/flags/rethrow.js',
       'built-ins/RegExp/prototype/flags/return-order.js',
 
-      // regexp named backreference is valid in es2016, with different semantics (as long as no unicode flag)
+      // regex acceptor: tests using constructor/eval
       'built-ins/RegExp/named-groups/unicode-malformed.js',
       'built-ins/RegExp/named-groups/string-replace-undefined.js',
       'built-ins/RegExp/named-groups/string-replace-unclosed.js',

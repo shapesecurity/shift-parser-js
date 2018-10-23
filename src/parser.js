@@ -1664,7 +1664,7 @@ export class GenericParser extends Tokenizer {
         let pattern = token.value.slice(1, lastSlash);
         let flags = token.value.slice(lastSlash + 1);
         let ctorArgs = this.parseRegexFlags(flags);
-        if (!acceptRegex(pattern, ctorArgs)) {
+        if (!acceptRegex(pattern, ctorArgs.unicode)) {
           throw this.createError(ErrorMessages.INVALID_REGEX);
         }
         ctorArgs.pattern = pattern;

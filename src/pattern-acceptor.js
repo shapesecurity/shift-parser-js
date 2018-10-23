@@ -29,12 +29,12 @@ const octalDigits = '01234567'.split('');
 
 
 class PatternAcceptorState {
-  constructor(pattern, flags) {
+  constructor(pattern, unicode) {
     this.pattern = pattern;
-    this.flags = flags;
+    this.unicode = unicode;
     this.index = 0;
     this.backreferences = [];
-    this.nParenthesis = 0;
+    this.capturingGroups = 0;
   }
 
   empty() {
@@ -42,8 +42,10 @@ class PatternAcceptorState {
   }
 
   nextCodePoint() {
-    let codePoint = this.pattern.codePointAt(this.index);
-    return isNaN(codePoint) ? false : String.fromCodePoint(codePoint);
+    if (this.empty()) {
+      return false;
+    }
+    return String.fromCodePoint(this.pattern.codePointAt(this.index));
   }
 
   skip(n) {
@@ -69,12 +71,6 @@ class PatternAcceptorState {
     return false;
   }
 
-  expect(str) {
-    if (!this.eat(str)) {
-      throw new Error(`expected token "${str}", but saw "${this.pattern.slice(this.index, this.index + str.length)}" @ index ${this.index}`);
-    }
-  }
-
   match(str) {
     return this.index + str.length <= this.pattern.length && this.pattern.slice(this.index, this.index + str.length) === str;
   }
@@ -88,14 +84,14 @@ class PatternAcceptorState {
     return false;
   }
 
-  collect(...strs) {
+  eatNaturalNumber() {
     let characters = [];
-    masterLoop:
+    outer:
     while (true) {
-      for (let str of strs) {
+      for (let str of decimalDigits) {
         if (this.eat(str)) {
           characters.push(str);
-          continue masterLoop;
+          continue outer;
         }
       }
       break;
@@ -104,174 +100,180 @@ class PatternAcceptorState {
   }
 }
 
-export const acceptRegex = (pattern, flags) => {
-  let state = new PatternAcceptorState(pattern, flags);
+export const acceptRegex = (pattern, unicode) => {
+  let state = new PatternAcceptorState(pattern, unicode);
   let accepted = acceptDisjunction(state);
-  if (accepted) {
-    if (state.flags.unicode) {
-      for (let backreference of state.backreferences) {
-        if (backreference > state.nParenthesis) {
-          return false;
-        }
+  if (accepted.matched && state.unicode) {
+    for (let backreference of state.backreferences) {
+      if (backreference > state.capturingGroups) {
+        return false;
       }
     }
   }
-  return accepted;
+  return accepted.matched;
 };
-
-const nonZeroLogicalOr = (...funcs) => (...args) => {
-  for (let func of funcs) {
-    let value = func(...args);
-    if (value === 0 || value) {
-      return value;
-    }
-  }
-  return false;
-};
-
-const falsyNotZero = value => value !== 0 && !value;
-
 
 const backtrackOnFailure = func => state => {
   let savedIndex = state.index;
-  let val;
-  try {
-    val = func(state);
-  } catch (e) {
-    val = false;
-  }
-  if (!val && val !== 0) {
+  let oldBackreferences = state.backreferences.slice(0);
+  let oldCapturingGroups = state.capturingGroups;
+  let val = func(state);
+  if (!val.matched) {
     state.index = savedIndex;
+    state.backreferences = oldBackreferences;
+    state.capturingGroups = oldCapturingGroups;
   }
   return val;
 };
 
 const acceptUnicodeEscape = backtrackOnFailure(state => {
-  state.expect('u');
-  if (state.flags.unicode && state.eat('{')) {
+  if (!state.eat('u')) {
+    return { matched: false };
+  }
+  if (state.unicode && state.eat('{')) {
     let digits = [];
     while (!state.eat('}')) {
       let digit = state.eatAny(...hexDigits);
       if (digit === false) {
-        return false;
+        return { matched: false };
       }
       digits.push(digit);
     }
     let value = parseInt(digits.join(''), 16);
-    return value > 0x10FFFF ? false : value;
+    return value > 0x10FFFF ? { matched: false } : { matched: true, value };
   }
   let digits = [0, 0, 0, 0].map(() => state.eatAny(...hexDigits));
   if (digits.find(digit => digit === false) === false) {
-    return false;
+    return { matched: false };
   }
   let value = parseInt(digits.join(''), 16);
-  if (state.flags.unicode && value >= 0xD800 && value <= 0xDBFF) {
+  if (state.unicode && value >= 0xD800 && value <= 0xDBFF) {
     let surrogatePairValue = backtrackOnFailure(subState => {
-      subState.expect('\\u');
+      if (!subState.eat('\\u')) {
+        return { matched: false };
+      }
       let digits2 = [0, 0, 0, 0].map(() => subState.eatAny(...hexDigits));
       if (digits2.find(digit => digit === false) === false) {
-        return false;
+        return { matched: false };
       }
       let value2 = parseInt(digits2.join(''), 16);
       if (value2 < 0xDC00 || value2 >= 0xE000) {
-        return false;
+        return { matched: false };
       }
-      return 0x10000 + ((value & 0x03FF) << 10) + (value2 & 0x03FF);
+      return { matched: true, value: 0x10000 + ((value & 0x03FF) << 10) + (value2 & 0x03FF) };
     })(state);
-    if (surrogatePairValue !== false) {
+    if (surrogatePairValue.matched) {
       return surrogatePairValue;
     }
   }
-  return value;
+  return { matched: true, value };
 });
 
 const acceptDisjunction = (state, terminator) => {
   do {
     if (terminator !== void 0 && state.eat(terminator)) {
-      return true;
+      return { matched: true };
     } else if (state.match('|')) {
       continue;
     }
-    if (!acceptAlternative(state, terminator)) {
-      return false;
+    if (!acceptAlternative(state, terminator).matched) {
+      return { matched: false };
     }
   } while (state.eat('|'));
-  if (terminator !== void 0) {
-    state.expect(terminator);
-  }
-  return true;
+  return { matched: terminator === void 0 || !!state.eat(terminator) };
 };
 
 const acceptAlternative = (state, terminator) => {
   while (!state.match('|') && !state.empty() && (terminator === void 0 || !state.match(terminator))) {
-    if (!acceptTerm(state)) {
-      return false;
+    if (!acceptTerm(state).matched) {
+      return { matched: false };
     }
   }
-  return true;
+  return { matched: true };
+};
+
+const orMatched = (...predicates) => state => {
+  for (let predicate of predicates) {
+    let value = predicate(state);
+    if (value.matched) {
+      return value;
+    }
+  }
+  return { matched: false };
 };
 
 const acceptTerm = state => {
   // non-quantified references are rolled into quantified accepts to improve performance significantly.
-  if (state.flags.unicode) {
-    return acceptAssertion(state) ||
-    acceptQuantified(acceptAtom)(state);
+  if (state.unicode) {
+    return orMatched(acceptAssertion, acceptQuantified(acceptAtom))(state);
   }
-  return acceptQuantified(acceptQuantifiableAssertion)(state) ||
-    acceptAssertion(state) ||
-    acceptQuantified(acceptAtom)(state);
-
+  return orMatched(acceptQuantified(acceptQuantifiableAssertion),
+    acceptAssertion,
+    acceptQuantified(acceptAtom))(state);
 };
 
 const acceptLabeledGroup = predicate => backtrackOnFailure(state => {
-  state.expect('(');
+  if (!state.eat('(')) {
+    return { matched: false };
+  }
   if (predicate(state)) {
     return acceptDisjunction(state, ')');
   }
-  return false;
+  return { matched: false };
 });
 
 const acceptQuantifiableAssertion = acceptLabeledGroup(state => !!state.eatAny('?=', '?!'));
 
-const acceptAssertion = state => !!state.eatAny('^', '$', '\\b', '\\B') ||
-  acceptQuantifiableAssertion(state);
+const acceptAssertion = state => {
+  return { matched: !!state.eatAny('^', '$', '\\b', '\\B') || acceptQuantifiableAssertion(state).matched };
+};
 
-const acceptDecimal = state => state.collect(...decimalDigits).length > 0;
+const acceptDecimal = state => {
+  return { matched: state.eatNaturalNumber().length > 0 };
+};
 
 const acceptQuantified = acceptor => backtrackOnFailure(state => {
-  if (!acceptor(state)) {
-    return false;
+  if (!acceptor(state).matched) {
+    return { matched: false };
   }
   if (state.match('{')) {
-    return backtrackOnFailure(subState => {
-      subState.expect('{');
-      let num1 = subState.collect(...decimalDigits);
+    let value = backtrackOnFailure(subState => {
+      if (!subState.eat('{')) {
+        return { matched: false };
+      }
+      let num1 = subState.eatNaturalNumber();
       if (num1.length === 0) {
-        return false;
+        return { matched: false };
       }
       if (subState.eat(',') && subState.matchAny(...decimalDigits)) {
-        let num2 = subState.collect(...decimalDigits);
+        let num2 = subState.eatNaturalNumber();
         if (num2.length === 0 || parseInt(num1) > parseInt(num2)) {
-          return false;
+          return { matched: false };
         }
       }
-      subState.expect('}');
+      if (!subState.eat('}')) {
+        return { matched: false };
+      }
       subState.eat('?');
-      return true;
-    })(state) || !state.flags.unicode;
+      return { matched: true };
+    })(state) || !state.unicode;
+    if (!value.matched) {
+      return { matched: !state.unicode };
+    }
+    return value;
   } else if (state.eatAny('*', '+', '?')) {
     state.eat('?');
   }
-  return true;
+  return { matched: true };
 });
 
 const acceptCharacterExcept = characters => state => {
   let nextCodePoint = state.nextCodePoint();
   if (nextCodePoint === false || characters.indexOf(nextCodePoint) !== -1) {
-    return false;
+    return { matched: false };
   }
   state.skip(nextCodePoint.length);
-  return true;
+  return { matched: true };
 };
 
 const acceptPatternCharacter = acceptCharacterExcept(syntaxCharacters);
@@ -280,209 +282,251 @@ const acceptExtendedPatternCharacter = acceptCharacterExcept(extendedSyntaxChara
 
 const acceptInvalidBracedQuantifier = state => {
   return backtrackOnFailure(subState => {
-    subState.expect('{');
-    if (!acceptDecimal(subState)) {
-      return false;
-    }
-    if (subState.eat(',') && !subState.match('}') && !acceptDecimal(subState)) {
-      return false;
-    }
-    subState.expect('}');
-    return true;
+    return { matched: !!(subState.eat('{') && acceptDecimal(subState).matched && (!subState.eat(',') || subState.match('}') || acceptDecimal(subState).matched) && subState.eat('}')) };
   })(state);
 };
 
 const acceptAtom = state => {
-  if (state.flags.unicode) {
-    return acceptPatternCharacter(state) ||
-    state.eat('.') ||
-    backtrackOnFailure(subState => subState.eat('\\') && !falsyNotZero(acceptAtomEscape(subState)))(state) ||
-    acceptCharacterClass(state) ||
-    acceptLabeledGroup(subState => subState.eat('?:'))(state) ||
-    acceptGrouping(state);
+  if (state.unicode) {
+    return orMatched(acceptPatternCharacter,
+      subState => {
+        return { matched: !!subState.eat('.') };
+      },
+      backtrackOnFailure(subState => subState.eat('\\') ? acceptAtomEscape(subState) : { matched: false }),
+      acceptCharacterClass,
+      acceptLabeledGroup(subState => subState.eat('?:')),
+      acceptGrouping)(state);
   }
-  let matched = state.eat('.') ||
-    backtrackOnFailure(subState => subState.eat('\\') && !falsyNotZero(acceptAtomEscape(subState)))(state) ||
-    acceptCharacterClass(state) ||
-    acceptLabeledGroup(subState => subState.eat('?:'))(state) ||
-    acceptGrouping(state);
-  if (!matched && acceptInvalidBracedQuantifier(state)) {
-    return false;
+  let matched = orMatched(
+    subState => {
+      return { matched: !!subState.eat('.') };
+    },
+    backtrackOnFailure(subState => subState.eat('\\') ? acceptAtomEscape(subState) : { matched: false }),
+    acceptCharacterClass,
+    acceptLabeledGroup(subState => subState.eat('?:')),
+    acceptGrouping)(state);
+  if (!matched.matched && acceptInvalidBracedQuantifier(state).matched) {
+    return { matched: false };
   }
-  return matched || acceptExtendedPatternCharacter(state);
+  return matched.matched ? matched : acceptExtendedPatternCharacter(state);
 
 };
 
 const acceptGrouping = backtrackOnFailure(state => {
-  state.expect('(');
-  if (!acceptDisjunction(state, ')')) {
-    return false;
+  if (!state.eat('(') || !acceptDisjunction(state, ')').matched) {
+    return { matched: false };
   }
-  state.nParenthesis++;
-  return true;
+  state.capturingGroups++;
+  return { matched: true };
 });
 
-const acceptAtomEscape = nonZeroLogicalOr(
-  state => acceptDecimalEscape(state),
-  state => acceptCharacterClassEscape(state),
-  state => acceptCharacterEscape(state)
-);
-
 const acceptDecimalEscape = backtrackOnFailure(state => {
-  let decimals = [];
   let firstDecimal = state.eatAny(...decimalDigits.slice(1));
   if (firstDecimal === false) {
-    return false;
-  }
-  decimals.push(firstDecimal);
-  let digit;
-  while ((digit = state.eatAny(...decimalDigits)) !== false) {
-    decimals.push(digit);
+    return { matched: false };
   }
   // we also accept octal escapes here, but it is impossible to tell if it is a octal escape until all parsing is complete.
   // octal escapes are handled in acceptCharacterEscape for classes
-  state.backreferences.push(parseInt(decimals.join('')));
-  return true;
+  state.backreferences.push(parseInt(firstDecimal + state.eatNaturalNumber()));
+  return { matched: true };
 });
 
-const acceptCharacterClassEscape = state => !!state.eatAny('d', 'D', 's', 'S', 'w', 'W');
+const acceptCharacterClassEscape = state => {
+  return { matched: !!state.eatAny('d', 'D', 's', 'S', 'w', 'W') };
+};
 
-const acceptCharacterEscape = nonZeroLogicalOr(
-  state => controlEscapeCharacterValues[state.eatAny(...controlEscapeCharacters)],
+const acceptCharacterEscape = orMatched(
+  state => {
+    let eaten = state.eatAny(...controlEscapeCharacters);
+    if (!eaten) {
+      return { matched: false };
+    }
+    return { matched: true, value: controlEscapeCharacterValues[eaten] };
+  },
   backtrackOnFailure(state => {
-    state.expect('c');
+    if (!state.eat('c')) {
+      return { matched: false };
+    }
     let character = state.eatAny(...controlCharacters);
     if (character === false) {
-      return false;
+      return { matched: false };
     }
-    return character.codePointAt(0) % 32;
+    return { matched: true, value: character.codePointAt(0) % 32 };
   }),
-  backtrackOnFailure(state => state.eat('0') && !state.eatAny(...decimalDigits) ? 0 : false),
   backtrackOnFailure(state => {
-    state.expect('x');
+    if (!state.eat('0') || state.eatAny(...decimalDigits)) {
+      return { matched: false };
+    }
+    return { matched: true, value: 0 };
+  }),
+  backtrackOnFailure(state => {
+    if (!state.eat('x')) {
+      return { matched: false };
+    }
     let digits = [0, 0].map(() => state.eatAny(...hexDigits));
     if (digits.find(value => value === false) === false) {
-      return false;
+      return { matched: false };
     }
-    return parseInt(digits.join(''), 16);
+    return { matched: true, value: parseInt(digits.join(''), 16) };
   }),
   acceptUnicodeEscape,
   backtrackOnFailure(state => {
-    if (state.flags.unicode) {
-      return false;
+    if (state.unicode) {
+      return { matched: false };
     }
     let octal1 = state.eatAny(...octalDigits);
     if (!octal1) {
-      return false;
+      return { matched: false };
     }
     let octal1Value = parseInt(octal1, 8);
     if (octalDigits.indexOf(state.nextCodePoint()) === -1) {
-      return octal1Value;
+      return { matched: true, value: octal1Value };
     }
     let octal2 = state.eatAny(...octalDigits);
     let octal2Value = parseInt(octal2, 8);
     if (octal1Value < 4) {
       if (octalDigits.indexOf(state.nextCodePoint()) === -1) {
-        return octal1Value << 3 | octal2Value;
+        return { matched: true, value: octal1Value << 3 | octal2Value };
       }
       let octal3 = state.eatAny(...octalDigits);
       let octal3Value = parseInt(octal3, 8);
-      return octal1Value << 6 | octal2Value << 3 | octal3Value;
+      return { matched: true, value: octal1Value << 6 | octal2Value << 3 | octal3Value };
     }
-    return octal1Value << 3 | octal2Value;
+    return { matched: true, value: octal1Value << 3 | octal2Value };
   }),
   backtrackOnFailure(state => {
-    if (!state.flags.unicode) {
-      return false;
+    if (!state.unicode) {
+      return { matched: false };
     }
     let value = state.eatAny(...syntaxCharacters);
     if (!value) {
-      return false;
+      return { matched: false };
     }
-    return value.codePointAt(0);
+    return { matched: true, value: value.codePointAt(0) };
   }),
-  state => state.flags.unicode && state.eat('/') && '/'.charCodeAt(0),
+  state => {
+    if (!state.unicode || !state.eat('/')) {
+      return { matched: false };
+    }
+    return { matched: true, value: '/'.charCodeAt(0) };
+  },
   backtrackOnFailure(state => {
-    if (state.flags.unicode) {
-      return false;
+    if (state.unicode) {
+      return { matched: false };
     }
     let next = state.nextCodePoint();
-    if (next !== false && next !== 'c' && next !== 'k') {
+    if (next !== false && next !== 'c') {
       state.skip(1);
-      return next.codePointAt(0);
+      return { matched: true, value: next.codePointAt(0) };
     }
-    return false;
+    return { matched: false };
   })
 );
 
+const acceptAtomEscape = orMatched(
+  acceptDecimalEscape,
+  acceptCharacterClassEscape,
+  acceptCharacterEscape
+);
+
 const acceptCharacterClass = backtrackOnFailure(state => {
-  state.expect('[');
+  if (!state.eat('[')) {
+    return { matched: false };
+  }
   state.eat('^');
-  const acceptClassEscape = nonZeroLogicalOr(
-    subState => subState.eat('b') && 0x0008, // backspace
-    subState => subState.flags.unicode && subState.eat('-') && '-'.charCodeAt(0),
-    backtrackOnFailure(subState => !subState.flags.unicode && subState.eat('c') && subState.eatAny(...decimalDigits, '_')),
+
+  const acceptClassEscape = orMatched(
+    subState => {
+      return { matched: !!subState.eat('b'), value: 0x0008 };
+    },
+    subState => {
+      return { matched: subState.unicode && !!subState.eat('-'), value: '-'.charCodeAt(0) };
+    },
+    backtrackOnFailure(subState => {
+      if (subState.unicode || !subState.eat('c')) {
+        return { matched: false };
+      }
+      let eaten = subState.eatAny(...decimalDigits, '_');
+      return { matched: !!eaten, value: eaten };
+    }),
     acceptCharacterClassEscape,
     acceptCharacterEscape
   );
-  const isTrueOrZero = value => value || value === 0;
+
   const acceptClassAtomNoDash = localState => {
     if (localState.eat('\\')) {
-      return nonZeroLogicalOr(
+      return orMatched(
         acceptClassEscape,
         backtrackOnFailure(subState => {
           if (subState.match('c')) {
-            return 0x005C; // reverse solidus
+            return { matched: true, value: 0x005C }; // reverse solidus
           }
-          return false;
+          return { matched: false };
         })
       )(localState);
     }
     let nextCodePoint = localState.nextCodePoint();
     if (nextCodePoint === false) {
-      return false;
+      return { matched: false };
     }
     localState.skip(nextCodePoint.length);
-    return nextCodePoint.codePointAt(0);
+    return { matched: true, value: nextCodePoint.codePointAt(0) };
   };
-  const acceptClassAtom = localState => localState.eat('-') && '-'.codePointAt(0) || acceptClassAtomNoDash(localState);
+
+  const acceptClassAtom = localState => {
+    if (localState.eat('-')) {
+      return { matched: true, value: '-'.codePointAt(0) };
+    }
+    return acceptClassAtomNoDash(localState);
+  };
+
   const finishClassRange = (localState, atom) => {
+    const isUnvaluedPassedAtom = subAtom => {
+      return subAtom.value === void 0 && subAtom.matched;
+    };
     if (localState.eat('-')) {
       if (localState.match(']')) {
-        return true;
+        return { matched: true };
       }
       let otherAtom = acceptClassAtom(localState);
-      if (localState.flags.unicode && (atom === true || otherAtom === true)) {
-        throw new Error('class in range is illegal');
-      } else if (!(!localState.flags.unicode && (atom === true || otherAtom === true)) && atom > otherAtom) {
-        throw new Error('out of order');
+      if (!otherAtom.matched) {
+        return { matched: false };
+      }
+      if (localState.unicode && (isUnvaluedPassedAtom(atom) || isUnvaluedPassedAtom(otherAtom))) {
+        return { matched: false };
+      } else if (!(!localState.unicode && (isUnvaluedPassedAtom(atom) || isUnvaluedPassedAtom(otherAtom))) && atom.value > otherAtom.value) {
+        return { matched: false };
       } else if (localState.match(']')) {
-        return true;
-      } else {
-        return acceptNonEmptyClassRanges(localState);
+        return { matched: true };
       }
-    } else {
-      if (localState.match(']')) {
-        return true;
-      }
-      return acceptNonEmptyClassRangesNoDash(localState);
+      return acceptNonEmptyClassRanges(localState);
 
     }
+    if (localState.match(']')) {
+      return { matched: true };
+    }
+    return acceptNonEmptyClassRangesNoDash(localState);
+
   };
+
   const acceptNonEmptyClassRanges = localState => {
     let atom = acceptClassAtom(localState);
-    return isTrueOrZero(atom) && finishClassRange(localState, atom);
+    return atom.matched ? finishClassRange(localState, atom) : { matched: false };
   };
+
   const acceptNonEmptyClassRangesNoDash = localState => {
     let atom = acceptClassAtomNoDash(localState);
-    return isTrueOrZero(atom) && finishClassRange(localState, atom);
+    return atom.matched ? finishClassRange(localState, atom) : { matched: false };
   };
+
   if (state.eat(']')) {
-    return true;
+    return { matched: true };
   }
+
   let value = acceptNonEmptyClassRanges(state);
-  if (value) {
-    state.expect(']');
+  if (value.matched && !state.eat(']')) {
+    return { matched: false };
   }
+
   return value;
 });

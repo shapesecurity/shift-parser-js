@@ -165,6 +165,7 @@ suite('Parser', () => {
       '/[\\15]/',
       '/[\\153]/',
       '/[\\72]/',
+      '/\\k/',
     ];
     const regexToFail = [
       '/(?<=t|v|X|.|$||)/',
@@ -210,6 +211,7 @@ suite('Parser', () => {
       '/\\uZZ/u',
       '/\\u{ZZ}/u',
       '/5{5,1G}/u',
+      '/\\k/u',
     ];
     regexToPass.forEach(source => testRegexSuccess(source));
     regexToFail.forEach(source => testRegexFailure(source));

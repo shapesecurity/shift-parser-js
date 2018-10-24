@@ -43,7 +43,7 @@ class PatternAcceptorState {
 
   nextCodePoint() {
     if (this.empty()) {
-      return false;
+      return null;
     }
     return String.fromCodePoint(this.pattern.codePointAt(this.index));
   }
@@ -68,7 +68,7 @@ class PatternAcceptorState {
         return str;
       }
     }
-    return false;
+    return null;
   }
 
   match(str) {
@@ -96,7 +96,7 @@ class PatternAcceptorState {
       }
       break;
     }
-    return characters.join('');
+    return characters.length == 0 ? null : characters.join('');
   }
 }
 
@@ -134,7 +134,7 @@ const acceptUnicodeEscape = backtrackOnFailure(state => {
     let digits = [];
     while (!state.eat('}')) {
       let digit = state.eatAny(...hexDigits);
-      if (digit === false) {
+      if (digit === null) {
         return { matched: false };
       }
       digits.push(digit);
@@ -143,7 +143,7 @@ const acceptUnicodeEscape = backtrackOnFailure(state => {
     return value > 0x10FFFF ? { matched: false } : { matched: true, value };
   }
   let digits = [0, 0, 0, 0].map(() => state.eatAny(...hexDigits));
-  if (digits.find(digit => digit === false) === false) {
+  if (digits.some(digit => digit === null)) {
     return { matched: false };
   }
   let value = parseInt(digits.join(''), 16);
@@ -153,7 +153,7 @@ const acceptUnicodeEscape = backtrackOnFailure(state => {
         return { matched: false };
       }
       let digits2 = [0, 0, 0, 0].map(() => subState.eatAny(...hexDigits));
-      if (digits2.find(digit => digit === false) === false) {
+      if (digits2.some(digit => digit === null)) {
         return { matched: false };
       }
       let value2 = parseInt(digits2.join(''), 16);
@@ -229,7 +229,7 @@ const acceptAssertion = state => {
 };
 
 const acceptDecimal = state => {
-  return { matched: state.eatNaturalNumber().length > 0 };
+  return { matched: state.eatNaturalNumber() !== null };
 };
 
 const acceptQuantified = acceptor => backtrackOnFailure(state => {
@@ -242,12 +242,12 @@ const acceptQuantified = acceptor => backtrackOnFailure(state => {
         return { matched: false };
       }
       let num1 = subState.eatNaturalNumber();
-      if (num1.length === 0) {
+      if (num1 === null) {
         return { matched: false };
       }
       if (subState.eat(',') && subState.matchAny(...decimalDigits)) {
         let num2 = subState.eatNaturalNumber();
-        if (num2.length === 0 || parseInt(num1) > parseInt(num2)) {
+        if (num2 === null || parseInt(num1) > parseInt(num2)) {
           return { matched: false };
         }
       }
@@ -269,7 +269,7 @@ const acceptQuantified = acceptor => backtrackOnFailure(state => {
 
 const acceptCharacterExcept = characters => state => {
   let nextCodePoint = state.nextCodePoint();
-  if (nextCodePoint === false || characters.indexOf(nextCodePoint) !== -1) {
+  if (nextCodePoint === null || characters.indexOf(nextCodePoint) !== -1) {
     return { matched: false };
   }
   state.skip(nextCodePoint.length);
@@ -322,12 +322,12 @@ const acceptGrouping = backtrackOnFailure(state => {
 
 const acceptDecimalEscape = backtrackOnFailure(state => {
   let firstDecimal = state.eatAny(...decimalDigits.slice(1));
-  if (firstDecimal === false) {
+  if (firstDecimal === null) {
     return { matched: false };
   }
   // we also accept octal escapes here, but it is impossible to tell if it is a octal escape until all parsing is complete.
   // octal escapes are handled in acceptCharacterEscape for classes
-  state.backreferences.push(parseInt(firstDecimal + state.eatNaturalNumber()));
+  state.backreferences.push(parseInt(firstDecimal + (state.eatNaturalNumber() || '')));
   return { matched: true };
 });
 
@@ -338,7 +338,7 @@ const acceptCharacterClassEscape = state => {
 const acceptCharacterEscape = orMatched(
   state => {
     let eaten = state.eatAny(...controlEscapeCharacters);
-    if (!eaten) {
+    if (eaten === null) {
       return { matched: false };
     }
     return { matched: true, value: controlEscapeCharacterValues[eaten] };
@@ -348,7 +348,7 @@ const acceptCharacterEscape = orMatched(
       return { matched: false };
     }
     let character = state.eatAny(...controlCharacters);
-    if (character === false) {
+    if (character === null) {
       return { matched: false };
     }
     return { matched: true, value: character.codePointAt(0) % 32 };
@@ -364,7 +364,7 @@ const acceptCharacterEscape = orMatched(
       return { matched: false };
     }
     let digits = [0, 0].map(() => state.eatAny(...hexDigits));
-    if (digits.find(value => value === false) === false) {
+    if (digits.some(value => value === null)) {
       return { matched: false };
     }
     return { matched: true, value: parseInt(digits.join(''), 16) };
@@ -375,7 +375,7 @@ const acceptCharacterEscape = orMatched(
       return { matched: false };
     }
     let octal1 = state.eatAny(...octalDigits);
-    if (!octal1) {
+    if (octal1 === null) {
       return { matched: false };
     }
     let octal1Value = parseInt(octal1, 8);
@@ -399,7 +399,7 @@ const acceptCharacterEscape = orMatched(
       return { matched: false };
     }
     let value = state.eatAny(...syntaxCharacters);
-    if (!value) {
+    if (value === null) {
       return { matched: false };
     }
     return { matched: true, value: value.codePointAt(0) };
@@ -415,7 +415,7 @@ const acceptCharacterEscape = orMatched(
       return { matched: false };
     }
     let next = state.nextCodePoint();
-    if (next !== false && next !== 'c') {
+    if (next !== null && next !== 'c') {
       state.skip(1);
       return { matched: true, value: next.codePointAt(0) };
     }
@@ -466,7 +466,7 @@ const acceptCharacterClass = backtrackOnFailure(state => {
       )(localState);
     }
     let nextCodePoint = localState.nextCodePoint();
-    if (nextCodePoint === false) {
+    if (nextCodePoint === null) {
       return { matched: false };
     }
     localState.skip(nextCodePoint.length);

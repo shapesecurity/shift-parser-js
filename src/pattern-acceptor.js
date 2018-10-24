@@ -238,9 +238,7 @@ const acceptQuantified = acceptor => backtrackOnFailure(state => {
   }
   if (state.match('{')) {
     let value = backtrackOnFailure(subState => {
-      if (!subState.eat('{')) {
-        return { matched: false };
-      }
+      subState.eat('{');
       let num1 = subState.eatNaturalNumber();
       if (num1 === null) {
         return { matched: false };
@@ -256,7 +254,7 @@ const acceptQuantified = acceptor => backtrackOnFailure(state => {
       }
       subState.eat('?');
       return { matched: true };
-    })(state) || !state.unicode;
+    })(state);
     if (!value.matched) {
       return { matched: !state.unicode };
     }
@@ -524,8 +522,8 @@ const acceptCharacterClass = backtrackOnFailure(state => {
   }
 
   let value = acceptNonEmptyClassRanges(state);
-  if (value.matched && !state.eat(']')) {
-    return { matched: false };
+  if (value.matched) {
+    state.eat(']'); // cannot fail, as above will not return matched if it is not seen in advance
   }
 
   return value;

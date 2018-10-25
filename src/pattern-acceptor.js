@@ -96,7 +96,7 @@ class PatternAcceptorState {
       }
       break;
     }
-    return characters.length == 0 ? null : characters.join('');
+    return characters.length === 0 ? null : characters.join('');
   }
 }
 

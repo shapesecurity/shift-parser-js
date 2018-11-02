@@ -192,8 +192,8 @@ const acceptAlternative = (state, terminator) => {
   return { matched: true };
 };
 
-const orMatched = (...predicates) => state => {
-  for (let predicate of predicates) {
+const anyOf = (...acceptors) => state => {
+  for (let predicate of acceptors) {
     let value = predicate(state);
     if (value.matched) {
       return value;
@@ -205,9 +205,9 @@ const orMatched = (...predicates) => state => {
 const acceptTerm = state => {
   // non-quantified references are rolled into quantified accepts to improve performance significantly.
   if (state.unicode) {
-    return orMatched(acceptAssertion, acceptQuantified(acceptAtom))(state);
+    return anyOf(acceptAssertion, acceptQuantified(acceptAtom))(state);
   }
-  return orMatched(acceptQuantified(acceptQuantifiableAssertion),
+  return anyOf(acceptQuantified(acceptQuantifiableAssertion),
     acceptAssertion,
     acceptQuantified(acceptAtom))(state);
 };
@@ -286,19 +286,15 @@ const acceptInvalidBracedQuantifier = state => {
 
 const acceptAtom = state => {
   if (state.unicode) {
-    return orMatched(acceptPatternCharacter,
-      subState => {
-        return { matched: !!subState.eat('.') };
-      },
+    return anyOf(acceptPatternCharacter,
+      subState => ({ matched: !!subState.eat('.') }),
       backtrackOnFailure(subState => subState.eat('\\') ? acceptAtomEscape(subState) : { matched: false }),
       acceptCharacterClass,
       acceptLabeledGroup(subState => subState.eat('?:')),
       acceptGrouping)(state);
   }
-  let matched = orMatched(
-    subState => {
-      return { matched: !!subState.eat('.') };
-    },
+  let matched = anyOf(
+    subState => ({ matched: !!subState.eat('.') }),
     backtrackOnFailure(subState => subState.eat('\\') ? acceptAtomEscape(subState) : { matched: false }),
     acceptCharacterClass,
     acceptLabeledGroup(subState => subState.eat('?:')),
@@ -333,7 +329,7 @@ const acceptCharacterClassEscape = state => {
   return { matched: !!state.eatAny('d', 'D', 's', 'S', 'w', 'W') };
 };
 
-const acceptCharacterEscape = orMatched(
+const acceptCharacterEscape = anyOf(
   state => {
     let eaten = state.eatAny(...controlEscapeCharacters);
     if (eaten === null) {
@@ -421,7 +417,7 @@ const acceptCharacterEscape = orMatched(
   })
 );
 
-const acceptAtomEscape = orMatched(
+const acceptAtomEscape = anyOf(
   acceptDecimalEscape,
   acceptCharacterClassEscape,
   acceptCharacterEscape
@@ -433,7 +429,7 @@ const acceptCharacterClass = backtrackOnFailure(state => {
   }
   state.eat('^');
 
-  const acceptClassEscape = orMatched(
+  const acceptClassEscape = anyOf(
     subState => {
       return { matched: !!subState.eat('b'), value: 0x0008 };
     },
@@ -453,7 +449,7 @@ const acceptCharacterClass = backtrackOnFailure(state => {
 
   const acceptClassAtomNoDash = localState => {
     if (localState.eat('\\')) {
-      return orMatched(
+      return anyOf(
         acceptClassEscape,
         backtrackOnFailure(subState => {
           if (subState.match('c')) {

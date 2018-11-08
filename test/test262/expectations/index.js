@@ -76,11 +76,6 @@ module.exports = {
       ...numsepXpass,
     ],
     files: [
-      // feature misclassification (missing async iteration flag): https://github.com/tc39/test262/pull/1942
-      'built-ins/Function/prototype/toString/proxy-async-generator-function.js',
-      'built-ins/Function/prototype/toString/proxy-async-generator-method-definition.js',
-      'language/expressions/await/async-generator-interleaved.js',
-
       // functions with reserved names whose bodies are strict: https://github.com/tc39/ecma262/pull/1158
       'language/expressions/function/name-arguments-strict-body.js',
       'language/expressions/function/name-eval-strict-body.js',

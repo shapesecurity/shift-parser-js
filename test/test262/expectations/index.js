@@ -24,6 +24,8 @@ module.exports = {
       'json-superset',
       'export-star-as-namespace-from-module',
       'optional-catch-binding',
+      'dynamic-import',
+      'import.meta',
     ],
     xpassDespiteFeatures: [
       // json-superset: tests using eval
@@ -46,6 +48,7 @@ module.exports = {
       // regexp-dotall: tests using constructor, or checking properties of functions
       'annexB/built-ins/RegExp/prototype/flags/order-after-compile.js',
       'built-ins/RegExp/duplicate-flags.js',
+      'built-ins/RegExp/prototype/dotAll/cross-realm.js',
       'built-ins/RegExp/prototype/dotAll/length.js',
       'built-ins/RegExp/prototype/dotAll/name.js',
       'built-ins/RegExp/prototype/dotAll/prop-desc.js',
@@ -57,6 +60,15 @@ module.exports = {
       'built-ins/RegExp/prototype/flags/rethrow.js',
       'built-ins/RegExp/prototype/flags/return-order.js',
 
+      // dynamic-import: tests using eval
+      'language/expressions/dynamic-import/usage-from-eval.js',
+
+      // import.meta: tests using eval or equivalent
+      'language/expressions/import.meta/not-accessible-from-direct-eval.js',
+      'language/expressions/import.meta/syntax/goal-async-function-params-or-body.js',
+      'language/expressions/import.meta/syntax/goal-function-params-or-body.js',
+      'language/expressions/import.meta/syntax/goal-generator-params-or-body.js',
+
       ...bigintXpass,
 
       ...regexpXpass,
@@ -64,10 +76,6 @@ module.exports = {
       ...numsepXpass,
     ],
     files: [
-      // feature misclassification (missing async iteration flag): TODO report
-      'built-ins/Function/prototype/toString/proxy-async-generator-function.js',
-      'built-ins/Function/prototype/toString/proxy-async-generator-method-definition.js',
-
       // functions with reserved names whose bodies are strict: https://github.com/tc39/ecma262/pull/1158
       'language/expressions/function/name-arguments-strict-body.js',
       'language/expressions/function/name-eval-strict-body.js',

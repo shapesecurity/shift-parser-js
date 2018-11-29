@@ -33,6 +33,7 @@ export const ErrorMessages = {
   NEWLINE_AFTER_THROW: 'Illegal newline after throw',
   UNTERMINATED_REGEXP: 'Invalid regular expression: missing /',
   INVALID_REGEXP_FLAGS: 'Invalid regular expression flags',
+  INVALID_REGEX: 'Invalid regular expression',
   INVALID_LHS_IN_ASSIGNMENT: 'Invalid left-hand side in assignment',
   INVALID_LHS_IN_BINDING: 'Invalid left-hand side in binding', // todo collapse messages?
   INVALID_LHS_IN_FOR_IN: 'Invalid left-hand side in for-in',

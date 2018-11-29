@@ -4,6 +4,13 @@ export default {
       // Invalid tests
       // https://github.com/tc39/test262-parser-tests/issues/19
       '3dbb6e166b14a6c0.js',
+
+      // Invalid tests
+      // https://github.com/tc39/test262-parser-tests/issues/20
+      '66e383bfd18e66ab.js',
+      '78c215fabdf13bae.js',
+      'bf49ec8d96884562.js',
+      'e4a43066905a597b.js',
     ],
     early: [
       // Early Errors which our AST format can't represent

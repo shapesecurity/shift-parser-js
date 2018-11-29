@@ -2,7 +2,6 @@
 
 const bigintXpass = require('./bigint-tests-without-literals.js');
 const numsepXpass = require('./numeric-seperator-tests-without-literals.js');
-const { xpass: regexpXpass, xfail: regexpXfail } = require('./regexp.js');
 
 module.exports = {
   xfail: {
@@ -11,7 +10,6 @@ module.exports = {
       'async-iteration',
       'BigInt',
       'regexp-dotall',
-      'regexp-unicode-property-escapes',
       'class-fields-public',
       'class-fields-private',
       'class-static-fields-public',
@@ -26,6 +24,9 @@ module.exports = {
       'optional-catch-binding',
       'dynamic-import',
       'import.meta',
+      'regexp-unicode-property-escapes',
+      'regexp-named-groups',
+      'regexp-lookbehind',
     ],
     xpassDespiteFeatures: [
       // json-superset: tests using eval
@@ -69,11 +70,25 @@ module.exports = {
       'language/expressions/import.meta/syntax/goal-function-params-or-body.js',
       'language/expressions/import.meta/syntax/goal-generator-params-or-body.js',
 
+      // regex acceptor: tests using constructor/eval
+      'built-ins/RegExp/named-groups/string-replace-undefined.js',
+      'built-ins/RegExp/named-groups/string-replace-unclosed.js',
+      'built-ins/RegExp/named-groups/string-replace-numbered.js',
+      'built-ins/RegExp/named-groups/string-replace-nocaptures.js',
+      'built-ins/RegExp/named-groups/string-replace-missing.js',
+      'built-ins/RegExp/named-groups/string-replace-get.js',
+      'built-ins/RegExp/named-groups/string-replace-escaped.js',
+      'built-ins/RegExp/named-groups/groups-object-undefined.js',
+      'built-ins/RegExp/named-groups/groups-object-subclass.js',
+      'built-ins/RegExp/named-groups/groups-object-subclass-sans.js',
+      'built-ins/RegExp/named-groups/functional-replace-non-global.js',
+      'built-ins/RegExp/named-groups/functional-replace-global.js',
+      'language/literals/regexp/named-groups/invalid-lone-surrogate-groupname.js',
+
       ...bigintXpass,
 
-      ...regexpXpass,
-
       ...numsepXpass,
+      
     ],
     files: [
       // functions with reserved names whose bodies are strict: https://github.com/tc39/ecma262/pull/1158
@@ -85,7 +100,10 @@ module.exports = {
       // ES2018 invalid escapes in template literals: https://github.com/tc39/ecma262/pull/773
       'language/expressions/tagged-template/invalid-escape-sequences.js',
 
-      ...regexpXfail,
+      'annexB/language/literals/regexp/class-escape.js', // /\c0/ is invalid in es2016
+
+      'language/literals/regexp/u-astral.js', // bug: shift-regexp-acceptor #5
+
     ],
   },
 };

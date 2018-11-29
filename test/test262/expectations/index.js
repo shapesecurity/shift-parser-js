@@ -88,7 +88,7 @@ module.exports = {
       ...bigintXpass,
 
       ...numsepXpass,
-      
+
     ],
     files: [
       // functions with reserved names whose bodies are strict: https://github.com/tc39/ecma262/pull/1158

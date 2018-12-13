@@ -100,10 +100,6 @@ module.exports = {
       // ES2018 invalid escapes in template literals: https://github.com/tc39/ecma262/pull/773
       'language/expressions/tagged-template/invalid-escape-sequences.js',
 
-      'annexB/language/literals/regexp/class-escape.js', // bug: shift-regexp-acceptor #10
-
-      'language/literals/regexp/u-astral.js', // bug: shift-regexp-acceptor #5
-
     ],
   },
 };

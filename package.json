@@ -27,7 +27,7 @@
     "multimap": "^1.0.2",
     "shift-ast": "^5.0.0",
     "shift-reducer": "^5.0.0",
-    "shift-regexp-acceptor": "^1.0.0"
+    "shift-regexp-acceptor": "^1.0.1"
   },
   "devDependencies": {
     "acorn": "6.0.1",

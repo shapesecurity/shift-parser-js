@@ -69,48 +69,72 @@ exports.testParseSuccess = function testParseSuccess(program) {
   });
 };
 
-exports.testParseFailure = function testParseFailure(source, ...message) {
+exports.testParseFailure = function testParseFailure(source, message, ...params) {
   test('Expect failure in Script: ' + source, () => {
     try {
       parseScript(source, { earlyErrors: false });
     } catch (e) {
-      expect(e.description.equals(...message)).to.be(true);
+      let finalMessage;
+      if (typeof message === 'function') {
+        finalMessage = message(...params);
+      } else {
+        finalMessage = message;
+      }
+      expect(e.description).to.be(finalMessage);
       return;
     }
     throw new Error('Expecting error in Script: ' + source);
   });
 };
 
-exports.testParseModuleFailure = function testParseModuleFailure(source, ...message) {
+exports.testParseModuleFailure = function testParseModuleFailure(source, message, ...params) {
   test('Expect failure in Module: ' + source, () => {
     try {
       parseModule(source, { earlyErrors: false });
     } catch (e) {
-      expect(e.description.equals(...message)).to.be(true);
+      let finalMessage;
+      if (typeof message === 'function') {
+        finalMessage = message(...params);
+      } else {
+        finalMessage = message;
+      }
+      expect(e.description).to.be(finalMessage);
       return;
     }
     throw new Error('Expecting error in Module: ' + source);
   });
 };
 
-exports.testEarlyError = function testParseFailure(source, ...message) {
+exports.testEarlyError = function testParseFailure(source, message, ...params) {
   test('Expect failure in Script: ' + source, () => {
     let parser = new Parser(source);
     let ast = parser.parseScript();
     let errors = EarlyErrorChecker.check(ast);
     expect(errors.length).to.be(1);
-    expect(errors[0].message.equals(...message)).to.be.ok();
+    let finalMessage;
+    if (typeof message === 'function') {
+      finalMessage = message(...params);
+    } else {
+      finalMessage = message;
+    }
+    expect(errors[0].message).to.be(finalMessage);
     return ast;
   });
 };
 
-exports.testModuleEarlyError = function testParseFailure(source, ...message) {
+exports.testModuleEarlyError = function testParseFailure(source, message, ...params) {
   test('Expect failure in Script: ' + source, () => {
     let parser = new Parser(source);
     let ast = parser.parseModule();
     let errors = EarlyErrorChecker.check(ast);
     expect(errors.length).to.be(1);
-    expect(errors[0].message.equals(...message)).to.be.ok();
+    let finalMessage;
+    if (typeof message === 'function') {
+      finalMessage = message(...params);
+    } else {
+      finalMessage = message;
+    }
+    expect(errors[0].message).to.be(finalMessage);
     return ast;
   });
 };

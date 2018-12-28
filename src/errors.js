@@ -90,6 +90,9 @@ export const ErrorMessages = {
   ILLEGAL_YIELD_EXPRESSIONS(paramType) {
     return `${paramType} parameters must not contain yield expressions`;
   },
+  ILLEGAL_AWAIT_EXPRESSIONS(paramType) {
+    return `${paramType} parameters must not contain await expressions`;
+  },
   ILLEGAL_YIELD_IDENTIFIER: '"yield" may not be used as an identifier in this context',
   ILLEGAL_AWAIT_IDENTIFIER: '"await" may not be used as an identifier in this context',
   DUPLICATE_CONSTRUCTOR: 'Duplicate constructor method in class',

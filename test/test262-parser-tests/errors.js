@@ -45,7 +45,12 @@ suite('test262-parser-tests', () => {
         let passSrc = fs.readFileSync(passTestFile, 'utf8');
         let passTree, passLocations, passComments;
         expect(() => {
-          ({ tree: passTree, locations: passLocations, comments: passComments } = parse(passSrc, isModule(f), true));
+          try {
+            ({ tree: passTree, locations: passLocations, comments: passComments } = parse(passSrc, isModule(f), true));
+          } catch (e) {
+            console.log(e);
+            throw e;
+          }
         }).to.not.throwError();
         locationSanityCheck(passTree, passLocations);
 

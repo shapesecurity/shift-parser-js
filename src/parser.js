@@ -1450,6 +1450,7 @@ export class GenericParser extends Tokenizer {
 
     let startState = this.startNode();
     if (this.allowAwaitExpression && this.eat(TokenType.AWAIT)) {
+      this.isBindingElement = this.isAssignmentTarget = false;
       let expression = this.isolateCoverGrammar(this.parseUnaryExpression);
       return this.finishNode(new AST.AwaitExpression({ expression }), startState);
     }

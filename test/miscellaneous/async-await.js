@@ -670,6 +670,35 @@ suite('async', () => {
     );
   });
 
+  testParse('(async function() { (await y); })', expr,
+    {
+      type: 'FunctionExpression',
+      name: null,
+      isAsync: true,
+      isGenerator: false,
+      params: {
+        type: 'FormalParameters',
+        rest: null,
+        items: [],
+      },
+      body: {
+        type: 'FunctionBody',
+        directives: [],
+        statements: [
+          {
+            type: 'ExpressionStatement',
+            expression: {
+              type: 'AwaitExpression',
+              expression: {
+                type: 'IdentifierExpression',
+                name: 'y',
+              },
+            },
+          },
+        ],
+      },
+    });
+
   suite('failures', () => {
     testParseFailure('async (a, ...b, ...c) => {}', 'Unexpected token ","');
     testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');

@@ -17,24 +17,25 @@
 let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
+let ErrorMessages = require('../../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('object binding', () => {
     suite('assignment', () => {
 
 
-      testParseFailure('({a = 0});', 'Illegal property initializer');
-      testParseFailure('({a} += 0);', 'Invalid left-hand side in assignment');
-      testParseFailure('({a,,} = 0)', 'Unexpected token ","');
-      testParseFailure('({,a,} = 0)', 'Unexpected token ","');
-      testParseFailure('({a,,a} = 0)', 'Unexpected token ","');
-      testParseFailure('({function} = 0)', 'Unexpected token "function"');
-      testParseFailure('({a:function} = 0)', 'Unexpected token "}"');
-      testParseFailure('({a:for} = 0)', 'Unexpected token "for"');
-      testParseFailure('({\'a\'} = 0)', 'Unexpected token "}"');
-      testParseFailure('({var} = 0)', 'Unexpected token "var"');
-      testParseFailure('({a.b} = 0)', 'Unexpected token "."');
-      testParseFailure('({0} = 0)', 'Unexpected token "}"');
+      testParseFailure('({a = 0});', ErrorMessages.ILLEGAL_PROPERTY);
+      testParseFailure('({a} += 0);', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('({a,,} = 0)', ErrorMessages.UNEXPECTED_TOKEN, ',');
+      testParseFailure('({,a,} = 0)', ErrorMessages.UNEXPECTED_TOKEN, ',');
+      testParseFailure('({a,,a} = 0)', ErrorMessages.UNEXPECTED_TOKEN, ',');
+      testParseFailure('({function} = 0)', ErrorMessages.UNEXPECTED_TOKEN, 'function');
+      testParseFailure('({a:function} = 0)', ErrorMessages.UNEXPECTED_TOKEN, '}');
+      testParseFailure('({a:for} = 0)', ErrorMessages.UNEXPECTED_TOKEN, 'for');
+      testParseFailure('({\'a\'} = 0)', ErrorMessages.UNEXPECTED_TOKEN, '}');
+      testParseFailure('({var} = 0)', ErrorMessages.UNEXPECTED_TOKEN, 'var');
+      testParseFailure('({a.b} = 0)', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('({0} = 0)', ErrorMessages.UNEXPECTED_TOKEN, '}');
     });
   });
 });

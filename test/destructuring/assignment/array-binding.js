@@ -17,6 +17,7 @@
 let expr = require('../../helpers').expr;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
+let ErrorMessages = require('../../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('array binding', () => {
@@ -69,23 +70,23 @@ suite('Parser', () => {
       });
 
 
-      testParseFailure('[x] += 0', 'Invalid left-hand side in assignment');
-      testParseFailure('[, x, ...y,] = 0', 'Invalid left-hand side in assignment');
-      testParseFailure('[...x, ...y] = 0', 'Invalid left-hand side in assignment');
-      testParseFailure('[...x, y] = 0', 'Invalid left-hand side in assignment');
-      testParseFailure('[...x,,] = 0', 'Invalid left-hand side in assignment');
-      testParseFailure('[0,{a=0}] = 0', 'Illegal property initializer');
-      testParseFailure('[{a=0},{b=0},0] = 0', 'Illegal property initializer');
-      testParseFailure('[{a=0},...0]', 'Illegal property initializer');
-      testParseFailure('[...0,a]=0', 'Invalid left-hand side in assignment');
-      testParseFailure('[...0,{a=0}]=0', 'Illegal property initializer');
-      testParseFailure('[...0,...{a=0}]=0', 'Illegal property initializer');
-      testParseFailure('[...{a=0},]', 'Unexpected comma after rest');
-      testParseFailure('[...{a=0},]=0', 'Unexpected comma after rest');
-      testParseFailure('[0] = 0', 'Invalid left-hand side in assignment');
-      testParseFailure('[a, ...b, {c=0}]', 'Illegal property initializer');
-      testParseFailure('{a = [...b, c]} = 0', 'Unexpected token "="');
-      testParseFailure('[a, ...(b = c)] = 0', 'Invalid left-hand side in assignment');
+      testParseFailure('[x] += 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('[, x, ...y,] = 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('[...x, ...y] = 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('[...x, y] = 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('[...x,,] = 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('[0,{a=0}] = 0', ErrorMessages.ILLEGAL_PROPERTY);
+      testParseFailure('[{a=0},{b=0},0] = 0', ErrorMessages.ILLEGAL_PROPERTY);
+      testParseFailure('[{a=0},...0]', ErrorMessages.ILLEGAL_PROPERTY);
+      testParseFailure('[...0,a]=0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('[...0,{a=0}]=0', ErrorMessages.ILLEGAL_PROPERTY);
+      testParseFailure('[...0,...{a=0}]=0', ErrorMessages.ILLEGAL_PROPERTY);
+      testParseFailure('[...{a=0},]', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+      testParseFailure('[...{a=0},]=0', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+      testParseFailure('[0] = 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
+      testParseFailure('[a, ...b, {c=0}]', ErrorMessages.ILLEGAL_PROPERTY);
+      testParseFailure('{a = [...b, c]} = 0', ErrorMessages.UNEXPECTED_TOKEN, '=');
+      testParseFailure('[a, ...(b = c)] = 0', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
     });
   });
 });

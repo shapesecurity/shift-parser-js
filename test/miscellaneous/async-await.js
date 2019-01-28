@@ -18,6 +18,7 @@ let testParse = require('../assertions').testParse;
 let testParseModule = require('../assertions').testParseModule;
 let { stmt, expr } = require('../helpers');
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -477,7 +478,7 @@ suite('async', () => {
       }
     );
 
-    testParseFailure('await 0', 'Unexpected number');
+    testParseFailure('await 0', ErrorMessages.UNEXPECTED_NUMBER);
   });
 
 
@@ -700,29 +701,29 @@ suite('async', () => {
     });
 
   suite('failures', () => {
-    testParseFailure('async (a, ...b, ...c) => {}', 'Unexpected token ","');
-    testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');
-    testParseFailure('new async() => {}', 'Unexpected token "=>"');
-    testParseFailure('({ async\nf(){} })', 'Unexpected identifier');
-    testParseFailure('async ((a)) => {}', 'Unexpected token "=>"');
-    testParseFailure('({ async get a(){} })', 'Unexpected identifier');
-    testParseFailure('async a => {} ()', 'Unexpected token "("');
-    testParseFailure('a + async b => {}', 'Unexpected token "=>"');
-    testParseFailure('a + async () => {}', 'Unexpected token "=>"');
-    testParseFailure('with({}) async function f(){};', 'Unexpected token "function"');
-    testParseFailure('function* a(){ async yield => {}; }', '"yield" may not be used as an identifier in this context');
-    testParseFailure('function* a(){ async (yield) => {}; }', 'Unexpected token "=>"');
-    testParseFailure('async function* a(){}', 'Unexpected token "*"');
-    testParseFailure('(async function* (){})', 'Unexpected token "*"');
-    testParseFailure('({ async *a(){} })', 'Unexpected token "*"');
-    testParseFailure('async await => 0', '"await" may not be used as an identifier in this context');
-    testParseFailure('async (await) => 0', 'Async arrow parameters may not contain "await"');
-    testParseFailure('(class { async })', 'Only methods are allowed in classes');
-    testParseFailure('(class { async\na(){} })', 'Only methods are allowed in classes');
-    testParseFailure('(class { async get a(){} })', 'Unexpected identifier');
-    testParseFailure('async (a = await => {}) => {}', 'Async arrow parameters may not contain "await"');
-    testParseFailure('async (a = (await) => {}) => {}', 'Async arrow parameters may not contain "await"');
-    testParseFailure('async (a = aw\\u{61}it => {}) => {}', 'Async arrow parameters may not contain "await"');
-    testParseFailure('async (a = (b = await (0)) => {}) => {}', 'Async arrow parameters may not contain "await"');
+    testParseFailure('async (a, ...b, ...c) => {}', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('async\n(a, b) => {}', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('new async() => {}', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('({ async\nf(){} })', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('async ((a)) => {}', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('({ async get a(){} })', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('async a => {} ()', ErrorMessages.UNEXPECTED_TOKEN, '(');
+    testParseFailure('a + async b => {}', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('a + async () => {}', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('with({}) async function f(){};', ErrorMessages.UNEXPECTED_TOKEN, 'function');
+    testParseFailure('function* a(){ async yield => {}; }', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function* a(){ async (yield) => {}; }', ErrorMessages.UNEXPECTED_TOKEN, '=>');
+    testParseFailure('async function* a(){}', ErrorMessages.UNEXPECTED_TOKEN, '*');
+    testParseFailure('(async function* (){})', ErrorMessages.UNEXPECTED_TOKEN, '*');
+    testParseFailure('({ async *a(){} })', ErrorMessages.UNEXPECTED_TOKEN, '*');
+    testParseFailure('async await => 0', ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
+    testParseFailure('async (await) => 0', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('(class { async })', ErrorMessages.ONLY_METHODS_IN_CLASSES);
+    testParseFailure('(class { async\na(){} })', ErrorMessages.ONLY_METHODS_IN_CLASSES);
+    testParseFailure('(class { async get a(){} })', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('async (a = await => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = (await) => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = aw\\u{61}it => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = (b = await (0)) => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
   });
 });

@@ -18,28 +18,28 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
-let errorMessages = require('../../dist/errors').ErrorMessages;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('untagged template expressions', () => {
 
 
-    testParseFailure('`', 'Unexpected end of input');
-    testParseFailure('a++``', 'Unexpected template');
-    testParseFailure('`${a', 'Unexpected end of input');
-    testParseFailure('`${a}a${b}', 'Unexpected end of input');
+    testParseFailure('`', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('a++``', ErrorMessages.UNEXPECTED_TEMPLATE);
+    testParseFailure('`${a', ErrorMessages.UNEXPECTED_EOS);
+    testParseFailure('`${a}a${b}', ErrorMessages.UNEXPECTED_EOS);
 
-    testParseFailure('`\\1`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\4`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\11`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\41`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\01`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\00`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\001`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\000`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\123`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\08`', errorMessages.NO_OCTALS_IN_TEMPLATES);
-    testParseFailure('`\\09`', errorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\1`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\4`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\11`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\41`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\01`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\00`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\001`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\000`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\123`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\08`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
+    testParseFailure('`\\09`', ErrorMessages.NO_OCTALS_IN_TEMPLATES);
   });
 
   suite('tagged template expressions', () => {

@@ -17,8 +17,8 @@
 let testParseFailure = require('../assertions').testParseFailure;
 let testParseModule = require('../assertions').testParseModule;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
-
 let moduleItem = require('../helpers').moduleItem;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function testImportDecl(code, tree) {
   testParseModule(code, moduleItem, tree);
@@ -162,25 +162,25 @@ suite('Parser', () => {
         moduleSpecifier: 'd',
       });
 
-    testParseFailure('import \'a\'', 'Unexpected token "import"');
-    testParseModuleFailure('{import a from \'b\';}', 'Unexpected token "import"');
-    testParseModuleFailure('import', 'Unexpected end of input');
-    testParseModuleFailure('import;', 'Unexpected token ";"');
-    testParseModuleFailure('import {}', 'Unexpected end of input');
-    testParseModuleFailure('import {};', 'Unexpected token ";"');
-    testParseModuleFailure('import {} from;', 'Unexpected token ";"');
-    testParseModuleFailure('import {,} from \'a\';', 'Unexpected token ","');
-    testParseModuleFailure('import {b,,} from \'a\';', 'Unexpected token ","');
-    testParseModuleFailure('import {b as,} from \'a\';', 'Unexpected token ","');
-    testParseModuleFailure('import {function} from \'a\';', 'Unexpected token "}"');
-    testParseModuleFailure('import {a as function} from \'a\';', 'Unexpected token "function"');
-    testParseModuleFailure('import {b,,c} from \'a\';', 'Unexpected token ","');
-    testParseModuleFailure('import {b,c,,} from \'a\';', 'Unexpected token ","');
-    testParseModuleFailure('import * As a from \'a\'', 'Unexpected identifier');
-    testParseModuleFailure('import / as a from \'a\'', 'Unexpected token "/"');
-    testParseModuleFailure('import * as b, a from \'a\'', 'Unexpected token ","');
-    testParseModuleFailure('import a as b from \'a\'', 'Unexpected identifier');
-    testParseModuleFailure('import a, b from \'a\'', 'Unexpected identifier');
+    testParseFailure('import \'a\'', ErrorMessages.UNEXPECTED_TOKEN, 'import');
+    testParseModuleFailure('{import a from \'b\';}', ErrorMessages.UNEXPECTED_TOKEN, 'import');
+    testParseModuleFailure('import', ErrorMessages.UNEXPECTED_EOS);
+    testParseModuleFailure('import;', ErrorMessages.UNEXPECTED_TOKEN, ';');
+    testParseModuleFailure('import {}', ErrorMessages.UNEXPECTED_EOS);
+    testParseModuleFailure('import {};', ErrorMessages.UNEXPECTED_TOKEN, ';');
+    testParseModuleFailure('import {} from;', ErrorMessages.UNEXPECTED_TOKEN, ';');
+    testParseModuleFailure('import {,} from \'a\';', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('import {b,,} from \'a\';', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('import {b as,} from \'a\';', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('import {function} from \'a\';', ErrorMessages.UNEXPECTED_TOKEN, '}');
+    testParseModuleFailure('import {a as function} from \'a\';', ErrorMessages.UNEXPECTED_TOKEN, 'function');
+    testParseModuleFailure('import {b,,c} from \'a\';', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('import {b,c,,} from \'a\';', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('import * As a from \'a\'', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('import / as a from \'a\'', ErrorMessages.UNEXPECTED_TOKEN, '/');
+    testParseModuleFailure('import * as b, a from \'a\'', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('import a as b from \'a\'', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('import a, b from \'a\'', ErrorMessages.UNEXPECTED_IDENTIFIER);
 
   });
 });

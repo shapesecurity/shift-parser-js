@@ -17,6 +17,7 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('for statement', () => {
@@ -45,6 +46,6 @@ suite('Parser', () => {
     );
 
 
-    testParseFailure('for({a=0};;);', 'Illegal property initializer');
+    testParseFailure('for({a=0};;);', ErrorMessages.ILLEGAL_PROPERTY);
   });
 });

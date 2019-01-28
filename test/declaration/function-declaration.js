@@ -17,6 +17,7 @@
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -50,16 +51,16 @@ suite('Parser', () => {
   suite('function declaration in labeled statement', () => {
 
 
-    testParseFailure('a: function* a(){}', 'Unexpected token "*"');
+    testParseFailure('a: function* a(){}', ErrorMessages.UNEXPECTED_TOKEN, '*');
   });
 
   suite('Annex B 3.4: function declarations in if statements', () => {
 
 
-    testParseFailure('for(;;) function a(){}', 'Unexpected token "function"');
-    testParseFailure('for(a in b) function c(){}', 'Unexpected token "function"');
-    testParseFailure('for(a of b) function c(){}', 'Unexpected token "function"');
-    testParseFailure('while(true) function a(){}', 'Unexpected token "function"');
-    testParseFailure('with(true) function a(){}', 'Unexpected token "function"');
+    testParseFailure('for(;;) function a(){}', ErrorMessages.UNEXPECTED_TOKEN, 'function');
+    testParseFailure('for(a in b) function c(){}', ErrorMessages.UNEXPECTED_TOKEN, 'function');
+    testParseFailure('for(a of b) function c(){}', ErrorMessages.UNEXPECTED_TOKEN, 'function');
+    testParseFailure('while(true) function a(){}', ErrorMessages.UNEXPECTED_TOKEN, 'function');
+    testParseFailure('with(true) function a(){}', ErrorMessages.UNEXPECTED_TOKEN, 'function');
   });
 });

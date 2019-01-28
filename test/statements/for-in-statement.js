@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('for in statement', () => {
@@ -105,17 +106,17 @@ suite('Parser', () => {
       body: { type: 'EmptyStatement' },
     });
 
-    testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
-    testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
-    testParseFailure('for(let ? b : c in 0);', 'Invalid left-hand side in for-in');
+    testParseFailure('for(let a = 0 in b);', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
+    testParseFailure('for(const a = 0 in b);', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
+    testParseFailure('for(let ? b : c in 0);', ErrorMessages.INVALID_LHS_IN_FOR_IN);
 
-    testParseFailure('for(({a}) in 0);', 'Invalid left-hand side in for-in');
-    testParseFailure('for(([a]) in 0);', 'Invalid left-hand side in for-in');
-    testParseFailure('for(var [] = 0 in b);', 'Invalid variable declaration in for-in statement');
-    testParseFailure('for(var {} = 0 in b);', 'Invalid variable declaration in for-in statement');
-    testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
-    testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
-    testParseFailure('"use strict"; for(var a = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('for(({a}) in 0);', ErrorMessages.INVALID_LHS_IN_FOR_IN);
+    testParseFailure('for(([a]) in 0);', ErrorMessages.INVALID_LHS_IN_FOR_IN);
+    testParseFailure('for(var [] = 0 in b);', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
+    testParseFailure('for(var {} = 0 in b);', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
+    testParseFailure('for(let a = 0 in b);', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
+    testParseFailure('for(const a = 0 in b);', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
+    testParseFailure('"use strict"; for(var a = 0 in b);', ErrorMessages.INVALID_VAR_INIT_FOR_IN);
 
   });
 });

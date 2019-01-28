@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let { stmt, expr } = require('../helpers');
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -145,24 +146,24 @@ suite('trailing function comma', () => {
   });
 
   suite('failures', () => {
-    testParseFailure('(,) => 0', 'Unexpected token ","');
-    testParseFailure('(a,,) => 0', 'Unexpected token ","');
-    testParseFailure('(a, ...b,) => 0', 'Unexpected token ","');
-    testParseFailure('async (,) => 0', 'Unexpected token ","');
-    testParseFailure('async (a,,) => 0', 'Unexpected token ","');
-    testParseFailure('async (a, ...b,) => 0', 'Unexpected token ","');
-    testParseFailure('function a(,) {}', 'Unexpected token ","');
-    testParseFailure('function a(b,,) {}', 'Unexpected token ","');
-    testParseFailure('function a(b, ...c,) {}', 'Unexpected token ","');
-    testParseFailure('(function (,) {})', 'Unexpected token ","');
-    testParseFailure('(function (a,,) {})', 'Unexpected token ","');
-    testParseFailure('(function (a, ...b,) {})', 'Unexpected token ","');
-    testParseFailure('({ a (,) {} })', 'Unexpected token ","');
-    testParseFailure('({ a (b,,) {} })', 'Unexpected token ","');
-    testParseFailure('({ a (b, ...c,) {} })', 'Unexpected token ","');
+    testParseFailure('(,) => 0', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('(a,,) => 0', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('(a, ...b,) => 0', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('async (,) => 0', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('async (a,,) => 0', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('async (a, ...b,) => 0', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('function a(,) {}', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('function a(b,,) {}', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('function a(b, ...c,) {}', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('(function (,) {})', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('(function (a,,) {})', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('(function (a, ...b,) {})', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('({ a (,) {} })', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('({ a (b,,) {} })', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('({ a (b, ...c,) {} })', ErrorMessages.UNEXPECTED_TOKEN, ',');
 
-    testParseFailure('({ set a (b,) {} })', 'Unexpected token ","');
-    testParseFailure('(a,)', 'Unexpected token ")"');
-    testParseFailure('({a:1},)', 'Unexpected token ")"');
+    testParseFailure('({ set a (b,) {} })', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseFailure('(a,)', ErrorMessages.UNEXPECTED_TOKEN, ')');
+    testParseFailure('({a:1},)', ErrorMessages.UNEXPECTED_TOKEN, ')');
   });
 });

@@ -18,6 +18,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('yield', () => {
@@ -28,7 +29,7 @@ suite('Parser', () => {
     }
 
 
-    testParseFailure('function *a(){yield\n*a}', 'Unexpected token "*"');
-    testParseFailure('function *a(){yield*}', 'Unexpected token "}"');
+    testParseFailure('function *a(){yield\n*a}', ErrorMessages.UNEXPECTED_TOKEN, '*');
+    testParseFailure('function *a(){yield*}', ErrorMessages.UNEXPECTED_TOKEN, '}');
   });
 });

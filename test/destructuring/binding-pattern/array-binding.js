@@ -17,26 +17,27 @@
 let stmt = require('../../helpers').stmt;
 let testParse = require('../../assertions').testParse;
 let testParseFailure = require('../../assertions').testParseFailure;
+let ErrorMessages = require('../../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('array binding', () => {
     suite('variable declarator', () => {
 
 
-      testParseFailure('var [a.b] = 0', 'Unexpected token "."');
-      testParseFailure('var ([x]) = 0', 'Unexpected token "("');
+      testParseFailure('var [a.b] = 0', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('var ([x]) = 0', ErrorMessages.UNEXPECTED_TOKEN, '(');
     });
 
     suite('formal parameter', () => {
       // passing cases are tested in other function test cases.
-      testParseFailure('([a.b]) => 0', 'Illegal arrow function parameter list');
-      testParseFailure('function a([a.b]) {}', 'Unexpected token "."');
-      testParseFailure('function* a([a.b]) {}', 'Unexpected token "."');
-      testParseFailure('(function ([a.b]) {})', 'Unexpected token "."');
-      testParseFailure('(function* ([a.b]) {})', 'Unexpected token "."');
-      testParseFailure('({a([a.b]){}})', 'Unexpected token "."');
-      testParseFailure('({*a([a.b]){}})', 'Unexpected token "."');
-      testParseFailure('({set a([a.b]){}})', 'Unexpected token "."');
+      testParseFailure('([a.b]) => 0', ErrorMessages.ILLEGAL_ARROW_FUNCTION_PARAMS);
+      testParseFailure('function a([a.b]) {}', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('function* a([a.b]) {}', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('(function ([a.b]) {})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('(function* ([a.b]) {})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('({a([a.b]){}})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('({*a([a.b]){}})', ErrorMessages.UNEXPECTED_TOKEN, '.');
+      testParseFailure('({set a([a.b]){}})', ErrorMessages.UNEXPECTED_TOKEN, '.');
     });
 
     suite('catch clause', () => {

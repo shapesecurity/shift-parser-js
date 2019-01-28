@@ -18,14 +18,15 @@ let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('automatic semicolon insertion', () => {
 
 
-    testParseFailure('throw /* \n */ e', 'Illegal newline after throw');
-    testParseFailure('throw /* \u2028 */ e', 'Illegal newline after throw');
-    testParseFailure('throw /* \u2029 */ e', 'Illegal newline after throw');
+    testParseFailure('throw /* \n */ e', ErrorMessages.NEWLINE_AFTER_THROW);
+    testParseFailure('throw /* \u2028 */ e', ErrorMessages.NEWLINE_AFTER_THROW);
+    testParseFailure('throw /* \u2029 */ e', ErrorMessages.NEWLINE_AFTER_THROW);
 
 
   });
@@ -33,7 +34,7 @@ suite('Parser', () => {
   suite('whitespace characters', () => {
 
 
-    testParseFailure('new\u180Ea', 'Unexpected "\u180E"'); // Mongolian vowel separator
+    testParseFailure('new\u180Ea', ErrorMessages.UNEXPECTED_ILLEGAL_TOKEN, '\u180E'); // Mongolian vowel separator
 
 
   });

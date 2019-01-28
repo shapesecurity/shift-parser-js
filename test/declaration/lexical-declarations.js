@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('declarations', () => {
@@ -63,14 +64,14 @@ suite('Parser', () => {
       ]
     );
 
-    testParseFailure('for(; false;) let {}', 'Unexpected token "{"');
-    testParseFailure('while(true) let[a] = 0', 'Unexpected token "let"');
-    testParseFailure('while(true) let a', 'Unexpected identifier');
-    testParseFailure('while(true) const a', 'Unexpected token "const"');
-    testParseFailure('with(true) let a', 'Unexpected identifier');
-    testParseFailure('with(true) class a {}', 'Unexpected token "class"');
+    testParseFailure('for(; false;) let {}', ErrorMessages.UNEXPECTED_TOKEN, '{');
+    testParseFailure('while(true) let[a] = 0', ErrorMessages.UNEXPECTED_TOKEN, 'let');
+    testParseFailure('while(true) let a', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('while(true) const a', ErrorMessages.UNEXPECTED_TOKEN, 'const');
+    testParseFailure('with(true) let a', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('with(true) class a {}', ErrorMessages.UNEXPECTED_TOKEN, 'class');
 
-    testParseFailure('a: let a', 'Unexpected identifier');
+    testParseFailure('a: let a', ErrorMessages.UNEXPECTED_IDENTIFIER);
 
   });
 });

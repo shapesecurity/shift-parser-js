@@ -17,11 +17,12 @@
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('call expression', () => {
-    testParseFailure('f(..a)', 'Unexpected token "."');
-    testParseFailure('f(....a)', 'Unexpected token "."');
-    testParseFailure('f(... ... a)', 'Unexpected token "..."');
+    testParseFailure('f(..a)', ErrorMessages.UNEXPECTED_TOKEN, '.');
+    testParseFailure('f(....a)', ErrorMessages.UNEXPECTED_TOKEN, '.');
+    testParseFailure('f(... ... a)', ErrorMessages.UNEXPECTED_TOKEN, '...');
   });
 });

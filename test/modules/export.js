@@ -17,8 +17,8 @@
 let testParseFailure = require('../assertions').testParseFailure;
 let testParseModule = require('../assertions').testParseModule;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
-
 let moduleItem = require('../helpers').moduleItem;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -313,28 +313,28 @@ suite('Parser', () => {
       ] }
     );
 
-    testParseFailure('export * from "a"', 'Unexpected token "export"');
-    testParseModuleFailure('{export default 3;}', 'Unexpected token "export"');
-    testParseModuleFailure('{export {a};}', 'Unexpected token "export"');
-    testParseModuleFailure('while (1) export default 3', 'Unexpected token "export"');
-    testParseModuleFailure('export', 'Unexpected end of input');
-    testParseModuleFailure('export ', 'Unexpected end of input');
-    testParseModuleFailure('export;', 'Unexpected token ";"');
-    testParseModuleFailure('export {,,}', 'Unexpected token ","');
-    testParseModuleFailure('export {a,,}', 'Unexpected token ","');
-    testParseModuleFailure('export {a,,b}', 'Unexpected token ","');
-    testParseModuleFailure('export {a,b} from', 'Unexpected end of input');
-    testParseModuleFailure('export {a,b} from a', 'Unexpected identifier');
-    testParseModuleFailure('export {a as} from a', 'Unexpected token "}"');
-    testParseModuleFailure('export {as b} from a', 'Unexpected identifier');
-    testParseModuleFailure('export * from a', 'Unexpected identifier');
-    testParseModuleFailure('export / from a', 'Unexpected token "/"');
-    testParseModuleFailure('export * From "a"', 'Unexpected identifier');
-    testParseModuleFailure('export let[a] = 0 export let[b] = 0', 'Unexpected token "export"');
-    testParseModuleFailure('export 3', 'Unexpected number');
-    testParseModuleFailure('export function () {}', 'Unexpected token "("');
-    testParseModuleFailure('export default default', 'Unexpected token "default"');
-    testParseModuleFailure('export default function', 'Unexpected end of input');
-    testParseModuleFailure('export {with as a}', 'Names of variables used in an export specifier from the current module must be identifiers');
+    testParseFailure('export * from "a"', ErrorMessages.UNEXPECTED_TOKEN, 'export');
+    testParseModuleFailure('{export default 3;}', ErrorMessages.UNEXPECTED_TOKEN, 'export');
+    testParseModuleFailure('{export {a};}', ErrorMessages.UNEXPECTED_TOKEN, 'export');
+    testParseModuleFailure('while (1) export default 3', ErrorMessages.UNEXPECTED_TOKEN, 'export');
+    testParseModuleFailure('export', ErrorMessages.UNEXPECTED_EOS);
+    testParseModuleFailure('export ', ErrorMessages.UNEXPECTED_EOS);
+    testParseModuleFailure('export;', ErrorMessages.UNEXPECTED_TOKEN, ';');
+    testParseModuleFailure('export {,,}', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('export {a,,}', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('export {a,,b}', ErrorMessages.UNEXPECTED_TOKEN, ',');
+    testParseModuleFailure('export {a,b} from', ErrorMessages.UNEXPECTED_EOS);
+    testParseModuleFailure('export {a,b} from a', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('export {a as} from a', ErrorMessages.UNEXPECTED_TOKEN, '}');
+    testParseModuleFailure('export {as b} from a', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('export * from a', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('export / from a', ErrorMessages.UNEXPECTED_TOKEN, '/');
+    testParseModuleFailure('export * From "a"', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('export let[a] = 0 export let[b] = 0', ErrorMessages.UNEXPECTED_TOKEN, 'export');
+    testParseModuleFailure('export 3', ErrorMessages.UNEXPECTED_NUMBER);
+    testParseModuleFailure('export function () {}', ErrorMessages.UNEXPECTED_TOKEN, '(');
+    testParseModuleFailure('export default default', ErrorMessages.UNEXPECTED_TOKEN, 'default');
+    testParseModuleFailure('export default function', ErrorMessages.UNEXPECTED_EOS);
+    testParseModuleFailure('export {with as a}', ErrorMessages.ILLEGAL_EXPORTED_NAME);
   });
 });

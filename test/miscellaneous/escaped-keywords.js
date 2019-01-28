@@ -19,6 +19,7 @@ let testParse = require('../assertions').testParse;
 let testEarlyError = require('../assertions').testEarlyError;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParseModuleFailure = require('../assertions').testParseModuleFailure;
+let ErrorMessages = require('../../dist/errors').ErrorMessages;
 
 function yd(p) {
   return stmt(p).body.statements[0].expression;
@@ -27,8 +28,8 @@ function yd(p) {
 suite('Parser', () => {
 
   suite('escapes in normal keywords', () => {
-    testParseFailure('i\\u0066 (0)', 'Unexpected escaped keyword');
-    testParseFailure('var i\\u0066', 'Unexpected escaped keyword');
+    testParseFailure('i\\u0066 (0)', ErrorMessages.UNEXPECTED_ESCAPED_KEYWORD);
+    testParseFailure('var i\\u0066', ErrorMessages.UNEXPECTED_ESCAPED_KEYWORD);
 
     testParse('({i\\u0066: 0})', stmt,
       {
@@ -52,7 +53,7 @@ suite('Parser', () => {
   });
 
   suite('escapes in "let"', () => {
-    testParseFailure('le\\u0074 a', 'Unexpected identifier');
+    testParseFailure('le\\u0074 a', ErrorMessages.UNEXPECTED_IDENTIFIER);
 
     testParse('var le\\u0074', stmt,
       {
@@ -69,12 +70,12 @@ suite('Parser', () => {
       }
     );
 
-    testEarlyError('"use strict"; var le\\u0074', 'The identifier "let" must not be in binding position in strict mode');
+    testEarlyError('"use strict"; var le\\u0074', ErrorMessages.INVALID_ID_BINDING_STRICT_MODE, 'let');
   });
 
   suite('escapes in "yield"', () => {
-    testParseFailure('function *a(){yi\\u0065ld 0}', '"yield" may not be used as an identifier in this context');
-    testParseFailure('function *a(){var yi\\u0065ld}', '"yield" may not be used as an identifier in this context');
+    testParseFailure('function *a(){yi\\u0065ld 0}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+    testParseFailure('function *a(){var yi\\u0065ld}', ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
 
     testParse('function *a(){({yi\\u0065ld: 0})}', yd,
       {
@@ -95,10 +96,10 @@ suite('Parser', () => {
   });
 
   suite('no escapes in contextual keywords', () => {
-    testParseFailure('({ g\\u0065t x(){} });', 'Unexpected identifier');
-    testParseModuleFailure('export {a \\u0061s b} from "";', 'Unexpected identifier');
-    testParseModuleFailure('export {} fr\\u006fm "";', 'Unexpected identifier');
-    testParseFailure('for (a o\\u0066 b);', 'Unexpected identifier');
-    testParseFailure('class a { st\\u0061tic m(){} }', 'Only methods are allowed in classes');
+    testParseFailure('({ g\\u0065t x(){} });', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('export {a \\u0061s b} from "";', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseModuleFailure('export {} fr\\u006fm "";', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('for (a o\\u0066 b);', ErrorMessages.UNEXPECTED_IDENTIFIER);
+    testParseFailure('class a { st\\u0061tic m(){} }', ErrorMessages.ONLY_METHODS_IN_CLASSES);
   });
 });

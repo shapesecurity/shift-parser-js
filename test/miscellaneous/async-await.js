@@ -700,6 +700,32 @@ suite('async', () => {
       },
     });
 
+  testParse('({ async *a(){} })', expr,
+    {
+      type: 'ObjectExpression',
+      properties: [
+        {
+          type: 'Method',
+          name: {
+            type: 'StaticPropertyName',
+            value: 'a',
+          },
+          isAsync: true,
+          isGenerator: true,
+          params: {
+            type: 'FormalParameters',
+            rest: null,
+            items: [],
+          },
+          body: {
+            'directives': [],
+            'statements': [],
+            'type': 'FunctionBody',
+          },
+        },
+      ],
+    });
+
   suite('failures', () => {
     testParseFailure('async (a, ...b, ...c) => {}', ErrorMessages.UNEXPECTED_TOKEN(','));
     testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');
@@ -713,9 +739,6 @@ suite('async', () => {
     testParseFailure('with({}) async function f(){};', 'Unexpected token "function"');
     testParseFailure('function* a(){ async yield => {}; }', '"yield" may not be used as an identifier in this context');
     testParseFailure('function* a(){ async (yield) => {}; }', 'Unexpected token "=>"');
-    testParseFailure('async function* a(){}', 'Unexpected token "*"');
-    testParseFailure('(async function* (){})', 'Unexpected token "*"');
-    testParseFailure('({ async *a(){} })', 'Unexpected token "*"');
     testParseFailure('async await => 0', '"await" may not be used as an identifier in this context');
     testParseFailure('async (await) => 0', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
     testParseFailure('(class { async })', 'Only methods are allowed in classes');

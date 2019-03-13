@@ -48,7 +48,7 @@ suite('Parser', () => {
             kind: 'let',
             declarators: [
               {
-                binding: { properties: [], type: 'ObjectBinding' },
+                binding: { properties: [], type: 'ObjectBinding', rest: null },
                 init: { properties: [], type: 'ObjectExpression' },
                 type: 'VariableDeclarator',
               },

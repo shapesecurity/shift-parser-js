@@ -33,6 +33,7 @@ suite('Parser', () => {
             type: 'AssignmentTargetPropertyIdentifier',
             binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
             init: { type: 'LiteralNumericExpression', value: 0 } }],
+          rest: null,
         }] },
       right: { type: 'IdentifierExpression', name: 'b' },
       body: { type: 'EmptyStatement' },

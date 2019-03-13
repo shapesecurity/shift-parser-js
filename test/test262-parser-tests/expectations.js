@@ -1,17 +1,6 @@
 export default {
   xfail: {
-    pass: [
-      // Invalid tests
-      // https://github.com/tc39/test262-parser-tests/issues/19
-      '3dbb6e166b14a6c0.js',
-
-      // Invalid tests
-      // https://github.com/tc39/test262-parser-tests/issues/20
-      '66e383bfd18e66ab.js',
-      '78c215fabdf13bae.js',
-      'bf49ec8d96884562.js',
-      'e4a43066905a597b.js',
-    ],
+    pass: [],
     early: [
       // Early Errors which our AST format can't represent
       '024073814ce2cace.js',
@@ -66,6 +55,14 @@ export default {
       // https://github.com/tc39/test262-parser-tests/issues/15
       '14eaa7e71c682461.js',
       'aca911e336954a5b.js',
+
+      // errors that michael disagrees with (function name `eval`/`arguments`/`package`/`static` invalid for strict mode function bodies)
+      '050a006ae573e260.js',
+      '2c0f785914da9d0b.js',
+      '574ea84fc61bdc31.js',
+      '6c4fe38464c16309.js',
+      '8643da76fe7e95c7.js',
+      'e0c3d30b6fe96812.js',
     ],
     fail: [
       // Invalid test

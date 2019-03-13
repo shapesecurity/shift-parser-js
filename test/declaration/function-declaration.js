@@ -48,8 +48,6 @@ suite('Parser', () => {
   });
 
   suite('function declaration in labeled statement', () => {
-
-
     testParseFailure('a: function* a(){}', 'Unexpected token "*"');
   });
 

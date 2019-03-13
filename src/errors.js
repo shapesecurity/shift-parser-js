@@ -32,12 +32,14 @@ export const ErrorMessages = {
   UNEXPECTED_COMMA_AFTER_REST: 'Unexpected comma after rest',
   NEWLINE_AFTER_THROW: 'Illegal newline after throw',
   UNTERMINATED_REGEXP: 'Invalid regular expression: missing /',
+  INVALID_REST_PARAMETERS_INITIALIZATION: 'Rest parameter may not have a default initializer',
   INVALID_REGEXP_FLAGS: 'Invalid regular expression flags',
   INVALID_REGEX: 'Invalid regular expression',
   INVALID_LHS_IN_ASSIGNMENT: 'Invalid left-hand side in assignment',
   INVALID_LHS_IN_BINDING: 'Invalid left-hand side in binding', // todo collapse messages?
   INVALID_LHS_IN_FOR_IN: 'Invalid left-hand side in for-in',
   INVALID_LHS_IN_FOR_OF: 'Invalid left-hand side in for-of',
+  INVALID_LHS_IN_FOR_AWAIT: 'Invalid left-hand side in for-await',
   INVALID_UPDATE_OPERAND: 'Increment/decrement target must be an identifier or member expression',
   INVALID_EXPONENTIATION_LHS: 'Unary expressions as the left operand of an exponentation expression ' +
     'must be disambiguated with parentheses',
@@ -47,6 +49,7 @@ export const ErrorMessages = {
   ILLEGAL_ARROW_FUNCTION_PARAMS: 'Illegal arrow function parameter list',
   INVALID_VAR_INIT_FOR_IN: 'Invalid variable declaration in for-in statement',
   INVALID_VAR_INIT_FOR_OF: 'Invalid variable declaration in for-of statement',
+  INVALID_VAR_INIT_FOR_AWAIT: 'Invalid variable declaration in for-await statement',
   UNINITIALIZED_BINDINGPATTERN_IN_FOR_INIT: 'Binding pattern appears without initializer in for statement init',
   ILLEGAL_PROPERTY: 'Illegal property initializer',
   INVALID_ID_BINDING_STRICT_MODE(id) {

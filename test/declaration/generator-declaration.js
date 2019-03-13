@@ -39,6 +39,7 @@ suite('Parser', () => {
           name: { type: 'StaticPropertyName', value: 'yield' },
           binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
         }],
+        rest: null,
       },
       expression: { type: 'LiteralNumericExpression', value: 0 },
     });

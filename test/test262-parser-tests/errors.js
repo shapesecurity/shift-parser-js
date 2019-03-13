@@ -43,6 +43,7 @@ suite('test262-parser-tests', () => {
       let passExplicitTestFile = `${scriptDir}/pass-explicit/${f}`;
       test(`does not throw error and generates same tree[${f}]`, () => {
         let passSrc = fs.readFileSync(passTestFile, 'utf8');
+         
         let passTree, passLocations, passComments;
         expect(() => {
           ({ tree: passTree, locations: passLocations, comments: passComments } = parse(passSrc, isModule(f), true));

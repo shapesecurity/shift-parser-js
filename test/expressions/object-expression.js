@@ -84,6 +84,45 @@ suite('Parser', () => {
       }
     );
 
+    testParse('({...a = 0})', expr, {
+      properties: [
+        {
+          expression: {
+            binding: {
+              name: 'a',
+              type: 'AssignmentTargetIdentifier',
+            },
+            expression: {
+              type: 'LiteralNumericExpression',
+              value: 0,
+            },
+            type: 'AssignmentExpression',
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+    });
+
+    testParse('({...a = []})', expr, {
+      properties: [
+        {
+          expression: {
+            binding: {
+              name: 'a',
+              type: 'AssignmentTargetIdentifier',
+            },
+            expression: {
+              type: 'ArrayExpression',
+              elements: [],
+            },
+            type: 'AssignmentExpression',
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+    });
 
   });
 });

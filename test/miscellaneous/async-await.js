@@ -731,14 +731,14 @@ suite('async', () => {
     testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');
     testParseFailure('new async() => {}', 'Unexpected token "=>"');
     testParseFailure('({ async\nf(){} })', 'Unexpected identifier');
-    testParseFailure('async ((a)) => {}', 'Unexpected token "=>"');
+    testParseFailure('async ((a)) => {}', 'Unexpected token "("');
     testParseFailure('({ async get a(){} })', 'Unexpected identifier');
     testParseFailure('async a => {} ()', 'Unexpected token "("');
     testParseFailure('a + async b => {}', 'Unexpected token "=>"');
     testParseFailure('a + async () => {}', 'Unexpected token "=>"');
     testParseFailure('with({}) async function f(){};', 'Unexpected token "function"');
     testParseFailure('function* a(){ async yield => {}; }', '"yield" may not be used as an identifier in this context');
-    testParseFailure('function* a(){ async (yield) => {}; }', 'Unexpected token "=>"');
+    testParseFailure('function* a(){ async (yield) => {}; }', '"yield" may not be used as an identifier in this context');
     testParseFailure('async await => 0', '"await" may not be used as an identifier in this context');
     testParseFailure('async (await) => 0', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
     testParseFailure('(class { async })', 'Only methods are allowed in classes');

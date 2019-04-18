@@ -33,6 +33,7 @@ export const ErrorMessages = {
   UNEXPECTED_REST_PARAMETERS_INITIALIZATION: 'Rest parameter may not have a default initializer',
   NEWLINE_AFTER_THROW: 'Illegal newline after throw',
   UNTERMINATED_REGEXP: 'Invalid regular expression: missing /',
+  INVALID_LAST_REST_PARAMETER: 'Rest parameter must be last formal parameter',
   INVALID_REST_PARAMETERS_INITIALIZATION: 'Rest parameter may not have a default initializer',
   INVALID_REGEXP_FLAGS: 'Invalid regular expression flags',
   INVALID_REGEX: 'Invalid regular expression',

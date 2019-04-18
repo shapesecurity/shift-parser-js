@@ -18,6 +18,7 @@ let testParse = require('../assertions').testParse;
 let testParseModule = require('../assertions').testParseModule;
 let { stmt, expr } = require('../helpers');
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -726,26 +727,26 @@ suite('async', () => {
     });
 
   suite('failures', () => {
-    testParseFailure('async (a, ...b, ...c) => {}', 'Unexpected token ","');
+    testParseFailure('async (a, ...b, ...c) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
     testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');
     testParseFailure('new async() => {}', 'Unexpected token "=>"');
     testParseFailure('({ async\nf(){} })', 'Unexpected identifier');
-    testParseFailure('async ((a)) => {}', 'Unexpected token "=>"');
+    testParseFailure('async ((a)) => {}', 'Unexpected token "("');
     testParseFailure('({ async get a(){} })', 'Unexpected identifier');
     testParseFailure('async a => {} ()', 'Unexpected token "("');
     testParseFailure('a + async b => {}', 'Unexpected token "=>"');
     testParseFailure('a + async () => {}', 'Unexpected token "=>"');
     testParseFailure('with({}) async function f(){};', 'Unexpected token "function"');
     testParseFailure('function* a(){ async yield => {}; }', '"yield" may not be used as an identifier in this context');
-    testParseFailure('function* a(){ async (yield) => {}; }', 'Unexpected token "=>"');
+    testParseFailure('function* a(){ async (yield) => {}; }', '"yield" may not be used as an identifier in this context');
     testParseFailure('async await => 0', '"await" may not be used as an identifier in this context');
-    testParseFailure('async (await) => 0', 'Async arrow parameters may not contain "await"');
+    testParseFailure('async (await) => 0', ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
     testParseFailure('(class { async })', 'Only methods are allowed in classes');
     testParseFailure('(class { async\na(){} })', 'Only methods are allowed in classes');
     testParseFailure('(class { async get a(){} })', 'Unexpected identifier');
-    testParseFailure('async (a = await => {}) => {}', 'Async arrow parameters may not contain "await"');
-    testParseFailure('async (a = (await) => {}) => {}', 'Async arrow parameters may not contain "await"');
-    testParseFailure('async (a = aw\\u{61}it => {}) => {}', 'Async arrow parameters may not contain "await"');
-    testParseFailure('async (a = (b = await (0)) => {}) => {}', 'Async arrow parameters may not contain "await"');
+    testParseFailure('async (a = await => {}) => {}', ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
+    testParseFailure('async (a = (await) => {}) => {}', ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
+    testParseFailure('async (a = aw\\u{61}it => {}) => {}', ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
+    testParseFailure('async (a = (b = await (0)) => {}) => {}', ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
   });
 });

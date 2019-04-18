@@ -16,14 +16,20 @@
 
 let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
+let testParseSuccess = require('../assertions').testParseSuccess;
 let testParseFailure = require('../assertions').testParseFailure;
-let testParse = require('../assertions').testParse;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('function expression', () => {
 
-
-    testParseFailure('(function(...a, b){})', 'Unexpected token ","');
+    testParseSuccess('var b = []; function a(...x) {}; a(...b);');
+    testParseFailure('(function(...a, b){})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
     testParseFailure('(function((a)){})', 'Unexpected token "("');
+    testParseFailure('(function(...a = []) {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+    testParseFailure('(async function(...a = []) {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+    testParseFailure('(function(...a, ...b){})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(async function(...a, b){})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(async function(...a, ...b){})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
   });
 });

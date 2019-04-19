@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('arrow expression', () => {
@@ -46,7 +47,36 @@ suite('Parser', () => {
       }
     );
 
+    testParse('(a = []) => {}', expr,
+      {
+        body: {
+          directives: [],
+          statements: [],
+          type: 'FunctionBody',
+        },
+        isAsync: false,
+        params: {
+          items: [
+            {
+              binding: {
+                name: 'a',
+                type: 'BindingIdentifier',
+              },
+              init: {
+                elements: [],
+                type: 'ArrayExpression',
+              },
+              type: 'BindingWithDefault',
+            },
+          ],
+          rest: null,
+          type: 'FormalParameters',
+        },
+        type: 'ArrowExpression',
+      });
 
+    testParseFailure('((...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+    testParseFailure('(async (...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
     testParseFailure('[]=>0', 'Unexpected token "=>"');
     testParseFailure('() + 1', 'Unexpected token "+"');
     testParseFailure('1 + ()', 'Unexpected end of input');
@@ -68,5 +98,11 @@ suite('Parser', () => {
     testParseFailure('() + 0', 'Unexpected token "+"');
     testParseFailure('(10) => 0', 'Illegal arrow function parameter list');
     testParseFailure('(10, 20) => 0', 'Illegal arrow function parameter list');
+    testParseFailure('(...a, b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(...a, ...b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(a, ...b,) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(async (...a, b) => {})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(async (...a, ...b) => {})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(async (...x = []) => {});', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
   });
 });

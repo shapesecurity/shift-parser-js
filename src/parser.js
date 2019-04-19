@@ -1983,6 +1983,12 @@ export class GenericParser extends Tokenizer {
       return paramsNode;
     } else if (this.eat(TokenType.ELLIPSIS)) {
       rest = this.parseBindingTarget();
+      if (this.match(TokenType.ASSIGN)) {
+        throw this.createError(ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+      }
+      if (this.match(TokenType.COMMA)) {
+        throw this.createError(ErrorMessages.INVALID_LAST_REST_PARAMETER);
+      }
       this.expect(TokenType.RPAREN);
       let paramsNode = this.finishNode({
         type: ARROW_EXPRESSION_PARAMS,
@@ -2016,6 +2022,12 @@ export class GenericParser extends Tokenizer {
         }
         this.lex();
         rest = this.parseBindingTarget();
+        if (this.match(TokenType.ASSIGN)) {
+          throw this.createError(ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+        }
+        if (this.match(TokenType.COMMA)) {
+          throw this.createError(ErrorMessages.INVALID_LAST_REST_PARAMETER);
+        }
         break;
       }
 
@@ -2156,21 +2168,15 @@ export class GenericParser extends Tokenizer {
     let properties = [], property = null;
     while (!this.match(TokenType.RBRACE)) {
       let isSpreadProperty = false;
-      let spreadPropertyOrAssignmentTarget = null;
+      let spreadProperty = null;
       if (this.match(TokenType.ELLIPSIS)) {
-        spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
+        spreadProperty = this.parseSpreadPropertyDefinition();
         isSpreadProperty = true;
-
-        if (spreadPropertyOrAssignmentTarget.type === 'SpreadProperty') {
-          property = spreadPropertyOrAssignmentTarget.expression;
-          if (property.type === 'ObjectExpression' || property.type === 'ArrayExpression') {
-            this.isBindingElement = this.isAssignmentTarget = false;
-          }
-          properties.push(spreadPropertyOrAssignmentTarget);
-        } else {
-          rest = this.inheritCoverGrammar(spreadPropertyOrAssignmentTarget);
-          break;
+        property = spreadProperty.expression;
+        if (property.type === 'ObjectExpression' || property.type === 'ArrayExpression') {
+          this.isBindingElement = this.isAssignmentTarget = false;
         }
+        properties.push(spreadProperty);
       } else {
         property = this.inheritCoverGrammar(this.parsePropertyDefinition);
         properties.push(property);
@@ -2199,16 +2205,8 @@ export class GenericParser extends Tokenizer {
   parseSpreadPropertyDefinition() {
     let startState = this.startNode();
     this.expect(TokenType.ELLIPSIS);
-    let expressionOrAssignmentTarget = this.parseAssignmentExpressionOrTarget();
 
-    if (expressionOrAssignmentTarget.type === 'ObjectAssignmentTarget' ||
-        expressionOrAssignmentTarget.type === 'IdentifierAssignmentTarget' ||
-        expressionOrAssignmentTarget.type === 'StaticMemberAssignmentTarget' ||
-        expressionOrAssignmentTarget.type === 'ComputedMemberAssignmentTarget' ||
-        expressionOrAssignmentTarget.type === 'ArrayAssignmentTarget' ||
-        expressionOrAssignmentTarget.type === 'ObjectAssignmentTarget') {
-      return expressionOrAssignmentTarget;
-    }
+    let expressionOrAssignmentTarget = this.parseAssignmentExpressionOrTarget();
     return this.finishNode(new AST.SpreadProperty({ expression: expressionOrAssignmentTarget }), startState);
   }
 

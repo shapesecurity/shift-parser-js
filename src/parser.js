@@ -723,9 +723,6 @@ export class GenericParser extends Tokenizer {
           if (decl.init !== null && (this.strict || init.kind !== 'var' || decl.binding.type !== 'BindingIdentifier')) {
             throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN);
           }
-          if (isAwait) {
-            throw this.createUnexpected(this.lookahead);
-          }
           ctor = AST.ForInStatement;
           this.lex();
           right = this.parseExpression();
@@ -772,7 +769,7 @@ export class GenericParser extends Tokenizer {
         this.firstExprError = null;
       }
       if (startsWithLet && this.matchContextualKeyword('of')) {
-        throw this.createError(isAwait ? ErrorMessages.INVALID_LHS_IN_FOR_AWAIT : ErrorMessages.INVALID_LHS_IN_FOR_OF);
+        throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
       }
       let ctor;
       if (this.match(TokenType.IN)) {
@@ -1246,9 +1243,6 @@ export class GenericParser extends Tokenizer {
       case 'ObjectExpression': {
         let last = node.properties.length > 0 ? node.properties[node.properties.length - 1] : void 0;
         if (last != null && last.type === 'SpreadProperty') {
-          if (last.type === 'ObjectAssignmentTarget' || last.type === 'ArrayAssignmentTarget') {
-            throw this.createError(ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
-          }
           return this.copyNode(node, new AST.ObjectAssignmentTarget({
             properties: node.properties.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
             rest: this.transformDestructuring(last.expression),
@@ -2000,8 +1994,7 @@ export class GenericParser extends Tokenizer {
       this.isBindingElement = this.isAssignmentTarget = false;
       return paramsNode;
     }
-
-
+    
     let group = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
 
     let params = this.isBindingElement ? [this.targetToBinding(this.transformDestructuringWithDefault(group))] : null;
@@ -2168,15 +2161,17 @@ export class GenericParser extends Tokenizer {
     let properties = [], property = null;
     while (!this.match(TokenType.RBRACE)) {
       let isSpreadProperty = false;
-      let spreadProperty = null;
+      let spreadPropertyOrAssignmentTarget = null;
       if (this.match(TokenType.ELLIPSIS)) {
-        spreadProperty = this.parseSpreadPropertyDefinition();
+        spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
         isSpreadProperty = true;
-        property = spreadProperty.expression;
+
+        property = spreadPropertyOrAssignmentTarget.expression;
         if (property.type === 'ObjectExpression' || property.type === 'ArrayExpression') {
           this.isBindingElement = this.isAssignmentTarget = false;
         }
-        properties.push(spreadProperty);
+        rest = property;
+        properties.push(spreadPropertyOrAssignmentTarget);
       } else {
         property = this.inheritCoverGrammar(this.parsePropertyDefinition);
         properties.push(property);
@@ -2195,18 +2190,14 @@ export class GenericParser extends Tokenizer {
       }
       return this.finishNode(new AST.ObjectAssignmentTarget({ properties: properties.map(p => this.transformDestructuring(p)), rest }), startState);
     }
-
-    if (rest !== null) {
-      properties.push(new AST.SpreadProperty({ expression: rest }));
-    }
     return this.finishNode(new AST.ObjectExpression({ properties }), startState);
   }
 
   parseSpreadPropertyDefinition() {
     let startState = this.startNode();
     this.expect(TokenType.ELLIPSIS);
-
     let expressionOrAssignmentTarget = this.parseAssignmentExpressionOrTarget();
+
     return this.finishNode(new AST.SpreadProperty({ expression: expressionOrAssignmentTarget }), startState);
   }
 

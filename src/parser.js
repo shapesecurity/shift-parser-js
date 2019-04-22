@@ -720,6 +720,9 @@ export class GenericParser extends Tokenizer {
         let decl = init.declarators[0];
 
         if (this.match(TokenType.IN)) {
+          if (isAwait) {
+            throw this.createUnexpected(this.lookahead);
+          }
           if (decl.init !== null && (this.strict || init.kind !== 'var' || decl.binding.type !== 'BindingIdentifier')) {
             throw this.createError(ErrorMessages.INVALID_VAR_INIT_FOR_IN);
           }
@@ -769,7 +772,7 @@ export class GenericParser extends Tokenizer {
         this.firstExprError = null;
       }
       if (startsWithLet && this.matchContextualKeyword('of')) {
-        throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_OF);
+        throw this.createError(isAwait ? ErrorMessages.INVALID_LHS_IN_FOR_AWAIT : ErrorMessages.INVALID_LHS_IN_FOR_OF);
       }
       let ctor;
       if (this.match(TokenType.IN)) {
@@ -791,7 +794,7 @@ export class GenericParser extends Tokenizer {
 
       return new ctor({ left: this.transformDestructuring(expr), right, body: this.getIteratorStatementEpilogue() });
     } else if (isAwait) {
-      throw this.createUnexpected(ErrorMessages.INVALID_LHS_IN_FOR_AWAIT);
+      throw this.createError(ErrorMessages.INVALID_LHS_IN_FOR_AWAIT);
     }
     if (this.firstExprError) {
       throw this.firstExprError;

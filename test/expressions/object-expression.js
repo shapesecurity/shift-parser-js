@@ -124,5 +124,37 @@ suite('Parser', () => {
       type: 'ObjectExpression',
     });
 
+    testParse('({...{}})', expr,
+      { properties: [
+        {
+          expression: {
+            type: 'ObjectExpression',
+            properties: [],
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+      });
+
+    testParse('({...[], ...{}})', expr,
+      { properties: [
+        {
+          expression: {
+            type: 'ArrayExpression',
+            elements: [],
+          },
+          type: 'SpreadProperty',
+        },
+        {
+          expression: {
+            type: 'ObjectExpression',
+            properties: [],
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+      });
   });
 });

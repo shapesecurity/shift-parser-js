@@ -201,71 +201,71 @@ suite('async', () => {
 
     testParseFailure('let b = async () => []; for (a in await b());', 'Unexpected identifier');
     testParse('async () => { let b = async () => []; for (a in await b()); }', expr,
-    {
-      body: {
-        directives: [],
-        statements: [
-          {
-            declaration: {
-              declarators: [
-                {
-                  binding: {
-                    name: 'b',
-                    type: 'BindingIdentifier',
-                  },
-                  init: {
-                    body: {
-                      elements: [],
-                      type: 'ArrayExpression',
+      {
+        body: {
+          directives: [],
+          statements: [
+            {
+              declaration: {
+                declarators: [
+                  {
+                    binding: {
+                      name: 'b',
+                      type: 'BindingIdentifier',
                     },
-                    isAsync: true,
-                    params: {
-                      items: [],
-                      rest: null,
-                      type: 'FormalParameters',
+                    init: {
+                      body: {
+                        elements: [],
+                        type: 'ArrayExpression',
+                      },
+                      isAsync: true,
+                      params: {
+                        items: [],
+                        rest: null,
+                        type: 'FormalParameters',
+                      },
+                      type: 'ArrowExpression',
                     },
-                    type: 'ArrowExpression',
+                    type: 'VariableDeclarator',
                   },
-                  type: 'VariableDeclarator',
-                },
-              ],
-              kind: 'let',
-              type: 'VariableDeclaration',
-            },
-            type: 'VariableDeclarationStatement',
-          },
-          {
-            body: {
-              type: 'EmptyStatement',
-            },
-            left: {
-              name: 'a',
-              type: 'AssignmentTargetIdentifier',
-            },
-            right: {
-              expression: {
-                arguments: [],
-                callee: {
-                  name: 'b',
-                  type: 'IdentifierExpression',
-                },
-                type: 'CallExpression',
+                ],
+                kind: 'let',
+                type: 'VariableDeclaration',
               },
-              type: 'AwaitExpression',
+              type: 'VariableDeclarationStatement',
             },
-            type: 'ForInStatement',
-          },
-        ],
-        type: 'FunctionBody',
-      },
-      isAsync: true,
-      params: {
-        items: [],
-        rest: null,
-        type: 'FormalParameters',
-      },
-      type: 'ArrowExpression',
-    });
+            {
+              body: {
+                type: 'EmptyStatement',
+              },
+              left: {
+                name: 'a',
+                type: 'AssignmentTargetIdentifier',
+              },
+              right: {
+                expression: {
+                  arguments: [],
+                  callee: {
+                    name: 'b',
+                    type: 'IdentifierExpression',
+                  },
+                  type: 'CallExpression',
+                },
+                type: 'AwaitExpression',
+              },
+              type: 'ForInStatement',
+            },
+          ],
+          type: 'FunctionBody',
+        },
+        isAsync: true,
+        params: {
+          items: [],
+          rest: null,
+          type: 'FormalParameters',
+        },
+        type: 'ArrowExpression',
+      });
   });
 
   suite('functions', () => {

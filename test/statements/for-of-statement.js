@@ -51,5 +51,6 @@ suite('Parser', () => {
 
     testParseFailure('for(var a of b, c);', 'Unexpected token ","');
     testParseFailure('for(a of b, c);', 'Unexpected token ","');
+    testParseFailure('for(let.x of a);', 'Invalid left-hand side in for-of');
   });
 });

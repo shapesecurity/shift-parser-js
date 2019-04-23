@@ -51,6 +51,7 @@ suite('Parser', () => {
 
     testParseFailure('for await(var a of b, c);', 'Unexpected token ","');
     testParseFailure('for await(a of b, c);', 'Unexpected token ","');
+    testParseFailure('for await(let.x of a);', 'Invalid left-hand side in for-await');
     testParseFailure('for await(let a in b);', 'Unexpected token "in"');
     testParseFailure('for await(a in b);', 'Unexpected token "in"');
     testParseFailure('for await(;;);', 'Unexpected token ";"');

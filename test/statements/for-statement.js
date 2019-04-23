@@ -46,7 +46,5 @@ suite('Parser', () => {
 
 
     testParseFailure('for({a=0};;);', 'Illegal property initializer');
-    testParseFailure('for await(;;);', 'Unexpected token ";"');
-    testParseFailure('let b = []; for await(a in b);', 'Unexpected token "in"');
   });
 });

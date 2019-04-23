@@ -38,6 +38,24 @@ suite('Parser', () => {
       right: { type: 'IdentifierExpression', name: 'b' },
       body: { type: 'EmptyStatement' },
     });
+    testParse('for(let.x of a);', stmt, {
+      type: 'ForOfStatement',
+      left: {
+        type: 'StaticMemberAssignmentTarget',
+        object: {
+          type: 'IdentifierExpression',
+          name: 'let',
+        },
+        property: 'x',
+      },
+      right: {
+        type: 'IdentifierExpression',
+        name: 'a',
+      },
+      body: {
+        type: 'EmptyStatement',
+      },
+    });
 
     testParseFailure('for(let of 0);', 'Unexpected number');
     testParseFailure('for(this of 0);', 'Invalid left-hand side in for-of');
@@ -51,6 +69,5 @@ suite('Parser', () => {
 
     testParseFailure('for(var a of b, c);', 'Unexpected token ","');
     testParseFailure('for(a of b, c);', 'Unexpected token ","');
-    testParseFailure('for(let.x of a);', 'Invalid left-hand side in for-of');
   });
 });

@@ -68,6 +68,9 @@ export default {
       // Invalid test
       // https://github.com/tc39/test262-parser-tests/issues/21
       'e3fbcf63d7e43ead.js',
+
+      // https://github.com/tc39/test262-parser-tests/issues/24
+      'ef2d369cccc5386c.js',
     ],
   },
 };

@@ -29,7 +29,6 @@ suite('Parser', () => {
     suite('let used as identifier expression', () => {
       testParseFailure('for(let[a].b of 0);', 'Unexpected token "."');
       testParseFailure('for(let[a]().b of 0);', 'Unexpected token "("');
-      testParseFailure('for(let.a of 0);', 'Invalid left-hand side in for-of');
     });
 
     suite('unicode identifier', () => {

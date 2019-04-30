@@ -75,7 +75,7 @@ function enforceDuplicateConstructorMethods(node, s) {
   return s;
 }
 
-const SUPERCALL_ERROR = node => new EarlyError(node, 'Calls to super must be in the "constructor" method of a class expression or class declaration that has a superclass');
+const SUPERCALL_ERROR = node => new EarlyError(node, ErrorMessages.ILLEGAL_SUPER_CALL);
 const SUPERPROPERTY_ERROR = node => new EarlyError(node, 'Member access on super must be in a method');
 const DUPLICATE_BINDING = node => new EarlyError(node, `Duplicate binding ${JSON.stringify(node.name)}`);
 const FREE_CONTINUE = node => new EarlyError(node, 'Continue statement must be nested within an iteration statement');

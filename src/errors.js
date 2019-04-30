@@ -49,6 +49,7 @@ export const ErrorMessages = {
   NO_CATCH_OR_FINALLY: 'Missing catch or finally after try',
   ILLEGAL_RETURN: 'Illegal return statement',
   ILLEGAL_ARROW_FUNCTION_PARAMS: 'Illegal arrow function parameter list',
+  INVALID_ASYNC_PARAMS: 'Async function parameters must not contain await expressions',
   INVALID_VAR_INIT_FOR_IN: 'Invalid variable declaration in for-in statement',
   INVALID_VAR_INIT_FOR_OF: 'Invalid variable declaration in for-of statement',
   INVALID_VAR_INIT_FOR_AWAIT: 'Invalid variable declaration in for-await statement',
@@ -86,6 +87,7 @@ export const ErrorMessages = {
     'Break statement must be nested within an iteration statement or a switch statement',
   ILLEGAL_WITH_STRICT_MODE: 'Strict mode code must not include a with statement',
   ILLEGAL_ACCESS_SUPER_MEMBER: 'Member access on super must be in a method',
+  ILLEGAL_SUPER_CALL: 'Calls to super must be in the "constructor" method of a class expression or class declaration that has a superclass',
   DUPLICATE_LABEL_DECLARATION(label) {
     return `Label ${JSON.stringify(label)} has already been declared`;
   },

@@ -38,24 +38,6 @@ suite('Parser', () => {
       right: { type: 'IdentifierExpression', name: 'b' },
       body: { type: 'EmptyStatement' },
     });
-    testParse('for await(let.x of a);', stmt, {
-      type: 'ForAwaitStatement',
-      left: {
-        type: 'StaticMemberAssignmentTarget',
-        object: {
-          type: 'IdentifierExpression',
-          name: 'let',
-        },
-        property: 'x',
-      },
-      right: {
-        type: 'IdentifierExpression',
-        name: 'a',
-      },
-      body: {
-        type: 'EmptyStatement',
-      },
-    })
 
     testParseFailure('for await(let of 0);', 'Unexpected number');
     testParseFailure('for await(this of 0);', 'Invalid left-hand side in for-await');
@@ -69,6 +51,7 @@ suite('Parser', () => {
 
     testParseFailure('for await(var a of b, c);', 'Unexpected token ","');
     testParseFailure('for await(a of b, c);', 'Unexpected token ","');
+    testParseFailure('for await(let.x of a);', 'Invalid left-hand side in for-await');
     testParseFailure('for await(let a in b);', 'Unexpected token "in"');
     testParseFailure('for await(a in b);', 'Unexpected token "in"');
     testParseFailure('for await(;;);', 'Unexpected token ";"');

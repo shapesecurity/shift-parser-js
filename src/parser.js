@@ -707,6 +707,7 @@ export class GenericParser extends Tokenizer {
       }
       return new AST.ForStatement({ init: null, test, update: right, body: this.getIteratorStatementEpilogue() });
     }
+    let startsWithLet = this.match(TokenType.LET);
     let isForDecl = this.lookaheadLexicalDeclaration();
     let leftStartState = this.startNode();
     if (this.match(TokenType.VAR) || isForDecl) {
@@ -770,6 +771,9 @@ export class GenericParser extends Tokenizer {
     if (this.isAssignmentTarget && expr.type !== 'AssignmentExpression' && (this.match(TokenType.IN) || this.matchContextualKeyword('of'))) {
       if (expr.type === 'ObjectAssignmentTarget' || expr.type === 'ArrayAssignmentTarget') {
         this.firstExprError = null;
+      }
+      if (startsWithLet && this.matchContextualKeyword('of')) {
+        throw this.createError(isAwait ? ErrorMessages.INVALID_LHS_IN_FOR_AWAIT : ErrorMessages.INVALID_LHS_IN_FOR_OF);
       }
       let ctor;
       if (this.match(TokenType.IN)) {

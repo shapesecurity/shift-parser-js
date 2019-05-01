@@ -30,6 +30,7 @@ export const ErrorMessages = {
   UNEXPECTED_EOS: 'Unexpected end of input',
   UNEXPECTED_LINE_TERMINATOR: 'Unexpected line terminator',
   UNEXPECTED_COMMA_AFTER_REST: 'Unexpected comma after rest',
+  UNEXPECTED_REST_PARAMETERS_INITIALIZATION: 'Rest parameter may not have a default initializer',
   NEWLINE_AFTER_THROW: 'Illegal newline after throw',
   UNTERMINATED_REGEXP: 'Invalid regular expression: missing /',
   INVALID_REGEXP_FLAGS: 'Invalid regular expression flags',

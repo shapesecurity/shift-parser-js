@@ -1086,7 +1086,6 @@ export class GenericParser extends Tokenizer {
         throw this.createUnexpected(this.lookahead);
       }
     }
-
     return this.copyNode(head, new AST.FormalParameters({ items: params, rest }));
   }
 
@@ -1127,7 +1126,6 @@ export class GenericParser extends Tokenizer {
       this.isBindingElement = this.isAssignmentTarget = false;
       return this.parseYieldExpression();
     }
-
     let expr = this.parseConditionalExpression();
 
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
@@ -1136,7 +1134,6 @@ export class GenericParser extends Tokenizer {
       let isAsync = expr.type === ARROW_EXPRESSION_PARAMS && expr.isAsync;
       return this.parseArrowExpressionTail(this.finishArrowParams(expr), isAsync, startState);
     }
-
     let isAssignmentOperator = false;
     let operator = this.lookahead;
     switch (operator.type) {
@@ -1540,7 +1537,6 @@ export class GenericParser extends Tokenizer {
     } else if (this.match(TokenType.ASYNC)) {
       expr = this.parsePrimaryExpression();
       // there's only three things this could be: an identifier, an async arrow, or an async function expression.
-
       if (expr.type === 'IdentifierExpression' && allowCall && !this.hasLineTerminatorBeforeNext) {
         if (this.matchIdentifier()) {
           // `async [no lineterminator here] identifier` must be an async arrow
@@ -1572,7 +1568,10 @@ export class GenericParser extends Tokenizer {
             }
             let rest = null;
             if (args.length > 0 && args[args.length - 1].type === 'SpreadElement') {
-              rest = this.targetToBinding(this.transformDestructuring(args[args.length - 1].expression));
+              rest = this.targetToBinding(this.transformDestructuringWithDefault(args[args.length - 1].expression));
+              if (rest.init != null) {
+                throw this.createError(ErrorMessages.UNEXPECTED_REST_PARAMETERS_INITIALIZATION);
+              }
               args = args.slice(0, -1);
             }
             let params = args.map(arg => this.targetToBinding(this.transformDestructuringWithDefault(arg)));
@@ -2134,9 +2133,15 @@ export class GenericParser extends Tokenizer {
         this.isBindingElement = this.isAssignmentTarget = false;
         return methodOrKey;
       case 'identifier':
+        if (token.value === 'await' && this.firstAwaitLocation == null) {
+          this.firstAwaitLocation = this.getLocation();
+        }
         if (this.eat(TokenType.ASSIGN)) {
           if (this.allowYieldExpression && token.value === 'yield') {
             throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+          }
+          if (this.allowAwaitExpression && token.value === 'await') {
+            throw this.createError(ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
           }
           // CoverInitializedName
           let init = this.isolateCoverGrammar(this.parseAssignmentExpression);
@@ -2148,6 +2153,9 @@ export class GenericParser extends Tokenizer {
         } else if (!this.match(TokenType.COLON)) {
           if (this.allowYieldExpression && token.value === 'yield') {
             throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
+          }
+          if (this.allowAwaitExpression && token.value === 'await') {
+            throw this.createError(ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
           }
           if (token.type === TokenType.IDENTIFIER || token.value === 'let' || token.value === 'yield' || token.value === 'async' || token.value === 'await') {
             return this.finishNode(new AST.ShorthandProperty({ name: this.finishNode(new AST.IdentifierExpression({ name: methodOrKey.value }), startState) }), startState);
@@ -2377,7 +2385,6 @@ export class GenericParser extends Tokenizer {
 
   parseFunction({ isExpr, inDefault, allowGenerator, isAsync, startState = this.startNode() }) {
     this.lex();
-
     let name = null;
     let isGenerator = allowGenerator && !!this.eat(TokenType.MUL);
 
@@ -2399,7 +2406,6 @@ export class GenericParser extends Tokenizer {
         throw this.createUnexpected(this.lookahead);
       }
     }
-
     this.allowYieldExpression = isGenerator;
     this.allowAwaitExpression = isAsync;
     this.firstAwaitLocation = null;
@@ -2456,6 +2462,9 @@ export class GenericParser extends Tokenizer {
         if (this.allowYieldExpression && token.value === 'yield') {
           throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
         }
+        if (this.allowAwaitExpression && token.value === 'await') {
+          throw this.createError(ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
+        }
         let defaultValue = null;
         if (this.eat(TokenType.ASSIGN)) {
           defaultValue = this.parseAssignmentExpression();
@@ -2485,7 +2494,6 @@ export class GenericParser extends Tokenizer {
     }
 
     this.expect(TokenType.RBRACE);
-
     return this.finishNode(new AST.ObjectBinding({ properties }), startState);
   }
 
@@ -2505,7 +2513,6 @@ export class GenericParser extends Tokenizer {
   parseBindingElement() {
     let startState = this.startNode();
     let binding = this.parseBindingTarget();
-
     if (this.eat(TokenType.ASSIGN)) {
       let init = this.parseAssignmentExpression();
       binding = this.finishNode(new AST.BindingWithDefault({ binding, init }), startState);
@@ -2523,13 +2530,18 @@ export class GenericParser extends Tokenizer {
 
   parseParams() {
     let startState = this.startNode();
-
     this.expect(TokenType.LPAREN);
 
     let items = [], rest = null;
     while (!this.match(TokenType.RPAREN)) {
       if (this.eat(TokenType.ELLIPSIS)) {
         rest = this.parseBindingTarget();
+        if (this.lookahead.type === TokenType.ASSIGN) {
+          throw this.createError(ErrorMessages.UNEXPECTED_REST_PARAMETERS_INITIALIZATION);
+        }
+        if (this.match(TokenType.COMMA)) {
+          throw this.createError(ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+        }
         break;
       }
       items.push(this.parseParam());

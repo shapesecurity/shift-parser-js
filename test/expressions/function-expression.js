@@ -28,8 +28,8 @@ suite('Parser', () => {
     testParseFailure('(function((a)){})', 'Unexpected token "("');
     testParseFailure('(function(...a = []) {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
     testParseFailure('(async function(...a = []) {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
-    testParseFailure('(function(...a, ...b){})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(async function(...a, b){})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(async function(...a, ...b){})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(function(...a, ...b){})', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+    testParseFailure('(async function(...a, b){})', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+    testParseFailure('(async function(...a, ...b){})', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
   });
 });

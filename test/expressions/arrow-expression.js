@@ -98,11 +98,11 @@ suite('Parser', () => {
     testParseFailure('() + 0', 'Unexpected token "+"');
     testParseFailure('(10) => 0', 'Illegal arrow function parameter list');
     testParseFailure('(10, 20) => 0', 'Illegal arrow function parameter list');
-    testParseFailure('(...a, b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(...a, ...b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(a, ...b,) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(async (...a, b) => {})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(async (...a, ...b) => {})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(...a, b) => {}', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+    testParseFailure('(...a, ...b) => {}', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+    testParseFailure('(a, ...b,) => {}', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
+    testParseFailure('(async (...a, b) => {})', 'Unexpected token ","');
+    testParseFailure('(async (...a, ...b) => {})', 'Unexpected token ","');
     testParseFailure('(async (...x = []) => {});', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
   });
 });

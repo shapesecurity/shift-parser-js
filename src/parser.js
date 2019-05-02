@@ -1984,7 +1984,7 @@ export class GenericParser extends Tokenizer {
         throw this.createError(ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
       }
       if (this.match(TokenType.COMMA)) {
-        throw this.createError(ErrorMessages.INVALID_LAST_REST_PARAMETER);
+        throw this.createError(ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
       }
       this.expect(TokenType.RPAREN);
       let paramsNode = this.finishNode({
@@ -1997,7 +1997,7 @@ export class GenericParser extends Tokenizer {
       this.isBindingElement = this.isAssignmentTarget = false;
       return paramsNode;
     }
-    
+
     let group = this.inheritCoverGrammar(this.parseAssignmentExpressionOrTarget);
 
     let params = this.isBindingElement ? [this.targetToBinding(this.transformDestructuringWithDefault(group))] : null;
@@ -2022,7 +2022,7 @@ export class GenericParser extends Tokenizer {
           throw this.createError(ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
         }
         if (this.match(TokenType.COMMA)) {
-          throw this.createError(ErrorMessages.INVALID_LAST_REST_PARAMETER);
+          throw this.createError(ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
         }
         break;
       }

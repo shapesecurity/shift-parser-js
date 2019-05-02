@@ -18,12 +18,13 @@ let expr = require('../helpers').expr;
 let stmt = require('../helpers').stmt;
 let testParseFailure = require('../assertions').testParseFailure;
 let testParse = require('../assertions').testParse;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('function expression', () => {
 
 
-    testParseFailure('(function(...a, b){})', 'Unexpected token ","');
+    testParseFailure('(function(...a, b){})', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
     testParseFailure('(function((a)){})', 'Unexpected token "("');
   });
 });

@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let { stmt, expr } = require('../helpers');
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 function id(x) {
   return x;
@@ -153,13 +154,13 @@ suite('trailing function comma', () => {
     testParseFailure('async (a, ...b,) => 0', 'Unexpected token ","');
     testParseFailure('function a(,) {}', 'Unexpected token ","');
     testParseFailure('function a(b,,) {}', 'Unexpected token ","');
-    testParseFailure('function a(b, ...c,) {}', 'Unexpected token ","');
+    testParseFailure('function a(b, ...c,) {}', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
     testParseFailure('(function (,) {})', 'Unexpected token ","');
     testParseFailure('(function (a,,) {})', 'Unexpected token ","');
-    testParseFailure('(function (a, ...b,) {})', 'Unexpected token ","');
+    testParseFailure('(function (a, ...b,) {})', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
     testParseFailure('({ a (,) {} })', 'Unexpected token ","');
     testParseFailure('({ a (b,,) {} })', 'Unexpected token ","');
-    testParseFailure('({ a (b, ...c,) {} })', 'Unexpected token ","');
+    testParseFailure('({ a (b, ...c,) {} })', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
 
     testParseFailure('({ set a (b,) {} })', 'Unexpected token ","');
     testParseFailure('(a,)', 'Unexpected token ")"');

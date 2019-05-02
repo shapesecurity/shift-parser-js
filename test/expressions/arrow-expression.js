@@ -75,6 +75,27 @@ suite('Parser', () => {
         type: 'ArrowExpression',
       });
 
+    testParse('a => {}', expr,
+      {
+        body: {
+          directives: [],
+          statements: [],
+          type: 'FunctionBody',
+        },
+        isAsync: false,
+        params: {
+          items: [
+            {
+              name: 'a',
+              type: 'BindingIdentifier',
+            }
+          ],
+          rest: null,
+          type: 'FormalParameters'
+        },
+        type: 'ArrowExpression',
+      });
+
     testParseFailure('((...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
     testParseFailure('(async (...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
     testParseFailure('[]=>0', 'Unexpected token "=>"');
@@ -104,5 +125,6 @@ suite('Parser', () => {
     testParseFailure('(async (...a, b) => {})', 'Unexpected token ","');
     testParseFailure('(async (...a, ...b) => {})', 'Unexpected token ","');
     testParseFailure('(async (...x = []) => {});', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+    testParseFailure('((x = 0) =>)', 'Unexpected token ")"');
   });
 });

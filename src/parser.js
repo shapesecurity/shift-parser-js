@@ -1102,6 +1102,8 @@ export class GenericParser extends Tokenizer {
   finishArrowParams(head) {
     let { params = null, rest = null } = head;
     if (head.type !== ARROW_EXPRESSION_PARAMS) {
+      // this doesn't appear to be reachable, but just in case
+      /* istanbul ignore next */
       if (head.type === 'IdentifierExpression') {
         params = [this.targetToBinding(this.transformDestructuring(head))];
       } else {

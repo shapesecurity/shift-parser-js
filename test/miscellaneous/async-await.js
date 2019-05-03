@@ -799,7 +799,7 @@ suite('async', () => {
     testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');
     testParseFailure('new async() => {}', 'Unexpected token "=>"');
     testParseFailure('({ async\nf(){} })', 'Unexpected identifier');
-    testParseFailure('async ((a)) => {}', 'Unexpected token "("');
+    testParseFailure('async ((a)) => {}', ErrorMessages.UNEXPECTED_TOKEN('=>'));
     testParseFailure('({ async get a(){} })', 'Unexpected identifier');
     testParseFailure('async a => {} ()', 'Unexpected token "("');
     testParseFailure('a + async b => {}', 'Unexpected token "=>"');

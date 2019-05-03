@@ -5,8 +5,4 @@ coverage/
 dist/
 shift-parser.js
 .nyc_output/
-<<<<<<< HEAD
 .npmrc
-=======
-.npmrc
->>>>>>> 1aa3d92e9bb27f3a6c84dd6eb0a59a4809fd814c

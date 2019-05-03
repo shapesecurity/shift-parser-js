@@ -689,7 +689,7 @@ export class GenericParser extends Tokenizer {
 
   parseForStatement() {
     this.lex();
-    let isAwait = this.eat(TokenType.AWAIT);
+    let isAwait = this.allowAwaitExpression && this.eat(TokenType.AWAIT);
     this.expect(TokenType.LPAREN);
     let test = null;
     let right = null;
@@ -2180,7 +2180,7 @@ export class GenericParser extends Tokenizer {
       if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
       }
-      return this.finishNode(new AST.ObjectAssignmentTarget({ properties: properties.map(p => this.transformDestructuring(p)), rest }), startState);
+      return this.finishNode(new AST.ObjectAssignmentTarget({ properties: properties.map(p => this.transformDestructuringWithDefault(p)), rest }), startState);
     }
     return this.finishNode(new AST.ObjectExpression({ properties }), startState);
   }

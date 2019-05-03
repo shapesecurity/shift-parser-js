@@ -22,7 +22,7 @@ let ErrorMessages = require('../../src/errors').ErrorMessages;
 function createAsyncContext(body) {
   return `
   (async function() {
-    ${body};
+    ${body}
   })();
   `;
 }
@@ -48,7 +48,7 @@ suite('Parser', () => {
     testParseFailure(createAsyncContext('for await(a in b);'), 'Unexpected token "in"');
     testParseFailure(createAsyncContext('for await(;;);'), 'Unexpected token ";"');
     testParseFailure(createAsyncContext('for await(let a;;;);'), 'Unexpected token ";"');
-    testParseFailure(createAsyncContext('let b = []; for await(a in b);'), 'Unexpected token "in"');
+    testParseFailure(createAsyncContext('for await(;;);'), 'Unexpected token ";"');
     testParseFailure(createAsyncContext('for await(;;);'), 'Unexpected token ";"');
     testParseFailure(createAsyncContext('let b = []; for await(a in b);'), 'Unexpected token "in"');
   });

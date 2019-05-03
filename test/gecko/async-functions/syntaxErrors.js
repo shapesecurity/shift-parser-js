@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-// Reference : https://github.com/mozilla/gecko-dev/tree/master/js/src/tests/non262/async-functions 
+// Reference : https://github.com/mozilla/gecko-dev/tree/master/js/src/tests/non262/async-functions
 
 let testParseFailure = require('../../assertions').testParseFailure;
 let testParseSuccess = require('../../assertions').testParseSuccess;

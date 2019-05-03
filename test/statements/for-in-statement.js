@@ -117,5 +117,6 @@ suite('Parser', () => {
     testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('"use strict"; for(var a = 0 in b);', 'Invalid variable declaration in for-in statement');
+    testParseFailure('let b = []; for await(a in b);', 'Unexpected token "in"');
   });
 });

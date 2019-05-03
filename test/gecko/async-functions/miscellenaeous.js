@@ -17,15 +17,36 @@
 // Reference : https://github.com/mozilla/gecko-dev/tree/master/js/src/tests/non262/async-functions 
 
 let testParseSuccess = require('../../assertions').testParseSuccess;
-let testParseFailure = require('../../assertions').testParseFailure;
+let testEarlyError = require('../../assertions').testEarlyError;
+let ErrorMessages = require('../../../src/errors').ErrorMessages;
 
 // Newline is allowed between await and operand
-let code = `
-var expr = async function foo() {
+let codeWithNoSyntaxErrors = [
+  `
+  var expr = async function foo() {
     return await
     10;
-};
-`;
+  };
+  `,
+  'async\nfunction a(){}',
+];
 
-testParseSuccess(code);
+let codeWithSyntaxErrors = [
+  // Await is not allowed as a default expr.
+  'async function a(k = await 3) {}',
+  'async function a() { async function b(k = await 3) {} }',
+  'async function a() { async function b(k = [await 3]) {} }',
 
+  'async function a() { async function b([k = await 3]) {} }',
+  'async function a() { async function b([k = [await 3]]) {} }',
+  'async function a() { async function b({k = await 3}) {} }',
+  'async function a() { async function b({k = [await 3]}) {} }',
+];
+
+for (let code of codeWithNoSyntaxErrors) {
+  testParseSuccess(code);
+}
+
+for (let code of codeWithSyntaxErrors) {
+  testEarlyError(code, ErrorMessages.INVALID_ASYNC_PARAMS);
+}

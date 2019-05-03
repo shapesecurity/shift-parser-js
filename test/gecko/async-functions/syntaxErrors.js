@@ -31,7 +31,7 @@ function assertSyntaxErrorForPropertyNames(code) {
   assertSyntaxError(code, ErrorMessages.UNEXPECTED_TOKEN('async'));
 }
 function assertSyntaxErrorForAwaitIdentfier(code) {
-  assertSyntaxError(code, ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
+  assertSyntaxError(code, ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
 }
 
 // async property name error
@@ -44,18 +44,6 @@ for (let decl of ['var', 'let', 'const']) {
 
 testParseFailure('await 10', ErrorMessages.UNEXPECTED_NUMBER);
 
-// |await| expression is invalid in arrow functions in async-context.
-let codeContainingAwaitasIdentifier = [
-  'async(a = await/r/g) => {}',
-  'async(a = (b = await/r/g) => {}) => {}',
-  '(a = async(b = await/r/g) => {}) => {}',
-  'async(a = async(b = await/r/g) => {}) => {}',
-];
-
-for (let code of codeContainingAwaitasIdentifier) {
-  assertSyntaxErrorForAwaitIdentfier(code);
-}
-
 let codeContainingAwaitAsRestBindingParam = [
   'async(...await) => {}',
   'async(a, ...await) => {}',
@@ -64,8 +52,15 @@ let codeContainingAwaitAsRestBindingParam = [
   'async(a = async(...await) => {}) => {}',
 ];
 
+let codeContainingAwaitRegex = [
+  'async(a = await/r/g) => {}',
+  'async(a = (b = await/r/g) => {}) => {}',
+  '(a = async(b = await/r/g) => {}) => {}',
+  'async(a = async(b = await/r/g) => {}) => {}',
+];
+
 // |await| cannot be used as rest-binding parameter in arrow functions in async-context.
-for (let code of codeContainingAwaitAsRestBindingParam) {
+for (let code of [].concat(codeContainingAwaitAsRestBindingParam, codeContainingAwaitRegex)) {
   assertSyntaxErrorForAwaitIdentfier(code);
 }
 

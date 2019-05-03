@@ -101,8 +101,12 @@ suite('Parser', () => {
     testParseFailure('(...a, b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
     testParseFailure('(...a, ...b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
     testParseFailure('(a, ...b,) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(async (...a, b) => {})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
-    testParseFailure('(async (...a, ...b) => {})', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(async (...a, b) => {})', ErrorMessages.UNEXPECTED_TOKEN(','));
+    testParseFailure('(async (...a, ...b) => {})', ErrorMessages.UNEXPECTED_TOKEN(','));
     testParseFailure('(async (...x = []) => {});', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+    testParseFailure('async (a = await => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = (await) => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = aw\\u{61}it => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = (b = await (0)) => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
   });
 });

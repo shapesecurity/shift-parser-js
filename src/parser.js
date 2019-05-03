@@ -117,7 +117,6 @@ export class GenericParser extends Tokenizer {
     this.allowYieldExpression = false;
     this.allowAwaitExpression = false;
     this.firstAwaitLocation = null; // for forbidding `await` in async arrow params.
-    this.blockAwaitIdentifier = false;
     this.module = false;
     this.moduleIsTheGoalSymbol = false;
     this.strict = false;
@@ -1120,8 +1119,6 @@ export class GenericParser extends Tokenizer {
     this.allowYieldExpression = false;
     this.allowAwaitExpression = isAsync;
     this.firstAwaitLocation = null;
-    let previousAwaitIdentifier = this.blockAwaitIdentifier;
-    this.blockAwaitIdentifier = isAsync;
     let body;
     if (this.match(TokenType.LBRACE)) {
       let previousAllowIn = this.allowIn;
@@ -1131,7 +1128,6 @@ export class GenericParser extends Tokenizer {
     } else {
       body = this.parseAssignmentExpression();
     }
-    this.blockAwaitIdentifier = previousAwaitIdentifier;
     this.allowYieldExpression = previousYield;
     this.allowAwaitExpression = previousAwait;
     this.firstAwaitLocation = previousAwaitLocation;
@@ -1144,13 +1140,11 @@ export class GenericParser extends Tokenizer {
 
   parseAssignmentExpressionOrTarget() {
     let startState = this.startNode();
-
     if (this.allowYieldExpression && this.match(TokenType.YIELD)) {
       this.isBindingElement = this.isAssignmentTarget = false;
       return this.parseYieldExpression();
     }
     let expr = this.parseConditionalExpression();
-
     if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.ARROW)) {
       this.isBindingElement = this.isAssignmentTarget = false;
       this.firstExprError = null;
@@ -1900,7 +1894,7 @@ export class GenericParser extends Tokenizer {
     if (this.lookahead.value === 'yield' && this.allowYieldExpression) {
       throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     }
-    if (this.lookahead.value === 'await' && (this.allowAwaitExpression || this.blockAwaitIdentifier)) {
+    if (this.lookahead.value === 'await' && (this.allowAwaitExpression)) {
       throw this.createError(ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
     }
     if (this.matchIdentifier()) {
@@ -2154,7 +2148,6 @@ export class GenericParser extends Tokenizer {
 
   parseObjectExpression() {
     let startState = this.startNode();
-
     this.lex();
     let rest = null;
     let properties = [], property = null;
@@ -2350,16 +2343,13 @@ export class GenericParser extends Tokenizer {
           this.expect(TokenType.RPAREN);
           let previousYield = this.allowYieldExpression;
           let previousAwait = this.allowAwaitExpression;
-          let previousAwaitIdentifier = this.blockAwaitIdentifier;
           let previousAwaitLocation = this.firstAwaitLocation;
           this.allowYieldExpression = false;
           this.allowAwaitExpression = false;
-          this.blockAwaitIdentifier = false;
           this.previousAwaitLocation = null;
           let body = this.parseFunctionBody();
           this.allowYieldExpression = previousYield;
           this.allowAwaitExpression = previousAwait;
-          this.blockAwaitIdentifier = previousAwaitIdentifier;
           this.previousAwaitLocation = previousAwaitLocation;
           return {
             methodOrKey: this.finishNode(new AST.Getter({ name, body }), startState),
@@ -2370,18 +2360,15 @@ export class GenericParser extends Tokenizer {
           this.expect(TokenType.LPAREN);
           let previousYield = this.allowYieldExpression;
           let previousAwait = this.allowAwaitExpression;
-          let previousAwaitIdentifier = this.blockAwaitIdentifier;
           let previousAwaitLocation = this.firstAwaitLocation;
           this.allowYieldExpression = false;
           this.allowAwaitExpression = false;
           this.previousAwaitLocation = null;
           let param = this.parseBindingElement();
-          this.blockAwaitIdentifier = false;
           this.expect(TokenType.RPAREN);
           let body = this.parseFunctionBody();
           this.allowYieldExpression = previousYield;
           this.allowAwaitExpression = previousAwait;
-          this.blockAwaitIdentifier = previousAwaitIdentifier;
           this.previousAwaitLocation = previousAwaitLocation;
           return {
             methodOrKey: this.finishNode(new AST.Setter({ name, param, body }), startState),
@@ -2393,18 +2380,14 @@ export class GenericParser extends Tokenizer {
     if (isAsync) {
       let previousYield = this.allowYieldExpression;
       let previousAwait = this.allowAwaitExpression;
-      let previousAwaitIdentifier = this.blockAwaitIdentifier;
       this.allowYieldExpression = isGenerator;
-      this.blockAwaitIdentifier = true;
       this.allowAwaitExpression = true;
       let params = this.parseParams();
       this.allowYieldExpression = isGenerator;
-      this.blockAwaitIdentifier = false;
       this.allowAwaitExpression = true;
       let body = this.parseFunctionBody();
       this.allowYieldExpression = previousYield;
       this.allowAwaitExpression = previousAwait;
-      this.blockAwaitIdentifier = previousAwaitIdentifier;
       return {
         methodOrKey: this.finishNode(new AST.Method({ isAsync, isGenerator, name, params, body }), startState),
         kind: 'method',
@@ -2414,7 +2397,6 @@ export class GenericParser extends Tokenizer {
     if (this.match(TokenType.LPAREN)) {
       let previousYield = this.allowYieldExpression;
       let previousAwait = this.allowAwaitExpression;
-      let previousAwaitIdentifier = this.blockAwaitIdentifier;
       let previousAwaitLocation = this.firstAwaitLocation;
       this.allowYieldExpression = isGenerator;
       this.allowAwaitExpression = false;
@@ -2423,7 +2405,6 @@ export class GenericParser extends Tokenizer {
       let body = this.parseFunctionBody();
       this.allowYieldExpression = previousYield;
       this.allowAwaitExpression = previousAwait;
-      this.blockAwaitIdentifier = previousAwaitIdentifier;
       this.previousAwaitLocation = previousAwaitLocation;
 
       return {

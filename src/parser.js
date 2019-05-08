@@ -528,7 +528,7 @@ export class GenericParser extends Tokenizer {
         let lexerState = this.saveLexerState();
         this.lex();
         if (!this.hasLineTerminatorBeforeNext && this.match(TokenType.FUNCTION)) {
-          return this.parseFunction({ isExpr: false, inDefault: true, allowGenerator: true, isAsync: true, startState: preAsyncStartState });
+          return this.parseFunction({ isExpr: false, inDefault: false, allowGenerator: true, isAsync: true, startState: preAsyncStartState });
         }
         this.restoreLexerState(lexerState);
         return this.parseStatement();
@@ -1182,7 +1182,6 @@ export class GenericParser extends Tokenizer {
     } else {
       return expr;
     }
-
     this.lex();
     let rhs = this.parseAssignmentExpression();
 
@@ -1240,7 +1239,7 @@ export class GenericParser extends Tokenizer {
         if (last != null && last.type === 'SpreadProperty') {
           return this.copyNode(node, new AST.ObjectAssignmentTarget({
             properties: node.properties.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
-            rest: this.transformDestructuring(last.expression),
+            rest: this.transformDestructuringWithDefault(last.expression),
           }));
         }
 
@@ -1260,11 +1259,6 @@ export class GenericParser extends Tokenizer {
         return this.copyNode(node, new AST.ArrayAssignmentTarget({
           elements: node.elements.map(e => e && this.transformDestructuringWithDefault(e)),
           rest: null,
-        }));
-      }
-      case 'AssignmentExpression': {
-        return this.copyNode(node, new AST.AssignmentTargetIdentifier({
-          name: node.binding.name,
         }));
       }
       case 'IdentifierExpression':
@@ -1288,7 +1282,6 @@ export class GenericParser extends Tokenizer {
       case 'AssignmentTargetWithDefault':
         return node;
     }
-
     // istanbul ignore next
     throw new Error('Not reached');
   }
@@ -1894,7 +1887,7 @@ export class GenericParser extends Tokenizer {
     if (this.lookahead.value === 'yield' && this.allowYieldExpression) {
       throw this.createError(ErrorMessages.ILLEGAL_YIELD_IDENTIFIER);
     }
-    if (this.lookahead.value === 'await' && (this.allowAwaitExpression)) {
+    if (this.lookahead.value === 'await' && this.allowAwaitExpression) {
       throw this.createError(ErrorMessages.ILLEGAL_AWAIT_IDENTIFIER);
     }
     if (this.matchIdentifier()) {
@@ -2150,8 +2143,9 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
     this.lex();
     let rest = null;
-    let properties = [], property = null;
+    let properties = [];
     while (!this.match(TokenType.RBRACE)) {
+      let property = null;
       let isSpreadProperty = false;
       let spreadPropertyOrAssignmentTarget = null;
       if (this.match(TokenType.ELLIPSIS)) {

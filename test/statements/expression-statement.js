@@ -16,10 +16,37 @@
 
 let testParse = require('../assertions').testParse;
 let stmt = require('../helpers').stmt;
+let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('expression statement', () => {
+    testParse('var {...a} = 0', stmt,
+      {
+        type: 'VariableDeclarationStatement',
+        declaration: {
+          type: 'VariableDeclaration',
+          kind: 'var',
+          declarators: [
+            {
+              type: 'VariableDeclarator',
+              binding: {
+                type: 'ObjectBinding',
+                properties: [],
+                rest: {
+                  type: 'BindingIdentifier',
+                  name: 'a',
+                },
+              },
+              init: {
+                type: 'LiteralNumericExpression',
+                value: 0,
+              },
+            },
+          ],
+        },
+      });
 
-
+    testParseFailure('let {a ...x} = {};', ErrorMessages.UNEXPECTED_TOKEN('...'));
   });
 });

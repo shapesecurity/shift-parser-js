@@ -75,6 +75,29 @@ suite('Parser', () => {
         type: 'ArrowExpression',
       });
 
+    testParse('({...a }) => 0', expr,
+      {
+        type: 'ArrowExpression',
+        isAsync: false,
+        params: {
+          type: 'FormalParameters',
+          items: [
+            {
+              type: 'ObjectBinding',
+              properties: [],
+              rest: {
+                type: 'BindingIdentifier',
+                name: 'a',
+              },
+            },
+          ],
+          rest: null,
+        },
+        body: {
+          type: 'LiteralNumericExpression',
+          value: 0,
+        },
+      });
     testParseFailure('((...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
     testParseFailure('(async (...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
     testParseFailure('[]=>0', 'Unexpected token "=>"');

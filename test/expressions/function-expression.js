@@ -23,6 +23,8 @@ let ErrorMessages = require('../../src/errors').ErrorMessages;
 suite('Parser', () => {
   suite('function expression', () => {
 
+    testParseSuccess('async (...a, b);');
+    testParseSuccess('async (...a, ...b);');
 
     testParseFailure('(function(...a, b){})', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);
     testParseSuccess('var b = []; function a(...x) {}; a(...b);');

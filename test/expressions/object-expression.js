@@ -16,6 +16,8 @@
 
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('object expression', () => {
@@ -157,4 +159,7 @@ suite('Parser', () => {
       type: 'ObjectExpression',
       });
   });
+
+  testParseFailure('({a ...b})', ErrorMessages.UNEXPECTED_TOKEN('...'));
+  testParseFailure('({...a = 0} = 0)', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 });

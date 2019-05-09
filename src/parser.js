@@ -1239,7 +1239,7 @@ export class GenericParser extends Tokenizer {
         if (last != null && last.type === 'SpreadProperty') {
           return this.copyNode(node, new AST.ObjectAssignmentTarget({
             properties: node.properties.slice(0, -1).map(e => e && this.transformDestructuringWithDefault(e)),
-            rest: this.transformDestructuringWithDefault(last.expression),
+            rest: this.transformDestructuring(last.expression),
           }));
         }
 
@@ -2151,18 +2151,14 @@ export class GenericParser extends Tokenizer {
       if (this.match(TokenType.ELLIPSIS)) {
         spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
         isSpreadProperty = true;
-
         property = spreadPropertyOrAssignmentTarget.expression;
-        if (property.type === 'ObjectExpression' || property.type === 'ArrayExpression') {
-          this.isBindingElement = this.isAssignmentTarget = false;
-        }
         rest = property;
         properties.push(spreadPropertyOrAssignmentTarget);
       } else {
         property = this.inheritCoverGrammar(this.parsePropertyDefinition);
         properties.push(property);
       }
-      if (!this.match(TokenType.RBRACE) && !this.match(TokenType.ELLIPSIS)) {
+      if (!this.match(TokenType.RBRACE)) {
         this.expect(TokenType.COMMA);
         if (isSpreadProperty) {
           this.isBindingElement = this.isAssignmentTarget = false;
@@ -2183,7 +2179,11 @@ export class GenericParser extends Tokenizer {
     let startState = this.startNode();
     this.expect(TokenType.ELLIPSIS);
     let expressionOrAssignmentTarget = this.parseAssignmentExpressionOrTarget();
-
+    if (!isValidSimpleAssignmentTarget(expressionOrAssignmentTarget)) {
+      this.isBindingElement = this.isAssignmentTarget = false;
+    } else if (expressionOrAssignmentTarget.type !== 'IdentifierExpression') {
+      this.isBindingElement = false;
+    }
     return this.finishNode(new AST.SpreadProperty({ expression: expressionOrAssignmentTarget }), startState);
   }
 
@@ -2322,8 +2322,8 @@ export class GenericParser extends Tokenizer {
     let isGenerator = !!this.eat(TokenType.MUL);
     if (isAsync && !this.lookaheadPropertyName()) {
       isAsync = false;
+      isGenerator = false;
       this.restoreLexerState(preAsyncTokenState);
-      isGenerator = !!this.eat(TokenType.MUL);
     }
 
     let { name } = this.parsePropertyName();
@@ -2560,7 +2560,6 @@ export class GenericParser extends Tokenizer {
 
   parseObjectBinding() {
     let startState = this.startNode();
-
     this.expect(TokenType.LBRACE);
 
     let properties = [];
@@ -2571,7 +2570,7 @@ export class GenericParser extends Tokenizer {
         break;
       }
       properties.push(this.parseBindingProperty());
-      if (!this.match(TokenType.RBRACE) && !this.match(TokenType.ELLIPSIS)) {
+      if (!this.match(TokenType.RBRACE)) {
         this.expect(TokenType.COMMA);
       }
     }

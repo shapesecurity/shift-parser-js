@@ -46,7 +46,7 @@ suite('Parser', () => {
           ],
         },
       });
-
+    testParseFailure('var {...a.b} = 0', ErrorMessages.UNEXPECTED_TOKEN('.'));
     testParseFailure('let {a ...x} = {};', ErrorMessages.UNEXPECTED_TOKEN('...'));
   });
 });

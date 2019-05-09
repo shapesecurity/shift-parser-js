@@ -18,6 +18,7 @@ let testParse = require('../assertions').testParse;
 let testParseModule = require('../assertions').testParseModule;
 let { stmt, expr } = require('../helpers');
 let testParseFailure = require('../assertions').testParseFailure;
+let testParseSuccess = require('../assertions').testParseSuccess;
 let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 function id(x) {
@@ -793,6 +794,50 @@ suite('async', () => {
         },
       ],
     });
+
+  testParse('async function* a(){}', stmt,
+    {
+      type: 'FunctionDeclaration',
+      isAsync: true,
+      isGenerator: true,
+      name: {
+        type: 'BindingIdentifier',
+        name: 'a',
+      },
+      params: {
+        type: 'FormalParameters',
+        items: [],
+        rest: null,
+      },
+      body: {
+        type: 'FunctionBody',
+        directives: [],
+        statements: [],
+      },
+    },
+  );
+
+  testParse('(async function* (){})', stmt,
+    {
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'FunctionExpression',
+        isAsync: true,
+        isGenerator: true,
+        name: null,
+        params: {
+          type: 'FormalParameters',
+          items: [],
+          rest: null,
+        },
+        body: {
+          type: 'FunctionBody',
+          directives: [],
+          statements: [],
+        },
+      },
+    },
+  );
 
   suite('failures', () => {
     testParseFailure('async (a, ...b, ...c) => {}', ErrorMessages.UNEXPECTED_TOKEN(','));

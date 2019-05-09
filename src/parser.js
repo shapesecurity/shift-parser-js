@@ -2147,8 +2147,8 @@ export class GenericParser extends Tokenizer {
     while (!this.match(TokenType.RBRACE)) {
       let property = null;
       let isSpreadProperty = false;
-      let spreadPropertyOrAssignmentTarget = null;
       if (this.match(TokenType.ELLIPSIS)) {
+        let spreadPropertyOrAssignmentTarget = null;
         spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
         isSpreadProperty = true;
         property = spreadPropertyOrAssignmentTarget.expression;

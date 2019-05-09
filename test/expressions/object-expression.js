@@ -160,6 +160,27 @@ suite('Parser', () => {
       });
   });
 
+  testParse('({... a.b} = 0)', expr,
+    {
+      type: 'AssignmentExpression',
+      binding: {
+        type: 'ObjectAssignmentTarget',
+        properties: [],
+        rest: {
+          type: 'StaticMemberAssignmentTarget',
+          object: {
+            type: 'IdentifierExpression',
+            name: 'a',
+          },
+          property: 'b',
+        },
+      },
+      expression: {
+        type: 'LiteralNumericExpression',
+        value: 0,
+      },
+
+    });
   testParseFailure('({a ...b})', ErrorMessages.UNEXPECTED_TOKEN('...'));
   testParseFailure('({...a = 0} = 0)', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 });

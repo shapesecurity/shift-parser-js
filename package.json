@@ -14,7 +14,8 @@
   ],
   "scripts": {
     "clean": "rm -rf dist coverage .nyc_output",
-    "test": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test --compilers js:babel-core/register",
+    "test-specific": "mocha --inline-diffs --check-leaks --ui tdd --reporter dot --slow 200 --timeout 5000 --recursive test/$TEST --compilers js:babel-core/register",
+    "test": "TEST=\"\" npm run test-specific",
     "coverage": "npm run build -- --plugins=istanbul && nyc --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 npm test",
     "lint": "eslint src test",
     "build": "babel --out-dir dist src",
@@ -25,9 +26,9 @@
   },
   "dependencies": {
     "multimap": "^1.0.2",
-    "shift-ast": "^5.0.0",
-    "shift-reducer": "^5.0.0",
-    "shift-regexp-acceptor": "^1.0.1"
+    "shift-ast": "6.0.0",
+    "shift-reducer": "6.0.0",
+    "shift-regexp-acceptor": "2.0.2"
   },
   "devDependencies": {
     "acorn": "6.0.1",
@@ -47,11 +48,11 @@
     "normalize-parser-test": "2.0.0",
     "nyc": "13.0.1",
     "regenerate": "^1.4.0",
-    "shift-parser-expectations": "^2017.0.0",
-    "shift-spec": "^2017.0.0",
+    "shift-parser-expectations": "^2018.0.2",
+    "shift-spec": "2018.0.2",
     "test262": "git+https://github.com/tc39/test262.git#8ed9947df1c4ea34fa1810067529df0806cc07ad",
     "test262-parser": "^2.0.7",
-    "test262-parser-tests": "0.0.3",
+    "test262-parser-tests": "0.0.5",
     "tick": "0.1.1",
     "traceur": "0.0.111",
     "uglify-js": "3.4.9",

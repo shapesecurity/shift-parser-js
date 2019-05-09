@@ -25,5 +25,6 @@ suite('Parser', () => {
     testParseFailure('/(?:)/mm', 'Duplicate regular expression flag \'m\'');
     testParseFailure('/(?:)/yy', 'Duplicate regular expression flag \'y\'');
     testParseFailure('/(?:)/uu', 'Duplicate regular expression flag \'u\'');
+    testParseFailure('/(?:)/ss', 'Duplicate regular expression flag \'s\'');
   });
 });

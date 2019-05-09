@@ -73,7 +73,7 @@ suite('Parser', () => {
           type: 'AssignmentExpression',
           binding: { type: 'ObjectAssignmentTarget', properties: [{ type: 'AssignmentTargetPropertyProperty',
             name: { type: 'StaticPropertyName', value: 'a' },
-            binding: { type: 'AssignmentTargetIdentifier', name: 'b' } }] },
+            binding: { type: 'AssignmentTargetIdentifier', name: 'b' } }], rest: null },
           expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );
@@ -84,7 +84,7 @@ suite('Parser', () => {
           binding: { type: 'ObjectAssignmentTarget', properties: [{ type: 'AssignmentTargetPropertyProperty',
             name: { type: 'StaticPropertyName', value: 'a' }, binding: { type: 'AssignmentTargetWithDefault',
               binding: { type: 'AssignmentTargetIdentifier', name: 'b' },
-              init: { type: 'LiteralNumericExpression', value: 0 } } }] },
+              init: { type: 'LiteralNumericExpression', value: 0 } } }], rest: null },
           expression: { type: 'LiteralNumericExpression', value: 1 },
         }
       );
@@ -95,7 +95,7 @@ suite('Parser', () => {
           type: 'AssignmentExpression',
           binding: { type: 'ObjectAssignmentTarget', properties: [{ type: 'AssignmentTargetPropertyProperty',
             name: { type: 'StaticPropertyName', value: 'a' }, binding: { type: 'StaticMemberAssignmentTarget',
-              object: { type: 'IdentifierExpression', name: 'b' }, property: 'c' } }] },
+              object: { type: 'IdentifierExpression', name: 'b' }, property: 'c' } }], rest: null },
           expression: { type: 'LiteralNumericExpression', value: 0 },
         }
       );

@@ -33,6 +33,7 @@ suite('Parser', () => {
             type: 'AssignmentTargetPropertyIdentifier',
             binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
             init: { type: 'LiteralNumericExpression', value: 0 } }],
+          rest: null,
         }] },
       right: { type: 'IdentifierExpression', name: 'b' },
       body: { type: 'EmptyStatement' },
@@ -50,5 +51,6 @@ suite('Parser', () => {
 
     testParseFailure('for(var a of b, c);', 'Unexpected token ","');
     testParseFailure('for(a of b, c);', 'Unexpected token ","');
+    testParseFailure('for(let.x of a);', 'Invalid left-hand side in for-of');
   });
 });

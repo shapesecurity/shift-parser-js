@@ -148,10 +148,10 @@ suite('trailing function comma', () => {
   suite('failures', () => {
     testParseFailure('(,) => 0', 'Unexpected token ","');
     testParseFailure('(a,,) => 0', 'Unexpected token ","');
-    testParseFailure('(a, ...b,) => 0', 'Unexpected token ","');
+    testParseFailure('(a, ...b,) => 0', ErrorMessages.INVALID_LAST_REST_PARAMETER);
     testParseFailure('async (,) => 0', 'Unexpected token ","');
     testParseFailure('async (a,,) => 0', 'Unexpected token ","');
-    testParseFailure('async (a, ...b,) => 0', 'Unexpected token ","');
+    testParseFailure('async (a, ...b,) => 0', ErrorMessages.UNEXPECTED_TOKEN(','));
     testParseFailure('function a(,) {}', 'Unexpected token ","');
     testParseFailure('function a(b,,) {}', 'Unexpected token ","');
     testParseFailure('function a(b, ...c,) {}', ErrorMessages.UNEXPECTED_COMMA_AFTER_REST);

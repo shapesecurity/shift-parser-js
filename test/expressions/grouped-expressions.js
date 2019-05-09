@@ -18,6 +18,7 @@
 let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('grouped expressions', () => {
@@ -25,5 +26,6 @@ suite('Parser', () => {
     testParseFailure('({a = 0})', 'Illegal property initializer');
     testParseFailure('(0, {a = 0}) => 0', 'Illegal arrow function parameter list');
     testParseFailure('({a = 0}, {a = 0}, 0) => 0', 'Unexpected number');
+    testParseFailure('(a = 0, ...b = []) => {}', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
   });
 });

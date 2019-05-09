@@ -33,12 +33,15 @@ export const ErrorMessages = {
   UNEXPECTED_REST_PARAMETERS_INITIALIZATION: 'Rest parameter may not have a default initializer',
   NEWLINE_AFTER_THROW: 'Illegal newline after throw',
   UNTERMINATED_REGEXP: 'Invalid regular expression: missing /',
+  INVALID_LAST_REST_PARAMETER: 'Rest parameter must be last formal parameter',
+  INVALID_REST_PARAMETERS_INITIALIZATION: 'Rest parameter may not have a default initializer',
   INVALID_REGEXP_FLAGS: 'Invalid regular expression flags',
   INVALID_REGEX: 'Invalid regular expression',
   INVALID_LHS_IN_ASSIGNMENT: 'Invalid left-hand side in assignment',
   INVALID_LHS_IN_BINDING: 'Invalid left-hand side in binding', // todo collapse messages?
   INVALID_LHS_IN_FOR_IN: 'Invalid left-hand side in for-in',
   INVALID_LHS_IN_FOR_OF: 'Invalid left-hand side in for-of',
+  INVALID_LHS_IN_FOR_AWAIT: 'Invalid left-hand side in for-await',
   INVALID_UPDATE_OPERAND: 'Increment/decrement target must be an identifier or member expression',
   INVALID_EXPONENTIATION_LHS: 'Unary expressions as the left operand of an exponentation expression ' +
     'must be disambiguated with parentheses',
@@ -46,8 +49,10 @@ export const ErrorMessages = {
   NO_CATCH_OR_FINALLY: 'Missing catch or finally after try',
   ILLEGAL_RETURN: 'Illegal return statement',
   ILLEGAL_ARROW_FUNCTION_PARAMS: 'Illegal arrow function parameter list',
+  INVALID_ASYNC_PARAMS: 'Async function parameters must not contain await expressions',
   INVALID_VAR_INIT_FOR_IN: 'Invalid variable declaration in for-in statement',
   INVALID_VAR_INIT_FOR_OF: 'Invalid variable declaration in for-of statement',
+  INVALID_VAR_INIT_FOR_AWAIT: 'Invalid variable declaration in for-await statement',
   UNINITIALIZED_BINDINGPATTERN_IN_FOR_INIT: 'Binding pattern appears without initializer in for statement init',
   ILLEGAL_PROPERTY: 'Illegal property initializer',
   INVALID_ID_BINDING_STRICT_MODE(id) {
@@ -82,6 +87,7 @@ export const ErrorMessages = {
     'Break statement must be nested within an iteration statement or a switch statement',
   ILLEGAL_WITH_STRICT_MODE: 'Strict mode code must not include a with statement',
   ILLEGAL_ACCESS_SUPER_MEMBER: 'Member access on super must be in a method',
+  ILLEGAL_SUPER_CALL: 'Calls to super must be in the "constructor" method of a class expression or class declaration that has a superclass',
   DUPLICATE_LABEL_DECLARATION(label) {
     return `Label ${JSON.stringify(label)} has already been declared`;
   },

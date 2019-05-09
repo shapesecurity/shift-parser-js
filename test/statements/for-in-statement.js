@@ -33,6 +33,7 @@ suite('Parser', () => {
             type: 'AssignmentTargetPropertyIdentifier',
             binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
             init: { type: 'LiteralNumericExpression', value: 0 } }],
+          rest: null,
         }] },
       right: { type: 'IdentifierExpression', name: 'b' },
       body: { type: 'EmptyStatement' },
@@ -116,6 +117,5 @@ suite('Parser', () => {
     testParseFailure('for(let a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('for(const a = 0 in b);', 'Invalid variable declaration in for-in statement');
     testParseFailure('"use strict"; for(var a = 0 in b);', 'Invalid variable declaration in for-in statement');
-
   });
 });

@@ -41,6 +41,7 @@ suite('Parser', () => {
               binding: { type: 'AssignmentTargetIdentifier', name: 'b' },
               init: { type: 'LiteralNumericExpression', value: 0 },
             }],
+            rest: null,
           },
         },
         expression: { type: 'LiteralNumericExpression', value: 0 },
@@ -58,6 +59,7 @@ suite('Parser', () => {
                 binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
                 init: { type: 'LiteralNumericExpression', value: 0 },
               }],
+              rest: null,
             },
           ],
           rest: {

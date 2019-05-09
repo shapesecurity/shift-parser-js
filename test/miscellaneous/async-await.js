@@ -18,6 +18,7 @@ let testParse = require('../assertions').testParse;
 let testParseModule = require('../assertions').testParseModule;
 let { stmt, expr } = require('../helpers');
 let testParseFailure = require('../assertions').testParseFailure;
+let testParseSuccess = require('../assertions').testParseSuccess;
 let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 function id(x) {
@@ -198,6 +199,74 @@ suite('async', () => {
         body: { type: 'FunctionBody', directives: [], statements: [] },
       }
     );
+
+    testParseFailure('let b = async () => []; for (a in await b());', 'Unexpected identifier');
+    testParse('async () => { let b = async () => []; for (a in await b()); }', expr,
+      {
+        body: {
+          directives: [],
+          statements: [
+            {
+              declaration: {
+                declarators: [
+                  {
+                    binding: {
+                      name: 'b',
+                      type: 'BindingIdentifier',
+                    },
+                    init: {
+                      body: {
+                        elements: [],
+                        type: 'ArrayExpression',
+                      },
+                      isAsync: true,
+                      params: {
+                        items: [],
+                        rest: null,
+                        type: 'FormalParameters',
+                      },
+                      type: 'ArrowExpression',
+                    },
+                    type: 'VariableDeclarator',
+                  },
+                ],
+                kind: 'let',
+                type: 'VariableDeclaration',
+              },
+              type: 'VariableDeclarationStatement',
+            },
+            {
+              body: {
+                type: 'EmptyStatement',
+              },
+              left: {
+                name: 'a',
+                type: 'AssignmentTargetIdentifier',
+              },
+              right: {
+                expression: {
+                  arguments: [],
+                  callee: {
+                    name: 'b',
+                    type: 'IdentifierExpression',
+                  },
+                  type: 'CallExpression',
+                },
+                type: 'AwaitExpression',
+              },
+              type: 'ForInStatement',
+            },
+          ],
+          type: 'FunctionBody',
+        },
+        isAsync: true,
+        params: {
+          items: [],
+          rest: null,
+          type: 'FormalParameters',
+        },
+        type: 'ArrowExpression',
+      });
   });
 
   suite('functions', () => {
@@ -700,12 +769,82 @@ suite('async', () => {
       },
     });
 
+  testParse('({ async *a(){} })', expr,
+    {
+      type: 'ObjectExpression',
+      properties: [
+        {
+          type: 'Method',
+          name: {
+            type: 'StaticPropertyName',
+            value: 'a',
+          },
+          isAsync: true,
+          isGenerator: true,
+          params: {
+            type: 'FormalParameters',
+            rest: null,
+            items: [],
+          },
+          body: {
+            'directives': [],
+            'statements': [],
+            'type': 'FunctionBody',
+          },
+        },
+      ],
+    });
+
+  testParse('async function* a(){}', stmt,
+    {
+      type: 'FunctionDeclaration',
+      isAsync: true,
+      isGenerator: true,
+      name: {
+        type: 'BindingIdentifier',
+        name: 'a',
+      },
+      params: {
+        type: 'FormalParameters',
+        items: [],
+        rest: null,
+      },
+      body: {
+        type: 'FunctionBody',
+        directives: [],
+        statements: [],
+      },
+    },
+  );
+
+  testParse('(async function* (){})', stmt,
+    {
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'FunctionExpression',
+        isAsync: true,
+        isGenerator: true,
+        name: null,
+        params: {
+          type: 'FormalParameters',
+          items: [],
+          rest: null,
+        },
+        body: {
+          type: 'FunctionBody',
+          directives: [],
+          statements: [],
+        },
+      },
+    },
+  );
+
   suite('failures', () => {
     testParseFailure('async (a, ...b, ...c) => {}', ErrorMessages.UNEXPECTED_TOKEN(','));
     testParseFailure('async\n(a, b) => {}', 'Unexpected token "=>"');
     testParseFailure('new async() => {}', 'Unexpected token "=>"');
     testParseFailure('({ async\nf(){} })', 'Unexpected identifier');
-    testParseFailure('async ((a)) => {}', 'Unexpected token "=>"');
+    testParseFailure('async ((a)) => {}', ErrorMessages.UNEXPECTED_TOKEN('=>'));
     testParseFailure('({ async get a(){} })', 'Unexpected identifier');
     testParseFailure('async a => {} ()', 'Unexpected token "("');
     testParseFailure('a + async b => {}', 'Unexpected token "=>"');
@@ -713,9 +852,6 @@ suite('async', () => {
     testParseFailure('with({}) async function f(){};', 'Unexpected token "function"');
     testParseFailure('function* a(){ async yield => {}; }', '"yield" may not be used as an identifier in this context');
     testParseFailure('function* a(){ async (yield) => {}; }', 'Unexpected token "=>"');
-    testParseFailure('async function* a(){}', 'Unexpected token "*"');
-    testParseFailure('(async function* (){})', 'Unexpected token "*"');
-    testParseFailure('({ async *a(){} })', 'Unexpected token "*"');
     testParseFailure('async await => 0', '"await" may not be used as an identifier in this context');
     testParseFailure('async (await) => 0', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
     testParseFailure('(class { async })', 'Only methods are allowed in classes');

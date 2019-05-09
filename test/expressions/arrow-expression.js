@@ -17,6 +17,7 @@
 let testParse = require('../assertions').testParse;
 let expr = require('../helpers').expr;
 let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('arrow expression', () => {
@@ -46,7 +47,59 @@ suite('Parser', () => {
       }
     );
 
+    testParse('(a = []) => {}', expr,
+      {
+        body: {
+          directives: [],
+          statements: [],
+          type: 'FunctionBody',
+        },
+        isAsync: false,
+        params: {
+          items: [
+            {
+              binding: {
+                name: 'a',
+                type: 'BindingIdentifier',
+              },
+              init: {
+                elements: [],
+                type: 'ArrayExpression',
+              },
+              type: 'BindingWithDefault',
+            },
+          ],
+          rest: null,
+          type: 'FormalParameters',
+        },
+        type: 'ArrowExpression',
+      });
 
+    testParse('({...a }) => 0', expr,
+      {
+        type: 'ArrowExpression',
+        isAsync: false,
+        params: {
+          type: 'FormalParameters',
+          items: [
+            {
+              type: 'ObjectBinding',
+              properties: [],
+              rest: {
+                type: 'BindingIdentifier',
+                name: 'a',
+              },
+            },
+          ],
+          rest: null,
+        },
+        body: {
+          type: 'LiteralNumericExpression',
+          value: 0,
+        },
+      });
+    testParseFailure('((...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+    testParseFailure('(async (...a = []) => {})', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
     testParseFailure('[]=>0', 'Unexpected token "=>"');
     testParseFailure('() + 1', 'Unexpected token "+"');
     testParseFailure('1 + ()', 'Unexpected end of input');
@@ -68,5 +121,15 @@ suite('Parser', () => {
     testParseFailure('() + 0', 'Unexpected token "+"');
     testParseFailure('(10) => 0', 'Illegal arrow function parameter list');
     testParseFailure('(10, 20) => 0', 'Illegal arrow function parameter list');
+    testParseFailure('(...a, b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(...a, ...b) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(a, ...b,) => {}', ErrorMessages.INVALID_LAST_REST_PARAMETER);
+    testParseFailure('(async (...a, b) => {})', ErrorMessages.UNEXPECTED_TOKEN(','));
+    testParseFailure('(async (...a, ...b) => {})', ErrorMessages.UNEXPECTED_TOKEN(','));
+    testParseFailure('(async (...x = []) => {});', ErrorMessages.INVALID_REST_PARAMETERS_INITIALIZATION);
+    testParseFailure('async (a = await => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = (await) => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = aw\\u{61}it => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
+    testParseFailure('async (a = (b = await (0)) => {}) => {}', ErrorMessages.NO_AWAIT_IN_ASYNC_PARAMS);
   });
 });

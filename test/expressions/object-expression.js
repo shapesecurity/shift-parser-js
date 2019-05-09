@@ -16,6 +16,8 @@
 
 let expr = require('../helpers').expr;
 let testParse = require('../assertions').testParse;
+let testParseFailure = require('../assertions').testParseFailure;
+let ErrorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('object expression', () => {
@@ -84,6 +86,101 @@ suite('Parser', () => {
       }
     );
 
+    testParse('({...a = 0})', expr, {
+      properties: [
+        {
+          expression: {
+            binding: {
+              name: 'a',
+              type: 'AssignmentTargetIdentifier',
+            },
+            expression: {
+              type: 'LiteralNumericExpression',
+              value: 0,
+            },
+            type: 'AssignmentExpression',
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+    });
 
+    testParse('({...a = []})', expr, {
+      properties: [
+        {
+          expression: {
+            binding: {
+              name: 'a',
+              type: 'AssignmentTargetIdentifier',
+            },
+            expression: {
+              type: 'ArrayExpression',
+              elements: [],
+            },
+            type: 'AssignmentExpression',
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+    });
+
+    testParse('({...{}})', expr,
+      { properties: [
+        {
+          expression: {
+            type: 'ObjectExpression',
+            properties: [],
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+      });
+
+    testParse('({...[], ...{}})', expr,
+      { properties: [
+        {
+          expression: {
+            type: 'ArrayExpression',
+            elements: [],
+          },
+          type: 'SpreadProperty',
+        },
+        {
+          expression: {
+            type: 'ObjectExpression',
+            properties: [],
+          },
+          type: 'SpreadProperty',
+        },
+      ],
+      type: 'ObjectExpression',
+      });
   });
+
+  testParse('({... a.b} = 0)', expr,
+    {
+      type: 'AssignmentExpression',
+      binding: {
+        type: 'ObjectAssignmentTarget',
+        properties: [],
+        rest: {
+          type: 'StaticMemberAssignmentTarget',
+          object: {
+            type: 'IdentifierExpression',
+            name: 'a',
+          },
+          property: 'b',
+        },
+      },
+      expression: {
+        type: 'LiteralNumericExpression',
+        value: 0,
+      },
+
+    });
+  testParseFailure('({a ...b})', ErrorMessages.UNEXPECTED_TOKEN('...'));
+  testParseFailure('({...a = 0} = 0)', ErrorMessages.INVALID_LHS_IN_ASSIGNMENT);
 });

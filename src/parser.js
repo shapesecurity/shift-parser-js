@@ -2148,8 +2148,7 @@ export class GenericParser extends Tokenizer {
       let property = null;
       let isSpreadProperty = false;
       if (this.match(TokenType.ELLIPSIS)) {
-        let spreadPropertyOrAssignmentTarget = null;
-        spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
+        let spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
         isSpreadProperty = true;
         property = spreadPropertyOrAssignmentTarget.expression;
         rest = property;

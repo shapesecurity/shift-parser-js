@@ -43,7 +43,7 @@
     "esprima": "4.0.1",
     "everything.js": "1.0.3",
     "expect.js": "0.3.1",
-    "microtime": "^2.1.8",
+    "microtime": "^3.0.0",
     "mocha": "5.2.0",
     "normalize-parser-test": "2.0.0",
     "nyc": "13.0.1",

@@ -200,6 +200,53 @@ suite('async', () => {
       }
     );
 
+    testParse('async (a = { b(await){} }) => {}', expr,
+      {
+        type: 'ArrowExpression',
+        isAsync: true,
+        params: {
+          type: 'FormalParameters',
+          items: [
+            {
+              type: 'BindingWithDefault',
+              binding: { type: 'BindingIdentifier', name: 'a' },
+              init: {
+                type: 'ObjectExpression',
+                properties: [
+                  {
+                    type: 'Method',
+                    isAsync: false,
+                    isGenerator: false,
+                    name: {
+                      type: 'StaticPropertyName',
+                      value: 'b',
+                    },
+                    params: {
+                      type: 'FormalParameters',
+                      items: [
+                        {
+                          type: 'BindingIdentifier',
+                          name: 'await',
+                        },
+                      ],
+                      rest: null,
+                    },
+                    body: {
+                      type: 'FunctionBody',
+                      directives: [],
+                      statements: [],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+          rest: null,
+        },
+        body: { type: 'FunctionBody', directives: [], statements: [] },
+      }
+    );
+
     testParseFailure('let b = async () => []; for (a in await b());', 'Unexpected identifier');
     testParse('async () => { let b = async () => []; for (a in await b()); }', expr,
       {

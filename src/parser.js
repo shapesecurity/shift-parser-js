@@ -2339,11 +2339,11 @@ export class GenericParser extends Tokenizer {
           let previousAwaitLocation = this.firstAwaitLocation;
           this.allowYieldExpression = false;
           this.allowAwaitExpression = false;
-          this.previousAwaitLocation = null;
+          this.firstAwaitLocation = null;
           let body = this.parseFunctionBody();
           this.allowYieldExpression = previousYield;
           this.allowAwaitExpression = previousAwait;
-          this.previousAwaitLocation = previousAwaitLocation;
+          this.firstAwaitLocation = previousAwaitLocation;
           return {
             methodOrKey: this.finishNode(new AST.Getter({ name, body }), startState),
             kind: 'method',
@@ -2356,13 +2356,13 @@ export class GenericParser extends Tokenizer {
           let previousAwaitLocation = this.firstAwaitLocation;
           this.allowYieldExpression = false;
           this.allowAwaitExpression = false;
-          this.previousAwaitLocation = null;
+          this.firstAwaitLocation = null;
           let param = this.parseBindingElement();
           this.expect(TokenType.RPAREN);
           let body = this.parseFunctionBody();
           this.allowYieldExpression = previousYield;
           this.allowAwaitExpression = previousAwait;
-          this.previousAwaitLocation = previousAwaitLocation;
+          this.firstAwaitLocation = previousAwaitLocation;
           return {
             methodOrKey: this.finishNode(new AST.Setter({ name, param, body }), startState),
             kind: 'method',
@@ -2398,7 +2398,7 @@ export class GenericParser extends Tokenizer {
       let body = this.parseFunctionBody();
       this.allowYieldExpression = previousYield;
       this.allowAwaitExpression = previousAwait;
-      this.previousAwaitLocation = previousAwaitLocation;
+      this.firstAwaitLocation = previousAwaitLocation;
 
       return {
         methodOrKey: this.finishNode(new AST.Method({ isAsync, isGenerator, name, params, body }), startState),

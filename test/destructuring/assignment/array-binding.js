@@ -21,8 +21,6 @@ let testParseFailure = require('../../assertions').testParseFailure;
 suite('Parser', () => {
   suite('array binding', () => {
     suite('assignment', () => {
-
-
       testParse('[a = 0, ...{b = 0}] = 0', expr, {
         type: 'AssignmentExpression',
         binding: {

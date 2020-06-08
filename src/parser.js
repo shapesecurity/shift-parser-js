@@ -2142,19 +2142,15 @@ export class GenericParser extends Tokenizer {
   parseObjectExpression() {
     let startState = this.startNode();
     this.lex();
-    let rest = null;
     let properties = [];
     while (!this.match(TokenType.RBRACE)) {
-      let property = null;
       let isSpreadProperty = false;
       if (this.match(TokenType.ELLIPSIS)) {
-        let spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
         isSpreadProperty = true;
-        property = spreadPropertyOrAssignmentTarget.expression;
-        rest = property;
+        let spreadPropertyOrAssignmentTarget = this.parseSpreadPropertyDefinition();
         properties.push(spreadPropertyOrAssignmentTarget);
       } else {
-        property = this.inheritCoverGrammar(this.parsePropertyDefinition);
+        let property = this.inheritCoverGrammar(this.parsePropertyDefinition);
         properties.push(property);
       }
       if (!this.match(TokenType.RBRACE)) {
@@ -2169,7 +2165,14 @@ export class GenericParser extends Tokenizer {
       if (!this.isAssignmentTarget) {
         throw this.createError(ErrorMessages.INVALID_LHS_IN_BINDING);
       }
-      return this.finishNode(new AST.ObjectAssignmentTarget({ properties: properties.map(p => this.transformDestructuringWithDefault(p)), rest }), startState);
+      let last = properties[properties.length - 1];
+      if (last != null && last.type === 'SpreadProperty') {
+        return this.finishNode(new AST.ObjectAssignmentTarget({
+          properties: properties.slice(0, -1).map(p => this.transformDestructuringWithDefault(p)),
+          rest: this.transformDestructuring(last.expression),
+        }), startState);
+      }
+      return this.finishNode(new AST.ObjectAssignmentTarget({ properties: properties.map(p => this.transformDestructuringWithDefault(p)), rest: null }), startState);
     }
     return this.finishNode(new AST.ObjectExpression({ properties }), startState);
   }

@@ -21,7 +21,24 @@ let testParseFailure = require('../../assertions').testParseFailure;
 suite('Parser', () => {
   suite('object binding', () => {
     suite('assignment', () => {
-
+      testParse('({a = 0, ...b} = 0);', expr, {
+        type: 'AssignmentExpression',
+        binding: {
+          type: 'ObjectAssignmentTarget',
+          properties: [
+            {
+              type: 'AssignmentTargetPropertyIdentifier',
+              binding: { type: 'AssignmentTargetIdentifier', name: 'a' },
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            },
+          ],
+          rest: {
+            type: 'AssignmentTargetIdentifier',
+            name: 'b',
+          },
+        },
+        expression: { type: 'LiteralNumericExpression', value: 0 },
+      });
 
       testParseFailure('({a = 0});', 'Illegal property initializer');
       testParseFailure('({a} += 0);', 'Invalid left-hand side in assignment');

@@ -22,13 +22,43 @@ let testParseFailure = require('../../assertions').testParseFailure;
 suite('Parser', () => {
   suite('object binding', () => {
     suite('variable declarator', () => {
-
+      testParse('var {a = 0, ...b} = 0;', p => stmt(p).declaration.declarators, [{
+        type: 'VariableDeclarator',
+        binding: {
+          type: 'ObjectBinding',
+          properties: [
+            {
+              type: 'BindingPropertyIdentifier',
+              binding: { type: 'BindingIdentifier', name: 'a' },
+              init: { type: 'LiteralNumericExpression', value: 0 },
+            },
+          ],
+          rest: {
+            type: 'BindingIdentifier',
+            name: 'b',
+          },
+        },
+        init: { type: 'LiteralNumericExpression', value: 0 },
+      }]);
 
       testParseFailure('var {a: b.c} = 0;', 'Unexpected token "."');
     });
 
     suite('formal parameter', () => {
-
+      testParse('async ({a = 0, ...b}) => 0;', p => expr(p).params.items, [{
+        type: 'ObjectBinding',
+        properties: [
+          {
+            type: 'BindingPropertyIdentifier',
+            binding: { type: 'BindingIdentifier', name: 'a' },
+            init: { type: 'LiteralNumericExpression', value: 0 },
+          },
+        ],
+        rest: {
+          type: 'BindingIdentifier',
+          name: 'b',
+        },
+      }]);
 
       // other passing cases are tested in other function test cases.
       testParseFailure('({e: a.b}) => 0', 'Illegal arrow function parameter list');
@@ -39,14 +69,10 @@ suite('Parser', () => {
       testParseFailure('({a({e: a.b}){}})', 'Unexpected token "."');
       testParseFailure('({*a({e: a.b}){}})', 'Unexpected token "."');
       testParseFailure('({set a({e: a.b}){}})', 'Unexpected token "."');
-
     });
 
     suite('catch clause', () => {
-
-
       testParseFailure('try {} catch ({e: x.a}) {}', 'Unexpected token "."');
     });
-
   });
 });

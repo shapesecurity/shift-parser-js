@@ -2180,13 +2180,13 @@ export class GenericParser extends Tokenizer {
   parseSpreadPropertyDefinition() {
     let startState = this.startNode();
     this.expect(TokenType.ELLIPSIS);
-    let expressionOrAssignmentTarget = this.parseAssignmentExpressionOrTarget();
-    if (!isValidSimpleAssignmentTarget(expressionOrAssignmentTarget)) {
+    let expression = this.parseAssignmentExpression();
+    if (!isValidSimpleAssignmentTarget(expression)) {
       this.isBindingElement = this.isAssignmentTarget = false;
-    } else if (expressionOrAssignmentTarget.type !== 'IdentifierExpression') {
+    } else if (expression.type !== 'IdentifierExpression') {
       this.isBindingElement = false;
     }
-    return this.finishNode(new AST.SpreadProperty({ expression: expressionOrAssignmentTarget }), startState);
+    return this.finishNode(new AST.SpreadProperty({ expression }), startState);
   }
 
   parsePropertyDefinition() {

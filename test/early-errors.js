@@ -18,11 +18,16 @@ let expect = require('expect.js');
 let parse = require('../').default;
 let parseWithLocation = require('../').parseScriptWithLocation;
 let testParseFailure = require('./assertions').testParseFailure;
+let testParseSuccess = require('./assertions').testParseSuccess;
 let testEarlyError = require('./assertions').testEarlyError;
 let testModuleEarlyError = require('./assertions').testModuleEarlyError;
 let ErrorMessages = require('../dist/errors.js').ErrorMessages;
 
 suite('Parser', () => {
+  suite('positive', () => {
+    testParseSuccess('async function f(){ for await (let x of 0) { break; } }');
+    testParseSuccess('async function f(){ for await (let x of 0) { continue; } }');
+  });
 
   // these *would* be early errors, but we have no way to represent them in our AST
   suite('early grammar errors', () => {
@@ -374,6 +379,10 @@ suite('Parser', () => {
     testEarlyError('for(let a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-of'));
     testEarlyError('for(const a of b) label: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-of'));
     testEarlyError('for(;;) labelA: labelB: labelC: function f(){}', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for'));
+    testEarlyError('async function f(){ for await(a of b) label: function f(){} }', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-await'));
+    testEarlyError('async function f(){ for await(var a of b) label: function f(){} }', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-await'));
+    testEarlyError('async function f(){ for await(let a of b) label: function f(){} }', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-await'));
+    testEarlyError('async function f(){ for await(const a of b) label: function f(){} }', ErrorMessages.ILLEGAL_LABEL_IN_BODY('for-await'));
 
     // 13.7.4.1
     // It is a Syntax Error if any element of the BoundNames of LexicalDeclaration

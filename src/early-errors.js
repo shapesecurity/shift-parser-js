@@ -342,6 +342,20 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return s;
   }
 
+  reduceForAwaitStatement(node, { left, right, body }) {
+    left = left.recordForOfVars();
+    left = left.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
+    left = left.enforceConflictingLexicallyDeclaredNames(body.varDeclaredNames, DUPLICATE_BINDING);
+    let s = super.reduceForOfStatement(node, { left, right, body });
+    if (isLabelledFunction(node.body)) {
+      s = s.addError(new EarlyError(node.body, 'The body of a for-await statement must not be a labeled function declaration'));
+    }
+    s = s.clearFreeContinueStatements();
+    s = s.clearFreeBreakStatements();
+    s = s.observeLexicalBoundary();
+    return s;
+  }
+
   reduceFunctionBody(node) {
     let s = super.reduceFunctionBody(...arguments);
     s = s.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);

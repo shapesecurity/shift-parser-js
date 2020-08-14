@@ -12,7 +12,7 @@ let makeCharArray = s => JSON.stringify(regenerate().add(...s).toArray());
 let whitespace = [0x09, 0x0B, 0x0c, 0x20, 0xA0, 0xFEFF].concat(require(`unicode-${unicodeVersion}/General_Category/Space_Separator/code-points`));
 let whitespaceSmall = whitespace.filter(ascii);
 let whitespaceArray = makeCharArray(whitespace.filter(a => a >= 256));
-let whitespaceBool = Array(128).fill(0).map((v, i) => whitespace.indexOf(i) !== -1);
+let whitespaceBool = Array(128).fill(0).map((v, i) => whitespaceSmall.indexOf(i) !== -1);
 // Note that we've omitted the range [0xA0, 0xFF], which must be tested in another way.
 
 

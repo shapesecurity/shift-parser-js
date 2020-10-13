@@ -6,9 +6,9 @@ script:
   - npm run coverage
   - npm run lint
 node_js:
-  - "6"
-  - "8"
   - "10"
+  - "12"
+  - "14"
 # the following config is needed for the "microtime" native node module
 env:
   - CXX=g++-4.8

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import reduce, { MonoidalReducer } from 'shift-reducer';
-import { isStrictModeReservedWord } from './utils';
-import { ErrorMessages } from './errors';
+const { default: reduce, MonoidalReducer } = require('shift-reducer');
+const { isStrictModeReservedWord } = require('./utils');
+const { ErrorMessages } = require('./errors');
 
-import { EarlyErrorState, EarlyError } from './early-error-state';
+const { EarlyErrorState, EarlyError } = require('./early-error-state');
 
 function isStrictFunctionBody({ directives }) {
   return directives.some(directive => directive.rawValue === 'use strict');
@@ -83,7 +83,7 @@ const UNBOUND_CONTINUE = node => new EarlyError(node, `Continue statement must b
 const FREE_BREAK = node => new EarlyError(node, 'Break statement must be nested within an iteration statement or a switch statement');
 const UNBOUND_BREAK = node => new EarlyError(node, `Break statement must be nested within a statement with label ${JSON.stringify(node.label)}`);
 
-export class EarlyErrorChecker extends MonoidalReducer {
+class EarlyErrorChecker extends MonoidalReducer {
   constructor() {
     super(EarlyErrorState);
   }
@@ -165,18 +165,20 @@ export class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceCatchClause(node, { binding, body }) {
-    binding = binding.observeLexicalDeclaration();
-    binding = binding.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
-    binding = binding.enforceConflictingLexicallyDeclaredNames(body.previousLexicallyDeclaredNames, DUPLICATE_BINDING);
-    binding.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
-      if (body.varDeclaredNames.has(bindingName)) {
-        body.varDeclaredNames.get(bindingName).forEach(conflictingNode => {
-          if (body.forOfVarDeclaredNames.indexOf(conflictingNode) >= 0) {
-            binding = binding.addError(DUPLICATE_BINDING(conflictingNode));
-          }
-        });
-      }
-    });
+    if (binding != null) {
+      binding = binding.observeLexicalDeclaration();
+      binding = binding.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
+      binding = binding.enforceConflictingLexicallyDeclaredNames(body.previousLexicallyDeclaredNames, DUPLICATE_BINDING);
+      binding.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
+        if (body.varDeclaredNames.has(bindingName)) {
+          body.varDeclaredNames.get(bindingName).forEach(conflictingNode => {
+            if (body.forOfVarDeclaredNames.indexOf(conflictingNode) >= 0) {
+              binding = binding.addError(DUPLICATE_BINDING(conflictingNode));
+            }
+          });
+        }
+      });
+    }
     let s = super.reduceCatchClause(node, { binding, body });
     s = s.observeLexicalBoundary();
     return s;
@@ -770,3 +772,5 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return reduce(new EarlyErrorChecker, node).errors;
   }
 }
+
+module.exports = { EarlyErrorChecker };

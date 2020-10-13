@@ -18,7 +18,6 @@ module.exports = {
       'numeric-separator-literal',
       'json-superset',
       'export-star-as-namespace-from-module',
-      'optional-catch-binding',
       'dynamic-import',
       'import.meta',
     ],

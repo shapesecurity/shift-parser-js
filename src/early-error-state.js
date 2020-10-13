@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import MultiMap from 'multimap';
+const MultiMap = require('multimap');
 
 function addEach(thisMap, ...otherMaps) {
   otherMaps.forEach(otherMap => {
@@ -27,7 +27,7 @@ function addEach(thisMap, ...otherMaps) {
 
 let identity; // initialised below EarlyErrorState
 
-export class EarlyErrorState {
+class EarlyErrorState {
 
   constructor() {
     this.errors = [];
@@ -400,10 +400,15 @@ Object.getOwnPropertyNames(EarlyErrorState.prototype).forEach(methodName => {
   });
 });
 
-export class EarlyError extends Error {
+class EarlyError extends Error {
   constructor(node, message) {
     super(message);
     this.node = node;
     this.message = message;
   }
 }
+
+module.exports = {
+  EarlyErrorState,
+  EarlyError,
+};

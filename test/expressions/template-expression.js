@@ -18,7 +18,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let expr = require('../helpers').expr;
-let errorMessages = require('../../dist/errors').ErrorMessages;
+let errorMessages = require('../../src/errors').ErrorMessages;
 
 suite('Parser', () => {
   suite('untagged template expressions', () => {

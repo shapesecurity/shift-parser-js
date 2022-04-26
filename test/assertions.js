@@ -6,7 +6,7 @@ let parseScript = require('../').parseScriptWithLocation;
 let parseModule = require('../').parseModuleWithLocation;
 let locationSanityCheck = require('./helpers').locationSanityCheck;
 let schemaCheck = require('./helpers').schemaCheck;
-let SHIFT_SPEC = require('shift-spec').default;
+let SHIFT_SPEC = require('shift-spec');
 let Parser = require('../src/parser').GenericParser;
 let EarlyErrorChecker = require('../src/early-errors').EarlyErrorChecker;
 

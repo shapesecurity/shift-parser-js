@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const { default: reduce, MonoidalReducer } = require('shift-reducer');
+const { reduce, MonoidalReducer } = require('shift-reducer');
 const { isStrictModeReservedWord } = require('./utils');
 const { ErrorMessages } = require('./errors');
 
@@ -165,18 +165,11 @@ class EarlyErrorChecker extends MonoidalReducer {
   }
 
   reduceCatchClause(node, { binding, body }) {
-    binding = binding.observeLexicalDeclaration();
-    binding = binding.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
-    binding = binding.enforceConflictingLexicallyDeclaredNames(body.previousLexicallyDeclaredNames, DUPLICATE_BINDING);
-    binding.lexicallyDeclaredNames.forEachEntry((nodes, bindingName) => {
-      if (body.varDeclaredNames.has(bindingName)) {
-        body.varDeclaredNames.get(bindingName).forEach(conflictingNode => {
-          if (body.forOfVarDeclaredNames.indexOf(conflictingNode) >= 0) {
-            binding = binding.addError(DUPLICATE_BINDING(conflictingNode));
-          }
-        });
-      }
-    });
+    if (binding != null) {
+      binding = binding.observeLexicalDeclaration();
+      binding = binding.enforceDuplicateLexicallyDeclaredNames(DUPLICATE_BINDING);
+      binding = binding.enforceConflictingLexicallyDeclaredNames(body.previousLexicallyDeclaredNames, DUPLICATE_BINDING);
+    }
     let s = super.reduceCatchClause(node, { binding, body });
     s = s.observeLexicalBoundary();
     return s;

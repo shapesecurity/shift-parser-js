@@ -922,11 +922,6 @@ suite('Parser', () => {
     // in the LexicallyDeclaredNames of Block.
     testEarlyError('try {} catch(e) { let e; }', ErrorMessages.DUPLICATE_BINDING('e'));
     testEarlyError('try {} catch(e) { function e(){} }', ErrorMessages.DUPLICATE_BINDING('e'));
-    // It is a Syntax Error if any element of the BoundNames of CatchParameter also occurs
-    // in the VarDeclaredNames of Block,
-    // unless that element is only bound by a VariableStatement or the VariableDeclarationList of a for statement,
-    // or the ForBinding of a for-in statement.
-    testEarlyError('try {} catch(e) { for(var e of 0); }', ErrorMessages.DUPLICATE_BINDING('e'));
 
     // 14.1.2, 14.2.1, 14.3.1, 14.4.1
     // It is a Syntax Error if ContainsUseStrict of FunctionBody is true and IsSimpleParameterList

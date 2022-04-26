@@ -16,7 +16,7 @@
 
 const { ErrorMessages } = require('./errors');
 
-const acceptRegex = require('shift-regexp-acceptor').default;
+const acceptRegex = require('shift-regexp-acceptor');
 
 const { Tokenizer, TokenClass, TokenType } = require('./tokenizer');
 
@@ -989,12 +989,19 @@ class GenericParser extends Tokenizer {
     let startState = this.startNode();
 
     this.lex();
-    this.expect(TokenType.LPAREN);
-    if (this.match(TokenType.RPAREN) || this.match(TokenType.LPAREN)) {
-      throw this.createUnexpected(this.lookahead);
+
+    let binding = null;
+
+    // Catch binding is optional
+    if (this.match(TokenType.LPAREN)) {
+      this.lex();
+      if (this.match(TokenType.RPAREN) || this.match(TokenType.LPAREN)) {
+        throw this.createUnexpected(this.lookahead);
+      }
+      binding = this.parseBindingTarget();
+      this.expect(TokenType.RPAREN);
     }
-    let binding = this.parseBindingTarget();
-    this.expect(TokenType.RPAREN);
+
     let body = this.parseBlock();
 
     return this.finishNode(new AST.CatchClause({ binding, body }), startState);

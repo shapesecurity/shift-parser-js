@@ -21,7 +21,66 @@ let testParseFailure = require('../assertions').testParseFailure;
 suite('Parser', () => {
   suite('try-catch statement', () => {
 
+    testParse('try {} catch (e) {}', stmt,
+      { type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
+        catchClause: {
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'e' },
+          body: { type: 'Block', statements: [] },
+        },
+      }
+    );
+
+    testParse('try {} catch {}', stmt,
+      { type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
+        catchClause: {
+          type: 'CatchClause',
+          binding: null,
+          body: { type: 'Block', statements: [] },
+        },
+      }
+    );
+
+    testParse('try {} catch (e) { for (var e of []); }', stmt,
+      { type: 'TryCatchStatement',
+        body: { type: 'Block', statements: [] },
+        catchClause: {
+          type: 'CatchClause',
+          binding: { type: 'BindingIdentifier', name: 'e' },
+          body: { type: 'Block', statements: [
+            {
+              body: {
+                type: 'EmptyStatement',
+              },
+              left: {
+                declarators: [
+                  {
+                    binding: {
+                      name: 'e',
+                      type: 'BindingIdentifier',
+                    },
+                    init: null,
+                    type: 'VariableDeclarator',
+                  },
+                ],
+                kind: 'var',
+                type: 'VariableDeclaration',
+              },
+              right: {
+                elements: [],
+                type: 'ArrayExpression',
+              },
+              type: 'ForOfStatement',
+            },
+          ] },
+        },
+      }
+    );
+
 
     testParseFailure('try {} catch ((e)) {}', 'Unexpected token "("');
+    testParseFailure('try {} catch () {}', 'Unexpected token ")"');
   });
 });

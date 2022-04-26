@@ -18,7 +18,6 @@ module.exports = {
       'numeric-separator-literal',
       'json-superset',
       'export-star-as-namespace-from-module',
-      'optional-catch-binding',
       'dynamic-import',
       'import.meta',
     ],
@@ -64,6 +63,9 @@ module.exports = {
 
       // ES2018 invalid escapes in template literals: https://github.com/tc39/ecma262/pull/773
       'language/expressions/tagged-template/invalid-escape-sequences.js',
+
+      // Needs to be rolled:
+      'language/statements/try/early-catch-var.js',
     ],
   },
 };

@@ -32,8 +32,6 @@ suite('Parser', () => {
     testParseFailure('(\'\\8\')', 'Unexpected "8"');
     testParseFailure('(\'\\9\')', 'Unexpected "9"');
     testParseFailure('(\'\\x0\')', 'Unexpected "0"');
-    testParseFailure('(\'\u2028\')', 'Unexpected "\u2028"');
-    testParseFailure('(\'\u2029\')', 'Unexpected "\u2029"');
     testParseFailure('(\'\\u{2028\')', 'Unexpected "{"');
     testParseFailure('\'use strict\'; (\'\\1\')', 'Unexpected legacy octal escape sequence: \\1');
     testParseFailure('\'use strict\'; (\'\\4\')', 'Unexpected legacy octal escape sequence: \\4');

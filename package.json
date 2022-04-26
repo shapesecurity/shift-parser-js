@@ -25,9 +25,9 @@
   },
   "dependencies": {
     "multimap": "^1.0.2",
-    "shift-ast": "6.0.0",
-    "shift-reducer": "6.0.0",
-    "shift-regexp-acceptor": "2.0.3"
+    "shift-ast": "7.0.0",
+    "shift-reducer": "7.0.0",
+    "shift-regexp-acceptor": "3.0.0"
   },
   "devDependencies": {
     "acorn": "6.0.1",
@@ -43,7 +43,7 @@
     "nyc": "13.0.1",
     "regenerate": "^1.4.0",
     "shift-parser-expectations": "^2018.0.2",
-    "shift-spec": "2018.0.2",
+    "shift-spec": "2019.0.0",
     "test262": "git+https://github.com/tc39/test262.git#8ed9947df1c4ea34fa1810067529df0806cc07ad",
     "test262-parser": "^2.0.7",
     "test262-parser-tests": "0.0.5",

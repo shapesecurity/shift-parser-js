@@ -63,6 +63,9 @@ module.exports = {
       '6c4fe38464c16309.js',
       '8643da76fe7e95c7.js',
       'e0c3d30b6fe96812.js',
+
+      // Needs to be rolled:
+      '0f5f47108da5c34e.js',
     ],
     fail: [
       // Invalid test

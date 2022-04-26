@@ -15,8 +15,7 @@
  */
 
 let stmt = require('../helpers').stmt;
-let testParse = require('../assertions').testParse;
-let testParseFailure = require('../assertions').testParseFailure;
+let { testParse, testParseSuccess, testParseFailure } = require('../assertions');
 
 suite('Parser', () => {
   suite('for statement', () => {
@@ -44,6 +43,7 @@ suite('Parser', () => {
         update: null }
     );
 
+    testParseSuccess('try {} catch(e) { for(var e of 0); }');
 
     testParseFailure('for({a=0};;);', 'Illegal property initializer');
   });

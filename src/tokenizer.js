@@ -1306,7 +1306,7 @@ class Tokenizer {
         return { type: TokenType.STRING, slice: this.getSlice(start, startLocation), str, octal };
       } else if (ch === '\\') {
         [str, octal] = this.scanStringEscape(str, octal);
-      } else if (isLineTerminator(ch.charCodeAt(0))) {
+      } else if (isLineTerminator(ch.charCodeAt(0)) && ch !== 0x2028 && ch !== 0x2029) {
         throw this.createILLEGAL();
       } else {
         str += ch;

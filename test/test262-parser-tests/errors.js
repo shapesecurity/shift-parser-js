@@ -1,8 +1,8 @@
-import fs from 'fs';
-import { parseScriptWithLocation, parseModuleWithLocation } from '../../';
-import { locationSanityCheck } from '../helpers';
-import expect from 'expect.js';
-import expectations from './expectations';
+const fs = require('fs');
+const { parseScriptWithLocation, parseModuleWithLocation } = require('../../');
+const { locationSanityCheck } = require('../helpers');
+const expect = require('expect.js');
+const expectations = require('./expectations');
 
 let scriptDir = 'node_modules/test262-parser-tests';
 let expectationsDir = 'node_modules/shift-parser-expectations/expectations';

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import reduce, { MonoidalReducer } from 'shift-reducer';
-import { isStrictModeReservedWord } from './utils';
-import { ErrorMessages } from './errors';
+const { default: reduce, MonoidalReducer } = require('shift-reducer');
+const { isStrictModeReservedWord } = require('./utils');
+const { ErrorMessages } = require('./errors');
 
-import { EarlyErrorState, EarlyError } from './early-error-state';
+const { EarlyErrorState, EarlyError } = require('./early-error-state');
 
 function isStrictFunctionBody({ directives }) {
   return directives.some(directive => directive.rawValue === 'use strict');
@@ -83,7 +83,7 @@ const UNBOUND_CONTINUE = node => new EarlyError(node, `Continue statement must b
 const FREE_BREAK = node => new EarlyError(node, 'Break statement must be nested within an iteration statement or a switch statement');
 const UNBOUND_BREAK = node => new EarlyError(node, `Break statement must be nested within a statement with label ${JSON.stringify(node.label)}`);
 
-export class EarlyErrorChecker extends MonoidalReducer {
+class EarlyErrorChecker extends MonoidalReducer {
   constructor() {
     super(EarlyErrorState);
   }
@@ -770,3 +770,5 @@ export class EarlyErrorChecker extends MonoidalReducer {
     return reduce(new EarlyErrorChecker, node).errors;
   }
 }
+
+module.exports = { EarlyErrorChecker };

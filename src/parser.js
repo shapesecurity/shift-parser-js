@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { ErrorMessages } from './errors';
+const { ErrorMessages } = require('./errors');
 
-import acceptRegex from 'shift-regexp-acceptor';
+const acceptRegex = require('shift-regexp-acceptor').default;
 
-import Tokenizer, { TokenClass, TokenType } from './tokenizer';
+const { Tokenizer, TokenClass, TokenType } = require('./tokenizer');
 
-import * as AST from 'shift-ast';
+const AST = require('shift-ast');
 
 // Empty parameter list for ArrowExpression
 const ARROW_EXPRESSION_PARAMS = 'CoverParenthesizedExpressionAndArrowParameterList';
@@ -108,7 +108,7 @@ function isUpdateOperator(token) {
   return token.type === TokenType.INC || token.type === TokenType.DEC;
 }
 
-export class GenericParser extends Tokenizer {
+class GenericParser extends Tokenizer {
   constructor(source) {
     super(source);
     this.allowIn = true;
@@ -1718,7 +1718,7 @@ export class GenericParser extends Tokenizer {
   }
 
   parseRegexFlags(flags) {
-    let global = false,
+    let isGlobal = false,
         ignoreCase = false,
         multiLine = false,
         unicode = false,
@@ -1728,10 +1728,10 @@ export class GenericParser extends Tokenizer {
       let f = flags[i];
       switch (f) {
         case 'g':
-          if (global) {
+          if (isGlobal) {
             throw this.createError('Duplicate regular expression flag \'g\'');
           }
-          global = true;
+          isGlobal = true;
           break;
         case 'i':
           if (ignoreCase) {
@@ -1767,7 +1767,7 @@ export class GenericParser extends Tokenizer {
           throw this.createError(`Invalid regular expression flag '${f}'`);
       }
     }
-    return { global, ignoreCase, multiLine, unicode, sticky, dotAll };
+    return { global: isGlobal, ignoreCase, multiLine, unicode, sticky, dotAll };
   }
 
   parsePrimaryExpression() {
@@ -2639,3 +2639,5 @@ export class GenericParser extends Tokenizer {
     return this.finishNode(new AST.FormalParameters({ items, rest }), startState);
   }
 }
+
+module.exports = { GenericParser };

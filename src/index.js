@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { GenericParser } from './parser';
-import { JsError } from './tokenizer';
-import { EarlyErrorChecker } from './early-errors';
-import { isLineTerminator } from './utils';
+const { GenericParser } = require('./parser');
+const { JsError } = require('./tokenizer');
+const { EarlyErrorChecker } = require('./early-errors');
+const { isLineTerminator } = require('./utils');
+const { Tokenizer, TokenClass, TokenType } = require('./tokenizer');
 
 class ParserWithLocation extends GenericParser {
   constructor(source) {
@@ -140,10 +141,21 @@ function generateInterfaceWithLocation(parsingFunctionName) {
   };
 }
 
-export const parseModule = generateInterface('parseModule');
-export const parseScript = generateInterface('parseScript');
-export const parseModuleWithLocation = generateInterfaceWithLocation('parseModule');
-export const parseScriptWithLocation = generateInterfaceWithLocation('parseScript');
-export default parseScript;
-export { EarlyErrorChecker, GenericParser, ParserWithLocation };
-export { default as Tokenizer, TokenClass, TokenType } from './tokenizer';
+const parseScript = generateInterface('parseScript');
+const parseModule = generateInterface('parseModule');
+const parseModuleWithLocation = generateInterfaceWithLocation('parseModule');
+const parseScriptWithLocation = generateInterfaceWithLocation('parseScript');
+
+module.exports = {
+  default: parseScript,
+  parseScript,
+  parseModule,
+  parseModuleWithLocation,
+  parseScriptWithLocation,
+  EarlyErrorChecker,
+  GenericParser,
+  ParserWithLocation,
+  Tokenizer,
+  TokenClass,
+  TokenType,
+};

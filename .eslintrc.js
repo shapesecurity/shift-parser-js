@@ -2,10 +2,9 @@ module.exports = {
   extends: 'eslint:recommended',
   env: {
     es6: true,
-    node: false,
+    node: true,
     browser: false,
   },
-  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module',

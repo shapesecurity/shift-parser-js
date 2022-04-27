@@ -729,7 +729,7 @@ suite('async', () => {
           arguments: [],
         },
         elements: [{ type: 'TemplateElement', rawValue: '' }],
-      },
+      }
     );
 
     testParse('async ((a))', expr,
@@ -861,7 +861,7 @@ suite('async', () => {
         directives: [],
         statements: [],
       },
-    },
+    }
   );
 
   testParse('(async function* (){})', stmt,
@@ -883,7 +883,7 @@ suite('async', () => {
           statements: [],
         },
       },
-    },
+    }
   );
 
   suite('failures', () => {

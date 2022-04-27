@@ -1,0 +1,57 @@
+name: check
+
+on:
+  push:
+    branches:
+      - es2019
+  pull_request:
+
+jobs:
+  pre:
+    name: Prerequisites
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Enforce CLA signature
+        env:
+          COMMIT_RANGE: ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+        run: curl https://raw.githubusercontent.com/shapesecurity/CLA/HEAD/cla-check.sh | bash
+
+  check:
+    needs: pre
+    if: |
+      !cancelled() && !failure()
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [14, 16, 18]
+
+    name: Check - node ${{ matrix.node }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint -- --quiet
+
+      - name: Test
+        run: npm test

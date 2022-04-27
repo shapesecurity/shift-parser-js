@@ -15,10 +15,10 @@
  */
 
 
-import { getHexValue, isLineTerminator, isWhiteSpace, isIdentifierStart, isIdentifierPart, isDecimalDigit } from './utils';
-import { ErrorMessages } from './errors';
+const { getHexValue, isLineTerminator, isWhiteSpace, isIdentifierStart, isIdentifierPart, isDecimalDigit } = require('./utils');
+const { ErrorMessages } = require('./errors');
 
-export const TokenClass = {
+const TokenClass = {
   Eof: { name: '<End>' },
   Ident: { name: 'Identifier', isIdentifierName: true },
   Keyword: { name: 'Keyword', isIdentifierName: true },
@@ -30,7 +30,7 @@ export const TokenClass = {
   Illegal: { name: 'Illegal' },
 };
 
-export const TokenType = {
+const TokenType = {
   EOS: { klass: TokenClass.Eof, name: 'EOS' },
   LPAREN: { klass: TokenClass.Punctuator, name: '(' },
   RPAREN: { klass: TokenClass.Punctuator, name: ')' },
@@ -153,7 +153,7 @@ const PUNCTUATOR_START = [
   F, F, F, F, F, F, T, T, T, T, F,
 ];
 
-export class JsError extends Error {
+class JsError extends Error {
   constructor(index, line, column, msg) {
     super(msg);
     this.index = index;
@@ -181,7 +181,7 @@ function decodeUtf16(lead, trail) {
   return (lead - 0xD800) * 0x400 + (trail - 0xDC00) + 0x10000;
 }
 
-export default class Tokenizer {
+class Tokenizer {
   constructor(source) {
     this.source = source;
     this.index = 0;
@@ -1503,3 +1503,11 @@ export default class Tokenizer {
     return prevToken;
   }
 }
+
+module.exports = {
+  default: Tokenizer,
+  Tokenizer,
+  TokenClass,
+  TokenType,
+  JsError,
+};

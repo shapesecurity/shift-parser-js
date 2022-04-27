@@ -17,7 +17,7 @@
 let testParse = require('../assertions').testParse;
 let testParseFailure = require('../assertions').testParseFailure;
 let stmt = require('../helpers').stmt;
-let ErrorMessages = require('../../dist/errors.js').ErrorMessages;
+let ErrorMessages = require('../../src/errors.js').ErrorMessages;
 
 function id(x) {
   return x;

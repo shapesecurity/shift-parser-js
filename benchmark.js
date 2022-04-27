@@ -64,4 +64,4 @@ function benchmarkParsing(fileName) {
 
 benchmarkParsing("angular/angular");
 benchmarkParsing("esprima/dist/esprima");
-benchmarkParsing("./dist/parser");
+benchmarkParsing("./src/parser");

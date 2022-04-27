@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { whitespaceArray, whitespaceBool, idStartLargeRegex, idStartBool, idContinueLargeRegex, idContinueBool } from './unicode';
+const { whitespaceArray, whitespaceBool, idStartLargeRegex, idStartBool, idContinueLargeRegex, idContinueBool } = require('./unicode');
 
 
 const strictReservedWords = [
@@ -67,31 +67,31 @@ const strictReservedWords = [
   'instanceof',
 ];
 
-export function isStrictModeReservedWord(id) {
+exports.isStrictModeReservedWord = id => {
   return strictReservedWords.indexOf(id) !== -1;
-}
+};
 
-export function isWhiteSpace(ch) {
+exports.isWhiteSpace = ch => {
   return ch < 128 ? whitespaceBool[ch] : ch === 0xA0 || ch > 0x167F && whitespaceArray.indexOf(ch) !== -1;
-}
+};
 
-export function isLineTerminator(ch) {
+exports.isLineTerminator = ch => {
   return ch === 0x0A || ch === 0x0D || ch === 0x2028 || ch === 0x2029;
-}
+};
 
-export function isIdentifierStart(ch) {
+exports.isIdentifierStart = ch => {
   return ch < 128 ? idStartBool[ch] : idStartLargeRegex.test(String.fromCodePoint(ch));
-}
+};
 
-export function isIdentifierPart(ch) {
+exports.isIdentifierPart = ch => {
   return ch < 128 ? idContinueBool[ch] : idContinueLargeRegex.test(String.fromCodePoint(ch));
-}
+};
 
-export function isDecimalDigit(ch) {
+exports.isDecimalDigit = ch => {
   return ch >= 48 && ch <= 57;
-}
+};
 
-export function getHexValue(rune) {
+exports.getHexValue = rune => {
   if (rune >= '0' && rune <= '9') {
     return rune.charCodeAt(0) - 48;
   }
@@ -102,4 +102,4 @@ export function getHexValue(rune) {
     return rune.charCodeAt(0) - 55;
   }
   return -1;
-}
+};

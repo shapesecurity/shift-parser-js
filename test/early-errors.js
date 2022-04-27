@@ -21,7 +21,7 @@ let testParseFailure = require('./assertions').testParseFailure;
 let testParseSuccess = require('./assertions').testParseSuccess;
 let testEarlyError = require('./assertions').testEarlyError;
 let testModuleEarlyError = require('./assertions').testModuleEarlyError;
-let ErrorMessages = require('../dist/errors.js').ErrorMessages;
+let ErrorMessages = require('../src/errors.js').ErrorMessages;
 
 suite('Parser', () => {
   suite('positive', () => {
